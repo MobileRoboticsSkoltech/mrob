@@ -1,0 +1,2 @@
+ADD_EXECUTABLE(example_SE3  example_SE3.cpp)
+TARGET_LINK_LIBRARIES(example_SE3 SE3)

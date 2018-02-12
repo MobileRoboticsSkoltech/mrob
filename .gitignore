@@ -1,0 +1,15 @@
+*~
+\#*\#
+.\#*
+*.swp
+*.swo
+[#]*[#]
+.#*
+*.sublime-project
+*.sublime-workspace
+*.cproject
+*.project
+.settings/
+build/
+lib/
+bin/
