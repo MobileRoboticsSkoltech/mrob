@@ -2,12 +2,14 @@
 
 # extra source files
 SET(sources
-    .cpp
+    NLOpt.cpp
 )
 
 # extra header files
 SET(headers
-    .hpp
+    node.hpp
+    factor.hpp
+    NLOpt.hpp
 )
 
 # create the shared library
