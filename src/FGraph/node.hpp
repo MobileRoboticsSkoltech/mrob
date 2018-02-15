@@ -12,7 +12,20 @@
 #ifndef NODE_HPP_
 #define NODE_HPP_
 
+namespace fgraph{
 
+class Node{
+  public:
+    Node();
+    virtual ~Node() = 0;
+    virtual void update() = 0;
+    virtual void evaluate() = 0;
+    virtual void evaluateJacobians() = 0;
+  protected:
+    double X;
+};
+
+}
 
 
 
