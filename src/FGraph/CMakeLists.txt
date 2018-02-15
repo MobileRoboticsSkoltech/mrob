@@ -2,19 +2,19 @@
 
 # extra source files
 SET(sources
-    NLOpt.cpp
+    FGraph.cpp
 )
 
 # extra header files
 SET(headers
     node.hpp
     factor.hpp
-    NLOpt.hpp
+    FGraph.hpp
 )
 
 # create the shared library
-ADD_LIBRARY(NLOpt SHARED  ${sources})
-#TARGET_LINK_LIBRARIES(NLopt )
+ADD_LIBRARY(FGraph SHARED  ${sources})
+#TARGET_LINK_LIBRARIES(FGraph )
 
 
 #install 

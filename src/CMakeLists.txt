@@ -11,11 +11,11 @@ INCLUDE_DIRECTORIES(${Eigen_INCLUDE_DIRS})
 
 #Adding directories and source modules
 INCLUDE_DIRECTORIES(./SE3)
-INCLUDE_DIRECTORIES(./NLOpt)
+INCLUDE_DIRECTORIES(./FGraph)
 INCLUDE_DIRECTORIES(./align_mth)
 
 # Adding source modules rules to the Cmake tree
 ADD_SUBDIRECTORY(SE3)
-ADD_SUBDIRECTORY(NLOpt)
+ADD_SUBDIRECTORY(FGraph)
 ADD_SUBDIRECTORY(align_mth)
 

@@ -1,7 +1,7 @@
 /* $COPYRIGHT_SKOLTECH
  * $LICENSE_LGPL
  *
- * NLOpt.cpp
+ * FGraph.cpp
  *
  *  Created on: Feb 12, 2018
  *      Author: Gonzalo Ferrer
@@ -10,5 +10,5 @@
  */
 
 
-
+#include "FGraph.hpp"
 
