@@ -13,12 +13,12 @@ Coding conventions are necessary to maintain homogeneity and readability across 
 * Variables are in lower camel-case. Member variables have an underscore appended. For example `odometryObs`, `localNodes_`.
 * Constants and enumerations are in uppercase. For example M_PI.
 * Class definitions proceed in the following order:
-⋅⋅* public constructors and the destructor
-⋅⋅* public virtual functions
-⋅⋅* public non-virtual member functions
-⋅⋅* public static functions
-⋅⋅* public member variables
-⋅⋅* public static variables
-⋅⋅* repeat all of the above in order for protected definitions, and finally private
+··* public constructors and the destructor
+··* public virtual functions
+··* public non-virtual member functions
+··* public static functions
+··* public member variables
+··* public static variables
+··* repeat all of the above in order for protected definitions, and finally private
 * Header files are commented using one-line comments beginning with ///*/* to mark them, comments are important.
 
