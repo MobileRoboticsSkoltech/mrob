@@ -21,5 +21,5 @@ Coding conventions are necessary to maintain homogeneity and readability across 
   - public member variables
   - public static variables
   - repeat all of the above in order for protected definitions, and finally private
-* Header files are commented using one-line comments beginning with ///*/* to mark them, comments are important.
+* Header files are commented using one-line comments beginning with / &ast &ast to mark them, comments are important.
 

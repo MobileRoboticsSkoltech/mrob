@@ -9,7 +9,9 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#include "FGraphOpt.hpp"
+#include "FGraph.hpp"
+
+using namespace skmr;
 
 int main()
 {

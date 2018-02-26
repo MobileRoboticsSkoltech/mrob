@@ -15,7 +15,7 @@
 #include "node.hpp"
 #include "factor.hpp"
 
-namespace fgraph{
+namespace skmr{
 /**
  * This class provides the general structure for encoding Factor Graphs and
  * implementing the inference solution to the joint probability P(x,u,z).
@@ -36,7 +36,7 @@ public:
     FGraph();
     ~FGraph();
 protected:
-    std::vector<*Node> nodes;
+    //std::vector<skmr::Node*> nodes_;
 };
 
 

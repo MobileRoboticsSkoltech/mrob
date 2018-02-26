@@ -12,17 +12,19 @@
 #ifndef NODE_HPP_
 #define NODE_HPP_
 
-namespace fgraph{
+#include "factor.hpp"
+#include "Eigen/Dense"
+
+namespace skmr{
 
 class Node{
   public:
     Node();
     virtual ~Node() = 0;
-    virtual void update() = 0;
-    virtual void evaluate() = 0;
-    virtual void evaluateJacobians() = 0;
+    virtual void update(const Eigen::MatrixXd &dx) = 0;
   protected:
-    double X;
+    Eigen::MatrixXd x_;
+    std::vector<skmr::Factor*> factors_;
 };
 
 }
