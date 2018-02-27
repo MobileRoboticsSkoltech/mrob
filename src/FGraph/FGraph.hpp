@@ -12,13 +12,15 @@
 #ifndef FGRAPH_HPP_
 #define FGRAPH_HPP_
 
+#include <unordered_map>
+#include <deque>
 #include "node.hpp"
 #include "factor.hpp"
 
 namespace skmr{
 /**
  * This class provides the general structure for encoding Factor Graphs and
- * implementing the inference solution to the joint probability P(x,u,z).
+ * to support the implementation of the inference solution to the joint probability P(x,u,z).
  * The solution to this joint probability is equivalent to a Nonlinear Least Squares (NLS) problem.
  *
  * Factor Graphs are bipartite graphs, meaning that we express the relations from a set of vertices "nodes"
@@ -26,17 +28,29 @@ namespace skmr{
  * of the nodes variables due to observations.
  * Bipartite is in the sense that edges of the graph are always from nodes to factors or vice versa.
  *
- * We require two abstract classes for doing that,
- *  - Class Node
- *  - Class Factor
+ * We require two abstract classes,
+ *  - Class Node: deque for fast iteration over uncertain sequence of elements.
+ *  - Class Factor:  contained on a map whose key is its Id.
+ *
+ * Both data containers are stored in maps whose key is their Ids. By doing this, we can iterate and quickly find elements
+ * in both data containers.
+ *
+ * Each problem instantaition should implement methods for solving the graph and storing the
+ * necessary data
  */
 
 class FGraph{
 public:
     FGraph();
-    ~FGraph();
+    virtual ~FGraph();
+    virtual void solve() = 0;
+
+    void addFactor(std::shared_ptr<Factor> &factor);
+    void addNode(std::shared_ptr<Node> &node);
 protected:
-    //std::vector<skmr::Node*> nodes_;
+    // we use a deque to avoid memory reallocation on growing number of nodes.
+    std::deque<std::shared_ptr<Node> > nodes_;
+    std::unordered_map<unsigned int, std::shared_ptr<Factor> > factors_;//maybe an overkill?
 };
 
 

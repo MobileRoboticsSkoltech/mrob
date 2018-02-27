@@ -2,6 +2,8 @@
 
 # extra source files
 SET(sources
+    node.cpp
+    factor.cpp
     FGraph.cpp
 )
 
@@ -10,6 +12,7 @@ SET(headers
     node.hpp
     factor.hpp
     FGraph.hpp
+    SolverDenseGaussNewton.hpp
 )
 
 # create the shared library

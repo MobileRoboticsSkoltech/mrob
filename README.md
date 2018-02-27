@@ -1,8 +1,8 @@
 # skmr
-The Soltech Mobile Robotics library includes a core set of functionalities required for a unified framework in robotics. In addition, some of the research topics of our lab and their implemented algorithms is present in the current library, being a self-contained library for almost any robotics topic.
+The Skoltech Mobile Robotics library (skmr) is our common framework for implementing our robotics research and projects. It includes a core set of functionalities including perception, path planning and optimization. The present library is meant to be a self-contained library.
 
 ## Dependencies
-Eigen
+Eigen, C++'11
 
 ## Coding conventions
 Coding conventions are necessary to maintain homogeneity and readability across all the project. Here are some conventions that we _should_ follow:

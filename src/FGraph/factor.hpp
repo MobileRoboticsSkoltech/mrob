@@ -12,20 +12,32 @@
 #ifndef FACTOR_HPP_
 #define FACTOR_HPP_
 
-#include "node.hpp"
 #include "Eigen/Dense"
+#include <vector>
+#include "node.hpp"
 
 namespace skmr{
 
+/**
+ * Factor class is a base pure abstract class to contain factors, the second type of vertexes
+ * on factor graphs (bipartite).
+ * Factors enconde their Ids and all the neighbour nodes they are connected to.
+ */
+
 class Factor{
 public:
-    Factor();
-    virtual ~Factor() = 0;
-    virtual void evaluate(void) = 0;
-    virtual void evaluateJacobians(void) = 0;
+    Factor(int id, int potNumberNodes = 5);
+    virtual ~Factor();
+    virtual int getDim(void) const = 0;
+
+    int getId(void) const {return id_;};
+    void addNeighbourNodes(std::shared_ptr<Node> &node);
+    void rmNeighbourNodes(std::shared_ptr<Node> &node);
+    const std::vector<std::shared_ptr<Node> >*
+            getNeighbourFactors(void) const {return &neighbourNodes_;};
 protected:
-    Eigen::VectorXd obs_; //will this caouse any problem?
-    //std::vector<skmr::Node*> nodes_;
+    int id_;
+    std::vector<std::shared_ptr<Node> > neighbourNodes_;
 };
 
 }
