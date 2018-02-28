@@ -21,22 +21,25 @@ namespace skmr{
 /**
  * Factor class is a base pure abstract class to contain factors, the second type of vertexes
  * on factor graphs (bipartite).
- * Factors enconde their Ids and all the neighbour nodes they are connected to.
+ * Factors encode their Ids and all the neighbour nodes they are connected to.
  */
 
 class Factor{
 public:
-    Factor(int id, int potNumberNodes = 5);
+    Factor(unsigned int id, unsigned int potNumberNodes = 5);
     virtual ~Factor();
     virtual int getDim(void) const = 0;
 
-    int getId(void) const {return id_;};
-    void addNeighbourNodes(std::shared_ptr<Node> &node);
-    void rmNeighbourNodes(std::shared_ptr<Node> &node);
+    unsigned int getId(void) const {return id_;};
+    /**
+     * Adds a node to the connected nodes in this factor (usually 2)
+     */
+    void addNode(std::shared_ptr<Node> &node);
+    void rmNode(std::shared_ptr<Node> &node);
     const std::vector<std::shared_ptr<Node> >*
             getNeighbourFactors(void) const {return &neighbourNodes_;};
 protected:
-    int id_;
+    unsigned int id_;
     std::vector<std::shared_ptr<Node> > neighbourNodes_;
 };
 

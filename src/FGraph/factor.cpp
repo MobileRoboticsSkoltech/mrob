@@ -15,7 +15,7 @@
 
 using namespace skmr;
 
-Factor::Factor(int id, int potNumberNodes) : id_(id)
+Factor::Factor(unsigned int id, unsigned int potNumberNodes) : id_(id)
 {
     neighbourNodes_.reserve( potNumberNodes );
 }
@@ -24,15 +24,16 @@ Factor::~Factor()
 {
     neighbourNodes_.clear();
 }
-void Factor::addNeighbourNodes(std::shared_ptr<Node> &node)
+void Factor::addNode(std::shared_ptr<Node> &node)
 {
     neighbourNodes_.push_back(node);
 }
 
-void Factor::rmNeighbourNodes(std::shared_ptr<Node> &node)
+void Factor::rmNode(std::shared_ptr<Node> &node)
 {
     // TODO programm me please
     assert(0 && "Factor::rmNeighbourNode: Not implemented yet");
+    // exhaustive line search over the vector, this SHOULD be small, right?
 }
 
 

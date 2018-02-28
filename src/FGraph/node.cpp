@@ -14,7 +14,7 @@
 
 using namespace skmr;
 
-Node::Node(int id, int potNumberFactors) : id_(id)
+Node::Node(unsigned int id, unsigned int potNumberFactors) : id_(id)
 {
     neighbourFactors_.reserve( potNumberFactors );
 }
@@ -23,12 +23,12 @@ Node::~Node()
 {
     neighbourFactors_.clear();
 }
-void Node::addNeighbourFactors(std::shared_ptr<Factor> &factor)
+void Node::addFactor(std::shared_ptr<Factor> &factor)
 {
     neighbourFactors_.push_back(factor);
 }
 
-void Node::rmNeighbourFactors(std::shared_ptr<Factor> &factor)
+void Node::rmFactor(std::shared_ptr<Factor> &factor)
 {
     // TODO programm me please
     assert(0 && "Node::rmNeighbourFactors: Not implemented yet");

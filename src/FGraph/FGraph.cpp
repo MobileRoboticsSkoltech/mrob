@@ -16,9 +16,12 @@
 using namespace skmr;
 
 
-FGraph::FGraph()
+FGraph::FGraph(unsigned int potNumberNodes, unsigned int potNumberFactors) :
+        factorCount_(0), nodeCount_(0)
 {
-    factors_.reserve(512);
+    //max_load is 1, so it rehashes and augment the #bucklets in the same amount
+    factors_.reserve(potNumberFactors);
+    nodes_.reserve(potNumberNodes);
 }
 FGraph::~FGraph()
 {
@@ -26,11 +29,13 @@ FGraph::~FGraph()
     factors_.clear();
 }
 
-void FGraph::addFactor(std::shared_ptr<Factor> &factor)
+bool FGraph::addFactor(std::shared_ptr<Factor> &factor)
 {
-    factors_.emplace(factor->getId(), factor);
+    auto res = factors_.emplace(factor->getId(), factor);
+    return res.second;
 }
-void FGraph::addNode(std::shared_ptr<Node> &node)
+bool FGraph::addNode(std::shared_ptr<Node> &node)
 {
-    nodes_.push_back(node);
+    auto res = nodes_.emplace(node->getId(), node);
+    return res.second;
 }

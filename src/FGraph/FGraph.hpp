@@ -29,28 +29,38 @@ namespace skmr{
  * Bipartite is in the sense that edges of the graph are always from nodes to factors or vice versa.
  *
  * We require two abstract classes,
- *  - Class Node: deque for fast iteration over uncertain sequence of elements.
- *  - Class Factor:  contained on a map whose key is its Id.
+ *  - Class Node
+ *  - Class Factor
  *
- * Both data containers are stored in maps whose key is their Ids. By doing this, we can iterate and quickly find elements
- * in both data containers.
+ * Both data containers are stored in unordered maps whose key is their Ids. By doing this, we can
+ * iterate and quickly find elements in both data containers.
  *
  * Each problem instantaition should implement methods for solving the graph and storing the
- * necessary data
+ * necessary data, such as information matrix, factorizations, etc.
  */
 
 class FGraph{
 public:
-    FGraph();
+    FGraph(unsigned int potNumberNodes = 512, unsigned int potNumberFactors = 512);
     virtual ~FGraph();
-    virtual void solve() = 0;
-
-    void addFactor(std::shared_ptr<Factor> &factor);
-    void addNode(std::shared_ptr<Node> &node);
+    //virtual void solve() = 0;//TODO should we remove this?
+    /**
+     * Adds a factor, with already a unique id if returned true.
+     * otherwise (false) it failed to add the new element, not unique key
+     */
+    bool addFactor(std::shared_ptr<Factor> &factor);
+    /**
+      * Adds a noder, with already a unique id if returned true.
+      * otherwise (false) it failed to add the new element, not unique key
+      */
+    bool addNode(std::shared_ptr<Node> &node);
+    unsigned int getFactorCount() const {return factorCount_;};
+    unsigned int getNodeCount() const {return nodeCount_;};
 protected:
-    // we use a deque to avoid memory reallocation on growing number of nodes.
-    std::deque<std::shared_ptr<Node> > nodes_;
-    std::unordered_map<unsigned int, std::shared_ptr<Factor> > factors_;//maybe an overkill?
+    //XXX maybe unordered sets might work too... do we REALLY need Ids?
+    std::unordered_map<unsigned int, std::shared_ptr<Node> >   nodes_;
+    std::unordered_map<unsigned int, std::shared_ptr<Factor> > factors_;
+    unsigned int factorCount_, nodeCount_;
 };
 
 

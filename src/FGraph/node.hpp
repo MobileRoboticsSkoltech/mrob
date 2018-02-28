@@ -32,16 +32,19 @@ class Factor;
 
 class Node{
   public:
-    Node(int id, int potNumberFactors = 5);
+    Node(unsigned int id, unsigned int potNumberFactors = 5);
     virtual ~Node();
     virtual int getDim(void) const = 0; //This will depend on the derived node
-    int getId(void) const {return id_;};
-    void addNeighbourFactors(std::shared_ptr<Factor> &factor);
-    void rmNeighbourFactors(std::shared_ptr<Factor> &factor);
+    unsigned int getId(void) const {return id_;};
+    /**
+     * Adds a factor to the connected factors in this node)
+     */
+    void addFactor(std::shared_ptr<Factor> &factor);
+    void rmFactor(std::shared_ptr<Factor> &factor);
     const std::vector<std::shared_ptr<Factor> >*
             getNeighbourFactors(void) const {return &neighbourFactors_;};
   protected:
-    int id_;
+    unsigned int id_;
     std::vector<std::shared_ptr<Factor> > neighbourFactors_;
 };
 

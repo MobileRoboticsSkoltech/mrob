@@ -1,18 +1,22 @@
 # locate the necessary dependencies, if any
 
-# extra source files
-SET(sources
-    node.cpp
-    factor.cpp
-    FGraph.cpp
-)
-
 # extra header files
 SET(headers
     node.hpp
     factor.hpp
     FGraph.hpp
+    nodePose3d.hpp
+    factor2Poses3d.hpp
     SolverDenseGaussNewton.hpp
+)
+
+# extra source files
+SET(sources
+    node.cpp
+    factor.cpp
+    FGraph.cpp
+    nodePose3d.cpp
+    factor2Poses3d.cpp
 )
 
 # create the shared library
@@ -36,4 +40,4 @@ ADD_LIBRARY(FGraph SHARED  ${sources})
 
 
 ADD_SUBDIRECTORY(examples)
-#ADD_SUBDIRECTORY(test)
+ADD_SUBDIRECTORY(tests)
