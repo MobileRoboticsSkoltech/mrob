@@ -26,11 +26,11 @@ namespace fg{
 
 class Factor{
 public:
-    Factor(unsigned int id, unsigned int potNumberNodes = 5);
+    Factor(unsign_t id, unsign_t potNumberNodes = 5);
     virtual ~Factor();
     virtual int getDim(void) const = 0;
 
-    unsigned int getId(void) const {return id_;};
+    unsign_t getId(void) const {return id_;};
     /**
      * Adds a node to the connected nodes in this factor (usually 2)
      */
@@ -39,7 +39,7 @@ public:
     const std::vector<std::shared_ptr<Node> >*
             getNeighbourFactors(void) const {return &neighbourNodes_;};
 protected:
-    unsigned int id_;
+    unsign_t id_;
     std::vector<std::shared_ptr<Node> > neighbourNodes_;
 };
 

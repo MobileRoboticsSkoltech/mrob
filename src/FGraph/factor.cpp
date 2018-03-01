@@ -15,13 +15,14 @@
 
 using namespace fg;
 
-Factor::Factor(unsigned int id, unsigned int potNumberNodes) : id_(id)
+Factor::Factor(unsign_t id, unsign_t potNumberNodes) : id_(id)
 {
     neighbourNodes_.reserve( potNumberNodes );
 }
 
 Factor::~Factor()
 {
+    std::cout << "deleting factor" << std::endl;
     neighbourNodes_.clear();
 }
 void Factor::addNode(std::shared_ptr<Node> &node)
@@ -31,9 +32,14 @@ void Factor::addNode(std::shared_ptr<Node> &node)
 
 void Factor::rmNode(std::shared_ptr<Node> &node)
 {
-    // TODO programm me please
-    assert(0 && "Factor::rmNeighbourNode: Not implemented yet");
     // exhaustive line search over the vector, this SHOULD be small, right?
+    std::vector<std::shared_ptr<Node> >::iterator n;
+    for (n = neighbourNodes_.begin(); n != neighbourNodes_.end(); ++n)
+    {
+        if (*n == node)
+            break;
+    }
+    neighbourNodes_.erase(n);
 }
 
 

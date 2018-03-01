@@ -25,7 +25,7 @@ class NodePose3d : public Node
     /**
      * For initialization, requires an initial estimation of the state.
      */
-    NodePose3d(int id, const Mat61 &initial_x);
+    NodePose3d(unsign_t id, const Mat61 &initial_x);
     virtual ~NodePose3d();
     virtual int getDim() const {return dim_;};
     /**

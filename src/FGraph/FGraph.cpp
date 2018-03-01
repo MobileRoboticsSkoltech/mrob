@@ -16,7 +16,7 @@
 using namespace fg;
 
 
-FGraph::FGraph(unsigned int potNumberNodes, unsigned int potNumberFactors) :
+FGraph::FGraph(unsign_t potNumberNodes, unsign_t potNumberFactors) :
         factorCount_(0), nodeCount_(0)
 {
     //max_load is 1, so it rehashes and augment the #bucklets in the same amount
@@ -38,4 +38,14 @@ bool FGraph::addNode(std::shared_ptr<Node> &node)
 {
     auto res = nodes_.emplace(node->getId(), node);
     return res.second;
+}
+void FGraph::connectNodeFactor(std::shared_ptr<Node> &node, std::shared_ptr<Factor> &factor)
+{
+    node->addFactor(factor);
+    factor->addNode(node);
+}
+void FGraph::disconnectNodeFactor(std::shared_ptr<Node> &node, std::shared_ptr<Factor> &factor)
+{
+    node->rmFactor(factor);
+    factor->rmNode(node);
 }

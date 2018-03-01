@@ -10,7 +10,11 @@
 
 #include <Eigen/Dense>
 
+
+// data types conventions
 typedef double matData_t;
+typedef unsigned int unsign_t;
+
 
 // Definition of squared matrices
 typedef Eigen::Matrix<matData_t, 2,2> Mat2;

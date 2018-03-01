@@ -16,6 +16,7 @@
 #include <memory>
 #include "Eigen/Dense"
 #include "matrixBase.hpp"
+#include <iostream>
 
 namespace fg{
 
@@ -32,19 +33,19 @@ class Factor;
 
 class Node{
   public:
-    Node(unsigned int id, unsigned int potNumberFactors = 5);
+    Node(unsign_t id, unsign_t potNumberFactors = 5);
     virtual ~Node();
     virtual int getDim(void) const = 0; //This will depend on the derived node
-    unsigned int getId(void) const {return id_;};
+    unsign_t getId(void) const {return id_;};
     /**
-     * Adds a factor to the connected factors in this node)
+     * Adds a factor to the list of factors connected to this node.
      */
     void addFactor(std::shared_ptr<Factor> &factor);
     void rmFactor(std::shared_ptr<Factor> &factor);
     const std::vector<std::shared_ptr<Factor> >*
             getNeighbourFactors(void) const {return &neighbourFactors_;};
   protected:
-    unsigned int id_;
+    unsign_t id_;
     std::vector<std::shared_ptr<Factor> > neighbourFactors_;
 };
 

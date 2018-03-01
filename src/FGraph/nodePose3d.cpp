@@ -13,14 +13,14 @@
 
 using namespace fg;
 
-NodePose3d::NodePose3d(int id, const Mat61 &initial_x) :
+NodePose3d::NodePose3d(unsign_t id, const Mat61 &initial_x) :
         Node(id), dim_(6), x_(initial_x), Tx_(initial_x)
 {
 }
 
 NodePose3d::~NodePose3d()
 {
-
+    std::cout << "deleting Node Pose 3d" << std::endl;
 }
 
 void NodePose3d::update(const Mat61 &dx)

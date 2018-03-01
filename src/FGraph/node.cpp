@@ -21,6 +21,7 @@ Node::Node(unsigned int id, unsigned int potNumberFactors) : id_(id)
 
 Node::~Node()
 {
+    std::cout << "deleting node" << std::endl;
     neighbourFactors_.clear();
 }
 void Node::addFactor(std::shared_ptr<Factor> &factor)

@@ -41,26 +41,40 @@ namespace fg{
 
 class FGraph{
 public:
-    FGraph(unsigned int potNumberNodes = 512, unsigned int potNumberFactors = 512);
+    FGraph(unsign_t potNumberNodes = 512, unsign_t potNumberFactors = 512);
     virtual ~FGraph();
     //virtual void solve() = 0;//TODO should we remove this?
     /**
      * Adds a factor, with already a unique id if returned true.
-     * otherwise (false) it failed to add the new element, not unique key
+     * otherwise (false) it failed to add the new element, not unique key.
+     * Note that the neighbbouring nodes of the factor should be already
+     * specified when creating the node.
      */
     bool addFactor(std::shared_ptr<Factor> &factor);
     /**
-      * Adds a noder, with already a unique id if returned true.
+      * Adds a node, with already a unique id if returned true.
       * otherwise (false) it failed to add the new element, not unique key
+      * The neighbouring factors of the node should be already specified when
+      * creating the node.
       */
     bool addNode(std::shared_ptr<Node> &node);
-    unsigned int getFactorCount() const {return factorCount_;};
-    unsigned int getNodeCount() const {return nodeCount_;};
+    /**
+     * Connects a node and a factor by updating their internal list of neighbours
+     * with the new connection. It updates both the node and the factor
+     */
+    void connectNodeFactor(std::shared_ptr<Node> &node, std::shared_ptr<Factor> &factor);
+    /**
+     * Disconnect node-factor and vice versa
+     */
+    void disconnectNodeFactor(std::shared_ptr<Node> &node, std::shared_ptr<Factor> &factor);
+    unsign_t getFactorCount() const {return factorCount_;};
+    unsign_t getNodeCount() const {return nodeCount_;};
 protected:
-    //XXX maybe unordered sets might work too... do we REALLY need Ids?
-    std::unordered_map<unsigned int, std::shared_ptr<Node> >   nodes_;
-    std::unordered_map<unsigned int, std::shared_ptr<Factor> > factors_;
-    unsigned int factorCount_, nodeCount_;
+    //XXX maybe unordered sets might work too... do we REALLY need Ids? Nodes Yes; Factors Maybe...
+    std::unordered_map<unsign_t, std::shared_ptr<Node> >   nodes_;
+    std::unordered_map<unsign_t, std::shared_ptr<Factor> > factors_;
+    //std::unordered_set<std::shared_ptr<Factor> > factors_;
+    unsign_t factorCount_, nodeCount_;
 };
 
 
