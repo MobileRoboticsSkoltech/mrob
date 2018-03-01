@@ -9,13 +9,12 @@ SET(sources
 
 # extra header files
 SET(headers
-	matrix_base.hpp
 	SO3.hpp
 	SE3.hpp
 )
 
 # create the shared library
-ADD_LIBRARY(SE3 SHARED  ${sources}  )
+ADD_LIBRARY(SE3 SHARED  ${sources} )
 #TARGET_LINK_LIBRARIES( .. )
 #target_link_libraries(${PROJECT_NAME} ${position_3d_LIBRARY})
 

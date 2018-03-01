@@ -9,7 +9,7 @@
 #define SO3_HPP_
 
 
-#include "matrix_base.hpp"
+#include "matrixBase.hpp"
 
 
 

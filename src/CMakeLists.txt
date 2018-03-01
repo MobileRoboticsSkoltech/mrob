@@ -9,6 +9,12 @@ ELSE(Eigen_FOUND)
 ENDIF(Eigen_FOUND)
 INCLUDE_DIRECTORIES(${Eigen_INCLUDE_DIRS})
 
+# general includes for all the project
+INCLUDE_DIRECTORIES(.)
+SET(general_headers
+    matrixBase.hpp
+)
+
 #Adding directories and source modules
 INCLUDE_DIRECTORIES(./SE3)
 INCLUDE_DIRECTORIES(./FGraph)

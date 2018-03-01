@@ -15,7 +15,7 @@
 #include <vector>
 #include <memory>
 #include "Eigen/Dense"
-#include "FGraphConventions.hpp"
+#include "matrixBase.hpp"
 
 namespace skmr{
 
