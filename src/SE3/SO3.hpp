@@ -1,9 +1,14 @@
-/*
+/* $COPYRIGHT_SKOLTECH
+ * $LICENSE_LGPL
+ *
  * SO3.hpp
  *
- *  Created on: Jun 27, 2017
- *      Author: gonzalo
+ *  Created on: Feb 12, 2018
+ *      Author: Gonzalo Ferrer
+ *              g.ferrer@skoltech.ru
+ *              Mobile Robotics Lab, Skoltech
  */
+
 
 #ifndef SO3_HPP_
 #define SO3_HPP_

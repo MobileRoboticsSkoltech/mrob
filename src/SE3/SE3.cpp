@@ -1,8 +1,12 @@
-/*
+/* $COPYRIGHT_SKOLTECH
+ * $LICENSE_LGPL
+ *
  * SE3.cpp
  *
- *  Created on: Jun 21, 2017
- *      Author: gonzalo
+ *  Created on: Feb 12, 2018
+ *      Author: Gonzalo Ferrer
+ *              g.ferrer@skoltech.ru
+ *              Mobile Robotics Lab, Skoltech
  */
 
 #include "SE3.hpp"

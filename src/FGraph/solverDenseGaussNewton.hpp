@@ -13,7 +13,7 @@
 #define SOLVERDENSEGAUSSNEWTON_HPP_
 
 
-namespace skmr{
+namespace fg{
 
 /**
  * The SolverDenseGaussNewton class is meant for a reduced dimensionality

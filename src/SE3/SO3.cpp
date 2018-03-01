@@ -1,9 +1,14 @@
-/*
+/* $COPYRIGHT_SKOLTECH
+ * $LICENSE_LGPL
+ *
  * SO3.cpp
  *
- *  Created on: Jun 27, 2017
- *      Author: gonzalo
+ *  Created on: Feb 12, 2018
+ *      Author: Gonzalo Ferrer
+ *              g.ferrer@skoltech.ru
+ *              Mobile Robotics Lab, Skoltech
  */
+
 
 #include "SO3.hpp"
 #include <cmath>
@@ -14,20 +19,20 @@ using namespace lie;
 
 SO3::SO3(const Mat31 &w) : Mat3(Mat3::Identity())
 {
-    std::cout << "SO3 with Mat31" << std::endl;
+    //std::cout << "SO3 with Mat31" << std::endl;
     this->exp(this->hat(w));
 }
 template<typename OtherDerived>
 SO3::SO3(const Eigen::MatrixBase<OtherDerived>& other)  :
 Mat3(other)
 {
-    std::cout << "SO3 MAT3" << std::endl;
+    //std::cout << "SO3 MAT3" << std::endl;
 }
 
 template<typename OtherDerived>
 SO3& SO3::operator=(const Eigen::MatrixBase <OtherDerived>& other)
 {
-    std::cout << "SO3 operator equal" << std::endl;
+    //std::cout << "SO3 operator equal" << std::endl;
     this->Mat3::operator=(other);
     return *this;
 }

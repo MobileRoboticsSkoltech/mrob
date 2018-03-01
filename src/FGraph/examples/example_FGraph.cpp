@@ -11,7 +11,7 @@
 
 #include "FGraph.hpp"
 
-using namespace skmr;
+using namespace fg;
 
 int main()
 {

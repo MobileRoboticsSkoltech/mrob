@@ -11,15 +11,23 @@
 
 
 #include "FGraph.hpp"
+#include "nodePose3d.hpp"
+#include <iostream> //this causes a non-free allocation in valgrind, dont panic
 
-
-using namespace skmr;
+using namespace fg;
 
 int main()
 {
-    // create a simple FGraph teting the insertion and deletions of elements
-    // TODO memory leaks
+    // create a simple FGraph testing the insertion and deletions of elements
     FGraph fg(50,50);
+    Mat61 xIni;
+    xIni << 0,0,0,1,-3,2;
+    std::shared_ptr<Node> n(new NodePose3d(1,xIni));
+
+    //add nodes
+    fg.addNode(n);
+    std::shared_ptr<Node> n2(new NodePose3d(2,xIni));
+    fg.addNode(n2);
 
     return 1;
 }

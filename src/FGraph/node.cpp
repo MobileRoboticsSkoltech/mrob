@@ -12,7 +12,7 @@
 #include "node.hpp"
 #include <assert.h>
 
-using namespace skmr;
+using namespace fg;
 
 Node::Node(unsigned int id, unsigned int potNumberFactors) : id_(id)
 {

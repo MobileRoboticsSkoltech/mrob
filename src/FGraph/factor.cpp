@@ -13,7 +13,7 @@
 #include "factor.hpp"
 #include <assert.h>
 
-using namespace skmr;
+using namespace fg;
 
 Factor::Factor(unsigned int id, unsigned int potNumberNodes) : id_(id)
 {

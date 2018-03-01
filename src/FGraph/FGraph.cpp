@@ -13,7 +13,7 @@
 #include "FGraph.hpp"
 
 
-using namespace skmr;
+using namespace fg;
 
 
 FGraph::FGraph(unsigned int potNumberNodes, unsigned int potNumberFactors) :

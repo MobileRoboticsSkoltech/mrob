@@ -17,7 +17,7 @@
 #include "node.hpp"
 #include "factor.hpp"
 
-namespace skmr{
+namespace fg{
 /**
  * This class provides the general structure for encoding Factor Graphs and
  * to support the implementation of the inference solution to the joint probability P(x,u,z).

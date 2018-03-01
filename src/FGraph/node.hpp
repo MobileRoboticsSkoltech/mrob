@@ -17,7 +17,7 @@
 #include "Eigen/Dense"
 #include "matrixBase.hpp"
 
-namespace skmr{
+namespace fg{
 
 class Factor;
 

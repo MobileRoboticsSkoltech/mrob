@@ -11,12 +11,11 @@
 
 #include "nodePose3d.hpp"
 
-using namespace skmr;
+using namespace fg;
 
-NodePose3d::NodePose3d(int id, StateVect &initial_x) :
-        Node(id), dim_(6), x_(initial_x)
+NodePose3d::NodePose3d(int id, const Mat61 &initial_x) :
+        Node(id), dim_(6), x_(initial_x), Tx_(initial_x)
 {
-
 }
 
 NodePose3d::~NodePose3d()
@@ -24,8 +23,9 @@ NodePose3d::~NodePose3d()
 
 }
 
-void NodePose3d::update(StateVect &dx)
+void NodePose3d::update(const Mat61 &dx)
 {
-    //TODO this is not true for se(3)
-    x_.noalias() += dx;
+    // Tx and x are always sync, i.e., Tx = exp(x^)
+    Tx_.update(dx);
+    x_ = Tx_.ln_vee();
 }

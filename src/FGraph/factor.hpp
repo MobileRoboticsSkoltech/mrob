@@ -16,7 +16,7 @@
 #include <vector>
 #include "node.hpp"
 
-namespace skmr{
+namespace fg{
 
 /**
  * Factor class is a base pure abstract class to contain factors, the second type of vertexes
