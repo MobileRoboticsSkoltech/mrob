@@ -10,11 +10,12 @@
  */
 
 #include "nodePose3d.hpp"
+#include <iostream>
 
 using namespace fg;
 
-NodePose3d::NodePose3d(unsign_t id, const Mat61 &initial_x) :
-        Node(id), dim_(6), x_(initial_x), Tx_(initial_x)
+NodePose3d::NodePose3d(const Mat61 &initial_x) :
+        Node(), dim_(6), x_(initial_x), Tx_(initial_x)
 {
 }
 

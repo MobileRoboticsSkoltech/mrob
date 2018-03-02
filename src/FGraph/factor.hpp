@@ -19,27 +19,28 @@
 namespace fg{
 
 /**
- * Factor class is a base pure abstract class to contain factors, the second type of vertexes
- * on factor graphs (bipartite).
- * Factors encode their Ids and all the neighbour nodes they are connected to.
+ * Factor class is a base pure abstract class defining factors,
+ * the second type of vertexes on factor graphs (bipartite).
+ * Factors keep track of all their neighbour nodes they are connected to.
+ *
+ * Because the number of Nodes they point to is fixed, we only allow
+ * to indicate its node neighbours at the object declaration.
+ * On the abstract class constructor they are not indicated, but should
+ * be on any child class.
  */
 
 class Factor{
 public:
-    Factor(unsign_t id, unsign_t potNumberNodes = 5);
+    /**
+     * On the derived class constructor we will specify the (ordered)
+     * nodes that the factor is connected to.
+     */
+    Factor(uint_t potNumberNodes = 5);
     virtual ~Factor();
     virtual int getDim(void) const = 0;
-
-    unsign_t getId(void) const {return id_;};
-    /**
-     * Adds a node to the connected nodes in this factor (usually 2)
-     */
-    void addNode(std::shared_ptr<Node> &node);
-    void rmNode(std::shared_ptr<Node> &node);
     const std::vector<std::shared_ptr<Node> >*
             getNeighbourFactors(void) const {return &neighbourNodes_;};
 protected:
-    unsign_t id_;
     std::vector<std::shared_ptr<Node> > neighbourNodes_;
 };
 

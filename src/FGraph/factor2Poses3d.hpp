@@ -21,15 +21,26 @@
 
 namespace fg{
 
+/**
+ * The Factor2Poses3d is a vertex representing the distribution between
+ * two nodePose3d, that is, it is expressing a Rigid Body Transformation
+ * between two poses.
+ *
+ * The state is an observer RBT, and as we have commented, we need to specify
+ * the two Nodes that the factor is connecting, which are provided by their
+ * shared_ptr's which are at the same time their keys for storage on the FGraph
+ *
+ * In particular, the residual of this factor is: TODO better formulate
+ *   r = ln(T2) - ln(T1*Tobs) = ln(T1^-1*T2) - ln(Tobs)
+ */
+
 class Factor2Poses3d : public Factor
 {
   public:
-    /**
-     * For initialization, requires an initial estimation of the state.
-     */
-    Factor2Poses3d(unsign_t id, const Mat61 &observation, const Mat6 &obsCov);
-    virtual ~Factor2Poses3d();
-    virtual int getDim() const {return dim_;};
+    Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
+            std::shared_ptr<Node> &n2, const Mat6 &obsCov);
+    ~Factor2Poses3d();
+    int getDim() const {return dim_;};
     /**
      * Evaluates residuals and Jacobians
      */
@@ -39,7 +50,7 @@ class Factor2Poses3d : public Factor
      */
     void evaluateLazy();
     Mat61 getObs() const {return obs_;};
-    Mat6 getJacobian(unsign_t nodeId) const;
+    Mat6 getJacobian(std::shared_ptr<Node> &n) const;
     Mat6 getCovariance() const {return obsCov_;};
 
   protected:
@@ -47,9 +58,8 @@ class Factor2Poses3d : public Factor
     Mat61 obs_;
     lie::SE3 Tobs_;
     Mat6 obsCov_;
-    // This clearly does not scales well, but we should not expect facors greater than 3...
-    //std::unordered_map<unsign_t , std::shared_ptr<Mat6> > Jacobians_;
-    unsign_t id1_, id2_;
+    // The Jacobians' correspondant nodes are ordered on the vector<Node>
+    // being [0]->J1 and [1]->J2
     Mat6 J1_, J2_;
 
   public:

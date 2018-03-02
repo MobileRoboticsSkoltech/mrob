@@ -12,7 +12,7 @@
 #ifndef FGRAPH_HPP_
 #define FGRAPH_HPP_
 
-#include <unordered_map>
+#include <unordered_set>
 #include <deque>
 #include "node.hpp"
 #include "factor.hpp"
@@ -32,7 +32,7 @@ namespace fg{
  *  - Class Node
  *  - Class Factor
  *
- * Both data containers are stored in unordered maps whose key is their Ids. By doing this, we can
+ * Both data containers are stored in unordered sets whose key is their adresses. By doing this, we can
  * iterate and quickly find elements in both data containers.
  *
  * Each problem instantaition should implement methods for solving the graph and storing the
@@ -41,40 +41,38 @@ namespace fg{
 
 class FGraph{
 public:
-    FGraph(unsign_t potNumberNodes = 512, unsign_t potNumberFactors = 512);
+    FGraph(uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
     virtual ~FGraph();
-    //virtual void solve() = 0;//TODO should we remove this?
     /**
-     * Adds a factor, with already a unique id if returned true.
-     * otherwise (false) it failed to add the new element, not unique key.
-     * Note that the neighbbouring nodes of the factor should be already
-     * specified when creating the node.
+     * Adds a factor, if it is not already on the set.
+     * Note that the connecting nodes of the factor should be already
+     * specified when creating the factor.
+     * Modifications of the structure of the graph are allowed
+     * by removing the factor and adding the new updated one.
      */
     bool addFactor(std::shared_ptr<Factor> &factor);
     /**
-      * Adds a node, with already a unique id if returned true.
-      * otherwise (false) it failed to add the new element, not unique key
-      * The neighbouring factors of the node should be already specified when
-      * creating the node.
+      * Adds a node if it was not already on the set.
       */
     bool addNode(std::shared_ptr<Node> &node);
     /**
      * Connects a node and a factor by updating their internal list of neighbours
-     * with the new connection. It updates both the node and the factor
+     * with the new connection. It updates both the node and the factor.
+     * This connection is just an additional way of
      */
-    void connectNodeFactor(std::shared_ptr<Node> &node, std::shared_ptr<Factor> &factor);
+    void rmFactor(std::shared_ptr<Factor> &factor);
     /**
      * Disconnect node-factor and vice versa
      */
-    void disconnectNodeFactor(std::shared_ptr<Node> &node, std::shared_ptr<Factor> &factor);
-    unsign_t getFactorCount() const {return factorCount_;};
-    unsign_t getNodeCount() const {return nodeCount_;};
+    void rmNode(std::shared_ptr<Node> &node);
+    void printStatus() const;
+
+    //TODO
+    void saveGraph() const;
+    void loadGraph();
 protected:
-    //XXX maybe unordered sets might work too... do we REALLY need Ids? Nodes Yes; Factors Maybe...
-    std::unordered_map<unsign_t, std::shared_ptr<Node> >   nodes_;
-    std::unordered_map<unsign_t, std::shared_ptr<Factor> > factors_;
-    //std::unordered_set<std::shared_ptr<Factor> > factors_;
-    unsign_t factorCount_, nodeCount_;
+    std::unordered_set<std::shared_ptr<Node> >   nodes_;
+    std::unordered_set<std::shared_ptr<Factor> > factors_;
 };
 
 

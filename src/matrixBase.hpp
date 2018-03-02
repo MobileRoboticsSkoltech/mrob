@@ -13,7 +13,7 @@
 
 // data types conventions
 typedef double matData_t;
-typedef unsigned int unsign_t;
+typedef unsigned int uint_t;
 
 
 // Definition of squared matrices

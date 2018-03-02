@@ -16,7 +16,7 @@
 #include <memory>
 #include "Eigen/Dense"
 #include "matrixBase.hpp"
-#include <iostream>
+
 
 namespace fg{
 
@@ -27,25 +27,28 @@ class Factor;
  * abstract methods on get and set dimension
  * is just a reminder that this is an Abstract class
  *
+ * Node class keeps track of all the neighbouring factors.
  * Destructor takes care of the neighbour factors included.
  *
  */
 
 class Node{
   public:
-    Node(unsign_t id, unsign_t potNumberFactors = 5);
+    Node(uint_t potNumberFactors = 5);
     virtual ~Node();
     virtual int getDim(void) const = 0; //This will depend on the derived node
-    unsign_t getId(void) const {return id_;};
     /**
      * Adds a factor to the list of factors connected to this node.
      */
-    void addFactor(std::shared_ptr<Factor> &factor);
-    void rmFactor(std::shared_ptr<Factor> &factor);
+    virtual bool addFactor(std::shared_ptr<Factor> &factor);
+    /**
+     * This function is very inefficient: it is an exhaustive search
+     * so use only when necessary.
+     */
+    virtual bool rmFactor(std::shared_ptr<Factor> &factor);
     const std::vector<std::shared_ptr<Factor> >*
             getNeighbourFactors(void) const {return &neighbourFactors_;};
   protected:
-    unsign_t id_;
     std::vector<std::shared_ptr<Factor> > neighbourFactors_;
 };
 

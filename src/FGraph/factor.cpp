@@ -12,10 +12,11 @@
 
 #include "factor.hpp"
 #include <assert.h>
+#include <iostream>
 
 using namespace fg;
 
-Factor::Factor(unsign_t id, unsign_t potNumberNodes) : id_(id)
+Factor::Factor(uint_t potNumberNodes)
 {
     neighbourNodes_.reserve( potNumberNodes );
 }
@@ -25,21 +26,4 @@ Factor::~Factor()
     std::cout << "deleting factor" << std::endl;
     neighbourNodes_.clear();
 }
-void Factor::addNode(std::shared_ptr<Node> &node)
-{
-    neighbourNodes_.push_back(node);
-}
-
-void Factor::rmNode(std::shared_ptr<Node> &node)
-{
-    // exhaustive line search over the vector, this SHOULD be small, right?
-    std::vector<std::shared_ptr<Node> >::iterator n;
-    for (n = neighbourNodes_.begin(); n != neighbourNodes_.end(); ++n)
-    {
-        if (*n == node)
-            break;
-    }
-    neighbourNodes_.erase(n);
-}
-
 

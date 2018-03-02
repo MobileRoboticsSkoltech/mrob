@@ -11,10 +11,11 @@
 
 #include "node.hpp"
 #include <assert.h>
+#include <iostream>
 
 using namespace fg;
 
-Node::Node(unsigned int id, unsigned int potNumberFactors) : id_(id)
+Node::Node(uint_t potNumberFactors)
 {
     neighbourFactors_.reserve( potNumberFactors );
 }
@@ -24,13 +25,24 @@ Node::~Node()
     std::cout << "deleting node" << std::endl;
     neighbourFactors_.clear();
 }
-void Node::addFactor(std::shared_ptr<Factor> &factor)
+bool Node::addFactor(std::shared_ptr<Factor> &factor)
 {
     neighbourFactors_.push_back(factor);
+    return true;
 }
 
-void Node::rmFactor(std::shared_ptr<Factor> &factor)
+bool Node::rmFactor(std::shared_ptr<Factor> &factor)
 {
-    // TODO programm me please
-    assert(0 && "Node::rmNeighbourFactors: Not implemented yet");
+    // exhaustive line search over the vector, this SHOULD be small, right?
+    // still, it is very ineffcient O(n), but we have preferred using a vector
+    // over a set or a map because we are gonna iterate over this container,
+    // while it is not so clear that we would want to remove factors (although possible)
+    std::vector<std::shared_ptr<Factor> >::iterator f;
+    for (f = neighbourFactors_.begin(); f != neighbourFactors_.end(); ++f)
+    {
+        if (*f == factor)
+            break;
+    }
+    neighbourFactors_.erase(f);
+    return true;
 }
