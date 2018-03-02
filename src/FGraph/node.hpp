@@ -46,6 +46,8 @@ class Node{
      * so use only when necessary.
      */
     virtual bool rmFactor(std::shared_ptr<Factor> &factor);
+    virtual void print() const {};
+    void clear() {neighbourFactors_.clear();};
     const std::vector<std::shared_ptr<Factor> >*
             getNeighbourFactors(void) const {return &neighbourFactors_;};
   protected:

@@ -24,19 +24,20 @@ int main()
 
     //add nodes. In general Nodes just need their initial state.
     Mat61 xIni;
-    xIni << 0,0,0,1,-3,2;
+    xIni << 0,0.1,0,1,-3,2;
     std::shared_ptr<Node> n(new NodePose3d(xIni));
     fg.addNode(n);
     std::shared_ptr<Node> n2(new NodePose3d(xIni));
     fg.addNode(n2);
-    fg.printStatus();
 
     // add factors. We need to specify the node/nodes connecting the factor
     Mat6 obsCov = Mat6::Identity();
     std::shared_ptr<Factor> f(new Factor2Poses3d(xIni,n,n2,obsCov));
     fg.addFactor(f);
 
-    fg.printStatus();
+    fg.rmNode(n);
+    fg.rmFactor(f);
+    fg.printStatus(1);
 
     return 1;
 }

@@ -52,6 +52,7 @@ class Factor2Poses3d : public Factor
     Mat61 getObs() const {return obs_;};
     Mat6 getJacobian(std::shared_ptr<Node> &n) const;
     Mat6 getCovariance() const {return obsCov_;};
+    void print() const;
 
   protected:
     int dim_;//fixed to 6, a RBT

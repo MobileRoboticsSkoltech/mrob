@@ -30,3 +30,10 @@ void NodePose3d::update(const Mat61 &dx)
     Tx_.update(dx);
     x_ = Tx_.ln_vee();
 }
+void NodePose3d::print() const
+{
+    std::cout << "Printing Node Pose 3d, state = \n" <<
+            x_ << "\nrepresenting the transformation\n" <<
+            Tx_ << "\nand neighbour factors " <<
+            neighbourFactors_.size() << std::endl;
+}

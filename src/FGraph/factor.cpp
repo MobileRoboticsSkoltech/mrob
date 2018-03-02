@@ -12,7 +12,6 @@
 
 #include "factor.hpp"
 #include <assert.h>
-#include <iostream>
 
 using namespace fg;
 
@@ -23,7 +22,5 @@ Factor::Factor(uint_t potNumberNodes)
 
 Factor::~Factor()
 {
-    std::cout << "deleting factor" << std::endl;
     neighbourNodes_.clear();
 }
-

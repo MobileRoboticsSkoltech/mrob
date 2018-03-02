@@ -47,6 +47,10 @@ public:
      * Adds a factor, if it is not already on the set.
      * Note that the connecting nodes of the factor should be already
      * specified when creating the factor.
+     *
+     * This function includes the factor into its connected
+     * nodes.
+     *
      * Modifications of the structure of the graph are allowed
      * by removing the factor and adding the new updated one.
      */
@@ -56,16 +60,16 @@ public:
       */
     bool addNode(std::shared_ptr<Node> &node);
     /**
-     * Connects a node and a factor by updating their internal list of neighbours
-     * with the new connection. It updates both the node and the factor.
-     * This connection is just an additional way of
+     * Removes a Factor and on all the connected Nodes
+     * list of factors, it is removed as well
      */
     void rmFactor(std::shared_ptr<Factor> &factor);
     /**
-     * Disconnect node-factor and vice versa
+     * Removes Node from list. TODO should we eliminate
+     * all factors pointing to that node?
      */
     void rmNode(std::shared_ptr<Node> &node);
-    void printStatus() const;
+    void printStatus(bool complete = false) const;
 
     //TODO
     void saveGraph() const;

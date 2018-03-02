@@ -38,6 +38,7 @@ public:
     Factor(uint_t potNumberNodes = 5);
     virtual ~Factor();
     virtual int getDim(void) const = 0;
+    virtual void print() const {};
     const std::vector<std::shared_ptr<Node> >*
             getNeighbourNodes(void) const {return &neighbourNodes_;};
 protected:

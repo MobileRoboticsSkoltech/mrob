@@ -48,3 +48,13 @@ Mat6 Factor2Poses3d::getJacobian(std::shared_ptr<Node> &n) const
         // get a Jacobian that does not define the factor
         return Mat6::Zero();
 }
+
+void Factor2Poses3d::print() const
+{
+    std::cout << "Printing Factor of 2 Poses, obs= \n" <<
+                obs_ << "\nrepresenting the transformation\n" <<
+                Tobs_ << " \nand covariance\n" <<
+                obsCov_ << "\n and neighbour Nodes " <<
+                neighbourNodes_.size() << std::endl;
+}
+

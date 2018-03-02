@@ -34,6 +34,7 @@ class NodePose3d : public Node
      */
     void update(const Mat61 &dx);
     Mat61 getState() const {return x_;};
+    void print() const;
 
   protected:
     int dim_;

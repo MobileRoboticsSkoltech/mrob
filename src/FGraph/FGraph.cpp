@@ -24,18 +24,31 @@ FGraph::FGraph(uint_t potNumberNodes, uint_t potNumberFactors)
 }
 FGraph::~FGraph()
 {
-    nodes_.clear();
+    // clear every node's list of neigbours factors
+    for (auto n: nodes_)
+        n->clear();
     factors_.clear();
+    nodes_.clear();
 }
 
 bool FGraph::addFactor(std::shared_ptr<Factor> &factor)
 {
     auto res = factors_.insert(factor);
-    return res.second;
+    // TODO aqui hay un bug con liberacion de memoria
+    if (res.second)
+    {
+        auto list = factor->getNeighbourNodes();
+        for( auto n: *list)
+        {
+            n->print();
+            n->addFactor(factor);
+        }
+        return true;
+    }
+    return false;
 }
 bool FGraph::addNode(std::shared_ptr<Node> &node)
 {
-    std::cout << "entering add Node" << std::endl;
     auto res = nodes_.insert(node);
     return res.second;
 }
@@ -44,7 +57,9 @@ void FGraph::rmFactor(std::shared_ptr<Factor> &factor)
     // remove from any extra thing
     auto list = factor->getNeighbourNodes();
     for( auto n: *list)
+    {
         n->rmFactor(factor);//its an exhaustive search...TODO remove?
+    }
     factors_.erase(factor);
 }
 void FGraph::rmNode(std::shared_ptr<Node> &node)
@@ -52,9 +67,17 @@ void FGraph::rmNode(std::shared_ptr<Node> &node)
     // TODO Factors associated to this node should be removed
     nodes_.erase(node);
 }
-void FGraph::printStatus() const
+void FGraph::printStatus(bool completePrint) const
 {
     std::cout << "Status of graph: " <<
             nodes_.size()  << "Nodes and " <<
             factors_.size() << "Factors." << std::endl;
+
+    if(completePrint)
+    {
+        for (auto n : nodes_)
+            n->print();
+        for (auto f : factors_)
+            f->print();
+    }
 }
