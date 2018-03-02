@@ -42,10 +42,14 @@ bool FGraph::addNode(std::shared_ptr<Node> &node)
 void FGraph::rmFactor(std::shared_ptr<Factor> &factor)
 {
     // remove from any extra thing
+    auto list = factor->getNeighbourNodes();
+    for( auto n: *list)
+        n->rmFactor(factor);//its an exhaustive search...TODO remove?
     factors_.erase(factor);
 }
 void FGraph::rmNode(std::shared_ptr<Node> &node)
 {
+    // TODO Factors associated to this node should be removed
     nodes_.erase(node);
 }
 void FGraph::printStatus() const

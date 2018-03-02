@@ -39,7 +39,7 @@ public:
     virtual ~Factor();
     virtual int getDim(void) const = 0;
     const std::vector<std::shared_ptr<Node> >*
-            getNeighbourFactors(void) const {return &neighbourNodes_;};
+            getNeighbourNodes(void) const {return &neighbourNodes_;};
 protected:
     std::vector<std::shared_ptr<Node> > neighbourNodes_;
 };

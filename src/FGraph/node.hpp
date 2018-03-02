@@ -49,6 +49,7 @@ class Node{
     const std::vector<std::shared_ptr<Factor> >*
             getNeighbourFactors(void) const {return &neighbourFactors_;};
   protected:
+    // For highly connected nodes where removing is necessary, map should be better
     std::vector<std::shared_ptr<Factor> > neighbourFactors_;
 };
 
