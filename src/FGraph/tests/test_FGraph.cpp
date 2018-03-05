@@ -37,7 +37,7 @@ int main()
 
     fg.rmNode(n);
     fg.rmFactor(f);
-    fg.printStatus(1);
+    fg.print(1);
 
     return 1;
 }

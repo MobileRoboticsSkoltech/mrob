@@ -22,7 +22,6 @@ Node::Node(uint_t potNumberFactors)
 
 Node::~Node()
 {
-    std::cout << "deleting Node base 3d" << std::endl;
     neighbourFactors_.clear();
 }
 bool Node::addFactor(std::shared_ptr<Factor> &factor)
@@ -38,7 +37,6 @@ bool Node::rmFactor(std::shared_ptr<Factor> &factor)
     // over a set or a map because we are gonna iterate over this container,
     // while it is not so clear that we would want to remove factors (although possible)
     std::vector<std::shared_ptr<Factor> >::iterator f;
-    std::cout << "size list" << neighbourFactors_.size() << std::endl;
     for (f = neighbourFactors_.begin(); f != neighbourFactors_.end(); ++f)
     {
         if (*f == factor)

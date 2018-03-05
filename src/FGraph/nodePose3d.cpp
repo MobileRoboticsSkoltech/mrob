@@ -21,7 +21,7 @@ NodePose3d::NodePose3d(const Mat61 &initial_x) :
 
 NodePose3d::~NodePose3d()
 {
-    std::cout << "deleting Node Pose 3d" << std::endl;
+
 }
 
 void NodePose3d::update(const Mat61 &dx)

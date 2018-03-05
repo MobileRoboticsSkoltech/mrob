@@ -7,7 +7,7 @@ SET(headers
     FGraph.hpp
     nodePose3d.hpp
     factor2Poses3d.hpp
-    SolverDenseGaussNewton.hpp
+    solverDense.hpp
 )
 
 # extra source files
@@ -17,6 +17,7 @@ SET(sources
     FGraph.cpp
     nodePose3d.cpp
     factor2Poses3d.cpp
+    solverDense.cpp
 )
 
 # create the shared library

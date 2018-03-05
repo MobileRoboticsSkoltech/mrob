@@ -1,7 +1,7 @@
 /* $COPYRIGHT_SKOLTECH
  * $LICENSE_LGPL
  *
- * solverDenseGaussNewton.hpp
+ * solverDense.hpp
  *
  *  Created on: Feb 27, 2018
  *      Author: Gonzalo Ferrer
@@ -9,9 +9,10 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#ifndef SOLVERDENSEGAUSSNEWTON_HPP_
-#define SOLVERDENSEGAUSSNEWTON_HPP_
+#ifndef SOLVERDENSE_HPP_
+#define SOLVERDENSE_HPP_
 
+#include "FGraph.hpp"
 
 namespace fg{
 
@@ -23,13 +24,20 @@ namespace fg{
  * matrix.
  */
 
-class SolverDenseGaussNewton: public FGraph
+class DenseGaussNewton
 {
-    SolverDenseGaussNewton();
-    virtual ~SolverDenseGaussNewton();
+public:
+    DenseGaussNewton(std::shared_ptr<FGraph> fg);
+    virtual ~DenseGaussNewton();
+    void buildProblem();
+    void solve();
+protected:
+    std::shared_ptr<FGraph> fg_;// reference to the graph structure
+    MatX Information_;
+
 };
 
 }
 
 
-#endif /* SOLVERDENSEGAUSSNEWTON_HPP_ */
+#endif /* SOLVERDENSE_HPP_ */

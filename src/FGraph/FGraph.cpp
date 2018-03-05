@@ -34,13 +34,11 @@ FGraph::~FGraph()
 bool FGraph::addFactor(std::shared_ptr<Factor> &factor)
 {
     auto res = factors_.insert(factor);
-    // TODO aqui hay un bug con liberacion de memoria
     if (res.second)
     {
         auto list = factor->getNeighbourNodes();
         for( auto n: *list)
         {
-            n->print();
             n->addFactor(factor);
         }
         return true;
@@ -67,7 +65,7 @@ void FGraph::rmNode(std::shared_ptr<Node> &node)
     // TODO Factors associated to this node should be removed
     nodes_.erase(node);
 }
-void FGraph::printStatus(bool completePrint) const
+void FGraph::print(bool completePrint) const
 {
     std::cout << "Status of graph: " <<
             nodes_.size()  << "Nodes and " <<

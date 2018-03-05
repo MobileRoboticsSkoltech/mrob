@@ -69,7 +69,7 @@ public:
      * all factors pointing to that node?
      */
     void rmNode(std::shared_ptr<Node> &node);
-    void printStatus(bool complete = false) const;
+    void print(bool complete = false) const;
 
     //TODO
     void saveGraph() const;

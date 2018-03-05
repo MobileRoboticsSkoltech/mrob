@@ -22,6 +22,7 @@ typedef Eigen::Matrix<matData_t, 3,3> Mat3;
 typedef Eigen::Matrix<matData_t, 4,4> Mat4;
 typedef Eigen::Matrix<matData_t, 5,5> Mat5;
 typedef Eigen::Matrix<matData_t, 6,6> Mat6;
+typedef Eigen::Matrix<matData_t, Eigen::Dynamic,Eigen::Dynamic> MatX;
 
 
 // Definition of column matrices (vectors)
