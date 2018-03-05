@@ -15,29 +15,28 @@
 #include "factor2Poses3d.hpp"
 #include <iostream> //this causes 1 non-free allocation in valgrind, dont panic
 
-using namespace fg;
 
 int main()
 {
     // create a simple FGraph testing the insertion and deletions of elements
-    FGraph fg(50,50);
+    fg::FGraph fgr(50,50);
 
     //add nodes. In general Nodes just need their initial state.
     Mat61 xIni;
     xIni << 0,0.1,0,1,-3,2;
-    std::shared_ptr<Node> n(new NodePose3d(xIni));
-    fg.addNode(n);
-    std::shared_ptr<Node> n2(new NodePose3d(xIni));
-    fg.addNode(n2);
+    std::shared_ptr<fg::Node> n(new fg::NodePose3d(xIni));
+    fgr.addNode(n);
+    std::shared_ptr<fg::Node> n2(new fg::NodePose3d(xIni));
+    fgr.addNode(n2);
 
     // add factors. We need to specify the node/nodes connecting the factor
     Mat6 obsCov = Mat6::Identity();
-    std::shared_ptr<Factor> f(new Factor2Poses3d(xIni,n,n2,obsCov));
-    fg.addFactor(f);
+    std::shared_ptr<fg::Factor> f(new fg::Factor2Poses3d(xIni,n,n2,obsCov));
+    fgr.addFactor(f);
 
-    fg.rmNode(n);
-    fg.rmFactor(f);
-    fg.print(1);
+    fgr.rmNode(n);
+    fgr.rmFactor(f);
+    fgr.print(1);
 
     return 1;
 }

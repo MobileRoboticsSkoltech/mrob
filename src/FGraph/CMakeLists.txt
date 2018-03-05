@@ -7,6 +7,7 @@ SET(headers
     FGraph.hpp
     nodePose3d.hpp
     factor2Poses3d.hpp
+    factor1Pose3d.hpp
     solverDense.hpp
 )
 
@@ -17,6 +18,7 @@ SET(sources
     FGraph.cpp
     nodePose3d.cpp
     factor2Poses3d.cpp
+    factor1Pose3d.cpp
     solverDense.cpp
 )
 

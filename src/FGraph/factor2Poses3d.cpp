@@ -19,7 +19,8 @@ using namespace fg;
 Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
         std::shared_ptr<Node> &n2, const Mat6 &obsCov):
         Factor(), dim_(6), obs_(observation), Tobs_(observation),
-        obsCov_(obsCov), J1_(Mat6::Zero()), J2_(Mat6::Zero())
+        obsCov_(obsCov), J1_(Mat6::Zero()), J2_(Mat6::Zero()),
+        r_(Mat61::Zero())
 {
     neighbourNodes_.push_back(n1);
     neighbourNodes_.push_back(n2);
@@ -31,11 +32,17 @@ Factor2Poses3d::~Factor2Poses3d()
 
 void Factor2Poses3d::evaluate()
 {
+    // residuals
+    this->evaluateLazy();
 
+    // TODO Jacobians
+    J1_ = Mat6::Identity();
+    J2_ = 2*Mat6::Identity();
 }
 void Factor2Poses3d::evaluateLazy()
 {
-
+    // TODO Evaluation of residuals
+    r_ = Mat61::Random();
 }
 Mat6 Factor2Poses3d::getJacobian(std::shared_ptr<Node> &n) const
 {

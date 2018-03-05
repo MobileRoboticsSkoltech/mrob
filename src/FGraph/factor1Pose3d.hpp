@@ -1,16 +1,16 @@
 /* $COPYRIGHT_SKOLTECH
  * $LICENSE_LGPL
  *
- * factor2Poses3d.hpp
+ * factor1Pose3d.hpp
  *
- *  Created on: Feb 28, 2018
+ *  Created on: Mar 5, 2018
  *      Author: Gonzalo Ferrer
  *              g.ferrer@skoltech.ru
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#ifndef FACTOR2POSES3D_HPP_
-#define FACTOR2POSES3D_HPP_
+#ifndef FACTOR1POSE3D_HPP_
+#define FACTOR1POSE3D_HPP_
 
 
 #include "factor.hpp"
@@ -21,24 +21,23 @@
 namespace fg{
 
 /**
- * The Factor2Poses3d is a vertex representing the distribution between
- * two nodePose3d, that is, it is expressing a Rigid Body Transformation
- * between two poses.
+ * The Factor1Poses3d is a vertex representing the distribution
+ * of a nodePose3d, pretty much like an anchoring factor.
  *
- * The state is an observer RBT, and as we have commented, we need to specify
- * the two Nodes that the factor is connecting, which are provided by their
- * shared_ptr's which are at the same time their keys for storage on the FGraph
+ * The state is an observed RBT, coincident with the node state it is connected to.
+ * We should provide the node's
+ * shared_ptr which are at the same time their keys for storage on the FGraph
  *
  * In particular, the residual of this factor is: TODO better formulate
- *   r = ln(T2) - ln(T1*Tobs) = ln(T1^-1*T2) - ln(Tobs)
+ *   r = obs-x
  */
 
-class Factor2Poses3d : public Factor
+class Factor1Pose3d : public Factor
 {
   public:
-    Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
-            std::shared_ptr<Node> &n2, const Mat6 &obsCov);
-    ~Factor2Poses3d();
+    Factor1Pose3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
+             const Mat6 &obsCov);
+    ~Factor1Pose3d();
     int getDim() const {return dim_;};
     /**
      * Evaluates residuals and Jacobians
@@ -58,9 +57,7 @@ class Factor2Poses3d : public Factor
     Mat61 obs_;
     lie::SE3 Tobs_;
     Mat6 obsCov_;
-    // The Jacobians' correspondant nodes are ordered on the vector<Node>
-    // being [0]->J1 and [1]->J2
-    Mat6 J1_, J2_;
+    Mat6 J1_;
     Mat61 r_;// residuals
 
   public:
@@ -73,5 +70,4 @@ class Factor2Poses3d : public Factor
 
 
 
-
-#endif /* FACTOR2POSES3D_HPP_ */
+#endif /* FACTOR1POSE3D_HPP_ */

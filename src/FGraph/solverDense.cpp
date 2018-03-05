@@ -18,8 +18,9 @@ using namespace fg;
 DenseGaussNewton::DenseGaussNewton(std::shared_ptr<FGraph> fg):
         fg_(fg)
 {
-    std::cout << "We are here" << std::endl;
     fg->print();
+    //TODO this does not work like this
+    //lowerTriangularInformation_.selfadjointView<Eigen::Lower>();
 }
 
 DenseGaussNewton::~DenseGaussNewton()
@@ -27,7 +28,22 @@ DenseGaussNewton::~DenseGaussNewton()
 
 }
 
-void DenseGaussNewton::buildProblem()
+void DenseGaussNewton::solveOnce()
 {
+    // iterate over all nodes
+    // get list of nodes? fg_->
+    //for ()
+    {
+        // Create the information matrix on Ax=b
+        // Create the b vector from residuals
 
+    }
+    // Factorize I
+    //
+}
+
+int DenseGaussNewton::solve()
+{
+    // Iteratively solve until convergence
+    return 0;
 }

@@ -29,11 +29,12 @@ class DenseGaussNewton
 public:
     DenseGaussNewton(std::shared_ptr<FGraph> fg);
     virtual ~DenseGaussNewton();
-    void buildProblem();
-    void solve();
+    void solveOnce();
+    int solve();
 protected:
     std::shared_ptr<FGraph> fg_;// reference to the graph structure
-    MatX Information_;
+    //exploting symetry of I = A'*A, we store on a lower triangular matrix
+    MatX lowerTriangularInformation_;
 
 };
 
