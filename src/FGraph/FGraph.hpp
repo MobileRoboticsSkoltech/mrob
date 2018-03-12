@@ -70,6 +70,16 @@ public:
      */
     void rmNode(std::shared_ptr<Node> &node);
     void print(bool complete = false) const;
+    /**
+     * get the iterator for the Nodes set
+     */
+    std::unordered_set<std::shared_ptr<Node> >::iterator
+    getBeginNodesIter(){return nodes_.begin();};
+    /**
+     *
+     */
+    std::unordered_set<std::shared_ptr<Node> >::iterator
+    getEndNodesIter() {return nodes_.end();};
 
     //TODO
     void saveGraph() const;

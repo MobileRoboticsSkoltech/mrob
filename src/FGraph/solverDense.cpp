@@ -31,10 +31,11 @@ DenseGaussNewton::~DenseGaussNewton()
 void DenseGaussNewton::solveOnce()
 {
     // iterate over all nodes
-    // get list of nodes? fg_->
-    //for ()
+    auto iter = fg_->getBeginNodesIter();
+    for ( ; iter != fg_->getEndNodesIter(); ++iter )
     {
-        // Create the information matrix on Ax=b
+        (*iter)->print();
+        // Create the information matrix on Ax=b TODO como hacerlo sin romper abstract class??
         // Create the b vector from residuals
 
     }
