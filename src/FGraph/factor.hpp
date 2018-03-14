@@ -43,6 +43,13 @@ public:
             getNeighbourNodes(void) const {return &neighbourNodes_;};
 protected:
     std::vector<std::shared_ptr<Node> > neighbourNodes_;
+    uint_t dim_;
+    uint_t nodes_dim_;//summation of all the nodes that the factor affects
+
+    matData_t chi2_;
+    //TODO
+    MatX1 obs_;
+    MatX J_;//Joint Jacobian
 };
 
 }

@@ -31,7 +31,7 @@ typedef Eigen::Matrix<matData_t, 3,1> Mat31;
 typedef Eigen::Matrix<matData_t, 4,1> Mat41;
 typedef Eigen::Matrix<matData_t, 5,1> Mat51;
 typedef Eigen::Matrix<matData_t, 6,1> Mat61;
-
+typedef Eigen::Matrix<matData_t, Eigen::Dynamic,1> MatX1;
 
 
 

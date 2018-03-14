@@ -85,6 +85,7 @@ public:
     void saveGraph() const;
     void loadGraph();
 protected:
+    // XXX is it better than vector for what we are using them?
     std::unordered_set<std::shared_ptr<Node> >   nodes_;
     std::unordered_set<std::shared_ptr<Factor> > factors_;
 };

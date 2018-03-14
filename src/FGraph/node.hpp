@@ -38,6 +38,12 @@ class Node{
     virtual ~Node();
     virtual int getDim(void) const = 0; //This will depend on the derived node
     /**
+     * The update operation, give a dynamic vector, it updates
+     * the value of the state x
+     */
+    virtual void update(const MatX1 &dx) = 0;
+    virtual MatX1 getState() const {return x_;};
+    /**
      * Adds a factor to the list of factors connected to this node.
      */
     virtual bool addFactor(std::shared_ptr<Factor> &factor);
@@ -53,6 +59,14 @@ class Node{
   protected:
     // For highly connected nodes where removing is necessary, map should be better
     std::vector<std::shared_ptr<Factor> > neighbourFactors_;
+    /**
+     * We have chosen to use a dynamic matrix, instead of
+     * templating the dimensions and creating a fixed vector.
+     * The reason for doing that is polymorphism, we prefer to
+     * preserve polymorphism for node storage at the cost of
+     * a slightly less allocation of resources.
+     */
+    MatX1 x_;
 };
 
 }
