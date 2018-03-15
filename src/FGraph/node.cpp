@@ -15,7 +15,8 @@
 
 using namespace fg;
 
-Node::Node(uint_t potNumberFactors)
+Node::Node(uint_t dim, uint_t potNumberFactors):
+        dim_(dim)
 {
     neighbourFactors_.reserve( potNumberFactors );
 }

@@ -37,8 +37,25 @@ public:
      */
     Factor(uint_t potNumberNodes = 5);
     virtual ~Factor();
-    virtual int getDim(void) const = 0;
-    virtual void print() const {};
+    /**
+     * Evaluates residuals and Jacobians
+     */
+    virtual void evaluate() = 0;
+    /**
+     * Jacobians are not evaluated, just the residuals
+     */
+    virtual matData_t evaluateError() = 0;
+
+    virtual void print() const = 0;
+    /**
+     * Optimization on the compiler copying elision, so it wont be copied
+     * XXX Is this true when we assign to a fixed matrix too?
+     */
+    MatX1 getObs() const {return obs_;};
+    MatX getJacobian() const {return J_;};
+    MatX getCovariance() const {return W_;};
+
+    int getDim() const {return dim_;};
     const std::vector<std::shared_ptr<Node> >*
             getNeighbourNodes(void) const {return &neighbourNodes_;};
 protected:
@@ -47,9 +64,10 @@ protected:
     uint_t nodes_dim_;//summation of all the nodes that the factor affects
 
     matData_t chi2_;
-    //TODO
-    MatX1 obs_;
+    // declared here but initialized on child classes
+    MatX1 obs_, r_; //and residuals
     MatX J_;//Joint Jacobian
+    MatX W_;//inverse of observation covariance (information matrix)
 };
 
 }

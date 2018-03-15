@@ -48,3 +48,15 @@ int DenseGaussNewton::solve()
     // Iteratively solve until convergence
     return 0;
 }
+
+/*MatX Factor2Poses3d::getJacobian(std::shared_ptr<Node> &n) const
+{
+    if(neighbourNodes_[0] == n)
+        return J1_;
+    if(neighbourNodes_[1] == n)
+        return J2_;
+    else
+        // derivatives w.r.t other nodes are 0, regardless of the incorrectness of trying
+        // get a Jacobian that does not define the factor
+        return Mat6::Zero();
+}*/

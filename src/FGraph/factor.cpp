@@ -15,7 +15,8 @@
 
 using namespace fg;
 
-Factor::Factor(uint_t potNumberNodes)
+Factor::Factor(uint_t potNumberNodes):
+        chi2_(0)
 {
     neighbourNodes_.reserve( potNumberNodes );
 }

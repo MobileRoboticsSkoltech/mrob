@@ -34,6 +34,8 @@ public:
 protected:
     std::shared_ptr<FGraph> fg_;// reference to the graph structure
     //exploting symetry of I = A'*A, we store on a lower triangular matrix
+    // more at : https://eigen.tuxfamily.org/dox-devel/group__QuickRefPage.html
+    //triangularView<SelfAdjoint>()
     MatX lowerTriangularInformation_;
 
 };

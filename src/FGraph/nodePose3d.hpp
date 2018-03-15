@@ -27,22 +27,16 @@ class NodePose3d : public Node
      */
     NodePose3d(const Mat61 &initial_x);
     virtual ~NodePose3d();
-    int getDim() const {return dim_;};
     /**
      * The update operation corresponds to the augmented sum, which is equivalent
      * to T'=exp(dxi^)*T and x'=vee(ln(T'))
      */
-    void update(const Mat61 &dx);
-    Mat61 getState() const {return x_;};
+    void update(const Eigen::Ref<const MatX1> &dx);
     void print() const;
 
   protected:
-    int dim_;
-    Mat61 x_;
-    lie::SE3 Tx_;
+    lie::SE3 Tx_;//redundant state representation, now directly in SE(3)
 
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen
 
 };
 

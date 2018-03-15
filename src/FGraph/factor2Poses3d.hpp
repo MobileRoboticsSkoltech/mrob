@@ -39,7 +39,6 @@ class Factor2Poses3d : public Factor
     Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
             std::shared_ptr<Node> &n2, const Mat6 &obsCov);
     ~Factor2Poses3d();
-    int getDim() const {return dim_;};
     /**
      * Evaluates residuals and Jacobians
      */
@@ -47,21 +46,14 @@ class Factor2Poses3d : public Factor
     /**
      * Jacobians are not evaluated, just the residuals
      */
-    void evaluateLazy();
-    Mat61 getObs() const {return obs_;};
-    Mat6 getJacobian(std::shared_ptr<Node> &n) const;
-    Mat6 getCovariance() const {return obsCov_;};
+    matData_t evaluateError();
     void print() const;
 
   protected:
-    int dim_;//fixed to 6, a RBT
-    Mat61 obs_;
     lie::SE3 Tobs_;
-    Mat6 obsCov_;
     // The Jacobians' correspondant nodes are ordered on the vector<Node>
     // being [0]->J1 and [1]->J2
-    Mat6 J1_, J2_;
-    Mat61 r_;// residuals
+
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen

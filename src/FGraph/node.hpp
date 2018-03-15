@@ -34,15 +34,16 @@ class Factor;
 
 class Node{
   public:
-    Node(uint_t potNumberFactors = 5);
+    Node(uint_t dim, uint_t potNumberFactors = 5);
     virtual ~Node();
-    virtual int getDim(void) const = 0; //This will depend on the derived node
     /**
      * The update operation, give a dynamic vector, it updates
      * the value of the state x
      */
-    virtual void update(const MatX1 &dx) = 0;
-    virtual MatX1 getState() const {return x_;};
+    virtual void update(const Eigen::Ref<const MatX1> &dx) = 0;
+    virtual void print() const = 0;
+    MatX1 getState() const {return x_;};//TODO is this efficient??
+    uint_t getDim(void) const {return dim_;};
     /**
      * Adds a factor to the list of factors connected to this node.
      */
@@ -52,7 +53,6 @@ class Node{
      * so use only when necessary.
      */
     virtual bool rmFactor(std::shared_ptr<Factor> &factor);
-    virtual void print() const {};
     void clear() {neighbourFactors_.clear();};
     const std::vector<std::shared_ptr<Factor> >*
             getNeighbourFactors(void) const {return &neighbourFactors_;};
@@ -67,6 +67,7 @@ class Node{
      * a slightly less allocation of resources.
      */
     MatX1 x_;
+    uint_t dim_;
 };
 
 }

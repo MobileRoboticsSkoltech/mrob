@@ -38,30 +38,18 @@ class Factor1Pose3d : public Factor
     Factor1Pose3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
              const Mat6 &obsCov);
     ~Factor1Pose3d();
-    int getDim() const {return dim_;};
     /**
      * Evaluates residuals and Jacobians
      */
     void evaluate();
     /**
-     * Jacobians are not evaluated, just the residuals
+     * Returns the chi2 error and fills the residual vector
      */
-    void evaluateLazy();
-    Mat61 getObs() const {return obs_;};
-    Mat6 getJacobian(std::shared_ptr<Node> &n) const;
-    Mat6 getCovariance() const {return obsCov_;};
+    matData_t evaluateError();
     void print() const;
 
   protected:
-    int dim_;//fixed to 6, a RBT
-    Mat61 obs_;
     lie::SE3 Tobs_;
-    Mat6 obsCov_;
-    Mat6 J1_;
-    Mat61 r_;// residuals
-
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen
 
 };
 

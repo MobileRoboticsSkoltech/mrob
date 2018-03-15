@@ -86,6 +86,8 @@ public:
     void loadGraph();
 protected:
     // XXX is it better than vector for what we are using them?
+    // Vector is much faster for direct access [], but needs allocation
+    // Set iterates ok and can remove elements nicely.
     std::unordered_set<std::shared_ptr<Node> >   nodes_;
     std::unordered_set<std::shared_ptr<Factor> > factors_;
 };
