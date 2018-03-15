@@ -52,10 +52,10 @@ public:
      * but they are designed to initialize FIXED size matrices, eg
      *     Mat5 J = getJacobian();
      */
-    const Eigen::Ref<const MatX1> getObs() const {return obs_;};
-    const Eigen::Ref<const MatX1> getResidual() const {return r_;};
-    const Eigen::Ref<const MatX> getJacobian() const {return J_;};
-    const Eigen::Ref<const MatX> getCovariance() const {return W_;};
+    void getObs(Eigen::Ref<MatX1> res) const {res = obs_;};
+    void getResidual(Eigen::Ref<MatX1> res) const {res = r_;};
+    void getJacobian(Eigen::Ref<MatX> res) const {res = J_;};
+    void getCovariance(Eigen::Ref<MatX1> res) const {res = W_;};
 
     int getDim() const {return dim_;};
     const std::vector<std::shared_ptr<Node> >*

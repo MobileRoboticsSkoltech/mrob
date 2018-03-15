@@ -39,14 +39,19 @@ class Node{
     /**
      * The update operation, give a block vector, it updates
      * the value of the state x.
-     * Since we done know the size at compilation, we declare
+     * Since we don't know the size at compilation, we declare
      * a dynamic matrix, but on run-time we would like to use
      * a fixed block matrix, and this virtual function will handle
      * it nicely.
      */
     virtual void update(const Eigen::Ref<const MatX1> &dx) = 0;
     virtual void print() const = 0;
-    const Eigen::Ref<const MatX1> getState() const {return x_;};
+    /**
+     * We may declare a fixed size matrix at run time and provide
+     * it as an argument for the getState function, no need to be dynamic,
+     * as long as the dimension is correctly set
+     */
+    void getState(Eigen::Ref<MatX1> res) const {res = x_;};
     uint_t getDim(void) const {return dim_;};
     /**
      * Adds a factor to the list of factors connected to this node.
