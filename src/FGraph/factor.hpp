@@ -48,12 +48,14 @@ public:
 
     virtual void print() const = 0;
     /**
-     * Optimization on the compiler copying elision, so it wont be copied
-     * XXX Is this true when we assign to a fixed matrix too?
+     * All these methods return a reference to a dynamic matrix
+     * but they are designed to initialize FIXED size matrices, eg
+     *     Mat5 J = getJacobian();
      */
-    MatX1 getObs() const {return obs_;};
-    MatX getJacobian() const {return J_;};
-    MatX getCovariance() const {return W_;};
+    const Eigen::Ref<const MatX1> getObs() const {return obs_;};
+    const Eigen::Ref<const MatX1> getResidual() const {return r_;};
+    const Eigen::Ref<const MatX> getJacobian() const {return J_;};
+    const Eigen::Ref<const MatX> getCovariance() const {return W_;};
 
     int getDim() const {return dim_;};
     const std::vector<std::shared_ptr<Node> >*

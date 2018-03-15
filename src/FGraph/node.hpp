@@ -37,12 +37,16 @@ class Node{
     Node(uint_t dim, uint_t potNumberFactors = 5);
     virtual ~Node();
     /**
-     * The update operation, give a dynamic vector, it updates
-     * the value of the state x
+     * The update operation, give a block vector, it updates
+     * the value of the state x.
+     * Since we done know the size at compilation, we declare
+     * a dynamic matrix, but on run-time we would like to use
+     * a fixed block matrix, and this virtual function will handle
+     * it nicely.
      */
     virtual void update(const Eigen::Ref<const MatX1> &dx) = 0;
     virtual void print() const = 0;
-    MatX1 getState() const {return x_;};//TODO is this efficient??
+    const Eigen::Ref<const MatX1> getState() const {return x_;};
     uint_t getDim(void) const {return dim_;};
     /**
      * Adds a factor to the list of factors connected to this node.
