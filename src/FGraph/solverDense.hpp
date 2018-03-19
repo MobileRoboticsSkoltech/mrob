@@ -21,7 +21,7 @@ namespace fg{
  * in state variables (nodes) and multiple observations affecting them (factors).
  *
  * Given the nature of the problem, we have a reduced but dense information
- * matrix.
+ * matrix. No optimization is carried out for ordering or storing sparse matrices.
  */
 
 class DenseGaussNewton
@@ -30,13 +30,27 @@ public:
     DenseGaussNewton(std::shared_ptr<FGraph> fg);
     virtual ~DenseGaussNewton();
     void solveOnce();
+    void solveIncremental();//TODO
     int solve();
+    /**
+     *  Linearizes the Jacobian and calculates the residuals
+     */
+    void evaluate();
+    /**
+     *  Evaluates the residuals on every factor
+     */
+    void evaluateResiduals();
+    /**
+     *  Evaluates the Jacobians on every factor
+     */
+    void evaluateJacobians();
 protected:
     std::shared_ptr<FGraph> fg_;// reference to the graph structure
-    //exploting symetry of I = A'*A, we store on a lower triangular matrix
+    //exploting symetry of A = Adj'*Adj, we store on a lower triangular matrix
     // more at : https://eigen.tuxfamily.org/dox-devel/group__QuickRefPage.html
     //triangularView<SelfAdjoint>()
-    MatX lowerTriangularInformation_;
+    MatX A_;
+    MatX1 b_;
 
 };
 

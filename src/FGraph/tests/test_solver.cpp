@@ -35,8 +35,8 @@ int main ()
     graph->print();
 
     // solve the Gauss Newton optimization
-    fg::DenseGaussNewton solver(graph);
-    solver.solveOnce();
+    fg::DenseGaussNewton problem(graph);
+    problem.solveOnce();
 
     return 0;
 }

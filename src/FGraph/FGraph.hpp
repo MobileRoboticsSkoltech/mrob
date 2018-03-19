@@ -32,11 +32,13 @@ namespace fg{
  *  - Class Node
  *  - Class Factor
  *
- * Both data containers are stored in unordered sets whose key is their adresses. By doing this, we can
+ * Both data containers are stored in unordered sets whose keys are their adresses. By doing this, we can
  * iterate and quickly find elements in both data containers.
  *
  * Each problem instantaition should implement methods for solving the graph and storing the
  * necessary data, such as information matrix, factorizations, etc.
+ *
+ * TODO for large scale problems, build a subset of the graphs considered, using a tree or other structures
  */
 
 class FGraph{

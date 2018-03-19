@@ -19,8 +19,11 @@ DenseGaussNewton::DenseGaussNewton(std::shared_ptr<FGraph> fg):
         fg_(fg)
 {
     fg->print();
-    //TODO this does not work like this
     //lowerTriangularInformation_.selfadjointView<Eigen::Lower>();
+    // Create the matrices on Ax=b
+    uint_t state_dim = 3;//read from fg?
+    MatX A_(state_dim, state_dim);
+    MatX1 b_(state_dim);
 }
 
 DenseGaussNewton::~DenseGaussNewton()
@@ -30,13 +33,22 @@ DenseGaussNewton::~DenseGaussNewton()
 
 void DenseGaussNewton::solveOnce()
 {
-    // iterate over all nodes
+
+
+    // 1) Iterate over all nodes, for now, we don't elect a subset of them
     auto iter = fg_->getBeginNodesIter();
     for ( ; iter != fg_->getEndNodesIter(); ++iter )
     {
-        (*iter)->print();
-        // Create the information matrix on Ax=b TODO como hacerlo sin romper abstract class??
-        // Create the b vector from residuals
+        // 2) Every Node has a vector of neighbour factors, we iterate over them to calculate
+        // residuals and the Jacobians
+        auto neighFactors = (*iter)->getNeighbourFactors();
+        for (uint_t i = 0; i < neighFactors->size();  ++i)
+        {
+            std::shared_ptr<fg::Factor> factor = (*neighFactors)[i];//shared pointer to a base class factor
+            factor->evaluate();
+
+
+        }
 
     }
     // Factorize I
