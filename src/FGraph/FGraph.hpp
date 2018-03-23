@@ -12,8 +12,9 @@
 #ifndef FGRAPH_HPP_
 #define FGRAPH_HPP_
 
-#include <unordered_set>
-#include <deque>
+//#include <unordered_set>
+//#include <deque>//TODO change for long allocations
+#include <vector>
 #include "node.hpp"
 #include "factor.hpp"
 
@@ -72,26 +73,30 @@ public:
      */
     void rmNode(std::shared_ptr<Node> &node);
     void print(bool complete = false) const;
-    /**
-     * get the iterator for the Nodes set
-     */
-    std::unordered_set<std::shared_ptr<Node> >::iterator
-    getBeginNodesIter(){return nodes_.begin();};
-    /**
-     *
-     */
-    std::unordered_set<std::shared_ptr<Node> >::iterator
-    getEndNodesIter() {return nodes_.end();};
+
 
     //TODO
     void saveGraph() const;
     void loadGraph();
 protected:
-    // XXX is it better than vector for what we are using them?
-    // Vector is much faster for direct access [], but needs allocation
-    // Set iterates ok and can remove elements nicely.
-    std::unordered_set<std::shared_ptr<Node> >   nodes_;
-    std::unordered_set<std::shared_ptr<Factor> > factors_;
+    /**
+	 *  XXX is set better than vector for what we are using them?
+	 *  Vector is much faster for direct access [], but needs allocation.
+	 *  We are also interested on having indices on nodes and factors.
+	 *  Set iterates ok O(1) and can remove elements nicely O(1).
+	 *
+	 *  For now we will use vectors, but we will mantain abstraction in case we need to change
+     *
+     */
+    //std::unordered_set<std::shared_ptr<Node> >   nodes_;
+    std::vector<std::shared_ptr<Node> >   nodes_, localNodes_;
+
+    //std::unordered_set<std::shared_ptr<Factor> > factors_;
+    std::vector<std::shared_ptr<Factor> > factors_, localFactors_;
+
+    // This variable is for selecting subsets of nodes and factors stored on
+    // localNodes and localFactors. TODO
+    bool isHoleProblem_;
 };
 
 

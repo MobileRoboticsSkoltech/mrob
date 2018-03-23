@@ -32,25 +32,27 @@ public:
     void solveOnce();
     void solveIncremental();//TODO
     int solve();
+    // XXX this functions should be protected, or public?
     /**
-     *  Linearizes the Jacobian and calculates the residuals
+     *  Linearizes the Jacobians, creates the information matrix and calculates the residuals
      */
     void evaluate();
     /**
-     *  Evaluates the residuals on every factor
+     *  Evaluates *only* the residuals on every factor and calculates the Chi2 error
      */
-    void evaluateResiduals();
+    matData_t evaluateChi2();
     /**
-     *  Evaluates the Jacobians on every factor
+     * Builds the matrices, after evaluating all factors
      */
-    void evaluateJacobians();
+    void buildMatrices();
 protected:
     std::shared_ptr<FGraph> fg_;// reference to the graph structure
-    //exploting symetry of A = Adj'*Adj, we store on a lower triangular matrix
+    //exploting symetry of I = A'*A, we store on a lower triangular matrix
     // more at : https://eigen.tuxfamily.org/dox-devel/group__QuickRefPage.html
     //triangularView<SelfAdjoint>()
-    MatX A_;
+    MatX Information_;
     MatX1 b_;
+    bool isProblemEvaluated;
 
 };
 

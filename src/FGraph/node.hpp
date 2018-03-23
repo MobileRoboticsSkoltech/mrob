@@ -14,6 +14,7 @@
 
 #include <vector>
 #include <memory>
+#include <assert.h>
 #include "Eigen/Dense"
 #include "matrixBase.hpp"
 
@@ -45,13 +46,14 @@ class Node{
      * it nicely.
      */
     virtual void update(const Eigen::Ref<const MatX1> &dx) = 0;
-    virtual void print() const = 0;
     /**
      * We may declare a fixed size matrix at run time and provide
      * it as an argument for the getState function, no need to be dynamic,
      * as long as the dimension is correctly set
      */
     void getState(Eigen::Ref<MatX1> res) const {res = x_;};
+    id_t getId() const {return id_;};
+    void setId(id_t id) {id_ = id;};
     uint_t getDim(void) const {return dim_;};
     /**
      * Adds a factor to the list of factors connected to this node.
@@ -65,9 +67,11 @@ class Node{
     void clear() {neighbourFactors_.clear();};
     std::vector<std::shared_ptr<Factor> >*
             getNeighbourFactors(void) {return &neighbourFactors_;};
+    void print() const ;
   protected:
     // For highly connected nodes where removing is necessary, map should be better
     std::vector<std::shared_ptr<Factor> > neighbourFactors_;
+    id_t id_;
     /**
      * We have chosen to use a dynamic matrix, instead of
      * templating the dimensions and creating a fixed vector.

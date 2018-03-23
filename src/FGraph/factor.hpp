@@ -56,16 +56,22 @@ public:
     void getResidual(Eigen::Ref<MatX1> res) const {res = r_;};
     void getJacobian(Eigen::Ref<MatX> res) const {res = J_;};
     void getCovariance(Eigen::Ref<MatX1> res) const {res = W_;};
+    //matData_t getChi2() const { return r_.dot(W_*r_);};//TODO do we need to calculate this?
+    matData_t getChi2() const { return chi2_;};
 
-    int getDim() const {return dim_;};
+    id_t getId() const {return id_;};
+    void setId(id_t id) {id_ = id;};
+    uint_t getDim() const {return dim_;};
+    uint_t getAllNodesDim(){ return allNodesDim_;};
     const std::vector<std::shared_ptr<Node> >*
             getNeighbourNodes(void) const {return &neighbourNodes_;};
 protected:
+    id_t id_;
     std::vector<std::shared_ptr<Node> > neighbourNodes_;
     uint_t dim_;
-    uint_t nodes_dim_;//summation of all the nodes that the factor affects
-
+    uint_t allNodesDim_;//summation of all the nodes that the factor affects
     matData_t chi2_;
+
     // declared here but initialized on child classes
     MatX1 obs_, r_; //and residuals
     MatX J_;//Joint Jacobian

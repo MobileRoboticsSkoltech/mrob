@@ -16,9 +16,10 @@
 using namespace fg;
 
 
-FGraph::FGraph(uint_t potNumberNodes, uint_t potNumberFactors)
+FGraph::FGraph(uint_t potNumberNodes, uint_t potNumberFactors) :
+		isHoleProblem_(false)
 {
-    //max_load is 1, so it rehashes and augment the #bucklets in the same amount
+    //For Ste:: max_load is 1, so it rehashes and augment the #bucklets in the same amount
     factors_.reserve(potNumberFactors);
     nodes_.reserve(potNumberNodes);
 }
@@ -33,6 +34,10 @@ FGraph::~FGraph()
 
 bool FGraph::addFactor(std::shared_ptr<Factor> &factor)
 {
+	factor->setId(factors_.size()+1);//Starts at 1
+	factors_.push_back(factor);
+	return true;
+    /* XXX if changes to Set, to be removed
     auto res = factors_.insert(factor);
     if (res.second)
     {
@@ -43,27 +48,33 @@ bool FGraph::addFactor(std::shared_ptr<Factor> &factor)
         }
         return true;
     }
-    return false;
+    return false;*/
 }
 bool FGraph::addNode(std::shared_ptr<Node> &node)
 {
-    auto res = nodes_.insert(node);
-    return res.second;
+	node->setId(nodes_.size()+1);
+	nodes_.push_back(node);
+	return true;
+    //auto res = nodes_.insert(node);
+    //return res.second;
 }
 void FGraph::rmFactor(std::shared_ptr<Factor> &factor)
 {
-    // remove from any extra thing
+	assert(0);
+    /* For sets, not implemented for vectors
+	// remove from any extra thing
     auto list = factor->getNeighbourNodes();
     for( auto n: *list)
     {
         n->rmFactor(factor);//its an exhaustive search...TODO remove?
     }
-    factors_.erase(factor);
+    factors_.erase(factor);*/
 }
 void FGraph::rmNode(std::shared_ptr<Node> &node)
 {
+	assert(0);
     // TODO Factors associated to this node should be removed
-    nodes_.erase(node);
+    //nodes_.erase(node);
 }
 void FGraph::print(bool completePrint) const
 {

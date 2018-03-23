@@ -1,13 +1,15 @@
-/* $COPYRIGHT_SKOLTECH
+/* $COPYRIGHT SKOLTECH
  * $LICENSE_LGPL
  *
- * test_solverDenseGN.cpp
+ * example_solver.cpp
  *
- *  Created on: Mar 5, 2018
+ *  Created on: Mar 22, 2018
  *      Author: Gonzalo Ferrer
  *              g.ferrer@skoltech.ru
- *              Mobile Robotics Lab, Skoltech 
+ *              Mobile Robotics Lab, Skoltech
  */
+
+
 
 
 
@@ -40,4 +42,3 @@ int main ()
 
     return 0;
 }
-

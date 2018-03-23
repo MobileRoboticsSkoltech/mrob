@@ -8,7 +8,8 @@ SET(headers
     nodePose3d.hpp
     factor2Poses3d.hpp
     factor1Pose3d.hpp
-    solverDense.hpp
+    FGraphBuild.hpp
+    #solverDense.hpp
 )
 
 # extra source files
@@ -19,7 +20,8 @@ SET(sources
     nodePose3d.cpp
     factor2Poses3d.cpp
     factor1Pose3d.cpp
-    solverDense.cpp
+    FGraphBuild.cpp
+    #solverDense.cpp
 )
 
 # create the shared library
@@ -43,4 +45,4 @@ TARGET_LINK_LIBRARIES(FGraph SE3)
 
 
 ADD_SUBDIRECTORY(examples)
-ADD_SUBDIRECTORY(tests)
+#ADD_SUBDIRECTORY(tests)

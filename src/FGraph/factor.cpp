@@ -16,7 +16,7 @@
 using namespace fg;
 
 Factor::Factor(uint_t potNumberNodes):
-        chi2_(0)
+		id_(0), dim_(0), allNodesDim_(0), chi2_(0)
 {
     neighbourNodes_.reserve( potNumberNodes );
 }

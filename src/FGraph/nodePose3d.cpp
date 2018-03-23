@@ -36,10 +36,3 @@ void NodePose3d::update(const Eigen::Ref<const MatX1> &dx)
     x_ = Tx_.ln_vee();//this will cast to
 }
 
-void NodePose3d::print() const
-{
-    std::cout << "Printing Node Pose 3d, state = \n" <<
-            x_ << "\nrepresenting the transformation\n" <<
-            Tx_ << "\nand neighbour factors " <<
-            neighbourFactors_.size() << std::endl;
-}

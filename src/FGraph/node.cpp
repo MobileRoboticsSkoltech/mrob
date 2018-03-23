@@ -10,13 +10,12 @@
  */
 
 #include "node.hpp"
-#include <assert.h>
 #include <iostream>
 
 using namespace fg;
 
 Node::Node(uint_t dim, uint_t potNumberFactors):
-        dim_(dim)
+		 id_(0), dim_(dim)
 {
     neighbourFactors_.reserve( potNumberFactors );
 }
@@ -45,4 +44,12 @@ bool Node::rmFactor(std::shared_ptr<Factor> &factor)
     }
     neighbourFactors_.erase(f);
     return true;
+}
+
+void Node::print() const
+{
+    std::cout << "Printing Node, state = \n" <<
+            x_ << "\n Id = " <<
+			id_ << "\nand neighbour factors " <<
+            neighbourFactors_.size() << std::endl;
 }
