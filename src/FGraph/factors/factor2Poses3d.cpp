@@ -43,13 +43,3 @@ matData_t Factor2Poses3d::evaluateError()
     return 0.0;
 }
 
-void Factor2Poses3d::print() const
-{
-    std::cout << "Printing Factor of 2 Poses, obs= \n" <<
-                obs_ << "\nrepresenting the transformation\n" <<
-                Tobs_ << " \nand covariance\n" <<
-                W_ << "\n Chi2 error = " <<
-                chi2_ << " and neighbour Nodes " <<
-                neighbourNodes_.size() << std::endl;
-}
-

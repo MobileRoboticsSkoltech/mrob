@@ -68,6 +68,7 @@ class Node{
     std::vector<std::shared_ptr<Factor> >*
             getNeighbourFactors(void) {return &neighbourFactors_;};
     void print() const ;
+
   protected:
     // For highly connected nodes where removing is necessary, map should be better
     std::vector<std::shared_ptr<Factor> > neighbourFactors_;
@@ -75,9 +76,9 @@ class Node{
     /**
      * We have chosen to use a dynamic matrix, instead of
      * templating the dimensions and creating a fixed vector.
-     * The reason for doing that is polymorphism, we prefer to
+     * The reason for doing that is polymorphism. We prefer to
      * preserve polymorphism for node storage at the cost of
-     * a slightly less allocation of resources.
+     * a allocating more resources (matrices).
      */
     MatX1 x_;
     uint_t dim_;

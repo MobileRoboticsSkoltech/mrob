@@ -46,16 +46,23 @@ public:
      */
     virtual matData_t evaluateError() = 0;
 
-    virtual void print() const = 0;
     /**
-     * All these methods return a reference to a dynamic matrix
-     * but they are designed to initialize FIXED size matrices, eg
+     * The print utility could be reimplemented on child classes
+     * if there are special needs
+     */
+    virtual void print() const;
+    /**
+     * Return a constant pointer to the dynamic matrix. At runtime we still
+     * can't know the size in all problems. TODO If we were using using a fixed sized matrix
+     * we probably want to use an eigen reference (Ref) to a dynamic matrix, e.g.
      *     Mat5 J = getJacobian();
      */
-    void getObs(Eigen::Ref<MatX1> res) const {res = obs_;};
-    void getResidual(Eigen::Ref<MatX1> res) const {res = r_;};
-    void getJacobian(Eigen::Ref<MatX> res) const {res = J_;};
-    void getCovariance(Eigen::Ref<MatX1> res) const {res = W_;};
+    const MatX1* getObs() const {return &obs_;};
+    const MatX1* getResidual() const {return &r_;};
+    const MatX* getCovariance() const {return &W_;};
+    const MatX* getJacobian() const {return &J_;};
+    //void getJacobian(Eigen::Ref<MatX> res) const {res = J_;};
+
     //matData_t getChi2() const { return r_.dot(W_*r_);};//TODO do we need to calculate this?
     matData_t getChi2() const { return chi2_;};
 
@@ -65,6 +72,7 @@ public:
     uint_t getAllNodesDim(){ return allNodesDim_;};
     const std::vector<std::shared_ptr<Node> >*
             getNeighbourNodes(void) const {return &neighbourNodes_;};
+
 protected:
     id_t id_;
     std::vector<std::shared_ptr<Node> > neighbourNodes_;

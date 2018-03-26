@@ -11,8 +11,8 @@
 
 
 #include "FGraph.hpp"
-#include "nodePose3d.hpp"
-#include "factor2Poses3d.hpp"
+#include "factors/nodePose3d.hpp"
+#include "factors/factor2Poses3d.hpp"
 #include <iostream> //this causes 1 non-free allocation in valgrind, dont panic
 
 

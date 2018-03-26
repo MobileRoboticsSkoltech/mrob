@@ -40,12 +40,3 @@ matData_t Factor1Pose3d::evaluateError()
     r_ = Mat61::Identity();
     return 0.0;
 }
-
-void Factor1Pose3d::print() const
-{
-    std::cout << "Printing Anchor Factor of 1 Poses, obs= \n" <<
-                    obs_ << "\nrepresenting the transformation\n" <<
-                    Tobs_ << " \nand covariance\n" <<
-                    W_ << "\n and neighbour Nodes " <<
-                    neighbourNodes_.size() << std::endl;
-}

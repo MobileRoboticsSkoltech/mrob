@@ -30,16 +30,22 @@ namespace fg{
  */
 class FGraphBuild : public FGraph
 {
-  public:
-	enum buildType{Adjacency = 0, Adj2Info, Info};
-    FGraphBuild();
+public:
+    enum buildType{Adjacency = 0, Adj2Info, Info};
+    FGraphBuild(buildType type = Adj2Info, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
     virtual ~FGraphBuild();
-    void buildproblem();
-    void solve();
-  protected:
+    void buildProblem();
+    void solve();// XXX this goes here?
+
+protected:
+    void buildProblemAdjacency();
+    void buildProblemAdj2Info();
+    void buildProblemDirectInfo();
+
+
     buildType type_;
-    MatRow A_;
-    MatCol I_;
+    SMatRow A_;
+    SMatCol I_;
 
 
 };

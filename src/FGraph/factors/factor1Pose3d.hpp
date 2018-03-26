@@ -46,7 +46,6 @@ class Factor1Pose3d : public Factor
      * Returns the chi2 error and fills the residual vector
      */
     matData_t evaluateError();
-    void print() const;
 
   protected:
     lie::SE3 Tobs_;

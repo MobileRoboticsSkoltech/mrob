@@ -47,7 +47,6 @@ class Factor2Poses3d : public Factor
      * Jacobians are not evaluated, just the residuals
      */
     matData_t evaluateError();
-    void print() const;
 
   protected:
     lie::SE3 Tobs_;

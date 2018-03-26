@@ -5,11 +5,7 @@ SET(headers
     node.hpp
     factor.hpp
     FGraph.hpp
-    nodePose3d.hpp
-    factor2Poses3d.hpp
-    factor1Pose3d.hpp
     FGraphBuild.hpp
-    #solverDense.hpp
 )
 
 # extra source files
@@ -17,15 +13,23 @@ SET(sources
     node.cpp
     factor.cpp
     FGraph.cpp
-    nodePose3d.cpp
-    factor2Poses3d.cpp
-    factor1Pose3d.cpp
     FGraphBuild.cpp
-    #solverDense.cpp
+)
+
+SET(factors_headers
+    factors/nodePose3d.hpp
+    factors/factor2Poses3d.hpp
+    factors/factor1Pose3d.hpp
+)
+
+SET(factors_sources
+    factors/nodePose3d.cpp
+    factors/factor2Poses3d.cpp
+    factors/factor1Pose3d.cpp
 )
 
 # create the shared library
-ADD_LIBRARY(FGraph SHARED  ${sources})
+ADD_LIBRARY(FGraph SHARED  ${sources} ${factors_sources})
 TARGET_LINK_LIBRARIES(FGraph SE3)
 
 

@@ -12,6 +12,7 @@
 
 #include "factor.hpp"
 #include <assert.h>
+#include <iostream>
 
 using namespace fg;
 
@@ -24,4 +25,15 @@ Factor::Factor(uint_t potNumberNodes):
 Factor::~Factor()
 {
     neighbourNodes_.clear();
+}
+
+void Factor::print() const
+{
+    std::cout << "Printing Factor , obs= \n" << obs_
+              << "\n Residuals= " << r_
+              << " \nand covariance\n" << W_
+              << "\n Calculated Jacobian = " << J_
+              << "\n Chi2 error = " << chi2_
+              << " and neighbour Nodes " << neighbourNodes_.size()
+              << std::endl;
 }
