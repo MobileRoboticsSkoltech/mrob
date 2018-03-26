@@ -29,15 +29,17 @@ void FGraphBuild::buildProblem()
 {
     switch(type_)
     {
-    case Adjacency:
+    case ADJACENCY:
         buildProblemAdjacency();
         break;
-    case Info:
+    case INFO:
         buildProblemDirectInfo();
         break;
-    case Adj2Info:
-    default:
+    case ADJ2INFO:
         buildProblemAdj2Info();
+        break;
+    case SCHUR:
+    default:
         break;
     }
 }
@@ -45,7 +47,29 @@ void FGraphBuild::buildProblem()
 
 void FGraphBuild::buildProblemAdjacency()
 {
+    // 1) resize properly matrices (if needed)
+    r_.resize(obsDim_,1);
+    A_.resize(obsDim_, stateDim_);
 
+    uint_t index = 0;
+    for (uint_t i = 0; i < factors_.size(); ++i)
+    {
+        auto f = factors_[i];
+        // 2) Evaluate every factor given the current state
+        f->evaluate();
+
+        // 3) Get the calculated residual and build the joint Residual
+        r_.block(index, 0, f->getDim(), 1) << f->getResidual();
+
+        // 4) Get information matrix for every factor
+        const MatX* W = f->getInvCovariance();
+
+        // 5) build Adjacency matrix as a composition of rows
+        const MatX* J = f->getJacobian();
+
+        // update new indixes
+        index += f->getDim();
+    }
 }
 
 

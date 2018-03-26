@@ -22,6 +22,7 @@ Factor1Pose3d::Factor1Pose3d(const Mat61 &observation, std::shared_ptr<Node> &n1
 {
     neighbourNodes_.push_back(n1);
     obs_ = observation;//allocates memory and creates a copy
+    dim_ = 6;
 }
 
 Factor1Pose3d::~Factor1Pose3d()

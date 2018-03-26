@@ -29,7 +29,7 @@ Factor::~Factor()
 
 void Factor::print() const
 {
-    std::cout << "Printing Factor , obs= \n" << obs_
+    std::cout << "Printing Factor: " << id_ << ", obs= \n" << obs_
               << "\n Residuals= " << r_
               << " \nand covariance\n" << W_
               << "\n Calculated Jacobian = " << J_

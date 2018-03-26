@@ -21,6 +21,7 @@ NodePose3d::NodePose3d(const Mat61 &initial_x) :
     assert(initial_x.rows() == 6 && "NodePose3d:: Incorrect dimension on initial state rows" );
     assert(initial_x.cols() == 1 && "NodePose3d:: Incorrect dimension on initial state cols" );
     x_ = initial_x;// here x_ is allocated for the 1st time
+    dim_ = 6;
 }
 
 NodePose3d::~NodePose3d()

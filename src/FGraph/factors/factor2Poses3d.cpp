@@ -23,6 +23,7 @@ Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &
     neighbourNodes_.push_back(n1);
     neighbourNodes_.push_back(n2);
     obs_ = observation;
+    dim_ = 6;
 }
 
 Factor2Poses3d::~Factor2Poses3d()

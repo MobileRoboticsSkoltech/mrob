@@ -34,8 +34,6 @@ int main()
     std::shared_ptr<fg::Factor> f(new fg::Factor2Poses3d(xIni,n,n2,obsCov));
     fgr.addFactor(f);
 
-    fgr.rmNode(n);
-    fgr.rmFactor(f);
     fgr.print(1);
 
     return 1;

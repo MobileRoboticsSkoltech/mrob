@@ -59,7 +59,7 @@ public:
      */
     const MatX1* getObs() const {return &obs_;};
     const MatX1* getResidual() const {return &r_;};
-    const MatX* getCovariance() const {return &W_;};
+    const MatX* getInvCovariance() const {return &W_;};
     const MatX* getJacobian() const {return &J_;};
     //void getJacobian(Eigen::Ref<MatX> res) const {res = J_;};
 
@@ -76,7 +76,7 @@ public:
 protected:
     id_t id_;
     std::vector<std::shared_ptr<Node> > neighbourNodes_;
-    uint_t dim_;
+    uint_t dim_;//dimension of the observation
     uint_t allNodesDim_;//summation of all the nodes that the factor affects
     matData_t chi2_;
 

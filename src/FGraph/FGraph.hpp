@@ -22,7 +22,7 @@ namespace fg{
 /**
  * This class provides the general structure for encoding Factor Graphs and
  * to support the implementation of the inference solution to the joint probability P(x,u,z).
- * The solution to this joint probability is equivalent to a Nonlinear Least Squares (NLS) problem.
+ * The solution to this joint probability is equivalent to a Nonlinear Least Squares (NLSQ) problem.
  *
  * Factor Graphs are bipartite graphs, meaning that we express the relations from a set of vertices "nodes"
  * which include our state variables through a set of vertices "factors", capturing the inherent distribution
@@ -63,12 +63,12 @@ public:
       */
     bool addNode(std::shared_ptr<Node> &node);
     /**
-     * Removes a Factor and on all the connected Nodes
+     * TODO Removes a Factor and on all the connected Nodes
      * list of factors, it is removed as well
      */
     void rmFactor(std::shared_ptr<Factor> &factor);
     /**
-     * Removes Node from list. TODO should we eliminate
+     * TODO Removes Node from list. TODO should we eliminate
      * all factors pointing to that node?
      */
     void rmNode(std::shared_ptr<Node> &node);
@@ -94,6 +94,11 @@ protected:
     //std::unordered_set<std::shared_ptr<Factor> > factors_;
     std::vector<std::shared_ptr<Factor> > factors_, localFactors_;
 
+    /**
+     * Total accumulated dimensions on both the state (nodes)
+     * and the observations (factors)
+     */
+    uint_t stateDim_, obsDim_;
     // This variable is for selecting subsets of nodes and factors stored on
     // localNodes and localFactors. TODO
     bool isHoleProblem_;

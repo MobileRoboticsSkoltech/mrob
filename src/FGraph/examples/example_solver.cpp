@@ -22,7 +22,7 @@ int main ()
 {
 
     // create a simple graph to solve: 1 node multiple anchor observations
-    fg::FGraphBuild graph(fg::FGraphBuild::Adj2Info,50,50);
+    fg::FGraphBuild graph(fg::FGraphBuild::ADJ2INFO,50,50);
     Mat61 xIni, obs;
     xIni = Mat61::Zero();
     std::shared_ptr<fg::Node> n1(new fg::NodePose3d(xIni));

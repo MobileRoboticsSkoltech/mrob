@@ -52,6 +52,7 @@ class Node{
      * as long as the dimension is correctly set
      */
     void getState(Eigen::Ref<MatX1> res) const {res = x_;};
+    // Ideally FGraph structure takes care of Id's
     id_t getId() const {return id_;};
     void setId(id_t id) {id_ = id;};
     uint_t getDim(void) const {return dim_;};
