@@ -37,7 +37,7 @@ class Factor2Poses3d : public Factor
 {
   public:
     Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
-            std::shared_ptr<Node> &n2, const Mat6 &obsCov);
+            std::shared_ptr<Node> &n2, const Mat6 &obsInf);
     ~Factor2Poses3d();
     /**
      * Evaluates residuals and Jacobians

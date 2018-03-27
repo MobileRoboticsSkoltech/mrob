@@ -5,7 +5,7 @@ SET(headers
     node.hpp
     factor.hpp
     FGraph.hpp
-    FGraphBuild.hpp
+    FGraphSolve.hpp
 )
 
 # extra source files
@@ -13,7 +13,7 @@ SET(sources
     node.cpp
     factor.cpp
     FGraph.cpp
-    FGraphBuild.cpp
+    FGraphSolve.cpp
 )
 
 SET(factors_headers

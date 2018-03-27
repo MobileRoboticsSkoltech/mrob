@@ -17,12 +17,14 @@ using namespace fg;
 
 
 Factor1Pose3d::Factor1Pose3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
-             const Mat6 &obsCov):
+             const Mat6 &obsInf):
              Factor()
 {
     neighbourNodes_.push_back(n1);
     obs_ = observation;//allocates memory and creates a copy
     dim_ = 6;
+    W_ = obsInf;
+    WT2_ = W_.llt().matrixU();// we get the upper matrix U'*U
 }
 
 Factor1Pose3d::~Factor1Pose3d()

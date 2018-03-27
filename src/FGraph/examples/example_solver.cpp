@@ -13,7 +13,7 @@
 
 
 
-#include "FGraphBuild.hpp"
+#include "FGraphSolve.hpp"
 #include "factors/nodePose3d.hpp"
 #include "factors/factor1Pose3d.hpp"
 
@@ -22,7 +22,7 @@ int main ()
 {
 
     // create a simple graph to solve: 1 node multiple anchor observations
-    fg::FGraphBuild graph(fg::FGraphBuild::ADJ2INFO,50,50);
+    fg::FGraphSolve graph(fg::FGraphSolve::CHOL_ADJ,50,50);
     Mat61 xIni, obs;
     xIni = Mat61::Zero();
     std::shared_ptr<fg::Node> n1(new fg::NodePose3d(xIni));

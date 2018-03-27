@@ -60,6 +60,7 @@ public:
     const MatX1* getObs() const {return &obs_;};
     const MatX1* getResidual() const {return &r_;};
     const MatX* getInvCovariance() const {return &W_;};
+    const MatX* getWT2() const {return &WT2_;};
     const MatX* getJacobian() const {return &J_;};
     //void getJacobian(Eigen::Ref<MatX> res) const {res = J_;};
 
@@ -84,6 +85,8 @@ protected:
     MatX1 obs_, r_; //and residuals
     MatX J_;//Joint Jacobian
     MatX W_;//inverse of observation covariance (information matrix)
+    MatX WT2_;//transpose and squared root of W. TODO save as selfadjointView<Eigen::Lower>()?
+
 };
 
 }

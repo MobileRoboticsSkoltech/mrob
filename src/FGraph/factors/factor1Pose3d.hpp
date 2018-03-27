@@ -36,7 +36,7 @@ class Factor1Pose3d : public Factor
 {
   public:
     Factor1Pose3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
-             const Mat6 &obsCov);
+             const Mat6 &obsInf);
     ~Factor1Pose3d();
     /**
      * Evaluates residuals and Jacobians

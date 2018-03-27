@@ -29,8 +29,11 @@ typedef Eigen::Matrix<matData_t, 4,4> Mat4;
 typedef Eigen::Matrix<matData_t, 5,5> Mat5;
 typedef Eigen::Matrix<matData_t, 6,6> Mat6;
 typedef Eigen::Matrix<matData_t, Eigen::Dynamic,Eigen::Dynamic> MatX;
-typedef Eigen::SparseMatrix<matData_t, Eigen::ColMajor> SMatCol;
+
+//Sparse Matrices
+typedef Eigen::SparseMatrix<matData_t, Eigen::ColMajor> SMat;
 typedef Eigen::SparseMatrix<matData_t, Eigen::RowMajor> SMatRow;
+typedef Eigen::Triplet<matData_t> Triplet;
 
 // Definition of column matrices (vectors)
 typedef Eigen::Matrix<matData_t, 2,1> Mat21;

@@ -17,13 +17,15 @@ using namespace fg;
 
 
 Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
-        std::shared_ptr<Node> &n2, const Mat6 &obsCov):
+        std::shared_ptr<Node> &n2, const Mat6 &obsInf):
         Factor(), Tobs_(observation)
 {
     neighbourNodes_.push_back(n1);
     neighbourNodes_.push_back(n2);
     obs_ = observation;
     dim_ = 6;
+    W_ = obsInf;
+    WT2_ = W_.llt().matrixU();
 }
 
 Factor2Poses3d::~Factor2Poses3d()
