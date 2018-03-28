@@ -12,6 +12,7 @@
 
 #include "factor2Poses3d.hpp"
 #include <iostream>
+#include <Eigen/Cholesky>
 
 using namespace fg;
 
@@ -20,8 +21,18 @@ Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &
         std::shared_ptr<Node> &n2, const Mat6 &obsInf):
         Factor(6,12), obs_(observation), Tobs_(observation), W_(obsInf)
 {
-    neighbourNodes_.push_back(n1);
-    neighbourNodes_.push_back(n2);
+    assert(n1->getId() && "Factor2Poses3d::Factor2Poses3d: Non initialized Node1. Add nodes first and then Factors to the FG\n");
+    assert(n2->getId() && "Factor2Poses3d::Factor2Poses3d: Non initialized Node2. Add nodes first and then Factors to the FG\n");
+    if (n1->getId() < n2->getId())
+    {
+        neighbourNodes_.push_back(n1);
+        neighbourNodes_.push_back(n2);
+    }
+    else
+    {
+        neighbourNodes_.push_back(n2);
+        neighbourNodes_.push_back(n1);
+    }
     WT2_ = W_.llt().matrixU();
 }
 
@@ -35,6 +46,7 @@ void Factor2Poses3d::evaluate()
     this->evaluateError();
 
     // TODO Jacobians
+    J_ = MatD<6,12>::Random();
 }
 matData_t Factor2Poses3d::evaluateError()
 {

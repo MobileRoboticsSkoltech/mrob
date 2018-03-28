@@ -13,6 +13,7 @@
 #include "SE3.hpp"
 #include "SO3.hpp"
 #include <iostream>
+#include <Eigen/LU>
 
 
 int main()

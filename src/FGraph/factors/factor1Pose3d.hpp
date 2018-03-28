@@ -14,7 +14,6 @@
 
 
 #include "factor.hpp"
-#include <Eigen/Dense>
 #include "matrixBase.hpp"
 #include "SE3.hpp" //requires including and linking SE3 library
 
@@ -25,7 +24,6 @@ namespace fg{
  * of a nodePose3d, pretty much like an anchoring factor.
  *
  * The state is an observed RBT, coincident with the node state it is connected to.
- * We provide the node's Id to get the correspondent Jacobian
  *
  * In particular, the residual of this factor is: TODO better formulate
  *   r = obs-x
@@ -52,14 +50,14 @@ class Factor1Pose3d : public Factor
     const Eigen::Ref<const MatX1> getResidual() const {return r_;};
     const Eigen::Ref<const MatX> getInvCovariance() const {return W_;};
     const Eigen::Ref<const MatX> getWT2() const{return WT2_;};
-    const Eigen::Ref<const MatX> getJacobian(uint_t nodeId) const {return J_;};
+    const Eigen::Ref<const MatX> getJacobian() const {return J_;};
 
   protected:
     Mat61 obs_, r_; //and residuals
     lie::SE3 Tobs_;
-    Mat6 J_;//Jacobian
     Mat6 W_;//inverse of observation covariance (information matrix)
-    Mat6 WT2_;//transpose and squared root of W.
+    Mat6 WT2_;//transpose and squared root of W. We could delete this variable...
+    Mat6 J_;//Jacobian
 
 
 };

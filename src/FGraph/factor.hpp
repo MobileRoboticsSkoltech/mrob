@@ -12,9 +12,9 @@
 #ifndef FACTOR_HPP_
 #define FACTOR_HPP_
 
-#include "Eigen/Dense"
 #include <vector>
 #include "node.hpp"
+#include "matrixBase.hpp"
 
 namespace fg{
 
@@ -60,7 +60,8 @@ public:
     virtual const Eigen::Ref<const MatX1> getResidual() const = 0;
     virtual const Eigen::Ref<const MatX> getInvCovariance() const = 0;
     virtual const Eigen::Ref<const MatX> getWT2() const = 0;
-    virtual const Eigen::Ref<const MatX> getJacobian(uint_t nodeId) const = 0;
+    // TODO test this with MatX pointers, might be faster and no Ref is needed
+    virtual const Eigen::Ref<const MatX> getJacobian() const = 0;
 
     //matData_t getChi2() const { return r_.dot(W_*r_);};//TODO do we need to calculate this?
     matData_t getChi2() const { return chi2_;};
@@ -74,6 +75,10 @@ public:
 
 protected:
     id_t id_;
+    /**
+     * This is a sorted list, so at the constructor we should check
+     * of the order based on increasing ids (See examples)
+     */
     std::vector<std::shared_ptr<Node> > neighbourNodes_;
     uint_t dim_;//dimension of the observation
     uint_t allNodesDim_;//summation of all the nodes that the factor affects

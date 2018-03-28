@@ -13,7 +13,6 @@
 #define NODEPOSE3D_HPP_
 
 #include "node.hpp"
-#include <Eigen/Dense>
 #include "matrixBase.hpp"
 #include "SE3.hpp" //requires including and linking SE3 library
 

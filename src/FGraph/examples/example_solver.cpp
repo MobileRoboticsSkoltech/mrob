@@ -16,6 +16,7 @@
 #include "FGraphSolve.hpp"
 #include "factors/nodePose3d.hpp"
 #include "factors/factor1Pose3d.hpp"
+#include "factors/factor2Poses3d.hpp"
 
 
 int main ()
@@ -27,16 +28,25 @@ int main ()
     xIni = Mat61::Zero();
     std::shared_ptr<fg::Node> n1(new fg::NodePose3d(xIni));
     graph.addNode(n1);
-    Mat6 obsCov = Mat6::Identity();
-    for (auto i = 0; i < 3; ++i)
+    std::shared_ptr<fg::Node> n2(new fg::NodePose3d(xIni));
+    graph.addNode(n2);
+    Mat6 obsCov = Mat6::Random();
+    obsCov = obsCov*obsCov.transpose();
+    std::shared_ptr<fg::Factor> f1(new fg::Factor1Pose3d(obs,n1,obsCov));
+    graph.addFactor(f1);
+    for (auto i = 0; i < 2; ++i)
     {
         obs = Mat61::Random();
-        std::shared_ptr<fg::Factor> f(new fg::Factor1Pose3d(obs,n1,obsCov));
-        graph.addFactor(f);
+        std::shared_ptr<fg::Factor> f2(new fg::Factor2Poses3d(obs,n1,n2,obsCov));
+        graph.addFactor(f2);
     }
-    graph.print();
+
+
+
+    graph.print(1);
 
     // solve the Gauss Newton optimization
+    graph.buildProblem();
 
     return 0;
 }

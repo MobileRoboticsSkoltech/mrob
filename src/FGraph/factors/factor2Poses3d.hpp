@@ -14,7 +14,6 @@
 
 
 #include "factor.hpp"
-#include <Eigen/Dense>
 #include "matrixBase.hpp"
 #include "SE3.hpp" //requires including and linking SE3 library
 
@@ -56,7 +55,7 @@ class Factor2Poses3d : public Factor
     const Eigen::Ref<const MatX1> getResidual() const {return r_;};
     const Eigen::Ref<const MatX> getInvCovariance() const {return W_;};
     const Eigen::Ref<const MatX> getWT2() const{return WT2_;};
-    const Eigen::Ref<const MatX> getJacobian(uint_t nodeId) const {return J_;};//TODO for now
+    const Eigen::Ref<const MatX> getJacobian() const {return J_;};
 
   protected:
     // The Jacobians' correspondant nodes are ordered on the vector<Node>
@@ -64,9 +63,9 @@ class Factor2Poses3d : public Factor
     // declared here but initialized on child classes
     Mat61 obs_, r_; //and residuals
     lie::SE3 Tobs_;
-    MatD<6,12> J_;//Joint Jacobian TODO maybe divide into different
     Mat6 W_;//inverse of observation covariance (information matrix)
     Mat6 WT2_;//transpose and squared root of W.
+    MatD<6,12> J_;//Joint Jacobian
 
 
   public:

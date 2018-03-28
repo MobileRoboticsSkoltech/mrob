@@ -13,7 +13,8 @@
 #ifndef MATRIX_BASE_HPP_
 #define MATRIX_BASE_HPP_
 
-#include <Eigen/Dense>
+//#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <Eigen/Sparse>
 
 // data types conventions
@@ -45,7 +46,6 @@ typedef Eigen::Matrix<matData_t, Eigen::Dynamic,1> MatX1;
 
 
 // Definition of templated-based fixed matrices using c'11 aliases
-// TODO esto no funciona para variables no constantes
 template<int D>
 using MatD1 = Eigen::Matrix<matData_t, D,1>;
 template<int Rw,int Col>

@@ -35,7 +35,8 @@ public:
     FGraphSolve(solveType type = CHOL_ADJ, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
     virtual ~FGraphSolve();
     void buildProblem();
-    void solve();// XXX this goes here?
+    void solveOnce();
+    void solveIncremental();//TODO
 
 protected:
     /**
@@ -56,7 +57,7 @@ protected:
     solveType type_;
     SMatRow A_;//Adjacency matrix, as a Row sparse matrix
     SMat I_;//Information matrix
-    SMat W_;//a block diagonal information matrix. For types Adjacency it calculates its block transposed squared root
+    SMatRow W_;//a block diagonal information matrix. For types Adjacency it calculates its block transposed squared root
     MatX1 r_;// residuals as given by the factors
     MatX1 b_;// postprocessed residuals, either A'*W*r for the normal equation or W*r for QR solvers
 

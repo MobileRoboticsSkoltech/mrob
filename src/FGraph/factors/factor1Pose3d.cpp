@@ -12,16 +12,19 @@
 
 #include "factor1Pose3d.hpp"
 #include <iostream>
+#include <Eigen/Cholesky>
 
 using namespace fg;
 
 
 Factor1Pose3d::Factor1Pose3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
              const Mat6 &obsInf):
-             Factor(6,6), obs_(observation), W_(obsInf)
+             Factor(6,6), obs_(observation), W_(obsInf), J_(Mat6::Random())
 {
+    // Ordering here is not a problem, the node is unique
     neighbourNodes_.push_back(n1);
     WT2_ = W_.llt().matrixU();// we get the upper matrix U'*U
+    //std::cout << "WT2 = \n" << WT2_ << std::endl;
 }
 
 Factor1Pose3d::~Factor1Pose3d()
