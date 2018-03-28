@@ -32,9 +32,15 @@ class NodePose3d : public Node
      * to T'=exp(dxi^)*T and x'=vee(ln(T'))
      */
     void update(const Eigen::Ref<const MatX1> &dx);
+    virtual const Eigen::Ref<const MatX1> getState() const {return x_;};
+    void print() const;
 
   protected:
+    Mat61 x_;
     lie::SE3 Tx_;//redundant state representation, now directly in SE(3)
+
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen
 
 
 };

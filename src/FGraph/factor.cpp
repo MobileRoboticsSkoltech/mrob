@@ -11,14 +11,13 @@
 
 
 #include "factor.hpp"
-#include <assert.h>
-#include <iostream>
 
 using namespace fg;
 
-Factor::Factor(uint_t potNumberNodes):
-		id_(0), dim_(0), allNodesDim_(0), chi2_(0)
+Factor::Factor(uint_t dim, uint_t allNodesDim, uint_t potNumberNodes):
+		id_(0), dim_(dim), allNodesDim_(allNodesDim), chi2_(0)
 {
+    // Child factor must specify dimensions
     neighbourNodes_.reserve( potNumberNodes );
 }
 
@@ -27,13 +26,3 @@ Factor::~Factor()
     neighbourNodes_.clear();
 }
 
-void Factor::print() const
-{
-    std::cout << "Printing Factor: " << id_ << ", obs= \n" << obs_
-              << "\n Residuals= " << r_
-              << " \nand covariance\n" << W_
-              << "\n Calculated Jacobian = " << J_
-              << "\n Chi2 error = " << chi2_
-              << " and neighbour Nodes " << neighbourNodes_.size()
-              << std::endl;
-}

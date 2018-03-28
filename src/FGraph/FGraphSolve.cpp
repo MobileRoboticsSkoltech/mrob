@@ -77,6 +77,11 @@ void FGraphSolve::buildAdjacency()
         nodes = &localNodes_;
     }
 
+    for (uint_t i = 0; i < nodes->size(); ++i)
+    {
+        // calculate the indices to access
+    }
+
     for (uint_t i = 0; i < factors->size(); ++i)
     {
         auto f = (*factors)[i];
@@ -94,10 +99,9 @@ void FGraphSolve::buildAdjacency()
         auto f = (*factors)[i];
 
         // 3) Get the calculated residual and build the joint Residual
-        r_.block(index, 0, f->getDim(), 1) << *(f->getResidual());
+        r_.block(index, 0, f->getDim(), 1) << f->getResidual();
 
         // 4) build Adjacency matrix as a composition of rows
-        const MatX* J = f->getJacobian();
         // 4.1) Get the number of nodes involved
         auto neighNodes = f->getNeighbourNodes();
         for (uint_t i=0; i < neighNodes->size(); ++i)
@@ -107,7 +111,7 @@ void FGraphSolve::buildAdjacency()
         }
 
         // 5) Get information matrix for every factor, ONLY for the QR we need W^T/2
-        const MatX* W;
+        MatX W;
         if (QR)
         {
             W = f->getWT2();

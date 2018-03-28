@@ -35,7 +35,7 @@ public:
      * On the derived class constructor we will specify the (ordered)
      * nodes that the factor is connected to.
      */
-    Factor(uint_t potNumberNodes = 5);
+    Factor(uint_t dim, uint_t allNodesDim, uint_t potNumberNodes = 5);
     virtual ~Factor();
     /**
      * Evaluates residuals and Jacobians
@@ -50,19 +50,17 @@ public:
      * The print utility could be reimplemented on child classes
      * if there are special needs
      */
-    virtual void print() const;
+    virtual void print() const {};
     /**
-     * Return a constant pointer to the dynamic matrix. At runtime we still
-     * can't know the size in all problems. TODO If we were using using a fixed sized matrix
-     * we probably want to use an eigen reference (Ref) to a dynamic matrix, e.g.
-     *     Mat5 J = getJacobian();
+     * Return a Ref to a dynamic matrix, while the child matrix should declare
+     * all these variables as fixed size matrices, and ref takes care of
+     * doing the conversion with minimal temporary artifacts
      */
-    const MatX1* getObs() const {return &obs_;};
-    const MatX1* getResidual() const {return &r_;};
-    const MatX* getInvCovariance() const {return &W_;};
-    const MatX* getWT2() const {return &WT2_;};
-    const MatX* getJacobian() const {return &J_;};
-    //void getJacobian(Eigen::Ref<MatX> res) const {res = J_;};
+    virtual const Eigen::Ref<const MatX1> getObs() const = 0;
+    virtual const Eigen::Ref<const MatX1> getResidual() const = 0;
+    virtual const Eigen::Ref<const MatX> getInvCovariance() const = 0;
+    virtual const Eigen::Ref<const MatX> getWT2() const = 0;
+    virtual const Eigen::Ref<const MatX> getJacobian(uint_t nodeId) const = 0;
 
     //matData_t getChi2() const { return r_.dot(W_*r_);};//TODO do we need to calculate this?
     matData_t getChi2() const { return chi2_;};
@@ -81,11 +79,11 @@ protected:
     uint_t allNodesDim_;//summation of all the nodes that the factor affects
     matData_t chi2_;
 
-    // declared here but initialized on child classes
-    MatX1 obs_, r_; //and residuals
-    MatX J_;//Joint Jacobian
-    MatX W_;//inverse of observation covariance (information matrix)
-    MatX WT2_;//transpose and squared root of W. TODO save as selfadjointView<Eigen::Lower>()?
+    // variables to declare on child Factor, for instance of dim 6
+    //Mat61 obs_, r_; //and residuals
+    //Mat6 J1_,J2_;//Jacobians
+    //Mat6 W_;//inverse of observation covariance (information matrix)
+    //Mat6 WT2_;//transpose and squared root of W.
 
 };
 

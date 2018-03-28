@@ -47,12 +47,12 @@ class Node{
      */
     virtual void update(const Eigen::Ref<const MatX1> &dx) = 0;
     /**
-     * We may declare a fixed size matrix at run time and provide
+     * We will return a Reference to a fixed size matrix at run time and provide
      * it as an argument for the getState function, no need to be dynamic,
      * as long as the dimension is correctly set
      */
-    void getState(Eigen::Ref<MatX1> res) const {res = x_;};
-    // Ideally FGraph structure takes care of Id's
+    virtual const Eigen::Ref<const MatX1> getState() const = 0;
+    virtual void print() const {};
     id_t getId() const {return id_;};
     void setId(id_t id) {id_ = id;};
     uint_t getDim(void) const {return dim_;};
@@ -68,21 +68,21 @@ class Node{
     void clear() {neighbourFactors_.clear();};
     std::vector<std::shared_ptr<Factor> >*
             getNeighbourFactors(void) {return &neighbourFactors_;};
-    void print() const ;
 
   protected:
     // For highly connected nodes where removing is necessary, map should be better
     std::vector<std::shared_ptr<Factor> > neighbourFactors_;
     id_t id_;
+    uint_t dim_;
     /**
-     * We have chosen to use a dynamic matrix, instead of
-     * templating the dimensions and creating a fixed vector.
+     * On this pure abstract class we can't define a vector state,
+     * but we will return and process Ref<> to dynamic matrices.
      * The reason for doing that is polymorphism. We prefer to
      * preserve polymorphism for node storage at the cost of
-     * a allocating more resources (matrices).
+     * a returning Ref, although there is no extra allocation on this process.
+     * For instance, we will declare:
+     *      Mat61 x_;
      */
-    MatX1 x_;
-    uint_t dim_;
 };
 
 }

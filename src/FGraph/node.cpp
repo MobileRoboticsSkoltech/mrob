@@ -10,7 +10,6 @@
  */
 
 #include "node.hpp"
-#include <iostream>
 
 using namespace fg;
 
@@ -44,12 +43,4 @@ bool Node::rmFactor(std::shared_ptr<Factor> &factor)
     }
     neighbourFactors_.erase(f);
     return true;
-}
-
-void Node::print() const
-{
-    std::cout << "Printing Node: " << id_
-            << ", state = \n" << x_
-            <<  "\nand neighbour factors " << neighbourFactors_.size()
-            << std::endl;
 }
