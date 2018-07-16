@@ -40,7 +40,7 @@ public:
      * Constructor, requires the Lie algebra xi \in se3 representing the rigid body
      * transformation around the identity, by default generates T = exp(0^) = I
      */
-    SE3(const Mat61 &xi = Mat61());
+    SE3(const Mat61 &xi = Mat61::Zero());
     /**
      * This constructor allows you to construct from Eigen expressions
      * Eigen suggestion: TopicCustomizingEigen.html

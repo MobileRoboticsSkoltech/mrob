@@ -38,7 +38,7 @@ namespace align_mth{
 
 class Carun:  public align_mth::base_T {
   public:
-    Carun(const std::shared_ptr<Eigen::MatrixXd> &X);
+    Carun(const std::shared_ptr<Eigen::MatrixXd> &X, const std::shared_ptr<Eigen::MatrixXd> &Y);
     virtual ~Carun();
     virtual int solve();
 

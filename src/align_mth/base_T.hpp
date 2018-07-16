@@ -59,9 +59,10 @@ class PC_t{
 
 class base_T{
   public:
-    base_T(const std::shared_ptr<Eigen::MatrixXd> &X);
+    base_T(const std::shared_ptr<Eigen::MatrixXd> &X, const std::shared_ptr<Eigen::MatrixXd> &Y);
     virtual ~base_T();
     virtual int solve(void) = 0;
+    lie::SE3 getT(){return T;};
   protected:
     //std::shared_ptr<PC_t> X;
     std::shared_ptr<Eigen::MatrixXd> X;

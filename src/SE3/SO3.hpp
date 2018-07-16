@@ -38,7 +38,7 @@ public:
      * rotation around the identity, by default generates R = exp(0^) = I
      *
      */
-    SO3(const Mat31 &w = Mat31());
+    SO3(const Mat31 &w = Mat31::Zero());
 
     /**
      * This constructor allows to construct from Eigen expressions

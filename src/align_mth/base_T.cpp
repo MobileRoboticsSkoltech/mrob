@@ -53,8 +53,8 @@ void PC_t::add_point(Point3_t p)
 {
     X.push_back(p);
 }
-base_T::base_T(const std::shared_ptr<Eigen::MatrixXd>  &X_):
-    X(X_)
+base_T::base_T(const std::shared_ptr<Eigen::MatrixXd>  &X_, const std::shared_ptr<Eigen::MatrixXd> &Y_):
+    X(X_), Y(Y_)
 {
 }
 

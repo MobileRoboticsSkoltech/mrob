@@ -15,7 +15,8 @@
 using namespace align_mth;
 using namespace Eigen;
 
-Carun::Carun(const std::shared_ptr<MatrixXd> &X): base_T(X)
+Carun::Carun(const std::shared_ptr<MatrixXd> &X, const std::shared_ptr<Eigen::MatrixXd> &Y):
+        base_T(X,Y)
 {
 }
 
