@@ -1,5 +1,9 @@
 # skmr
 The Skoltech Mobile Robotics library (skmr) is our common framework for implementing our robotics research and projects. It includes a core set of functionalities including perception, path planning and optimization. The present library is meant to be a self-contained library.
+* [SE3](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/se3/browse): Rigid Body Transformations library.
+* [Fgraph](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/fgraph/browse): Factor Graph (WIP)
+* [PCReg](): Point Cloud Registration (WIP)
+* [TemplateNew](): Template for new projects.
 
 ## Dependencies
 Eigen, C++'11

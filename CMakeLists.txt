@@ -26,6 +26,22 @@ SET (CMAKE_CXX_STANDARD 11)
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu99")
 
+
+# locate the necessary dependencies, (Eigen)
+find_package(Eigen QUIET)
+if(Eigen_FOUND)
+  MESSAGE("Eigen found in CMake modules:" ${Eigen_INCLUDE_DIRS})
+ELSE(Eigen_FOUND)  
+    SET(Eigen_INCLUDE_DIRS /usr/local/include/eigen3)
+    MESSAGE("Eigen not found, adding manually directories. BE CAREFULL to have installed Eigen here:" ${Eigen_INCLUDE_DIRS})
+    MESSAGE(${Eigen_INCLUDE_DIRS})
+ENDIF(Eigen_FOUND)
+INCLUDE_DIRECTORIES(${Eigen_INCLUDE_DIRS})
+
+# general includes for all the project
+INCLUDE_DIRECTORIES(../include)
+
+
 ADD_SUBDIRECTORY(src)
 
 ADD_CUSTOM_TARGET (distclean @echo cleaning cmake files)

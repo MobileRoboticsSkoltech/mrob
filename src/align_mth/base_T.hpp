@@ -16,7 +16,7 @@
 #include <vector>
 #include <memory>
 #include <iostream>
-#include <Eigen/Dense>
+#include "matrixBase.hpp"
 #include "SE3.hpp"
 
 /**
@@ -59,14 +59,15 @@ class PC_t{
 
 class base_T{
   public:
-    base_T(const std::shared_ptr<Eigen::MatrixXd> &X, const std::shared_ptr<Eigen::MatrixXd> &Y);
+    base_T(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);//TODO input an array of data, and then a MAP to Eigen
     virtual ~base_T();
     virtual int solve(void) = 0;
     lie::SE3 getT(){return T;};
   protected:
+    // TODO will this be PCL?? I need to separe projects then
     //std::shared_ptr<PC_t> X;
-    std::shared_ptr<Eigen::MatrixXd> X;
-    std::shared_ptr<Eigen::MatrixXd> Y;
+    std::shared_ptr<MatX> X;
+    std::shared_ptr<MatX> Y;
     lie::SE3 T;
 };
 
