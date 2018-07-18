@@ -27,7 +27,7 @@ SET (CMAKE_CXX_STANDARD 11)
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu99")
 
 
-# locate the necessary dependencies, (Eigen)
+# locate the necessary dependencies for the project (Eigen)
 find_package(Eigen QUIET)
 if(Eigen_FOUND)
   MESSAGE("Eigen found in CMake modules:" ${Eigen_INCLUDE_DIRS})
@@ -38,11 +38,20 @@ ELSE(Eigen_FOUND)
 ENDIF(Eigen_FOUND)
 INCLUDE_DIRECTORIES(${Eigen_INCLUDE_DIRS})
 
-# general includes for all the project
-INCLUDE_DIRECTORIES(../include)
+#Adding directories and source modules to the Cmake tree.
+# Remove those that are not necessary, by default all are active
+INCLUDE_DIRECTORIES(./skmr/common/include)
+#ADD_SUBDIRECTORY(./skmr/common) #only headers here
 
+INCLUDE_DIRECTORIES(./skmr/SE3/include)
+ADD_SUBDIRECTORY(./skmr/SE3)
 
-ADD_SUBDIRECTORY(src)
+INCLUDE_DIRECTORIES(./skmr/FGraph/include)
+ADD_SUBDIRECTORY(./skmr/FGraph)
+
+INCLUDE_DIRECTORIES(./skmr/PCRegistration/include)
+ADD_SUBDIRECTORY(./skmr/PCRegistration)
+
 
 ADD_CUSTOM_TARGET (distclean @echo cleaning cmake files)
 
