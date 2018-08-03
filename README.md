@@ -14,7 +14,7 @@ Coding conventions are necessary to maintain homogeneity and readability across 
 
 * BSD/Allman conventions: -like, ie. brace on the next line from a control statement, indented on the same level. In switch-case statements the cases are on the same indent level as the switch statement.
 * Indents use 4 spaces instead of tabs. Tabs are not used.
-* Class and struct names camel-case and beginning with an uppercase letter.
+* Class and struct names camel-case and beginning with an uppercase letter. For example `BaseClass`, `Arun`.
 * Variables are in lower camel-case. Member variables have an underscore appended. For example `odometryObs`, `localNodes_`.
 * Constants and enumerations are in uppercase. For example M_PI.
 * Class definitions proceed in the following order:

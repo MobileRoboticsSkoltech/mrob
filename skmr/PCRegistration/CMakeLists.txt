@@ -6,6 +6,7 @@ SET(sources
     src/base_T.cpp
     src/create_points.cpp
     src/arun.cpp
+    src/GICP.cpp
 )
 
 # extra header files
@@ -13,6 +14,7 @@ SET(headers
     base_T.hpp
     create_points.cpp
     arun.hpp
+    GICP.hpp
 )
 
 # create the shared library

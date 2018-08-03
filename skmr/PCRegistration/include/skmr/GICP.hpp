@@ -12,6 +12,7 @@
 #ifndef GICP_HPP_
 #define GICP_HPP_
 
+#include "skmr/base_T.hpp"
 
 /**
  * Custom implementation of the GICP using SE3 optimization (improvement over Euler rotations)
@@ -30,10 +31,10 @@
 
 namespace skmr{
 
-class GICP:  public base_T {
+class GICP:  public Base_T {
   public:
-    GICP(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);
-    virtual ~Carun();
+    GICP(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y, MatX &CovX, MatX &CovY);
+    virtual ~GICP();
     virtual int solve();
 
   protected:

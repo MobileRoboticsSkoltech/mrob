@@ -11,6 +11,18 @@
 
 #include "skmr/GICP.hpp"
 
+using namespace skmr;
 
+GICP::GICP(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y, MatX &CovX, MatX &CovY):
+        Base_T(X,Y)
+{
+}
 
+GICP::~GICP()
+{
+}
 
+int GICP::solve()
+{
+    return 1;
+}
