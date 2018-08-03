@@ -10,21 +10,22 @@
  */
 
 #include "skmr/arun.hpp"
+#include <Eigen/LU>
 #include <Eigen/SVD>
 
 using namespace skmr;
 using namespace Eigen;
 
-Carun::Carun(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y):
-        base_T(X,Y)
+Arun::Arun(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y):
+        Base_T(X,Y)
 {
 }
 
-Carun::~Carun()
+Arun::~Arun()
 {
 }
 
-int Carun::solve()
+int Arun::solve()
 {
     /** Algorithm:
      *  1) calculate centroids cx = sum x_i. cy = sum y_i
@@ -37,30 +38,31 @@ int Carun::solve()
      *      step 5.5 is actually unnecessary IF applying Umeyama technique
      *  6) calculate translation as: t = cy - R * cx
      */
-    // Assume that we have asserted that they are 3xN matrices. (and the same length).
-    assert(1);
-    int N = 10;//XXX
+    // We have already asserted in base_T that they are 3xN matrices. (and the same length).
 
     // 1) calculate centroids cx = E{x_i}. cy = E{y_i}
-    MatrixXd sum_weight = MatrixXd::Constant(N,1, 1.0/(double)N);
-    Vector3d cxm = (*X)*sum_weight;
-    Vector3d cym = (*Y)*sum_weight;
+    MatX sum_weight = MatX::Constant(N_,1, 1.0/(double)N_);
+    Mat31 cxm = (*X)*sum_weight;
+    Mat31 cym = (*Y)*sum_weight;
 
     // 2)  calculate dispersion from centroids qx = x_i - cx
-    MatrixXd qx = *X - cxm;
-    MatrixXd qy = *Y - cym;
+    MatX ones = MatX::Constant(1,N_, -1.0);
+    MatX qx = cxm * ones; // vector of centroids
+    qx += (*X); //substraction inplace with data X
+    MatX qy = cym * ones; // vector of centroids
+    qy += (*Y); //substraction inplace with data X
 
 
     // 3) calculate matrix H = sum qx_i * qy_i^T
-    Matrix3d H = qx * qy.transpose();
+    Mat3 H = qx * qy.transpose();
 
     // 4) svd decomposition: H = U*D*V'
     JacobiSVD<Matrix3d> SVD(H, ComputeFullU | ComputeFullV);//Full matrices indicate Square matrices
 
-    //test
-    std::cout << "Checking matrix SVD: " << SVD.singularValues() <<
-                 ", U = " << SVD.matrixU() <<
-                 ", V = " << SVD.matrixV() << std::endl;
+    //test: prints results so far
+    /*std::cout << "Checking matrix SVD: \n" << SVD.singularValues() <<
+                 ",\n U = " << SVD.matrixU() <<
+                 ",\n V = " << SVD.matrixV() << std::endl;*/
 
 
     // 4.5) look for co-linear solutions, that is 2 of the 3 singular values are equal
@@ -75,7 +77,7 @@ int Carun::solve()
     }
 
     // 5) Calculate the rotation solution R = V*U'
-    Matrix3d R = SVD.matrixV() * SVD.matrixU().transpose();
+    Mat3 R = SVD.matrixV() * SVD.matrixU().transpose();
 
     // 5.5) check for correct solution (det = +1) or reflection (det = -1)
     // that is, solve the problem for co-planar set of points and centroid, when is l1 > l2 > l3 = 0
@@ -87,8 +89,7 @@ int Carun::solve()
     Mat31 t = cym - R*cxm;
 
     // 7) return result
-    SE3 T;
-    T << R, t,
+    this->T << R, t,
          0,0,0,1;
 
     return 1;

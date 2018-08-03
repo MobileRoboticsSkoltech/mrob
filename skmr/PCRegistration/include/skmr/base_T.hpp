@@ -31,6 +31,7 @@
 
 namespace skmr{
 
+//TODO is this used?
 class Point3_t{
 public:
     Point3_t(void);
@@ -46,6 +47,8 @@ public:
 /**
  * PC_t point cloud class provides an easy way to store data and auto remove its content
  * via pointer definitions
+ *
+ * TODO : to be deperrcated?? who uses this?
  */
 class PC_t{
   public:
@@ -57,10 +60,10 @@ class PC_t{
     std::vector<Point3_t> X;
 };
 
-class base_T{
+class Base_T{
   public:
-    base_T(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);//TODO input an array of data, and then a MAP to Eigen
-    virtual ~base_T();
+    Base_T(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);//TODO input an array of data, and then a MAP to Eigen
+    virtual ~Base_T();
     virtual int solve(void) = 0;
     SE3 getT(){return T;};
   protected:
@@ -69,6 +72,7 @@ class base_T{
     std::shared_ptr<MatX> X;
     std::shared_ptr<MatX> Y;
     SE3 T;
+    uint_t N_;
 };
 
 

@@ -22,10 +22,15 @@ int main()
           0, 2, 3, 2, 3, -1,
           3, -1, 3, -4 ,4, 7;
 
+    std::shared_ptr<MatX> Y (new MatX(3,6));//Initializes a zero matrix
+    *Y << 0, 1, 1, 4, 5, 10,
+          1, 2, 1, 2, 6, -1,
+          3, -3, 2, -4 ,7, 7;
+
     std::cout << "1st Arun\n" << *X << std::endl;
-    //skmr::Carun arun(X,X);//TODO there is a problem here on the determinant!
-    //arun.getT().print();
-    //arun.solve();
+    skmr::Arun arun(X,Y);
+    arun.solve();
+    arun.getT().print();
 
 
 

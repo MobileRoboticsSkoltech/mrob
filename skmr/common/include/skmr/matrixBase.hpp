@@ -13,8 +13,9 @@
 #ifndef MATRIX_BASE_HPP_
 #define MATRIX_BASE_HPP_
 
-//#include <Eigen/Dense>
+//#include <Eigen/Dense> // overkill including everything, Specific dependencies will be set at each module
 #include <Eigen/Core>
+//#include <Eigen/LU> // for inverse and determinant
 #include <Eigen/Sparse>
 
 // data types conventions

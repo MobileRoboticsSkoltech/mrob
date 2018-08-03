@@ -53,11 +53,15 @@ void PC_t::add_point(Point3_t p)
 {
     X.push_back(p);
 }
-base_T::base_T(const std::shared_ptr<MatX>  &X_, const std::shared_ptr<MatX> &Y_):
+Base_T::Base_T(const std::shared_ptr<MatX>  &X_, const std::shared_ptr<MatX> &Y_):
     X(X_), Y(Y_)
 {
+    assert(X->cols() >= X->rows()  && "base_T::base_T: Incorrect sizing, we expect 3xN");
+    assert(X->rows() == 3  && "base_T::base_T: Incorrect sizing, we expect 3xN");
+    assert(Y->cols() == X->cols()  && "base_T::base_T: Registration PC not equal");
+    N_ = X->cols();// we expect column matrices 3xN
 }
 
-base_T::~base_T()
+Base_T::~Base_T()
 {
 }

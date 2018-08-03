@@ -36,10 +36,10 @@
  */
 namespace skmr{
 
-class Carun:  public base_T {
+class Arun:  public Base_T {
   public:
-    Carun(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);
-    virtual ~Carun();
+    Arun(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);
+    virtual ~Arun();
     virtual int solve();
 
   protected:
