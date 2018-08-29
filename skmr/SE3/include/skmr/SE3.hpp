@@ -101,6 +101,11 @@ public:
      *                 [0      1]
      */
     SE3 inv(void) const;
+    /**
+     * Adjoint: Adj_xi = [R , t^R]
+     *                   [0    R]
+     */
+    Mat6 adj() const;
     void print(void) const;
     void print_lie(void) const;
 

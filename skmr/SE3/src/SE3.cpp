@@ -140,6 +140,19 @@ SE3 SE3::inv(void) const
 
 }
 
+Mat6 SE3::adj() const
+{
+    Mat6 res(Mat6::Zero());
+    SO3 R;
+    R << this->topLeftCorner<3,3>();// the operator = has not been defined here.
+    Mat31 t = this->topRightCorner<3,1>();
+    Mat3 tx = R.hat(t);
+    res.topLeftCorner<3,3>() << R;
+    res.bottomRightCorner<3,3>() << R;
+    res.topRightCorner<3,3>() << tx*R;
+    return res;
+}
+
 void SE3::print(void) const
 {
     std::cout << *this << std::endl;

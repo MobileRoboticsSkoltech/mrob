@@ -68,6 +68,10 @@ int main()
     std::cout << "invers = " << Tt  << std::endl;
     std::cout << "Matrix distance = " << (Tt-T2.inverse()).norm() << std::endl;
 
+
+    std::cout << "testing adjoint"  << std::endl;
+    std::cout << "Adjoint= " << Tt.adj()  << std::endl;
+
     }
 
 }

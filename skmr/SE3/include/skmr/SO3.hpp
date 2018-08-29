@@ -90,6 +90,10 @@ public:
      * Inverse: R^-1 = R'
      */
     SO3 inv(void) const;
+    /**
+     * Adjoint: Adj_w = R
+     */
+    Mat3 adj() const;
     void print(void) const;
     void print_lie(void) const;
 

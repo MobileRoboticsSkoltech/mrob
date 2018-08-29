@@ -43,6 +43,7 @@ void SO3::update(const Mat31 &dw)
     *this = dR * (*this);
 }
 
+//TODO remove from class
 Mat31 SO3::vee(const Mat3 &w_hat) const
 {
     Mat31 w;
@@ -97,6 +98,11 @@ Mat31 SO3::ln_vee() const
 SO3 SO3::inv(void) const
 {
     return this->transpose();
+}
+
+Mat3 SO3::adj() const
+{
+    return *this;
 }
 
 void SO3::print(void) const
