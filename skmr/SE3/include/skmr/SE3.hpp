@@ -33,6 +33,7 @@
  */
 namespace skmr{
 
+
 class SE3 : public Mat4
 {
 public:
@@ -60,17 +61,6 @@ public:
      * T'=exp(dxi^)*T
      */
     void update(const Mat61 &dxi);
-    /**
-     * Hat operator xi^ = [0  -w3   w2 v1
-     *                     w3   0  -w1 v2
-     *                   -w2  w1    0  v3
-     *                    0    0    0   0]
-     */
-    Mat4 hat(const Mat61 &xi) const;
-    /**
-     * Vee operator, the inverse of hat
-     */
-    Mat61 vee(const Mat4 &xi_hat) const;
     /**
      *  Exponential mapping of a skew symetric matrix in se3.
      *  exp(xi^) = [exp(w^)  Vv], where exp(w^) is the so3_exp and
@@ -112,6 +102,18 @@ public:
 protected:
 };
 
+
+/**
+ * Hat operator xi^ = [0  -w3   w2 v1
+ *                     w3   0  -w1 v2
+ *                   -w2  w1    0  v3
+ *                    0    0    0   0]
+ */
+Mat4 hat6(const Mat61 &xi);
+/**
+ * Vee operator, the inverse of hat
+ */
+Mat61 vee6(const Mat4 &xi_hat);
 
 }// end namespace
 #endif /* SE3_HPP_ */

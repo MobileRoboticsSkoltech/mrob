@@ -30,6 +30,7 @@
  */
 namespace skmr{
 
+
 class SO3 : public Mat3
 {
 public:
@@ -58,18 +59,6 @@ public:
      * R'=exp(dw^)*R
      */
     void update(const Mat31 &dw);
-    /**
-     * The hat operator (^) constructs a skew-symetric matrix from a R^3 such as [0 -w3 w2]
-     *                                                                           [w3  0 -w1]
-     *                                                                           [-w2 w1 0]
-     */
-    Mat3 hat(const Mat31 &w) const;
-    /**
-     * The vee operator gets the parameters w from a skew-symetric matrix of the form [0 -w3 w2]
-     *                                                                                [w3  0 -w1]
-     *                                                                                [-w2 w1 0]
-     */
-    Mat31 vee(const Mat3 &w_hat) const;
     /**
      *  Exponential mapping of a skew symetric matrix in so3. The Rodrigues formula provides
      *  an exact solution to the Taylor expansion of exp(A) = I + A + c2*A^2 + ...
@@ -100,6 +89,21 @@ public:
 protected:
 };
 
+
+/**
+ * Functions specified outside the class, since they are not strictly necessary as a class method.
+ *
+ * The hat operator (^) constructs a skew-symetric matrix from a R^3 such as [0 -w3 w2]
+ *                                                                           [w3  0 -w1]
+ *                                                                           [-w2 w1 0]
+ */
+Mat3 hat3(const Mat31 &w);
+/**
+ * The vee operator gets the parameters w from a skew-symetric matrix of the form [0 -w3 w2]
+ *                                                                                [w3  0 -w1]
+ *                                                                                [-w2 w1 0]
+ */
+Mat31 vee3(const Mat3 &w_hat);
 
 }// end namespace
 #endif /* SO3_HPP_ */

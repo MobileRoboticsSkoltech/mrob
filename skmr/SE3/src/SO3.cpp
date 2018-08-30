@@ -20,7 +20,7 @@ using namespace skmr;
 SO3::SO3(const Mat31 &w) : Mat3(Mat3::Identity())
 {
     //std::cout << "SO3 with Mat31" << std::endl;
-    this->exp(this->hat(w));
+    this->exp(hat3(w));
 }
 template<typename OtherDerived>
 SO3::SO3(const Eigen::MatrixBase<OtherDerived>& other)  :
@@ -43,15 +43,14 @@ void SO3::update(const Mat31 &dw)
     *this = dR * (*this);
 }
 
-//TODO remove from class
-Mat31 SO3::vee(const Mat3 &w_hat) const
+Mat31 skmr::vee3(const Mat3 &w_hat)
 {
     Mat31 w;
     w << -w_hat(1,2), w_hat(0,2), -w_hat(0,1);
     return w;
 }
 
-Mat3 SO3::hat(const Mat31 &w) const
+Mat3 skmr::hat3(const Mat31 &w)
 {
     Mat3 w_hat;
     w_hat <<     0.0, -w(2),  w(1),
@@ -63,7 +62,7 @@ Mat3 SO3::hat(const Mat31 &w) const
 
 void SO3::exp(const Mat3 &w_hat)
 {
-    Mat31 w = this->vee(w_hat);
+    Mat31 w = vee3(w_hat);
     double o = w.norm();
     if ( o < 1e-12){
         *this << Mat3::Identity();
@@ -92,7 +91,7 @@ Mat3 SO3::ln(double *ro) const
 Mat31 SO3::ln_vee() const
 {
     Mat3 w_hat = this->ln();
-    return this->vee(w_hat);
+    return vee3(w_hat);
 }
 
 SO3 SO3::inv(void) const

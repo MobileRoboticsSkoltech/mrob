@@ -20,7 +20,7 @@ using namespace skmr;
 SE3::SE3(const Mat61 &xi) : Mat4(Mat4::Identity())
 {
     //std::cout << "SE3 MAT31" << std::endl;
-    this->exp(this->hat(xi));
+    this->exp(hat6(xi));
 }
 
 template<typename OtherDerived>
@@ -43,7 +43,7 @@ void SE3::update(const Mat61 &dxi)
     *this << dT * (*this);
 }
 
-Mat61 SE3::vee(const Mat4 &xi_hat) const
+Mat61 skmr::vee6(const Mat4 &xi_hat)
 {
     Mat61 xi;
     xi << -xi_hat(1,2), xi_hat(0,2), -xi_hat(0,1),
@@ -51,7 +51,7 @@ Mat61 SE3::vee(const Mat4 &xi_hat) const
     return xi;
 }
 
-Mat4 SE3::hat(const Mat61 &xi) const
+Mat4 skmr::hat6(const Mat61 &xi)
 {
     Mat4 xi_hat;
     xi_hat  <<    0.0, -xi(2),  xi(1), xi(3),
@@ -64,7 +64,7 @@ Mat4 SE3::hat(const Mat61 &xi) const
 void SE3::exp(const Mat4 &xi_hat)
 {
     // Calculating xi = [w, v]
-    Mat61 xi = this->vee(xi_hat);
+    Mat61 xi = vee6(xi_hat);
     Mat31 w = xi.head<3>();
     Mat31 v = xi.tail<3>();
     SO3 R(w);
@@ -126,7 +126,7 @@ Mat4 SE3::ln(void) const
 Mat61 SE3::ln_vee() const
 {
     Mat4 xi_hat = this->ln();
-    return this->vee(xi_hat);
+    return vee6(xi_hat);
 }
 
 SE3 SE3::inv(void) const
@@ -146,7 +146,7 @@ Mat6 SE3::adj() const
     SO3 R;
     R << this->topLeftCorner<3,3>();// the operator = has not been defined here.
     Mat31 t = this->topRightCorner<3,1>();
-    Mat3 tx = R.hat(t);
+    Mat3 tx = hat3(t);
     res.topLeftCorner<3,3>() << R;
     res.bottomRightCorner<3,3>() << R;
     res.topRightCorner<3,3>() << tx*R;
