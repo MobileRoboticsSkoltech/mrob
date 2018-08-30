@@ -40,17 +40,17 @@ INCLUDE_DIRECTORIES(${Eigen_INCLUDE_DIRS})
 
 #Adding directories and source modules to the Cmake tree.
 # Remove those that are not necessary, by default all are active
-INCLUDE_DIRECTORIES(./skmr/common/include)
-#ADD_SUBDIRECTORY(./skmr/common) #only headers here
+INCLUDE_DIRECTORIES(./common/include)
+#ADD_SUBDIRECTORY(./common) #only headers here
 
-INCLUDE_DIRECTORIES(./skmr/SE3/include)
-ADD_SUBDIRECTORY(./skmr/SE3)
+INCLUDE_DIRECTORIES(./SE3/include)
+ADD_SUBDIRECTORY(./SE3)
 
-INCLUDE_DIRECTORIES(./skmr/FGraph/include)
-ADD_SUBDIRECTORY(./skmr/FGraph)
+INCLUDE_DIRECTORIES(./FGraph/include)
+ADD_SUBDIRECTORY(./FGraph)
 
-INCLUDE_DIRECTORIES(./skmr/PCRegistration/include)
-ADD_SUBDIRECTORY(./skmr/PCRegistration)
+INCLUDE_DIRECTORIES(./PCRegistration/include)
+ADD_SUBDIRECTORY(./PCRegistration)
 
 
 ADD_CUSTOM_TARGET (distclean @echo cleaning cmake files)
