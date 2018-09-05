@@ -13,8 +13,9 @@
 #define FACTOR_HPP_
 
 #include <vector>
+
+#include "skmr/matrix_base.hpp"
 #include "skmr/node.hpp"
-#include "skmr/matrixBase.hpp"
 
 namespace skmr{
 

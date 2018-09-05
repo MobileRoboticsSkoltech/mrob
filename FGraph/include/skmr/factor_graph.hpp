@@ -1,7 +1,7 @@
 /* $COPYRIGHT_SKOLTECH
  * $LICENSE_LGPL
  *
- * FGraph.hpp
+ * factor_graph.hpp
  *
  *  Created on: Feb 12, 2018
  *      Author: Gonzalo Ferrer
@@ -9,8 +9,8 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#ifndef FGRAPH_HPP_
-#define FGRAPH_HPP_
+#ifndef FACTOR_GRAPH_HPP_
+#define FACTOR_GRAPH_HPP_
 
 //#include <unordered_set>
 //#include <deque>//TODO change for long allocations
@@ -108,4 +108,4 @@ protected:
 
 }
 
-#endif /* FGraph_HPP_ */
+#endif /* FACTOR_Graph_HPP_ */

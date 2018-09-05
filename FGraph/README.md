@@ -8,5 +8,5 @@ C++'11, Eigen
 
 
 ## Coding conventions
-Please check the common conventions for [skmr](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse).
+Please check the common code conventions for [skmr](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse).
 

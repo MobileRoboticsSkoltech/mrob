@@ -4,16 +4,16 @@
 SET(headers
     node.hpp
     factor.hpp
-    FGraph.hpp
-    FGraphSolve.hpp
+    factor_graph.hpp
+    factor_graph_solve.hpp
 )
 
 # extra source files
 SET(sources
     src/node.cpp
     src/factor.cpp
-    src/FGraph.cpp
-    src/FGraphSolve.cpp
+    src/factor_graph.cpp
+    src/factor_graph_solve.cpp
 )
 
 SET(factors_headers

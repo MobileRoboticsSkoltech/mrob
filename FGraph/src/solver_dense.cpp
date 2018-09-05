@@ -1,7 +1,7 @@
 /* $COPYRIGHT_SKOLTECH
  * $LICENSE_LGPL
  *
- * DenseGaussNewton.cpp
+ * solver_dense.cpp
  *
  *  Created on: Mar 3, 2018
  *      Author: Gonzalo Ferrer
@@ -10,8 +10,8 @@
  */
 
 
-#include "skmr/solverDense.hpp"
 #include <iostream>
+#include "skmr/solver_dense.hpp"
 
 using namespace skmr;
 

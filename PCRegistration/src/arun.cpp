@@ -17,7 +17,7 @@ using namespace skmr;
 using namespace Eigen;
 
 Arun::Arun(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y):
-        Base_T(X,Y)
+        BaseTransf(X,Y)
 {
 }
 

@@ -13,8 +13,8 @@
 #define FACTOR1POSE3D_HPP_
 
 
+#include "skmr/matrix_base.hpp"
 #include "skmr/factor.hpp"
-#include "skmr/matrixBase.hpp"
 #include "skmr/SE3.hpp" //requires including and linking SE3 library
 
 namespace skmr{

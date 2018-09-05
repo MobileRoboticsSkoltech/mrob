@@ -1,7 +1,7 @@
 /* $COPYRIGHT_SKOLTECH
  * $LICENSE_LGPL
  *
- * base_T.cpp
+ * base_transf.cpp
  *
  *  Created on: Feb 1, 2018
  *      Author: Gonzalo Ferrer
@@ -9,7 +9,7 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#include "skmr/base_T.hpp"
+#include "skmr/base_transf.hpp"
 
 using namespace skmr;
 
@@ -53,7 +53,7 @@ void PC_t::add_point(Point3_t p)
 {
     X.push_back(p);
 }
-Base_T::Base_T(const std::shared_ptr<MatX>  &X_, const std::shared_ptr<MatX> &Y_):
+BaseTransf::BaseTransf(const std::shared_ptr<MatX>  &X_, const std::shared_ptr<MatX> &Y_):
     X(X_), Y(Y_)
 {
     assert(X->cols() >= X->rows()  && "base_T::base_T: Incorrect sizing, we expect 3xN");
@@ -62,6 +62,6 @@ Base_T::Base_T(const std::shared_ptr<MatX>  &X_, const std::shared_ptr<MatX> &Y_
     N_ = X->cols();// we expect column matrices 3xN
 }
 
-Base_T::~Base_T()
+BaseTransf::~BaseTransf()
 {
 }

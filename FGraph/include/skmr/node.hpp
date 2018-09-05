@@ -15,7 +15,8 @@
 #include <vector>
 #include <memory>
 #include <assert.h>
-#include "skmr/matrixBase.hpp"
+
+#include "skmr/matrix_base.hpp"
 
 
 namespace skmr{

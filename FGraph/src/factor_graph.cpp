@@ -1,7 +1,7 @@
 /* $COPYRIGHT_SKOLTECH
  * $LICENSE_LGPL
  *
- * FGraph.cpp
+ * factor_graph.cpp
  *
  *  Created on: Feb 12, 2018
  *      Author: Gonzalo Ferrer
@@ -10,8 +10,8 @@
  */
 
 
-#include "skmr/FGraph.hpp"
 #include <iostream>
+#include "skmr/factor_graph.hpp"
 
 using namespace skmr;
 

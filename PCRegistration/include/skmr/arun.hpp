@@ -12,7 +12,7 @@
 #ifndef ARUN_HPP_
 #define ARUN_HPP_
 
-#include "skmr/base_T.hpp"
+#include "base_transf.hpp"
 
 /**
  *  This class provides a set of methods to calculate the transformation
@@ -36,7 +36,7 @@
  */
 namespace skmr{
 
-class Arun:  public Base_T {
+class Arun:  public BaseTransf {
   public:
     Arun(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);
     virtual ~Arun();

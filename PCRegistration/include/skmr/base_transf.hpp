@@ -1,7 +1,7 @@
 /* $COPYRIGHT_SKOLTECH
  * $LICENSE_LGPL
  *
- * base_T.hpp
+ * base_transformation.hpp
  *
  *  Created on: Jan 31, 2018
  *      Author: Gonzalo Ferrer
@@ -9,14 +9,15 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#ifndef SRC_BASE_T_HPP_
-#define SRC_BASE_T_HPP_
+#ifndef SRC_BASE_TRANSF_HPP_
+#define SRC_BASE_TRANSF_HPP_
 
 
 #include <vector>
 #include <memory>
 #include <iostream>
-#include "skmr/matrixBase.hpp"
+
+#include "skmr/matrix_base.hpp"
 #include "skmr/SE3.hpp"
 
 /**
@@ -31,7 +32,7 @@
 
 namespace skmr{
 
-//TODO is this used?
+//TODO is this used? To be deprecated
 class Point3_t{
 public:
     Point3_t(void);
@@ -60,10 +61,10 @@ class PC_t{
     std::vector<Point3_t> X;
 };
 
-class Base_T{
+class BaseTransf{
   public:
-    Base_T(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);//TODO input an array of data, and then a MAP to Eigen
-    virtual ~Base_T();
+    BaseTransf(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);//TODO input an array of data, and then a MAP to Eigen
+    virtual ~BaseTransf();
     virtual int solve(void) = 0;
     SE3 getT(){return T;};
   protected:

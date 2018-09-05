@@ -12,8 +12,8 @@
 #ifndef NODEPOSE3D_HPP_
 #define NODEPOSE3D_HPP_
 
+#include "skmr/matrix_base.hpp"
 #include "skmr/node.hpp"
-#include "skmr/matrixBase.hpp"
 #include "skmr/SE3.hpp" //requires including and linking SE3 library
 
 namespace skmr{

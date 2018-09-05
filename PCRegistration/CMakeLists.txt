@@ -3,18 +3,18 @@
 
 # extra source files
 SET(sources
-    src/base_T.cpp
+    src/base_transf.cpp
     src/create_points.cpp
     src/arun.cpp
-    src/GICP.cpp
+    src/gicp.cpp
 )
 
 # extra header files
 SET(headers
-    base_T.hpp
+    base_transf.hpp
     create_points.cpp
     arun.hpp
-    GICP.hpp
+    gicp.hpp
 )
 
 # create the shared library

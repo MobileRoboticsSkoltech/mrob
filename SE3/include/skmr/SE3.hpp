@@ -14,7 +14,7 @@
 #define SE3_HPP_
 
 
-#include "skmr/matrixBase.hpp"
+#include "skmr/matrix_base.hpp"
 
 
 

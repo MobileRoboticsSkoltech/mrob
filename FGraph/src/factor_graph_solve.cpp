@@ -1,7 +1,7 @@
 /* $COPYRIGHT SKOLTECH
  * $LICENSE_LGPL
  *
- * FGraphSolve.cpp
+ * factor_graph_solve.cpp
  *
  *  Created on: Mar 23, 2018
  *      Author: Gonzalo Ferrer
@@ -11,7 +11,8 @@
 
 
 #include <iostream>
-#include "skmr/FGraphSolve.hpp"
+
+#include "skmr/factor_graph_solve.hpp"
 
 using namespace skmr;
 

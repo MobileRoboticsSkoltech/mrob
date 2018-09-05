@@ -1,7 +1,7 @@
 /* $COPYRIGHT SKOLTECH
  * $LICENSE_LGPL
  *
- * FGraphSolve.hpp
+ * factor_graph_solve.hpp
  *
  *  Created on: Mar 23, 2018
  *      Author: Gonzalo Ferrer
@@ -9,11 +9,11 @@
  *              Mobile Robotics Lab, Skoltech
  */
 
-#ifndef SRC_FGRAPH_FGRAPHSOLVE_HPP_
-#define SRC_FGRAPH_FGRAPHSOLVE_HPP_
+#ifndef SRC_FACTOR_GRAPH_SOLVE_HPP_
+#define SRC_FACTOR_GRAPH_SOLVE_HPP_
 
 
-#include "skmr/FGraph.hpp"
+#include "factor_graph.hpp"
 
 namespace skmr{
 
@@ -68,4 +68,4 @@ protected:
 }
 
 
-#endif /* SRC_FGRAPH_FGraphSolve_HPP_ */
+#endif /* SRC_FACTOR_GRAPH_SOLVE_HPP_ */

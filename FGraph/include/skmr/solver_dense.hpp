@@ -1,7 +1,7 @@
 /* $COPYRIGHT_SKOLTECH
  * $LICENSE_LGPL
  *
- * solverDense.hpp
+ * solver_dense.hpp
  *
  *  Created on: Feb 27, 2018
  *      Author: Gonzalo Ferrer
@@ -9,10 +9,10 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#ifndef SOLVERDENSE_HPP_
-#define SOLVERDENSE_HPP_
+#ifndef SOLVER_DENSE_HPP_
+#define SOLVER_DENSE_HPP_
 
-#include "skmr/FGraph.hpp"
+#include "factor_graph.hpp"
 
 namespace skmr{
 
@@ -22,6 +22,8 @@ namespace skmr{
  *
  * Given the nature of the problem, we have a reduced but dense information
  * matrix. No optimization is carried out for ordering or storing sparse matrices.
+ *
+ * TODO is this necessary? for dense problems should be elsewhere....
  */
 
 class DenseGaussNewton

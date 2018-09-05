@@ -1,7 +1,7 @@
 /* $COPYRIGHT_SKOLTECH
  * $LICENSE_LGPL
  *
- * GICP.hpp
+ * gicp.hpp
  *
  *  Created on: Jan 31, 2018
  *      Author: Gonzalo Ferrer
@@ -12,7 +12,7 @@
 #ifndef GICP_HPP_
 #define GICP_HPP_
 
-#include "skmr/base_T.hpp"
+#include "base_transf.hpp"
 
 /**
  * Custom implementation of the GICP using SE3 optimization (improvement over Euler rotations)
@@ -31,7 +31,7 @@
 
 namespace skmr{
 
-class GICP:  public Base_T {
+class GICP:  public BaseTransf {
   public:
     GICP(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y, MatX &CovX, MatX &CovY);
     virtual ~GICP();

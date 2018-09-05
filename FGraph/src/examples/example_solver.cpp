@@ -13,7 +13,7 @@
 
 
 
-#include "skmr/FGraphSolve.hpp"
+#include "../../include/skmr/factor_graph_solve.hpp"
 #include "skmr/factors/nodePose3d.hpp"
 #include "skmr/factors/factor1Pose3d.hpp"
 #include "skmr/factors/factor2Poses3d.hpp"
