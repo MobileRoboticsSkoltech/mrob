@@ -1,36 +1,25 @@
 # locate the necessary dependencies, if any
 
-# extra header files
-SET(headers
-    node.hpp
-    factor.hpp
-    factor_graph.hpp
-    factor_graph_solve.hpp
-)
 
 # extra source files
 SET(sources
-    src/node.cpp
-    src/factor.cpp
-    src/factor_graph.cpp
-    src/factor_graph_solve.cpp
+    base_transf.cpp
+    create_points.cpp
+    arun.cpp
+    gicp.cpp
 )
 
-SET(factors_headers
-    factors/nodePose3d.hpp
-    factors/factor2Poses3d.hpp
-    factors/factor1Pose3d.hpp
-)
-
-SET(factors_sources
-    src/factors/nodePose3d.cpp
-    src/factors/factor2Poses3d.cpp
-    src/factors/factor1Pose3d.cpp
+# extra header files
+SET(headers
+    base_transf.hpp
+    create_points.cpp
+    arun.hpp
+    gicp.hpp
 )
 
 # create the shared library
-ADD_LIBRARY(FGraph SHARED  ${sources} ${factors_sources})
-TARGET_LINK_LIBRARIES(FGraph SE3)
+ADD_LIBRARY(align_mth SHARED  ${sources})
+TARGET_LINK_LIBRARIES(align_mth SE3)
 
 
 #install 
@@ -48,5 +37,5 @@ TARGET_LINK_LIBRARIES(FGraph SE3)
 #INSTALL(FILES ../Findpeople_prediction.cmake DESTINATION ${CMAKE_ROOT}/Modules/)
 
 
-ADD_SUBDIRECTORY(src/examples)
-#ADD_SUBDIRECTORY(src/tests)
+ADD_SUBDIRECTORY(examples)
+#ADD_SUBDIRECTORY(test)

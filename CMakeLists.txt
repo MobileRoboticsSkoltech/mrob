@@ -38,20 +38,7 @@ ELSE(Eigen_FOUND)
 ENDIF(Eigen_FOUND)
 INCLUDE_DIRECTORIES(${Eigen_INCLUDE_DIRS})
 
-#Adding directories and source modules to the Cmake tree.
-# Remove those that are not necessary, by default all are active
-INCLUDE_DIRECTORIES(./common/include)
-#ADD_SUBDIRECTORY(./common) #only headers here
-
-INCLUDE_DIRECTORIES(./SE3/include)
-ADD_SUBDIRECTORY(./SE3)
-
-INCLUDE_DIRECTORIES(./FGraph/include)
-ADD_SUBDIRECTORY(./FGraph)
-
-INCLUDE_DIRECTORIES(./PCRegistration/include)
-ADD_SUBDIRECTORY(./PCRegistration)
-
+ADD_SUBDIRECTORY(./src)
 
 ADD_CUSTOM_TARGET (distclean @echo cleaning cmake files)
 

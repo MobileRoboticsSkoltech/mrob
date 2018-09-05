@@ -1,9 +1,9 @@
 # skmr
 The Skoltech Mobile Robotics library (skmr) is our common framework for implementing our robotics research and projects. It includes a core set of functionalities including perception, path planning and optimization. The present library is meant to be a self-contained library.
-* [common](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/skmr/common): common matrix definitions and typedefs.
-* [SE3](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/skmr/SE3): Rigid Body Transformations library.
-* [Fgraph](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/skmr/FGraph): Factor Graph (WIP)
-* [PCReg](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/skmr/PCRegistration): Point Cloud Registration (WIP)
+* [common](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/src/common): common matrix definitions and typedefs.
+* [SE3](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/src/SE3): Rigid Body Transformations library.
+* [Fgraph](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/src/FGraph): Factor Graph (WIP)
+* [PCReg](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/src/PCRegistration): Point Cloud Registration (WIP)
 * [TemplateNew](): Template for new projects.
 
 ## Dependencies
@@ -16,7 +16,7 @@ Coding conventions are necessary to maintain homogeneity and readability across 
 * Indents use 4 spaces instead of tabs. Tabs are not used.
 * Class and struct names camel-case and beginning with an uppercase letter. For example `BaseClass`, `Arun`.
 * Variables are in lower camel-case. For example `odometryObs`. Member variables have an underscore appended `localNodes_`.
-* Functions are in lower case, and can be separated by underscores, e.g. `solve_iterative()`.
+* Functions are in lower case, and can be separated by underscores, e.g. `solve_iterative()` or in lower camel-case, what is important is to be as descriptive as possible, not contracting names for the sake of understandability.
 * File names: Should be all lowercase, and can be separated by underscores, `example_align_methods.cpp`
 * Constants and enumerations are in uppercase. For example `M_PI`.
 * Class definitions proceed in the following order:
@@ -31,13 +31,35 @@ Coding conventions are necessary to maintain homogeneity and readability across 
 * Header files are commented using one-line comments beginning with / &ast &ast to mark them, comments are important.
 
 
-## Installation
+## Repository configuration
+
 
 Clone the project from CDISE bitbucket:
 
-`git -c http.sslVerify=false clone 	https://yourUserName@cdise-bitbucket.skoltech.ru/scm/mr/skmr.git`
-We need to disable the certificate because server certificate verifications fails. Another way of solving it obtaining the .pem certificate directly from the web-page and configuring git, but we recommend the former solution for being much easier.
+`git -c http.sslVerify=false clone 	https://git@cdise-bitbucket.skoltech.ru/scm/mr/skmr.git`
 
+We need to disable the certificate because server certificate verifications fails.
+
+`git remote remove origin`
+
+Create a new repository, either at the group or private.
+
+`git remote add origin ssh://yourUserName@cdise-bitbucket.skoltech.ru:7999/mr/yourNewProject.git`
+
+`git push -u origin master`
+
+
+To push and do other operations:
+* Obtain the .pem certificate directly from the web-page https://cdise-bitbucket.skoltech.ru
+* Configure .git/config, by adding the following lines: 
+```
+[http]
+	sslCAInfo=/home/yourUserName/sk-bitbucket.pem
+```
+
+When a project is finished and tested, it should be merged back to the original repository. Use the merge request feature.
+
+## Installation
 ```
 cd skmr
 mkdir build
@@ -46,7 +68,10 @@ cmake ..
 make -j
 ```
 
+
 ### Eclipse
-for Eclise users, on project, properties, C++build, select the build command `make -C ${projDirPath}./build`
+for Eclipse users:
+* Make: on project, properties, C++build, select the build command `make -C ${projDirPath}./build`
+* Find Eigen symbols: project, properties, C++ general, paths and symbols: add Eigen source, for example at /usr/local/include/eigen3
 
 

@@ -13,7 +13,7 @@
 #include "skmr/factors/nodePose3d.hpp"
 #include "skmr/factors/factor2Poses3d.hpp"
 #include <iostream> //this causes 1 non-free allocation in valgrind, dont panic
-#include "../../include/skmr/factor_graph.hpp"
+#include "skmr/factor_graph.hpp"
 
 
 int main()

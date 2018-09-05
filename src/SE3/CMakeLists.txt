@@ -1,32 +1,29 @@
-# locate the necessary dependencies, if any
+# locate the additional necessary dependencies, if any
 
 
 # extra source files
 SET(sources
-    src/base_transf.cpp
-    src/create_points.cpp
-    src/arun.cpp
-    src/gicp.cpp
+    SO3.cpp
+    SE3.cpp
 )
 
 # extra header files
 SET(headers
-    base_transf.hpp
-    create_points.cpp
-    arun.hpp
-    gicp.hpp
+	SO3.hpp
+	SE3.hpp
 )
 
 # create the shared library
-ADD_LIBRARY(align_mth SHARED  ${sources})
-TARGET_LINK_LIBRARIES(align_mth SE3)
+ADD_LIBRARY(SE3 SHARED  ${sources})
+#TARGET_LINK_LIBRARIES( .. )
+#target_link_libraries(${PROJECT_NAME} ${position_3d_LIBRARY})
 
 
 #install 
 #INSTALL(TARGETS people_prediction
 #        RUNTIME DESTINATION bin
-#        LIBRARY DESTINATION lib/MRobotics
-#        ARCHIVE DESTINATION lib/MRobotics)
+#        LIBRARY DESTINATION lib/SE3
+#        ARCHIVE DESTINATION lib/SE3)
 
 #INSTALL(FILES ${headers} DESTINATION include/iridrivers/people_prediction)
 #INSTALL(FILES ${headers_random} DESTINATION include/iridrivers/people_prediction/random)
@@ -37,5 +34,5 @@ TARGET_LINK_LIBRARIES(align_mth SE3)
 #INSTALL(FILES ../Findpeople_prediction.cmake DESTINATION ${CMAKE_ROOT}/Modules/)
 
 
-ADD_SUBDIRECTORY(src/examples)
-#ADD_SUBDIRECTORY(src/test)
+ADD_SUBDIRECTORY(examples)
+#ADD_SUBDIRECTORY(test)
