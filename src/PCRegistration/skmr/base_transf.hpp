@@ -20,11 +20,15 @@
 #include "skmr/matrix_base.hpp"
 #include "skmr/SE3.hpp"
 
+// PCL dependencies
+#include <pcl/point_types.h>
+#include <pcl/pcl_base.h>
+
 /**
  * This header provides the common structure for the Point Cloud Alignment,
  * that is, a common abstract class structure, common data variables and methods
  *
- * In general we will assume that point are
+ * In general we will assume that points and PointCloud is from the PCL library?
  */
 
 
@@ -45,33 +49,16 @@ public:
     double z;
 };
 
-/**
- * PC_t point cloud class provides an easy way to store data and auto remove its content
- * via pointer definitions
- *
- * TODO : to be deperrcated?? who uses this?
- */
-class PC_t{
-  public:
-    PC_t(int N);
-    ~PC_t();
-    void add_point(Point3_t);
-    void print();
-  private:
-    std::vector<Point3_t> X;
-};
 
 class BaseTransf{
   public:
-    BaseTransf(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);//TODO input an array of data, and then a MAP to Eigen
+    BaseTransf(const pcl::PointCloud< pcl::PointXYZ >::Ptr X, const pcl::PointCloud< pcl::PointXYZ >::Ptr Y);
     virtual ~BaseTransf();
     virtual int solve(void) = 0;
     SE3 getT(){return T;};
   protected:
-    // TODO will this be PCL?? I need to separe projects then
-    //std::shared_ptr<PC_t> X;
-    std::shared_ptr<MatX> X;
-    std::shared_ptr<MatX> Y;
+    pcl::PointCloud< pcl::PointXYZ >::Ptr X;
+    pcl::PointCloud< pcl::PointXYZ >::Ptr Y;
     SE3 T;
     uint_t N_;
 };

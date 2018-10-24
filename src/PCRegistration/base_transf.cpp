@@ -32,34 +32,15 @@ void Point3_t::print(void)
 {
     std::cout << "[" << x << ", " << y << ", "<< z << "]" << std::endl;
 }
-PC_t::PC_t(int N)
-{
-    X.reserve(N);
-}
-PC_t::~PC_t()
-{
-    X.clear();
-}
 
-void PC_t::print()
-{
-    for (Point3_t &element : X)
-    {
-        element.print();
-    }
-}
-
-void PC_t::add_point(Point3_t p)
-{
-    X.push_back(p);
-}
-BaseTransf::BaseTransf(const std::shared_ptr<MatX>  &X_, const std::shared_ptr<MatX> &Y_):
+BaseTransf::BaseTransf(const pcl::PointCloud< pcl::PointXYZ >::Ptr X_, const pcl::PointCloud< pcl::PointXYZ >::Ptr Y_):
     X(X_), Y(Y_)
 {
-    assert(X->cols() >= X->rows()  && "base_T::base_T: Incorrect sizing, we expect 3xN");
-    assert(X->rows() == 3  && "base_T::base_T: Incorrect sizing, we expect 3xN");
-    assert(Y->cols() == X->cols()  && "base_T::base_T: Registration PC not equal");
-    N_ = X->cols();// we expect column matrices 3xN
+    //assert(X->cols() >= X->rows()  && "base_T::base_T: Incorrect sizing, we expect 3xN");
+    //assert(X->rows() == 3  && "base_T::base_T: Incorrect sizing, we expect 3xN");
+    //assert(Y->cols() == X->cols()  && "base_T::base_T: Registration PC not equal");
+    assert(X->points.size() != 0 );
+    assert(Y->points.size() != 0 );
 }
 
 BaseTransf::~BaseTransf()

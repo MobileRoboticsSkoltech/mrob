@@ -8,7 +8,7 @@ endif(COMMAND cmake_policy)
 
 # The project name and the type of project
 PROJECT(skmr)
-#DISPLAY(${PROJECT_NAME})
+#MESSAGE(Project\ name:\ ${PROJECT_NAME})
 
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/lib)

@@ -1,4 +1,8 @@
 # locate the necessary dependencies, if any
+find_package(PCL 1.7 REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 
 # extra source files
@@ -18,8 +22,8 @@ SET(headers
 )
 
 # create the shared library
-ADD_LIBRARY(align_mth SHARED  ${sources})
-TARGET_LINK_LIBRARIES(align_mth SE3)
+ADD_LIBRARY(align_mth SHARED  ${sources} )
+TARGET_LINK_LIBRARIES(align_mth SE3 ${PCL_LIBRARIES})
 
 
 #install 
