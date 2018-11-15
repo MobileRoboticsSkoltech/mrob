@@ -52,13 +52,16 @@ public:
 
 class BaseTransf{
   public:
-    BaseTransf(const pcl::PointCloud< pcl::PointXYZ >::Ptr X, const pcl::PointCloud< pcl::PointXYZ >::Ptr Y);
+    //BaseTransf(const pcl::PointCloud< pcl::PointXYZ >::Ptr X, const pcl::PointCloud< pcl::PointXYZ >::Ptr Y);
+    BaseTransf(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);
     virtual ~BaseTransf();
     virtual int solve(void) = 0;
     SE3 getT(){return T;};
   protected:
-    pcl::PointCloud< pcl::PointXYZ >::Ptr X;
-    pcl::PointCloud< pcl::PointXYZ >::Ptr Y;
+    std::shared_ptr<MatX> X;
+    std::shared_ptr<MatX> Y;
+    //pcl::PointCloud< pcl::PointXYZ >::Ptr X;
+    //pcl::PointCloud< pcl::PointXYZ >::Ptr Y;
     SE3 T;
     uint_t N_;
 };

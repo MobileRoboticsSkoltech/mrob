@@ -1,5 +1,7 @@
 #Adding directories and source modules to the Cmake tree.
-# Remove those that are not necessary, by default all are active
+
+
+# SKMR modules. Remove those that are not necessary, by default all are active
 INCLUDE_DIRECTORIES(./common)
 #ADD_SUBDIRECTORY(./common) #only headers here
 
@@ -11,3 +13,11 @@ ADD_SUBDIRECTORY(./FGraph)
 
 INCLUDE_DIRECTORIES(./PCRegistration)
 ADD_SUBDIRECTORY(./PCRegistration)
+
+# Adding external dependencies on the tree
+SET(PYBIND11_CPP_STANDARD -std=c++11)
+ADD_SUBDIRECTORY(./external/pybind11)
+
+# Python bindings for the skmr library
+INCLUDE_DIRECTORIES(./skmrpy)
+ADD_SUBDIRECTORY(./skmrpy)

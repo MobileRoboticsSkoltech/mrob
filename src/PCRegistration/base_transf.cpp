@@ -33,14 +33,16 @@ void Point3_t::print(void)
     std::cout << "[" << x << ", " << y << ", "<< z << "]" << std::endl;
 }
 
-BaseTransf::BaseTransf(const pcl::PointCloud< pcl::PointXYZ >::Ptr X_, const pcl::PointCloud< pcl::PointXYZ >::Ptr Y_):
-    X(X_), Y(Y_)
+BaseTransf::BaseTransf(const std::shared_ptr<MatX> &X_, const std::shared_ptr<MatX> &Y_)
 {
-    //assert(X->cols() >= X->rows()  && "base_T::base_T: Incorrect sizing, we expect 3xN");
-    //assert(X->rows() == 3  && "base_T::base_T: Incorrect sizing, we expect 3xN");
-    //assert(Y->cols() == X->cols()  && "base_T::base_T: Registration PC not equal");
-    assert(X->points.size() != 0 );
-    assert(Y->points.size() != 0 );
+    assert(X_->cols() >= X_->rows()  && "base_T::base_T: Incorrect sizing, we expect 3xN");
+    assert(X_->rows() == 3  && "base_T::base_T: Incorrect sizing, we expect 3xN");
+    assert(Y_->cols() == X_->cols()  && "base_T::base_T: Registration PC not equal");
+    N_ = X_->cols();// we expect column matrices 3xN
+
+    // For PCL, to be removed??
+    //assert(X->points.size() != 0 );
+    //assert(Y->points.size() != 0 );
 }
 
 BaseTransf::~BaseTransf()
