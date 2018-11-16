@@ -83,7 +83,7 @@ public:
     Mat61 ln_vee() const;
     /**
      * Transforms a point p = (x,y,z)' such as res = T*p.
-     * This function saves to transfrom to homogenous coordinates.
+     * This function saves to transform to homogeneous coordinates.
      */
     Mat31 transform(const Mat31 & p) const;
     /**

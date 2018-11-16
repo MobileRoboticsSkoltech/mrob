@@ -47,7 +47,7 @@ Mat61 skmr::vee6(const Mat4 &xi_hat)
 {
     Mat61 xi;
     xi << -xi_hat(1,2), xi_hat(0,2), -xi_hat(0,1),
-           xi_hat(0,3), xi_hat(2,3), xi_hat(2,3);
+           xi_hat(0,3), xi_hat(1,3), xi_hat(2,3);
     return xi;
 }
 
@@ -127,6 +127,11 @@ Mat61 SE3::ln_vee() const
 {
     Mat4 xi_hat = this->ln();
     return vee6(xi_hat);
+}
+
+Mat31 SE3::transform(const Mat31 & p) const
+{
+    return this->topLeftCorner<3,3>()*p + this->topRightCorner<3,1>();
 }
 
 SE3 SE3::inv(void) const

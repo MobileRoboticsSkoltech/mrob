@@ -33,7 +33,7 @@ class PySE3 {
     Mat4 T() {return (Mat4)T_;};
     void update(const Mat61 &dxi) {T_.update(dxi);};
     Mat61 ln() {return T_.ln_vee();};
-
+    Mat31 trans(const Mat31 &p) {return T_.transform(p); }
 
   protected:
     SE3 T_;
@@ -50,6 +50,7 @@ PYBIND11_MODULE(skmrpy, m) {
         .def("T", &PySE3::T) // makes a copy of the 4x4 Transformation
         .def("update", &PySE3::update )
         .def("ln", &PySE3::ln)
+        .def("trans", &PySE3::trans)
         ;
 }
 
