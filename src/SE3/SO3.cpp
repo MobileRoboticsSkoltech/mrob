@@ -68,6 +68,10 @@ void SO3::exp(const Mat3 &w_hat)
         *this << Mat3::Identity();
         return;
     }
+    if ( fabs(o - M_PI) < 1e-12){
+        *this << -Mat3::Identity();
+        return;
+    }
     double c1 = std::sin(o)/o;
     double c2 = (1 - std::cos(o))/o/o;
     *this << Mat3::Identity() + c1 * w_hat + c2 * w_hat *w_hat;
@@ -78,13 +82,13 @@ Mat3 SO3::ln(double *ro) const
     // Logarithmic mapping of the rotations
     double o = std::fabs(std::acos((this->trace()-1)*0.5));
     if (ro != nullptr) *ro = o;
-    if ( o > 1e-9)
+    if ( o < 1e-9 || M_PI - o < 1e-9)
     {
-        return 0.5 * o / std::sin(o) * ( (*this) - this->transpose());
+        return Mat3::Zero();
     }
     else
     {
-        return Mat3::Zero();
+        return 0.5 * o / std::sin(o) * ( (*this) - this->transpose());
     }
 }
 

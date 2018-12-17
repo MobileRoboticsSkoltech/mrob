@@ -111,7 +111,7 @@ protected:
  */
 Mat4 hat6(const Mat61 &xi);
 /**
- * Vee operator, the inverse of hat
+ * Vee operator (v), the inverse of hat
  */
 Mat61 vee6(const Mat4 &xi_hat);
 

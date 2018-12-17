@@ -99,7 +99,7 @@ protected:
  */
 Mat3 hat3(const Mat31 &w);
 /**
- * The vee operator gets the parameters w from a skew-symetric matrix of the form [0 -w3 w2]
+ * The vee operator (v) gets the parameters w from a skew-symetric matrix of the form [0 -w3 w2]
  *                                                                                [w3  0 -w1]
  *                                                                                [-w2 w1 0]
  */

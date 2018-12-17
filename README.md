@@ -4,7 +4,6 @@ The Skoltech Mobile Robotics library (skmr) is our common framework for implemen
 * [SE3](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/src/SE3): Rigid Body Transformations library.
 * [Fgraph](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/src/FGraph): Factor Graph (WIP)
 * [PCReg](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/src/PCRegistration): Point Cloud Registration (WIP)
-* [TemplateNew](): Template for new projects.
 
 ## Dependencies
 Eigen, C++'11
@@ -33,10 +32,10 @@ Coding conventions are necessary to maintain homogeneity and readability across 
 
 ## Repository configuration SSH
 
-TODO, verify this. Create a SSH key and configure your account appropiately.
+Create a SSH key and configure your account appropiately.
 Clone the project from CDISE bitbucket:
 
-`git clone ssh://git@cdise-bitbucket.skoltech.ru/mr/skmr.git`
+`git clone ssh://git@cdise-bitbucket.skoltech.ru:7999/mr/skmr.git`
 
 
 `git remote remove origin`
@@ -47,35 +46,6 @@ Create a new repository, either at the group or private.
 
 `git push -u origin master`
 
-
-## Repository configuration HTTPS
-
-
-Clone the project from CDISE bitbucket:
-
-`git -c http.sslVerify=false clone 	https://git@cdise-bitbucket.skoltech.ru/scm/mr/skmr.git`
-
-We need to disable the certificate because server certificate verifications fails. Then,
-
-`git remote remove origin`
-
-Create a new repository, either at the group or private.
-
-`git remote add origin https://yourUserName@cdise-bitbucket.skoltech.ru:7999/scm/mr/yourNewProject.git`
-
-`git push -u origin master`
-
-
-To push and do other operations, do one of the following:
-* Disable SSL certificate for this repo:  `git config http.sslVerify false`
-* Obtain the .pem certificate directly from the web-page https://cdise-bitbucket.skoltech.ru
-  - Configure .git/config, by adding the following lines: 
-```
-[http]
-	sslCAInfo=/home/yourUserName/sk-bitbucket.pem
-```
-
-When a project is finished and tested, it should be merged back to the original repository. Use the merge request feature.
 
 ## Installation
 ```
