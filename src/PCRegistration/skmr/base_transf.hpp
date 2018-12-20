@@ -21,8 +21,6 @@
 #include "skmr/SE3.hpp"
 
 // PCL dependencies
-#include <pcl/point_types.h>
-#include <pcl/pcl_base.h>
 
 /**
  * This header provides the common structure for the Point Cloud Alignment,

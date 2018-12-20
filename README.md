@@ -35,12 +35,12 @@ Coding conventions are necessary to maintain homogeneity and readability across 
 Create a SSH key and configure your account appropiately.
 Clone the project from CDISE bitbucket:
 
-`git clone ssh://git@cdise-bitbucket.skoltech.ru:7999/mr/skmr.git`
+`git clone --recursive ssh://git@cdise-bitbucket.skoltech.ru:7999/mr/skmr.git`
 
 
 `git remote remove origin`
 
-Create a new repository, either at the group or private.
+Create a new repository at your private space.
 
 `git remote add origin ssh://yourUserName@cdise-bitbucket.skoltech.ru:7999/mr/yourNewProject.git`
 
