@@ -65,11 +65,8 @@ void SO3::exp(const Mat3 &w_hat)
     Mat31 w = vee3(w_hat);
     double o = w.norm();
     if ( o < 1e-12){
-        *this << Mat3::Identity();
-        return;
-    }
-    if ( fabs(o - M_PI) < 1e-12){
-        *this << -Mat3::Identity();
+        // sin(o)/0 -> 1. Others approximate this with Taylor, but we will leave it as 1
+        *this << Mat3::Identity() + w_hat;
         return;
     }
     double c1 = std::sin(o)/o;
@@ -80,16 +77,66 @@ void SO3::exp(const Mat3 &w_hat)
 Mat3 SO3::ln(double *ro) const
 {
     // Logarithmic mapping of the rotations
-    double o = std::fabs(std::acos((this->trace()-1)*0.5));
-    if (ro != nullptr) *ro = o;
-    if ( o < 1e-9 || M_PI - o < 1e-9)
+    Mat3 res;
+    double tr = (this->trace()-1)*0.5;
+    double o;
+    if (tr < 1.0 && tr > -1.0 )
     {
-        return Mat3::Zero();
+        // Usual case, tr \in (-1,1) and theta \in (-pi,pi)
+        o = std::fabs(std::acos(tr));
+        res << 0.5 * o / std::sin(o) * ( (*this) - this->transpose());
+    }
+    else if (tr >= 1.0)
+    {
+        // Special case tr =1  and theta = 0
+        o = 0.0;
+        res << Mat3::Zero();
     }
     else
     {
-        return 0.5 * o / std::sin(o) * ( (*this) - this->transpose());
+        // Special case tr = -1  and theta = +- pi or multiples
+        o = M_PI;
+        // R = I + 0 + (2/pi^2)W^2, which makes it symmetric R = Rt (W = hat(w))
+        // From here, we know that W^2 = ww^t - theta^2I, (you can span W^2 to see this)
+        // which leaves R = I + 2/pi2 (wwt - pi2 I)
+        // R+I = 2/pi2 wwt
+        // wwt = pi2 / 2 (R+I)
+        // so we find the maximum row and apply that formula
+        // knowing that norm(w) = pi
+        Mat31 w;
+        if( (*this)(0,0) > (*this)(1,1) && (*this)(0,0) > (*this)(2,2) )
+        {
+            // For stability, we average the two elements since it must be symetric
+            w << (*this)(0,0) + 1.0,
+                 0.5 * ( (*this)(0,1) + (*this)(1,0)),
+                 0.5 * ( (*this)(0,2) + (*this)(2,0));
+        }
+        else if( (*this)(1,1) > (*this)(0,0) && (*this)(1,1) > (*this)(2,2) )
+        {
+            w << 0.5 * ( (*this)(1,0) + (*this)(0,1)),
+                 (*this)(1,1) + 1.0,
+                 0.5 * ( (*this)(1,2) + (*this)(2,1));
+        }
+        else
+        {
+            w << 0.5 * ( (*this)(2,0) + (*this)(0,2)),
+                 0.5 * ( (*this)(2,1) + (*this)(1,2)),
+                 (*this)(2,2) + 1.0;
+        }
+        // normalize the vector w, such that norm(w) = pi
+        double length = w.norm();
+        if (length > 0.0)
+        {
+            w *= M_PI / length;
+        }
+        else
+        {
+            w << 0.0, 0.0, 0.0;
+        }
+        res = hat3(w);
     }
+    if (ro != nullptr) *ro = o;
+    return res;
 }
 
 Mat31 SO3::ln_vee() const

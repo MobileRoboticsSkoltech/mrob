@@ -23,10 +23,15 @@ SE3::SE3(const Mat61 &xi) : Mat4(Mat4::Identity())
     this->exp(hat6(xi));
 }
 
+SE3::SE3(const Mat4 &T) :
+        Mat4(T)
+{
+}
+
 template<typename OtherDerived>
 SE3::SE3(const Eigen::MatrixBase<OtherDerived>& other)  :
 Mat4(other)
-{    std::cout << "SE3 MAT4" << std::endl;
+{    //std::cout << "SE3 MAT4" << std::endl;
 }
 
 template<typename OtherDerived>
@@ -73,13 +78,22 @@ void SE3::exp(const Mat4 &xi_hat)
     // Calculate the closed form of V
     // V = I + c2*(w^) + c3*(w^)^2   ,
     // where o = norm(w), c2 = (1 - cos(o))/o^2, c3 = (o- sin(o) / o^3
-    Mat3 V = Mat3::Identity();
+    Mat3 V;
     double o = w.norm();
-    if ( o > 1e-9) //not zero
+    // TODO check this!! this is not working well
+    if ( o < 1e-12){
+        V << Mat3::Identity();
+    }
+    else if ( M_PI - o < 1e-12){
+        //TODO this is incorrect
+        std::cout << "Why are you here?" << std::endl;
+        V << Mat3::Identity();
+    }
+    else //not zero
     {
         double c2 = (1 - std::cos(o))/o/o;
         double c3 = (o - std::sin(o))/o/o/o;
-        V += c2*w_hat + c3*w_hat*w_hat;
+        V = Mat3::Identity() + c2*w_hat + c3*w_hat*w_hat;
     }
 
     // Calculate the translation component t = Vv
@@ -105,6 +119,7 @@ Mat4 SE3::ln(void) const
     // V^-1 = I - 0.5w^ + k1 (w^)^2
     // k1 = 1/o^2 * (1 - c1/(2c2) ) ,    c1 =sin(o)/o and c2 = (1 - cos(o))/o^2 from so3_exp
     Mat3 Vinv = Mat3::Identity();
+    //TODO this is incorrect
     if (o > 1e-9)
     {
         double c1 = std::sin(o)/o;

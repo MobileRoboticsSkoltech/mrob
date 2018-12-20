@@ -43,6 +43,10 @@ public:
      */
     SE3(const Mat61 &xi = Mat61::Zero());
     /**
+     * Constructor, requires the Transformation matrix 4x4
+     */
+    SE3(const Mat4 &T);
+    /**
      * This constructor allows you to construct from Eigen expressions
      * Eigen suggestion: TopicCustomizingEigen.html
      */

@@ -14,6 +14,7 @@
 #include "skmr/SO3.hpp"
 #include <iostream>
 #include <Eigen/LU>
+#include <cmath>
 
 
 int main()
@@ -21,13 +22,51 @@ int main()
 
     // SO3 tests
     // ========================================================
+
+    // Testing the Identity element
+    {
+    skmr::SO3 R;
+    R.print();
+    std::cout << "Identity element error= " << R.ln_vee().norm() << std::endl;
+    }
+
+    // Testing the Identity element plus epsilon
+    {
     Mat31 w;
-    w << 0.15, -0.2, 0.1;
+    w << 1e-15, 0, 0;
+    skmr::SO3 R(w);
+    std::cout << "Identity element error epsilon = " << R.ln_vee().norm() << std::endl;
+    }
+
+    // Testing Regular
+    {
+    Mat31 w;
+    w << 1.2, -0.3, 0.2;
     skmr::SO3 R = skmr::SO3(w);
-    //R.update(w);
+    std::cout << "Exponent and Log test " << (R.ln_vee() - w).norm() << std::endl;
+    }
+
+    // Testing Pi
+    {
+    Mat31 w;
+    w << M_PI, 0.0, 0.0;
+    skmr::SO3 R = skmr::SO3(w);
+    //R.print();
+    std::cout << "Pi rotation 1 component = " << (R.ln_vee() - w).norm() << std::endl;
+    }
+
+    {
+    Mat31 w;
+    w << M_PI*std::sqrt(1.0/3), M_PI*std::sqrt(1.0/3), M_PI*std::sqrt(1.0/3);
+    skmr::SO3 R = skmr::SO3(w);
+    std::cout << "Pi rotation 3 components= " <<  (R.ln_vee() - w).norm() << std::endl;
+    }
 
     // testing operators
-    std::cout << "testing operators\n";
+    Mat31 w;
+    w << M_PI, 0, 0;
+    skmr::SO3 R;
+    std::cout << "\ntesting operators\n";
     Mat3 w_hat = R.ln();
     std::cout << w_hat << std::endl;
     R.print_lie();
@@ -41,7 +80,7 @@ int main()
     // SE3 tests
     // ========================================================
     // testing the constructor
-    std::cout << "SE3 tests"  << std::endl;
+    std::cout << "\n\nSE3 tests"  << std::endl;
     skmr::SE3 T1;
     T1.print();
     T1.print_lie();
@@ -67,7 +106,9 @@ int main()
     skmr::SE3 Tt = T2.inv();
     std::cout << "invers = " << Tt  << std::endl;
     std::cout << "Matrix distance = " << (Tt-T2.inverse()).norm() << std::endl;
-
+    Mat61 xi2 = -T2.ln_vee();
+    skmr::SE3 T22( xi2);
+    std::cout << "Matrix distance by negating= " << (T22-T2.inverse()).norm() << std::endl;
 
     std::cout << "testing adjoint"  << std::endl;
     std::cout << "Adjoint= " << Tt.adj()  << std::endl;

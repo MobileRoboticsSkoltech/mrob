@@ -69,6 +69,8 @@ public:
      * Logarithmic mapping from SO3 to a skew-symetric matrix in so3
      * o = |acos(0.5*(tr(R)-1))|
      * w^ = o / (2sin(o))*(R-R^T)
+     *
+     * Special cases for 0 and +-pi
      */
     Mat3 ln(double *o = nullptr) const;
     /**
