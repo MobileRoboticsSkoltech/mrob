@@ -34,7 +34,7 @@ int main()
     {
     Mat31 w;
     w << 1e-15, 0, 0;
-    skmr::SO3 R(w);
+    skmr::SO3 R = skmr::SO3(w);
     std::cout << "Identity element error epsilon = " << R.ln_vee().norm() << std::endl;
     }
 
@@ -62,25 +62,60 @@ int main()
     std::cout << "Pi rotation 3 components= " <<  (R.ln_vee() - w).norm() << std::endl;
     }
 
-    // testing operators
-    Mat31 w;
-    w << M_PI, 0, 0;
-    skmr::SO3 R;
+    // testing operators}
+    {
     std::cout << "\ntesting operators\n";
+    Mat31 w;
+    w << M_PI, 0.0, 0.0;
+    skmr::SO3 R = skmr::SO3(w);
+    R.print();
     Mat3 w_hat = R.ln();
     std::cout << w_hat << std::endl;
-    R.print_lie();
 
     std::cout << "testing inverse"  << std::endl;
     skmr::SO3 Rt = R.inv();
     std::cout << "invers = " << Rt  << std::endl;
+    }
 
-    if (1)
-    {
+
     // SE3 tests
     // ========================================================
     // testing the constructor
     std::cout << "\n\nSE3 tests"  << std::endl;
+    {
+    skmr::SE3 T;
+    //T.print();
+    std::cout << "Identity element error= " << T.ln_vee().norm() << std::endl;
+    }
+    {
+    Mat61 xi;
+    xi << 1e-9,0,0, 20, 100, 4;
+    skmr::SE3 T(xi);
+    T.print();
+    std::cout << "Identity element plus epsilon= " << (T.ln_vee() - xi).norm() << std::endl;
+    }
+    {
+    Mat61 xi;
+    xi << 1,0,-0.2, 5, 10, 2;
+    skmr::SE3 T(xi);
+    //T.print();
+    std::cout << "Some normal element error = " << (T.ln_vee() - xi).norm() << std::endl;
+    }
+    {
+    Mat61 xi;
+    xi << M_PI,0,0, 5, 100, 2;
+    skmr::SE3 T(xi);
+    T.print_lie();
+    std::cout << "Pi error plus trans= " << (T.ln_vee()-xi).norm() << std::endl;
+    }
+    {
+    Mat61 xi;
+    xi << M_PI*std::sqrt(1.0/3)-1e-4, M_PI*std::sqrt(1.0/3), M_PI*std::sqrt(1.0/3), 5, 1000, 200;
+    skmr::SE3 T(xi);
+    T.print_lie();
+    std::cout << "Pi error 3 comp plus trans= " << (T.ln_vee()-xi).norm() << std::endl;
+    // The error ind
+    }
     skmr::SE3 T1;
     T1.print();
     T1.print_lie();
@@ -113,6 +148,6 @@ int main()
     std::cout << "testing adjoint"  << std::endl;
     std::cout << "Adjoint= " << Tt.adj()  << std::endl;
 
-    }
+
 
 }

@@ -80,15 +80,16 @@ Mat3 SO3::ln(double *ro) const
     Mat3 res;
     double tr = (this->trace()-1)*0.5;
     double o;
-    if (tr < 1.0 && tr > -1.0 )
+    if (tr  < 1.0 - 1e-9 && tr > -1.0 + 1e-9 )
     {
         // Usual case, tr \in (-1,1) and theta \in (-pi,pi)
         o = std::fabs(std::acos(tr));
         res << 0.5 * o / std::sin(o) * ( (*this) - this->transpose());
     }
-    else if (tr >= 1.0)
+    else if (tr >= 1.0 - 1e-9 )
     {
         // Special case tr =1  and theta = 0
+        //TODO augment epsilon and approximate o with Taylor
         o = 0.0;
         res << Mat3::Zero();
     }
@@ -96,7 +97,7 @@ Mat3 SO3::ln(double *ro) const
     {
         // Special case tr = -1  and theta = +- pi or multiples
         o = M_PI;
-        // R = I + 0 + (2/pi^2)W^2, which makes it symmetric R = Rt (W = hat(w))
+        // R = I + 0 + (2/pi^2)W^2, which makes it symmetric R = Rt and W = hat(w)
         // From here, we know that W^2 = ww^t - theta^2I, (you can span W^2 to see this)
         // which leaves R = I + 2/pi2 (wwt - pi2 I)
         // R+I = 2/pi2 wwt

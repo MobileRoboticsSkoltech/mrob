@@ -78,22 +78,13 @@ void SE3::exp(const Mat4 &xi_hat)
     // Calculate the closed form of V
     // V = I + c2*(w^) + c3*(w^)^2   ,
     // where o = norm(w), c2 = (1 - cos(o))/o^2, c3 = (o- sin(o) / o^3
-    Mat3 V;
+    Mat3 V = Mat3::Identity();
     double o = w.norm();
-    // TODO check this!! this is not working well
-    if ( o < 1e-12){
-        V << Mat3::Identity();
-    }
-    else if ( M_PI - o < 1e-12){
-        //TODO this is incorrect
-        std::cout << "Why are you here?" << std::endl;
-        V << Mat3::Identity();
-    }
-    else //not zero
-    {
+    // If rotation is not zero
+    if ( o > 1e-12){
         double c2 = (1 - std::cos(o))/o/o;
         double c3 = (o - std::sin(o))/o/o/o;
-        V = Mat3::Identity() + c2*w_hat + c3*w_hat*w_hat;
+        V += c2*w_hat + c3*w_hat*w_hat;
     }
 
     // Calculate the translation component t = Vv
@@ -108,7 +99,6 @@ void SE3::exp(const Mat4 &xi_hat)
 
 Mat4 SE3::ln(void) const
 {
-    //Mat3 RR = );
     SO3 R;
     R << this->topLeftCorner<3,3>();
     // Logarithmic mapping of the rotations
@@ -119,11 +109,11 @@ Mat4 SE3::ln(void) const
     // V^-1 = I - 0.5w^ + k1 (w^)^2
     // k1 = 1/o^2 * (1 - c1/(2c2) ) ,    c1 =sin(o)/o and c2 = (1 - cos(o))/o^2 from so3_exp
     Mat3 Vinv = Mat3::Identity();
-    //TODO this is incorrect
-    if (o > 1e-9)
+    //XXX for small numbers Taylor expansion should be used...
+    if (o > 1e-12)
     {
-        double c1 = std::sin(o)/o;
-        double c2 = (1 - std::cos(o))/o/o;
+        double c1 = std::sin(o); //sin(o)/o, we remove the o in both coeficients
+        double c2 = (1 - std::cos(o))/o; // (1 - std::cos(o))/o/o
         double k1 = 1/o/o*(1 - 0.5*c1/c2);
         Vinv += -0.5*w_hat + k1* w_hat*w_hat;
     }

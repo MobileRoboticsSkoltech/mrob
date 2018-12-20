@@ -38,12 +38,12 @@ class SE3 : public Mat4
 {
 public:
     /**
-     * Constructor, requires the Lie algebra xi \in se3 representing the rigid body
+     * Constructor, requires the Lie algebra xi^ \in se3 representing the rigid body
      * transformation around the identity, by default generates T = exp(0^) = I
      */
     SE3(const Mat61 &xi = Mat61::Zero());
     /**
-     * Constructor, requires the Transformation matrix 4x4
+     * Constructor, requires the Transformation matrix 4x4 XXX is this necessary?
      */
     SE3(const Mat4 &T);
     /**
@@ -76,7 +76,7 @@ public:
      */
     void exp(const Mat4 &xi_hat);
     /**
-     * Logarithm map, first we calculate log(R) and then
+     * Logarithm map, first we calculate ln(R) and then
      * V^-1 = I - 1/2 w^ + 1/o^2(1 - A / 2B) (w^)^2
      * v = V^-1 t
      */
