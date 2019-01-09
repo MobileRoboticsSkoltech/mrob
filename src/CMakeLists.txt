@@ -11,8 +11,9 @@ ADD_SUBDIRECTORY(./SE3)
 INCLUDE_DIRECTORIES(./FGraph)
 ADD_SUBDIRECTORY(./FGraph)
 
-INCLUDE_DIRECTORIES(./PCRegistration)
-ADD_SUBDIRECTORY(./PCRegistration)
+# TODO, when it is functional, it will be included
+#INCLUDE_DIRECTORIES(./PCRegistration)
+#ADD_SUBDIRECTORY(./PCRegistration)
 
 # Adding external dependencies on the tree
 SET(PYBIND11_CPP_STANDARD -std=c++11)

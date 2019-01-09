@@ -20,7 +20,6 @@
 #include "skmr/matrix_base.hpp"
 #include "skmr/SE3.hpp"
 
-// PCL dependencies
 
 /**
  * This header provides the common structure for the Point Cloud Alignment,
