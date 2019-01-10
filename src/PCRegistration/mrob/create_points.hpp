@@ -12,7 +12,7 @@
 #ifndef CREATE_POINTS_HPP_
 #define CREATE_POINTS_HPP_
 
-#include "skmr/SE3.hpp"
+#include "../../SE3/mrob/SE3.hpp"
 
 
 namespace skmr{

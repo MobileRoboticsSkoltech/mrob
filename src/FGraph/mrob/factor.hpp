@@ -14,10 +14,10 @@
 
 #include <vector>
 
-#include "skmr/matrix_base.hpp"
-#include "skmr/node.hpp"
+#include "mrob/matrix_base.hpp"
+#include "mrob/node.hpp"
 
-namespace skmr{
+namespace mrob{
 
 /**
  * Factor class is a base pure abstract class defining factors,

@@ -10,12 +10,12 @@
  */
 
 
-#include "skmr/SO3.hpp"
+#include "mrob/SO3.hpp"
 #include <cmath>
 #include <iostream>
 
 
-using namespace skmr;
+using namespace mrob;
 
 SO3::SO3(const Mat31 &w) : Mat3(Mat3::Identity())
 {
@@ -43,14 +43,14 @@ void SO3::update(const Mat31 &dw)
     *this = dR * (*this);
 }
 
-Mat31 skmr::vee3(const Mat3 &w_hat)
+Mat31 mrob::vee3(const Mat3 &w_hat)
 {
     Mat31 w;
     w << -w_hat(1,2), w_hat(0,2), -w_hat(0,1);
     return w;
 }
 
-Mat3 skmr::hat3(const Mat31 &w)
+Mat3 mrob::hat3(const Mat31 &w)
 {
     Mat3 w_hat;
     w_hat <<     0.0, -w(2),  w(1),

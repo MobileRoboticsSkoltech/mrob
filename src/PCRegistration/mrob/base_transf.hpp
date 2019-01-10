@@ -17,8 +17,8 @@
 #include <memory>
 #include <iostream>
 
-#include "skmr/matrix_base.hpp"
-#include "skmr/SE3.hpp"
+#include "../../common/mrob/matrix_base.hpp"
+#include "../../SE3/mrob/SE3.hpp"
 
 
 /**

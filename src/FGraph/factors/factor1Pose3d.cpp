@@ -10,11 +10,12 @@
  */
 
 
-#include "skmr/factors/factor1Pose3d.hpp"
+#include "mrob/factors/factor1Pose3d.hpp"
+
 #include <iostream>
 #include <Eigen/Cholesky>
 
-using namespace skmr;
+using namespace mrob;
 
 
 Factor1Pose3d::Factor1Pose3d(const Mat61 &observation, std::shared_ptr<Node> &n1,

@@ -15,10 +15,11 @@
 //#include <unordered_set>
 //#include <deque>//TODO change for long allocations
 #include <vector>
-#include "skmr/node.hpp"
-#include "skmr/factor.hpp"
 
-namespace skmr{
+#include "mrob/factor.hpp"
+#include "mrob/node.hpp"
+
+namespace mrob{
 /**
  * This class provides the general structure for encoding Factor Graphs and
  * to support the implementation of the inference solution to the joint probability P(x,u,z).

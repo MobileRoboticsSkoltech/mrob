@@ -12,11 +12,11 @@
 #ifndef NODEPOSE3D_HPP_
 #define NODEPOSE3D_HPP_
 
-#include "skmr/matrix_base.hpp"
-#include "skmr/node.hpp"
-#include "skmr/SE3.hpp" //requires including and linking SE3 library
+#include "mrob/matrix_base.hpp"
+#include "mrob/SE3.hpp" //requires including and linking SE3 library
+#include "mrob/node.hpp"
 
-namespace skmr{
+namespace mrob{
 
 class NodePose3d : public Node
 {

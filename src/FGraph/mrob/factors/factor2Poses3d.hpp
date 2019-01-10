@@ -13,11 +13,11 @@
 #define FACTOR2POSES3D_HPP_
 
 
-#include "skmr/matrix_base.hpp"
-#include "skmr/factor.hpp"
-#include "skmr/SE3.hpp" //requires including and linking SE3 library
+#include "mrob/matrix_base.hpp"
+#include "mrob/SE3.hpp" //requires including and linking SE3 library
+#include "mrob/factor.hpp"
 
-namespace skmr{
+namespace mrob{
 
 /**
  * The Factor2Poses3d is a vertex representing the distribution between

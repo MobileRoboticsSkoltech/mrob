@@ -14,7 +14,7 @@
 #define SE3_HPP_
 
 
-#include "skmr/matrix_base.hpp"
+#include "mrob/matrix_base.hpp"
 
 
 
@@ -31,7 +31,7 @@
  *  and v the translation.
  *  We will preserve this order in this class.
  */
-namespace skmr{
+namespace mrob{
 
 
 class SE3 : public Mat4

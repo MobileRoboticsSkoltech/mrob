@@ -12,9 +12,9 @@
 #ifndef SOLVER_DENSE_HPP_
 #define SOLVER_DENSE_HPP_
 
-#include "factor_graph.hpp"
+#include "mrob/factor_graph.hpp"
 
-namespace skmr{
+namespace mrob{
 
 /**
  * The SolverDenseGaussNewton class is meant for a reduced dimensionality

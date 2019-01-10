@@ -9,11 +9,12 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#include "skmr/factors/nodePose3d.hpp"
+#include "mrob/factors/nodePose3d.hpp"
+
 #include <iostream>
 #include <assert.h>
 
-using namespace skmr;
+using namespace mrob;
 
 NodePose3d::NodePose3d(const Mat61 &initial_x) :
         Node(6), x_(initial_x),Tx_(initial_x)

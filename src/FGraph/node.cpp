@@ -9,9 +9,9 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#include "skmr/node.hpp"
+#include "mrob/node.hpp"
 
-using namespace skmr;
+using namespace mrob;
 
 Node::Node(uint_t dim, uint_t potNumberFactors):
 		 id_(0), dim_(dim)

@@ -14,7 +14,7 @@
 #define SO3_HPP_
 
 
-#include "skmr/matrix_base.hpp"
+#include "mrob/matrix_base.hpp"
 
 
 
@@ -28,7 +28,7 @@
  *  representing the same transformation in the tangent space around the identity.
  *  Particularly, w  \in Re^3 represents the rotation
  */
-namespace skmr{
+namespace mrob{
 
 
 class SO3 : public Mat3

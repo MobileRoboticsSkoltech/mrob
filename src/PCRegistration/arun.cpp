@@ -9,7 +9,8 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#include "skmr/arun.hpp"
+#include "mrob/arun.hpp"
+
 #include <Eigen/LU>
 #include <Eigen/SVD>
 

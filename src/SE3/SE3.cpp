@@ -9,13 +9,13 @@
  *              Mobile Robotics Lab, Skoltech
  */
 
-#include "skmr/SE3.hpp"
-#include "skmr/SO3.hpp"
+#include "mrob/SE3.hpp"
+#include "mrob/SO3.hpp"
 #include <cmath>
 #include <iostream>
 
 
-using namespace skmr;
+using namespace mrob;
 
 SE3::SE3(const Mat61 &xi) : Mat4(Mat4::Identity())
 {
@@ -48,7 +48,7 @@ void SE3::update(const Mat61 &dxi)
     *this << dT * (*this);
 }
 
-Mat61 skmr::vee6(const Mat4 &xi_hat)
+Mat61 mrob::vee6(const Mat4 &xi_hat)
 {
     Mat61 xi;
     xi << -xi_hat(1,2), xi_hat(0,2), -xi_hat(0,1),
@@ -56,7 +56,7 @@ Mat61 skmr::vee6(const Mat4 &xi_hat)
     return xi;
 }
 
-Mat4 skmr::hat6(const Mat61 &xi)
+Mat4 mrob::hat6(const Mat61 &xi)
 {
     Mat4 xi_hat;
     xi_hat  <<    0.0, -xi(2),  xi(1), xi(3),

@@ -10,7 +10,8 @@
  */
 
 
-#include "skmr/create_points.hpp"
+#include "mrob/create_points.hpp"
+
 #include <random>
 #include <chrono>
 #include <assert.h>

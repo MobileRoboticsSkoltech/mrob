@@ -10,9 +10,9 @@
  */
 
 
-#include "skmr/factor.hpp"
+#include "mrob/factor.hpp"
 
-using namespace skmr;
+using namespace mrob;
 
 Factor::Factor(uint_t dim, uint_t allNodesDim, uint_t potNumberNodes):
 		id_(0), dim_(dim), allNodesDim_(allNodesDim), chi2_(0)

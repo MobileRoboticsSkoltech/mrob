@@ -9,9 +9,9 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#include "skmr/gicp.hpp"
+#include "mrob/gicp.hpp"
 
-using namespace skmr;
+using namespace mrob;
 
 GICP::GICP(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y, MatX &CovX, MatX &CovY):
         BaseTransf(X,Y)

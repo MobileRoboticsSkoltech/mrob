@@ -10,11 +10,12 @@
  */
 
 
-#include "skmr/factors/factor2Poses3d.hpp"
+#include "mrob/factors/factor2Poses3d.hpp"
+
 #include <iostream>
 #include <Eigen/Cholesky>
 
-using namespace skmr;
+using namespace mrob;
 
 
 Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &n1,

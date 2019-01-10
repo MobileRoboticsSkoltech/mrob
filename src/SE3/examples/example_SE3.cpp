@@ -10,11 +10,11 @@
  */
 
 
-#include "skmr/SE3.hpp"
-#include "skmr/SO3.hpp"
 #include <iostream>
 #include <Eigen/LU>
 #include <cmath>
+#include "mrob/SE3.hpp"
+#include "mrob/SO3.hpp"
 
 
 int main()
@@ -25,7 +25,7 @@ int main()
 
     // Testing the Identity element
     {
-    skmr::SO3 R;
+    mrob::SO3 R;
     R.print();
     std::cout << "Identity element error= " << R.ln_vee().norm() << std::endl;
     }
@@ -34,7 +34,7 @@ int main()
     {
     Mat31 w;
     w << 1e-15, 0, 0;
-    skmr::SO3 R = skmr::SO3(w);
+    mrob::SO3 R = mrob::SO3(w);
     std::cout << "Identity element error epsilon = " << R.ln_vee().norm() << std::endl;
     }
 
@@ -42,7 +42,7 @@ int main()
     {
     Mat31 w;
     w << 1.2, -0.3, 0.2;
-    skmr::SO3 R = skmr::SO3(w);
+    mrob::SO3 R = mrob::SO3(w);
     std::cout << "Exponent and Log test " << (R.ln_vee() - w).norm() << std::endl;
     }
 
@@ -50,7 +50,7 @@ int main()
     {
     Mat31 w;
     w << M_PI, 0.0, 0.0;
-    skmr::SO3 R = skmr::SO3(w);
+    mrob::SO3 R = mrob::SO3(w);
     //R.print();
     std::cout << "Pi rotation 1 component = " << (R.ln_vee() - w).norm() << std::endl;
     }
@@ -58,7 +58,7 @@ int main()
     {
     Mat31 w;
     w << M_PI*std::sqrt(1.0/3), M_PI*std::sqrt(1.0/3), M_PI*std::sqrt(1.0/3);
-    skmr::SO3 R = skmr::SO3(w);
+    mrob::SO3 R = mrob::SO3(w);
     std::cout << "Pi rotation 3 components= " <<  (R.ln_vee() - w).norm() << std::endl;
     }
 
@@ -67,13 +67,13 @@ int main()
     std::cout << "\ntesting operators\n";
     Mat31 w;
     w << M_PI, 0.0, 0.0;
-    skmr::SO3 R = skmr::SO3(w);
+    mrob::SO3 R = mrob::SO3(w);
     R.print();
     Mat3 w_hat = R.ln();
     std::cout << w_hat << std::endl;
 
     std::cout << "testing inverse"  << std::endl;
-    skmr::SO3 Rt = R.inv();
+    mrob::SO3 Rt = R.inv();
     std::cout << "invers = " << Rt  << std::endl;
     }
 
@@ -83,48 +83,48 @@ int main()
     // testing the constructor
     std::cout << "\n\nSE3 tests"  << std::endl;
     {
-    skmr::SE3 T;
+    mrob::SE3 T;
     //T.print();
     std::cout << "Identity element error= " << T.ln_vee().norm() << std::endl;
     }
     {
     Mat61 xi;
     xi << 1e-9,0,0, 20, 100, 4;
-    skmr::SE3 T(xi);
+    mrob::SE3 T(xi);
     T.print();
     std::cout << "Identity element plus epsilon= " << (T.ln_vee() - xi).norm() << std::endl;
     }
     {
     Mat61 xi;
     xi << 1,0,-0.2, 5, 10, 2;
-    skmr::SE3 T(xi);
+    mrob::SE3 T(xi);
     //T.print();
     std::cout << "Some normal element error = " << (T.ln_vee() - xi).norm() << std::endl;
     }
     {
     Mat61 xi;
     xi << M_PI,0,0, 5, 100, 2;
-    skmr::SE3 T(xi);
+    mrob::SE3 T(xi);
     T.print_lie();
     std::cout << "Pi error plus trans= " << (T.ln_vee()-xi).norm() << std::endl;
     }
     {
     Mat61 xi;
     xi << M_PI*std::sqrt(1.0/3)-1e-4, M_PI*std::sqrt(1.0/3), M_PI*std::sqrt(1.0/3), 5, 1000, 200;
-    skmr::SE3 T(xi);
+    mrob::SE3 T(xi);
     T.print_lie();
     std::cout << "Pi error 3 comp plus trans= " << (T.ln_vee()-xi).norm() << std::endl;
     // The error ind
     }
-    skmr::SE3 T1;
+    mrob::SE3 T1;
     T1.print();
     T1.print_lie();
     Mat61 xi;
     xi << 1,0,-0.2, 5, 10, 2;
-    skmr::SE3 T(xi);
+    mrob::SE3 T(xi);
     T.print();
     xi << T.ln_vee();
-    skmr::SE3 T2(xi);
+    mrob::SE3 T2(xi);
     T2.print();
     std::cout << "Matrix distance = " << (T-T2).norm() << std::endl;
 
@@ -138,11 +138,11 @@ int main()
     std::cout << v << std::endl;
 
     std::cout << "testing inverse"  << std::endl;
-    skmr::SE3 Tt = T2.inv();
+    mrob::SE3 Tt = T2.inv();
     std::cout << "invers = " << Tt  << std::endl;
     std::cout << "Matrix distance = " << (Tt-T2.inverse()).norm() << std::endl;
     Mat61 xi2 = -T2.ln_vee();
-    skmr::SE3 T22( xi2);
+    mrob::SE3 T22( xi2);
     std::cout << "Matrix distance by negating= " << (T22-T2.inverse()).norm() << std::endl;
 
     std::cout << "testing adjoint"  << std::endl;

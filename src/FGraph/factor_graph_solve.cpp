@@ -10,11 +10,12 @@
  */
 
 
+#include "mrob/factor_graph_solve.hpp"
+
 #include <iostream>
 
-#include "skmr/factor_graph_solve.hpp"
 
-using namespace skmr;
+using namespace mrob;
 
 FGraphSolve::FGraphSolve(solveType type, uint_t potNumberNodes, uint_t potNumberFactors):
 	FGraph(potNumberNodes, potNumberFactors), type_(type)

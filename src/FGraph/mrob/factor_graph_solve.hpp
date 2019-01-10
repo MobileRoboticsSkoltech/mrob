@@ -13,9 +13,9 @@
 #define SRC_FACTOR_GRAPH_SOLVE_HPP_
 
 
-#include "factor_graph.hpp"
+#include "mrob/factor_graph.hpp"
 
-namespace skmr{
+namespace mrob{
 
 
 /**

@@ -10,10 +10,11 @@
  */
 
 
-#include <iostream>
-#include "skmr/solver_dense.hpp"
+#include "mrob/solver_dense.hpp"
 
-using namespace skmr;
+#include <iostream>
+
+using namespace mrob;
 
 DenseGaussNewton::DenseGaussNewton(std::shared_ptr<FGraph> fg):
         fg_(fg), isProblemEvaluated(false)

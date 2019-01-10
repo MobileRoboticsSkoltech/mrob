@@ -19,8 +19,8 @@
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
-#include "skmr/SE3.hpp"
-using namespace skmr;
+#include "mrob/SE3.hpp"
+using namespace mrob;
 
 
 

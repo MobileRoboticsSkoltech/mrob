@@ -20,5 +20,5 @@ SET(PYBIND11_CPP_STANDARD -std=c++11)
 ADD_SUBDIRECTORY(./external/pybind11)
 
 # Python bindings for the skmr library
-INCLUDE_DIRECTORIES(./skmrpy)
-ADD_SUBDIRECTORY(./skmrpy)
+INCLUDE_DIRECTORIES(./mrobpy)
+ADD_SUBDIRECTORY(./mrobpy)

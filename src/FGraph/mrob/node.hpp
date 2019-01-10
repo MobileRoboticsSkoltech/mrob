@@ -16,10 +16,10 @@
 #include <memory>
 #include <assert.h>
 
-#include "skmr/matrix_base.hpp"
+#include "mrob/matrix_base.hpp"
 
 
-namespace skmr{
+namespace mrob{
 
 class Factor;
 

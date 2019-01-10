@@ -10,10 +10,11 @@
  */
 
 
-#include <iostream>
-#include "skmr/factor_graph.hpp"
+#include "mrob/factor_graph.hpp"
 
-using namespace skmr;
+#include <iostream>
+
+using namespace mrob;
 
 
 FGraph::FGraph(uint_t potNumberNodes, uint_t potNumberFactors) :

@@ -7,7 +7,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # The project name and the type of project
-PROJECT(skmr)
+PROJECT(mrob)
 #MESSAGE(Project\ name:\ ${PROJECT_NAME})
 
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
