@@ -1,12 +1,16 @@
-# mrob
-The Skoltech Mobile Robotics library (skmr) is our common framework for implementing our robotics research and projects. It includes a core set of functionalities including perception, path planning and optimization. The present library is meant to be a self-contained library.
-* [common](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/src/common): common matrix definitions and typedefs.
-* [SE3](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/src/SE3): Rigid Body Transformations library.
-* [Fgraph](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/src/FGraph): Factor Graph (WIP)
-* [PCReg](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/skmr/browse/src/PCRegistration): Point Cloud Registration (WIP)
+# MROB: Mobile Robotics library
+The Skoltech Mobile Robotics library (mrob) is our common framework for implementing our robotics research and projects. It includes a core set of functionalities including perception, path planning and optimization. The present library is meant to be a self-contained library.
+* [common](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/src/common): common matrix definitions and typedefs.
+* [SE3](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/src/SE3): Rigid Body Transformations library.
+* [Fgraph](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/src/FGraph): Factor Graph (WIP)
+* [PCReg](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/src/PCRegistration): Point Cloud Registration (WIP)
+* [mrobPy]() Python bindings (using pybind11) for some of the above methods.
 
 ## Dependencies
-Eigen, C++'11
+* C++'11
+* [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) (requires installation)
+* [pybind11](https://github.com/pybind/pybind11) (no action required, it is a submodule)
+
 
 ## Coding conventions
 Coding conventions are necessary to maintain homogeneity and readability across all the project. Here are some conventions that we _should_ follow:
@@ -32,10 +36,10 @@ Coding conventions are necessary to maintain homogeneity and readability across 
 
 ## Repository configuration SSH
 
-Create a SSH key and configure your account appropiately.
+Create a SSH key and configure your account appropriately.
 Clone the project from CDISE bitbucket:
 
-`git clone --recursive ssh://git@cdise-bitbucket.skoltech.ru:7999/mr/skmr.git`
+`git clone --recursive ssh://git@cdise-bitbucket.skoltech.ru:7999/mr/mrob.git`
 
 
 `git remote remove origin`
@@ -49,7 +53,7 @@ Create a new repository at your private space.
 
 ## Installation
 ```
-cd skmr
+cd mrob
 mkdir build
 cd build
 cmake ..

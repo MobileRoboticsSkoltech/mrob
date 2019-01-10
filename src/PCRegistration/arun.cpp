@@ -14,7 +14,7 @@
 #include <Eigen/LU>
 #include <Eigen/SVD>
 
-using namespace skmr;
+using namespace mrob;
 using namespace Eigen;
 
 Arun::Arun(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y):

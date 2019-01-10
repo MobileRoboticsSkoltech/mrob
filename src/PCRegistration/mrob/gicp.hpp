@@ -12,7 +12,7 @@
 #ifndef GICP_HPP_
 #define GICP_HPP_
 
-#include "../mrob/base_transf.hpp"
+#include "mrob/base_transf.hpp"
 
 /**
  * Custom implementation of the GICP using SE3 optimization (improvement over Euler rotations)
@@ -29,7 +29,7 @@
  */
 
 
-namespace skmr{
+namespace mrob{
 
 class GICP:  public BaseTransf {
   public:

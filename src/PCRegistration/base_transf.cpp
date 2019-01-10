@@ -11,7 +11,7 @@
 
 #include "mrob/base_transf.hpp"
 
-using namespace skmr;
+using namespace mrob;
 
 Point3_t::Point3_t(void):
         x(0.0), y(0.0), z(0.0)

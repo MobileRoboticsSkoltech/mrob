@@ -17,8 +17,8 @@
 #include <memory>
 #include <iostream>
 
-#include "../../common/mrob/matrix_base.hpp"
-#include "../../SE3/mrob/SE3.hpp"
+#include "mrob/matrix_base.hpp"
+#include "mrob/SE3.hpp"
 
 
 /**
@@ -31,7 +31,7 @@
 
 
 
-namespace skmr{
+namespace mrob{
 
 //TODO is this used? To be deprecated
 class Point3_t{

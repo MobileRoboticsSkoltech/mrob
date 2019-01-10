@@ -12,10 +12,10 @@
 #ifndef CREATE_POINTS_HPP_
 #define CREATE_POINTS_HPP_
 
-#include "../../SE3/mrob/SE3.hpp"
+#include "mrob/SE3.hpp"
 
 
-namespace skmr{
+namespace mrob{
 
 /**
  * Class samples a random configuration on SE3 using a

@@ -18,7 +18,7 @@
 #include <iostream>
 #include <cmath>
 
-using namespace skmr;
+using namespace mrob;
 
 Csample_uniform_SE3::Csample_uniform_SE3(double R_range, double t_range):
     R_uniform_(-R_range, R_range), t_uniform_(-t_range, t_range)

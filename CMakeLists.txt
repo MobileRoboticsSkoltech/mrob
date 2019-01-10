@@ -26,8 +26,9 @@ SET (CMAKE_CXX_STANDARD 11)
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu99")
 
-
-# locate the necessary dependencies for the project (Eigen)
+# ===================================================================
+# DEPENDENCIES: locate the necessary dependencies for the project
+# DEPENDENCIES: Eigen
 find_package(Eigen QUIET)
 if(Eigen_FOUND)
   MESSAGE("Eigen found in CMake modules:" ${Eigen_INCLUDE_DIRS})
@@ -38,7 +39,34 @@ ELSE(Eigen_FOUND)
 ENDIF(Eigen_FOUND)
 INCLUDE_DIRECTORIES(${Eigen_INCLUDE_DIRS})
 
-ADD_SUBDIRECTORY(./src)
+# DEPENDENCIES: pybind11
+SET(PYBIND11_CPP_STANDARD -std=c++11)
+ADD_SUBDIRECTORY(./pybind11)
+
+
+# ===================================================================
+# CODE: main modules are included in CMakeFile at ./src
+#Adding directories and source modules to the Cmake tree.
+
+# MROB modules. Remove those that are not necessary, by default all are active
+INCLUDE_DIRECTORIES(./src/common)
+#ADD_SUBDIRECTORY(./common) #only headers here
+
+INCLUDE_DIRECTORIES(./src/SE3)
+ADD_SUBDIRECTORY(./src/SE3)
+
+INCLUDE_DIRECTORIES(./src/FGraph)
+ADD_SUBDIRECTORY(./src/FGraph)
+
+INCLUDE_DIRECTORIES(./src/PCRegistration)
+ADD_SUBDIRECTORY(./src/PCRegistration)
+
+# New modules should be included here
+
+# MROB python dingins, defined here:
+ADD_SUBDIRECTORY(./mrobpy)
+
+
 
 ADD_CUSTOM_TARGET (distclean @echo cleaning cmake files)
 

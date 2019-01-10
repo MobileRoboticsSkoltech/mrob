@@ -10,9 +10,9 @@
  */
 
 
-#include "../mrob/arun.hpp"
-#include "../mrob/base_transf.hpp"
-#include "../mrob/create_points.hpp"
+#include "mrob/arun.hpp"
+#include "mrob/base_transf.hpp"
+#include "mrob/create_points.hpp"
 
 int main()
 {
@@ -28,7 +28,7 @@ int main()
           3, -3, 2, -4 ,7, 7;
 
     std::cout << "1st Arun\n" << *X << std::endl;
-    skmr::Arun arun(X,Y);
+    mrob::Arun arun(X,Y);
     arun.solve();
     arun.getT().print();
 
