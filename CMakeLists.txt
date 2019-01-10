@@ -22,9 +22,7 @@ ENDIF (NOT CMAKE_BUILD_TYPE)
 # flag _REENTRANT for safe threads and NDEBUG to disable asserts
 SET(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -D_REENTRANT")
 SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -D_REENTRANT -DNDEBUG")
-SET (CMAKE_CXX_STANDARD 11)
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu99")
+SET(CMAKE_CXX_STANDARD 11)
 
 # ===================================================================
 # DEPENDENCIES: locate the necessary dependencies for the project
@@ -45,12 +43,11 @@ ADD_SUBDIRECTORY(./pybind11)
 
 
 # ===================================================================
-# CODE: main modules are included in CMakeFile at ./src
-#Adding directories and source modules to the Cmake tree.
+# CODE: main modules and directories are included here
 
 # MROB modules. Remove those that are not necessary, by default all are active
 INCLUDE_DIRECTORIES(./src/common)
-#ADD_SUBDIRECTORY(./common) #only headers here
+#ADD_SUBDIRECTORY(./src/common) #only headers here
 
 INCLUDE_DIRECTORIES(./src/SE3)
 ADD_SUBDIRECTORY(./src/SE3)
@@ -63,7 +60,7 @@ ADD_SUBDIRECTORY(./src/PCRegistration)
 
 # New modules should be included here
 
-# MROB python dingins, defined here:
+# MROB python bingins, defined here:
 ADD_SUBDIRECTORY(./mrobpy)
 
 
