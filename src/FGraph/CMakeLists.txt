@@ -2,10 +2,10 @@
 
 # extra header files
 SET(headers
-    node.hpp
-    factor.hpp
-    factor_graph.hpp
-    factor_graph_solve.hpp
+    mrob/node.hpp
+    mrob/factor.hpp
+    mrob/factor_graph.hpp
+    mrob/factor_graph_solve.hpp
 )
 
 # extra source files
@@ -17,9 +17,9 @@ SET(sources
 )
 
 SET(factors_headers
-    factors/nodePose3d.hpp
-    factors/factor2Poses3d.hpp
-    factors/factor1Pose3d.hpp
+    mrob/factors/nodePose3d.hpp
+    mrob/factors/factor2Poses3d.hpp
+    mrob/factors/factor1Pose3d.hpp
 )
 
 SET(factors_sources

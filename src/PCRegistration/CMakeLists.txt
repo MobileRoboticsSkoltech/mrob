@@ -11,10 +11,10 @@ SET(sources
 
 # extra header files
 SET(headers
-    base_transf.hpp
-    create_points.cpp
-    arun.hpp
-    gicp.hpp
+    mrob/base_transf.hpp
+    mrob/create_points.cpp
+    mrob/arun.hpp
+    mrob/gicp.hpp
 )
 
 # create the shared library

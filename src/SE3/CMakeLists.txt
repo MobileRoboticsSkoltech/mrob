@@ -9,8 +9,8 @@ SET(sources
 
 # extra header files
 SET(headers
-	SO3.hpp
-	SE3.hpp
+	mrob/SO3.hpp
+	mrob/SE3.hpp
 )
 
 # create the shared library
