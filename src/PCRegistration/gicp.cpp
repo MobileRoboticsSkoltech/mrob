@@ -13,8 +13,8 @@
 
 using namespace mrob;
 
-GICP::GICP(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y, MatX &CovX, MatX &CovY):
-        BaseTransf(X,Y)
+GICP::GICP(const MatX &X, const MatX &Y, const MatX &CovX, const MatX &CovY):
+        BaseTransf(X,Y), CovX_(CovX), CovY_(CovY)
 {
 }
 

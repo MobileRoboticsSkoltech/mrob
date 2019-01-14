@@ -36,13 +36,15 @@
  */
 namespace mrob{
 
-class Arun:  public BaseTransf {
+class Arun : public BaseTransf {
   public:
-    Arun(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);
+    Arun(const MatX &X, const MatX &Y);
     virtual ~Arun();
     virtual int solve();
 
   protected:
+    // Data on Eigen matrices X,Y from
+
 };
 
 }//end namespace

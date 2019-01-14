@@ -33,11 +33,12 @@ namespace mrob{
 
 class GICP:  public BaseTransf {
   public:
-    GICP(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y, MatX &CovX, MatX &CovY);
+    GICP(const MatX &X, const MatX &Y, const MatX &CovX, const MatX &CovY);
     virtual ~GICP();
     virtual int solve();
 
   protected:
+    const MatX &CovX_, &CovY_;
 };
 
 }//end namespace

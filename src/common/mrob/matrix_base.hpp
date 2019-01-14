@@ -24,7 +24,7 @@ typedef unsigned int uint_t;
 typedef unsigned int id_t;
 
 
-// Definition of squared matrices
+// Definition of squared matrices, by default column major
 typedef Eigen::Matrix<matData_t, 2,2> Mat2;
 typedef Eigen::Matrix<matData_t, 3,3> Mat3;
 typedef Eigen::Matrix<matData_t, 4,4> Mat4;

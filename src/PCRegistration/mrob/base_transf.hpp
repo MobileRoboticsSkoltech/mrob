@@ -49,18 +49,17 @@ public:
 
 class BaseTransf{
   public:
-    //BaseTransf(const pcl::PointCloud< pcl::PointXYZ >::Ptr X, const pcl::PointCloud< pcl::PointXYZ >::Ptr Y);
-    BaseTransf(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y);
+    BaseTransf(const MatX &X, const MatX &Y);
     virtual ~BaseTransf();
     virtual int solve(void) = 0;
-    SE3 getT(){return T;};
+    SE3 getT(){return T_;};
   protected:
-    std::shared_ptr<MatX> X;
-    std::shared_ptr<MatX> Y;
-    //pcl::PointCloud< pcl::PointXYZ >::Ptr X;
-    //pcl::PointCloud< pcl::PointXYZ >::Ptr Y;
-    SE3 T;
+    // Data is referred as a constant reference to an Eigen object, allocated outside this class.
+    // it is the designer responsability to allocate these data.
+    const MatX &X_, &Y_;
+    SE3 T_;
     uint_t N_;
+
 };
 
 

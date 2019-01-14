@@ -91,6 +91,12 @@ public:
      */
     Mat31 transform(const Mat31 & p) const;
     /**
+     * Transforms an array of points P = {p_n} = (x,y,z)'_n such as res = T*p_n.
+     * The array is of the form 3xN
+     * This function saves to transform to homogeneous coordinates.
+     */
+    MatX transformArray(const MatX &P) const;
+    /**
      * Inverse: T^-1 = [R', -R't]
      *                 [0      1]
      */

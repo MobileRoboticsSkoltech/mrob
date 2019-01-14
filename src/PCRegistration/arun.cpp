@@ -17,9 +17,11 @@
 using namespace mrob;
 using namespace Eigen;
 
-Arun::Arun(const std::shared_ptr<MatX> &X, const std::shared_ptr<MatX> &Y):
+Arun::Arun(const MatX &X, const MatX &Y) :
         BaseTransf(X,Y)
 {
+
+
 }
 
 Arun::~Arun()
@@ -43,15 +45,15 @@ int Arun::solve()
 
     // 1) calculate centroids cx = E{x_i}. cy = E{y_i}
     MatX sum_weight = MatX::Constant(N_,1, 1.0/(double)N_);
-    Mat31 cxm = (*X)*sum_weight;
-    Mat31 cym = (*Y)*sum_weight;
+    Mat31 cxm = X_*sum_weight;
+    Mat31 cym = Y_*sum_weight;
 
     // 2)  calculate dispersion from centroids qx = x_i - cx
     MatX ones = MatX::Constant(1,N_, -1.0);
     MatX qx = cxm * ones; // vector of centroids
-    qx += (*X); //substraction inplace with data X
+    qx += X_; //substraction inplace with data X
     MatX qy = cym * ones; // vector of centroids
-    qy += (*Y); //substraction inplace with data X
+    qy += Y_; //substraction inplace with data X
 
 
     // 3) calculate matrix H = sum qx_i * qy_i^T
@@ -90,7 +92,7 @@ int Arun::solve()
     Mat31 t = cym - R*cxm;
 
     // 7) return result
-    this->T << R, t,
+    this->T_ << R, t,
          0,0,0,1;
 
     return 1;

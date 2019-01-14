@@ -17,18 +17,18 @@
 int main()
 {
     // test data structures
-    std::shared_ptr<MatX> X (new MatX(3,6));//Initializes a zero matrix
-    *X << 0, 1, 1, 2, 5, 10,
-          0, 2, 3, 2, 3, -1,
-          3, -1, 3, -4 ,4, 7;
+    uint_t N = 3;
+    MatX X = MatX::Random(3,N);
 
-    std::shared_ptr<MatX> Y (new MatX(3,6));//Initializes a zero matrix
-    *Y << 0, 1, 1, 4, 5, 10,
-          1, 2, 1, 2, 6, -1,
-          3, -3, 2, -4 ,7, 7;
+    Mat61 xi = Mat61::Random();
+
+    mrob::SE3 T(xi);
+
+
+    MatX Y = MatX::Random(3,N);
 
     mrob::Arun arun(X,Y);
-    std::cout << "1st Arun\n" << *X << std::endl;
+    std::cout << "1st Arun\n" << X << std::endl;
     arun.solve();
     arun.getT().print();
 

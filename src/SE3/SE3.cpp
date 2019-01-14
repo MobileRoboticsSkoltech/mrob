@@ -13,6 +13,7 @@
 #include "mrob/SO3.hpp"
 #include <cmath>
 #include <iostream>
+#include <memory>
 
 
 using namespace mrob;
@@ -138,6 +139,17 @@ Mat31 SE3::transform(const Mat31 & p) const
 {
     return this->topLeftCorner<3,3>()*p + this->topRightCorner<3,1>();
 }
+
+MatX SE3::transformArray(const MatX &P) const
+{
+    assert(P.rows() == 3 && "SE3::transformArray: incorrect data structure");
+    uint_t N = P.cols();
+    MatX res;
+    //for (uint_t i = 0; )
+    //    res() =
+    return res;
+}
+
 
 SE3 SE3::inv(void) const
 {
