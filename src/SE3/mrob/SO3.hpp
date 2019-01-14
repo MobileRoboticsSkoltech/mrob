@@ -40,7 +40,11 @@ public:
      *
      */
     SO3(const Mat31 &w = Mat31::Zero());
-
+    /**
+     * Constructor from a transformation
+     *
+     */
+    SO3(const Mat3 &R);
     /**
      * This constructor allows to construct from Eigen expressions
      * Eigen suggestion: TopicCustomizingEigen.html

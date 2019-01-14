@@ -19,9 +19,28 @@
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
+#include "mrob/SO3.hpp"
 #include "mrob/SE3.hpp"
 using namespace mrob;
 
+
+/**
+ * Class to overcome the Eigen templated constructor, which does work.
+ */
+class PySO3 {
+  public:
+    PySO3(const Mat31 &w) : R_(w) { };
+    PySO3(const Mat3 &R) : R_(R) { };
+    Mat3 R() {return (Mat3)R_;};
+    void update(const Mat31 &dw) {R_.update(dw);};
+    Mat31 ln() {return R_.ln_vee();};
+    PySO3 inv(){return PySO3(R_.inv());}
+    Mat3 adj(){return R_.adj();}
+
+  protected:
+    SO3 R_;
+
+};
 
 
 /**
@@ -46,7 +65,7 @@ class PySE3 {
 
 
 PYBIND11_MODULE(mrob, m) {
-    m.doc() = "pybind11 SE3 plugin";
+    m.doc() = "pybind11 SO3 and SE3 plugin";
     // Later, in binding code:
     py::class_<PySE3>(m, "SE3")
         .def(py::init<const Mat61 &>())
@@ -57,6 +76,15 @@ PYBIND11_MODULE(mrob, m) {
         .def("transform", &PySE3::transform)
         .def("inv", &PySE3::inv)
         .def("adj", &PySE3::adj)
+        ;
+    py::class_<PySO3>(m, "SO3")
+        .def(py::init<const Mat31 &>())
+        .def(py::init<const Mat3 &>())
+        .def("R", &PySO3::R) // makes a copy of the 3x3 Transformation
+        .def("update", &PySO3::update )
+        .def("ln", &PySO3::ln)
+        .def("inv", &PySO3::inv)
+        .def("adj", &PySO3::adj)
         ;
 }
 
