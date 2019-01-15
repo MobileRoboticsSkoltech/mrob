@@ -26,6 +26,7 @@
  * T = min sum || y - Tx ||S
  *
  * The covariances provided are of the form S = R diag(e,1,1) R', so they MUST have been already processed.
+ * The right way is a block matrix of covariances of the form Cov = [Cov_1, Cov_2,..., Cov_N], i.e, Cov \in R^{3x3N}
  */
 
 
@@ -33,12 +34,12 @@ namespace mrob{
 
 class GICP:  public BaseTransf {
   public:
-    GICP(const MatX &X, const MatX &Y, const MatX &CovX, const MatX &CovY);
+    GICP(const MatX &X, const MatX &Y, const MatX &covX, const MatX &covY);
     virtual ~GICP();
     virtual int solve();
 
   protected:
-    const MatX &CovX_, &CovY_;
+    const MatX &covX_, &covY_;
 };
 
 }//end namespace

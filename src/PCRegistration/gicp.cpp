@@ -11,11 +11,15 @@
 
 #include "mrob/gicp.hpp"
 
+
 using namespace mrob;
 
-GICP::GICP(const MatX &X, const MatX &Y, const MatX &CovX, const MatX &CovY):
-        BaseTransf(X,Y), CovX_(CovX), CovY_(CovY)
+GICP::GICP(const MatX &X, const MatX &Y, const MatX &covX, const MatX &covY):
+        BaseTransf(X,Y), covX_(covX), covY_(covY)
 {
+    // Check for covariances data, stored as 3x3 blocks
+    assert(covX.rows() == 3 && "GICP::GICP: Incorrect size of data, rows not 3");
+    assert(covX.cols() == 3*N_ && "GICP::GICP: Incorrect size of data, cols");
 }
 
 GICP::~GICP()

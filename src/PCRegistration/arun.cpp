@@ -17,11 +17,9 @@
 using namespace mrob;
 using namespace Eigen;
 
-Arun::Arun(const MatX &X, const MatX &Y) :
+Arun::Arun(const MatX &X, const MatX &Y):
         BaseTransf(X,Y)
 {
-
-
 }
 
 Arun::~Arun()
