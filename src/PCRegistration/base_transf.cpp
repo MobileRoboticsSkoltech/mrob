@@ -40,6 +40,8 @@ BaseTransf::BaseTransf(const MatX &X, const MatX &Y):
     assert(X.cols() >= 3  && "BaseTransf::BaseTransf: Incorrect sizing, we expect at least 3 correspondences (not aligned)");
     assert(Y.cols() == X.cols()  && "BaseTransf::BaseTransf: Same number of correspondences");
     N_ = X.cols();
+    //std::cout << "X data: \n" << X_ << std::endl;
+    //std::cout << "Y data: \n" << Y_ << std::endl;
 }
 
 BaseTransf::~BaseTransf()

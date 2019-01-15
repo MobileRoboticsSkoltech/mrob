@@ -63,9 +63,9 @@ int Arun::solve()
     JacobiSVD<Matrix3d> SVD(H, ComputeFullU | ComputeFullV);//Full matrices indicate Square matrices
 
     //test: prints results so far
-    /*std::cout << "Checking matrix SVD: \n" << SVD.singularValues() <<
+    std::cout << "Checking matrix SVD: \n" << SVD.singularValues() <<
                  ",\n U = " << SVD.matrixU() <<
-                 ",\n V = " << SVD.matrixV() << std::endl;*/
+                 ",\n V = " << SVD.matrixV() << std::endl;
 
 
     // 4.5) look for co-linear solutions, that is 2 of the 3 singular values are equal
@@ -86,7 +86,12 @@ int Arun::solve()
     // that is, solve the problem for co-planar set of points and centroid, when is l1 > l2 > l3 = 0
     // Since H = D1*u1*v1' + D2*u2*v2' + D3*u3*v3',    and D3 = 0, we can swap signs in V
     // such as Vp = [v1,v2,-v3] and the solution is still minimal, but we want a valid rotation R \in SO(3)
-    R << SVD.matrixV().topLeftCorner<3,2>(), R.determinant() * SVD.matrixV().topRightCorner<3,1>();
+    if (R.determinant() < 0.0 )
+    {
+        Mat3 Vn;
+        Vn << SVD.matrixV().topLeftCorner<3,2>(), -SVD.matrixV().topRightCorner<3,1>();
+        R << Vn * SVD.matrixU().transpose();
+    }
 
     // 6) calculate translation as: t = cy - R * cx
     Mat31 t = cym - R*cxm;

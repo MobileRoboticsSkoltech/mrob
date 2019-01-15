@@ -144,9 +144,9 @@ MatX SE3::transformArray(const MatX &P) const
 {
     assert(P.rows() == 3 && "SE3::transformArray: incorrect data structure");
     uint_t N = P.cols();
-    MatX res;
-    //for (uint_t i = 0; )
-    //    res() =
+    MatX res(3,N);
+    for (uint_t i = 0; i < N; ++i)
+        res.col(i) << this->transform(P.col(i));
     return res;
 }
 

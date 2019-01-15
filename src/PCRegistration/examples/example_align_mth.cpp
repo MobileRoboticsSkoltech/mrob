@@ -17,18 +17,21 @@
 int main()
 {
     // test data structures
-    uint_t N = 3;
+    uint_t N = 4;
     MatX X = MatX::Random(3,N);
+    std::cout << "X data: \n" << X << std::endl;
 
     Mat61 xi = Mat61::Random();
-
+    //Mat61 xi = Mat61::Zero();
     mrob::SE3 T(xi);
+    std::cout << "T random transformation: \n" << std::endl;
+    T.print();
 
 
-    MatX Y = MatX::Random(3,N);
+    MatX Y = T.transformArray(X);
+    std::cout << "Y data: \n" << Y << std::endl;
 
     mrob::Arun arun(X,Y);
-    std::cout << "1st Arun\n" << X << std::endl;
     arun.solve();
     arun.getT().print();
 
