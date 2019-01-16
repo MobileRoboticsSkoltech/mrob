@@ -10,7 +10,6 @@
  */
 
 #include "mrob/SE3.hpp"
-#include "mrob/SO3.hpp"
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -173,6 +172,13 @@ Mat6 SE3::adj() const
     res.bottomRightCorner<3,3>() << R;
     res.topRightCorner<3,3>() << tx*R;
     return res;
+}
+
+SO3 SE3::R() const
+{
+    SO3 R;
+    R << this->topLeftCorner<3,3>();
+    return R;
 }
 
 void SE3::print(void) const

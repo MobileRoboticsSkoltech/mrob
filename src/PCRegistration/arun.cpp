@@ -61,9 +61,9 @@ int Arun::solve()
     JacobiSVD<Matrix3d> SVD(H, ComputeFullU | ComputeFullV);//Full matrices indicate Square matrices
 
     //test: prints results so far
-    std::cout << "Checking matrix SVD: \n" << SVD.singularValues() <<
+    /*std::cout << "Checking matrix SVD: \n" << SVD.singularValues() <<
                  ",\n U = " << SVD.matrixU() <<
-                 ",\n V = " << SVD.matrixV() << std::endl;
+                 ",\n V = " << SVD.matrixV() << std::endl;*/
 
 
     // 4.5) look for co-linear solutions, that is 2 of the 3 singular values are equal

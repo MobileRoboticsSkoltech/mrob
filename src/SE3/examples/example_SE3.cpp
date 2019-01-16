@@ -11,7 +11,7 @@
 
 
 #include <iostream>
-#include <Eigen/LU>
+#include <Eigen/LU> // for inverse and determinant
 #include <cmath>
 #include "mrob/SE3.hpp"
 #include "mrob/SO3.hpp"

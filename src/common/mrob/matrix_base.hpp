@@ -50,7 +50,7 @@ typedef Eigen::Matrix<matData_t, Eigen::Dynamic,1> MatX1;
 template<int D>
 using MatD1 = Eigen::Matrix<matData_t, D,1>;
 template<int Rw,int Col>
-using MatD = Eigen::Matrix<matData_t, Rw, Col>;
+using Mat = Eigen::Matrix<matData_t, Rw, Col>;
 
 
 

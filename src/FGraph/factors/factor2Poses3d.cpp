@@ -47,7 +47,7 @@ void Factor2Poses3d::evaluate()
     this->evaluateError();
 
     // TODO Jacobians
-    J_ = MatD<6,12>::Random();
+    J_ = Mat<6,12>::Random();
 }
 matData_t Factor2Poses3d::evaluateError()
 {

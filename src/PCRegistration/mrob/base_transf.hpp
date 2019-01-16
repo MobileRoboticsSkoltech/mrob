@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "mrob/matrix_base.hpp"
+#include <Eigen/LU> // for inverse and determinant
 #include "mrob/SE3.hpp"
 
 

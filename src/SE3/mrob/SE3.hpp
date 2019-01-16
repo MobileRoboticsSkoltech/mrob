@@ -15,6 +15,7 @@
 
 
 #include "mrob/matrix_base.hpp"
+#include "mrob/SO3.hpp"
 
 
 
@@ -106,6 +107,10 @@ public:
      *                   [0    R]
      */
     Mat6 adj() const;
+    /**
+     * R method returns an SO3 rotation corresponding to the subblock matrix
+     */
+    SO3 R() const;
     void print(void) const;
     void print_lie(void) const;
 

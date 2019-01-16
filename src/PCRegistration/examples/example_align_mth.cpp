@@ -10,9 +10,11 @@
  */
 
 
-#include "mrob/arun.hpp"
 #include "mrob/base_transf.hpp"
+#include "mrob/arun.hpp"
+#include "mrob/gicp.hpp"
 #include "mrob/create_points.hpp"
+
 
 int main()
 {
@@ -34,6 +36,21 @@ int main()
     mrob::Arun arun(X,Y);
     arun.solve();
     arun.getT().print();
+
+    // Solve for GICP
+    MatX covX(3,3*N);
+    MatX covY(3,3*N);
+    for (uint_t i = 0; i < N ; ++i)
+    {
+        covX.block<3,3>(0,3*i) = Mat3::Identity();
+        covY.block<3,3>(0,3*i) = Mat3::Identity();
+    }
+    mrob::GICP gicp(X,Y,covX,covY);
+    gicp.solve();
+    gicp.solve();
+    gicp.solve();
+    gicp.solve();
+    gicp.getT().print();
 
 
 
