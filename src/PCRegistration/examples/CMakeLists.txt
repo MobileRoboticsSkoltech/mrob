@@ -1,2 +1,2 @@
 ADD_EXECUTABLE(example_align_mth  example_align_mth.cpp)
-TARGET_LINK_LIBRARIES(example_align_mth align_mth)
+TARGET_LINK_LIBRARIES(example_align_mth PCRegistration)

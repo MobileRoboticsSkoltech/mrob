@@ -18,8 +18,8 @@ SET(headers
 )
 
 # create the shared library
-ADD_LIBRARY(align_mth SHARED  ${sources} )
-TARGET_LINK_LIBRARIES(align_mth SE3 )
+ADD_LIBRARY(PCRegistration SHARED  ${sources} )
+TARGET_LINK_LIBRARIES(PCRegistration SE3 )
 
 
 #install 
