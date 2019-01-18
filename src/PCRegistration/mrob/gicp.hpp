@@ -32,10 +32,10 @@
 
 namespace mrob{
 
-class GICP:  public BaseTransf {
+class Gicp:  public BaseTransf {
   public:
-    GICP(const MatX &X, const MatX &Y, const MatX &covX, const MatX &covY);
-    virtual ~GICP();
+    Gicp(const MatX &X, const MatX &Y, const MatX &covX, const MatX &covY);
+    virtual ~Gicp();
     virtual int solve();
 
   protected:
@@ -45,4 +45,4 @@ class GICP:  public BaseTransf {
 }//end namespace
 
 
-#endif /* GICP_HPP_ */
+#endif /* Gicp_HPP_ */

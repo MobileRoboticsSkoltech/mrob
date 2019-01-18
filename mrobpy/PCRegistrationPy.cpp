@@ -30,23 +30,32 @@ using namespace mrob;
 class ArunPy : public Arun
 {
   public:
-    ArunPy(const py::EigenDRef<const MatX> &X, const py::EigenDRef<const MatX> &Y) :
+    // wrapper for handling EIgen::Ref, as the only way to pass by reference in pybind11
+    ArunPy(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y) :
         Arun(X,Y) {};
 };
 
 
+class GicpPy : public Gicp
+{
+  public:
+    GicpPy(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y,
+           const py::EigenDRef<const MatX> covX, const py::EigenDRef<const MatX> covY ) :
+        Gicp(X,Y,covX,covY) {};
+};
+
 void init_PCRegistration(py::module &m)
 {
     py::class_<ArunPy>(m, "Arun")
-            .def(py::init<py::EigenDRef<const MatX> &, py::EigenDRef<const MatX> &>())
+            .def(py::init<py::EigenDRef<const MatX> , py::EigenDRef<const MatX> >())
             .def("solve", &ArunPy::solve)
             .def("getT", &ArunPy::getT)
             ;
-    py::class_<GICP>(m, "GICP")
-            .def(py::init<const MatX &, const MatX &,
-                          const MatX &, const MatX &>())
-            .def("solve", &GICP::solve)
-            .def("getT", &GICP::getT)
+    py::class_<GicpPy>(m, "Gicp")
+            .def(py::init<const py::EigenDRef<const MatX> , const py::EigenDRef<const MatX> ,
+                    const py::EigenDRef<const MatX> , const py::EigenDRef<const MatX> >())
+            .def("solve", &Gicp::solve)
+            .def("getT", &Gicp::getT)
             ;
 }
 

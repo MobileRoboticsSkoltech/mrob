@@ -45,7 +45,7 @@ int main()
         covX.block<3,3>(0,3*i) = Mat3::Identity();
         covY.block<3,3>(0,3*i) = Mat3::Identity();
     }
-    mrob::GICP gicp(X,Y,covX,covY);
+    mrob::Gicp gicp(X,Y,covX,covY);
     gicp.solve();
     gicp.solve();
     gicp.solve();

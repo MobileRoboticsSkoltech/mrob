@@ -1,7 +1,7 @@
 /* $COPYRIGHT_SKOLTECH
  * $LICENSE_LGPL
  *
- * gicp.cpp
+ * Gicp.cpp
  *
  *  Created on: Jan 31, 2018
  *      Author: Gonzalo Ferrer
@@ -14,20 +14,20 @@
 
 using namespace mrob;
 
-GICP::GICP(const MatX &X, const MatX &Y, const MatX &covX, const MatX &covY):
+Gicp::Gicp(const MatX &X, const MatX &Y, const MatX &covX, const MatX &covY):
         BaseTransf(X,Y), covX_(covX), covY_(covY)
 {
     // Check for covariances data, stored as 3x3 blocks
-    assert(covX.rows() == 3 && "GICP::GICP: Incorrect size of data, rows not 3");
-    assert(covX.cols() == 3*N_ && "GICP::GICP: Incorrect size of data, cols");
+    assert(covX.rows() == 3 && "Gicp::Gicp: Incorrect size of data, rows not 3");
+    assert(covX.cols() == 3*N_ && "Gicp::Gicp: Incorrect size of data, cols");
 }
 
-GICP::~GICP()
+Gicp::~Gicp()
 {
 
 }
 
-int GICP::solve()
+int Gicp::solve()
 {
     // TODO precalculation of T by reduced Arun
     // TODO different number of iterations and convergence criterion

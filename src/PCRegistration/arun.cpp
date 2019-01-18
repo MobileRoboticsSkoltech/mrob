@@ -13,6 +13,7 @@
 
 #include <Eigen/LU>
 #include <Eigen/SVD>
+#include <iostream>
 
 using namespace mrob;
 using namespace Eigen;
@@ -20,6 +21,8 @@ using namespace Eigen;
 Arun::Arun(const MatX &X, const MatX &Y):
         BaseTransf(X,Y)
 {
+    std::cout << "X: \n" << X_ << "\nY:\n" << Y_ << std::endl;
+    std::cout << "X_cols: \n" << X_.cols() << "\nX size: \n" << X_.size() << std::endl;
 }
 
 Arun::~Arun()
@@ -43,6 +46,7 @@ int Arun::solve()
 
     // 1) calculate centroids cx = E{x_i}. cy = E{y_i}
     MatX sum_weight = MatX::Constant(N_,1, 1.0/(double)N_);
+    std::cout << "X: \n" << X_ << "\n";
     Mat31 cxm = X_*sum_weight;
     Mat31 cym = Y_*sum_weight;
 
