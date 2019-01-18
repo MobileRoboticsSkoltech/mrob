@@ -18,6 +18,8 @@
 //#include <Eigen/LU> // for inverse and determinant
 #include <Eigen/Sparse>
 
+//#define EIGEN_DEFAULT_TO_ROW_MAJOR
+
 // data types conventions
 typedef double matData_t;
 typedef unsigned int uint_t;
@@ -25,16 +27,17 @@ typedef unsigned int id_t;
 
 
 // Definition of squared matrices, by default column major
-typedef Eigen::Matrix<matData_t, 2,2> Mat2;
-typedef Eigen::Matrix<matData_t, 3,3> Mat3;
-typedef Eigen::Matrix<matData_t, 4,4> Mat4;
-typedef Eigen::Matrix<matData_t, 5,5> Mat5;
-typedef Eigen::Matrix<matData_t, 6,6> Mat6;
-typedef Eigen::Matrix<matData_t, Eigen::Dynamic,Eigen::Dynamic> MatX;
+typedef Eigen::Matrix<matData_t, 2,2, Eigen::RowMajor> Mat2;
+typedef Eigen::Matrix<matData_t, 3,3, Eigen::RowMajor> Mat3;
+typedef Eigen::Matrix<matData_t, 4,4, Eigen::RowMajor> Mat4;
+typedef Eigen::Matrix<matData_t, 5,5, Eigen::RowMajor> Mat5;
+typedef Eigen::Matrix<matData_t, 6,6, Eigen::RowMajor> Mat6;
+typedef Eigen::Matrix<matData_t, Eigen::Dynamic,Eigen::Dynamic, Eigen::RowMajor> MatX;
 
 //Sparse Matrices
-typedef Eigen::SparseMatrix<matData_t, Eigen::ColMajor> SMat;
+typedef Eigen::SparseMatrix<matData_t, Eigen::ColMajor> SMatCol;
 typedef Eigen::SparseMatrix<matData_t, Eigen::RowMajor> SMatRow;
+typedef Eigen::SparseMatrix<matData_t, Eigen::RowMajor> SMat; //TODO remove from project SMatRows, it is now by default
 typedef Eigen::Triplet<matData_t> Triplet;
 
 // Definition of column matrices (vectors)
@@ -48,9 +51,9 @@ typedef Eigen::Matrix<matData_t, Eigen::Dynamic,1> MatX1;
 
 // Definition of templated-based fixed matrices using c'11 aliases
 template<int D>
-using MatD1 = Eigen::Matrix<matData_t, D,1>;
+using Vect = Eigen::Matrix<matData_t, D,1>;
 template<int Rw,int Col>
-using Mat = Eigen::Matrix<matData_t, Rw, Col>;
+using Mat = Eigen::Matrix<matData_t, Rw, Col, Eigen::RowMajor>;
 
 
 

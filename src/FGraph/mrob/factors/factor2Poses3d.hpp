@@ -65,7 +65,7 @@ class Factor2Poses3d : public Factor
     SE3 Tobs_;
     Mat6 W_;//inverse of observation covariance (information matrix)
     Mat6 WT2_;//transpose and squared root of W.
-    Mat<6,12> J_;//Joint Jacobian
+    Mat<6,12> J_;//Joint Jacobian TODO is this better defined as a dynamic matrix?
 
 
   public:

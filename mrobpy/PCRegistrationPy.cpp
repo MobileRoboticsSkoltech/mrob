@@ -15,9 +15,8 @@
  * using the pybind11 library, here included as an external dependency,
  */
 
-#include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <pybind11/eigen.h>
 namespace py = pybind11;
 
 
@@ -27,12 +26,21 @@ namespace py = pybind11;
 
 using namespace mrob;
 
+
+class ArunPy : public Arun
+{
+  public:
+    ArunPy(const py::EigenDRef<const MatX> &X, const py::EigenDRef<const MatX> &Y) :
+        Arun(X,Y) {};
+};
+
+
 void init_PCRegistration(py::module &m)
 {
-    py::class_<Arun>(m, "Arun")
-            .def(py::init<const MatX &, const MatX &>())
-            .def("solve", &Arun::solve)
-            .def("getT", &Arun::getT)
+    py::class_<ArunPy>(m, "Arun")
+            .def(py::init<py::EigenDRef<const MatX> &, py::EigenDRef<const MatX> &>())
+            .def("solve", &ArunPy::solve)
+            .def("getT", &ArunPy::getT)
             ;
     py::class_<GICP>(m, "GICP")
             .def(py::init<const MatX &, const MatX &,

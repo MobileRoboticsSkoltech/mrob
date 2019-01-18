@@ -33,7 +33,7 @@ int GICP::solve()
     // TODO different number of iterations and convergence criterion
 
     // Initialize Jacobian and Hessian
-    Mat<6,1> J = Mat<6,1>::Zero();
+    Mat61 J = Mat61::Zero();
     Mat6 H = Mat6::Zero();
 
     // not vectoried operations (due to Jacobian)
