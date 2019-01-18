@@ -21,8 +21,6 @@ using namespace Eigen;
 Arun::Arun(const MatX &X, const MatX &Y):
         BaseTransf(X,Y)
 {
-    std::cout << "X: \n" << X_ << "\nY:\n" << Y_ << std::endl;
-    std::cout << "X_cols: \n" << X_.cols() << "\nX size: \n" << X_.size() << std::endl;
 }
 
 Arun::~Arun()
@@ -44,9 +42,12 @@ int Arun::solve()
      */
     // We have already asserted in base_T that they are 3xN matrices. (and the same length).
 
+    std::cout << "X: \n" << X_ << "\nY:\n" << Y_ << std::endl;
+    std::cout << "X_cols: \n" << X_.cols() << "\nX size: \n" << X_.size() << std::endl;
     // 1) calculate centroids cx = E{x_i}. cy = E{y_i}
     MatX sum_weight = MatX::Constant(N_,1, 1.0/(double)N_);
     std::cout << "X: \n" << X_ << "\n";
+    std::cout << "\nY: \n" << Y_ << "\n";
     Mat31 cxm = X_*sum_weight;
     Mat31 cym = Y_*sum_weight;
 
@@ -65,9 +66,9 @@ int Arun::solve()
     JacobiSVD<Matrix3d> SVD(H, ComputeFullU | ComputeFullV);//Full matrices indicate Square matrices
 
     //test: prints results so far
-    /*std::cout << "Checking matrix SVD: \n" << SVD.singularValues() <<
+    std::cout << "Checking matrix SVD: \n" << SVD.singularValues() <<
                  ",\n U = " << SVD.matrixU() <<
-                 ",\n V = " << SVD.matrixV() << std::endl;*/
+                 ",\n V = " << SVD.matrixV() << std::endl;
 
 
     // 4.5) look for co-linear solutions, that is 2 of the 3 singular values are equal
@@ -76,6 +77,7 @@ int Arun::solve()
     {
         l = SVD.singularValues()(i);
         if (fabs(l - l_prev) < 1e-6)
+
             return 0; //they are co-linear, there exist infinite transformations
         else
             l_prev = l;//this works because we assume that they singular values are ordered.
@@ -83,7 +85,7 @@ int Arun::solve()
 
     // 5) Calculate the rotation solution R = V*U'
     Mat3 R = SVD.matrixV() * SVD.matrixU().transpose();
-
+    std::cout << "R det = " << R.determinant() << std::endl;
     // 5.5) check for correct solution (det = +1) or reflection (det = -1)
     // that is, solve the problem for co-planar set of points and centroid, when is l1 > l2 > l3 = 0
     // Since H = D1*u1*v1' + D2*u2*v2' + D3*u3*v3',    and D3 = 0, we can swap signs in V
@@ -93,6 +95,7 @@ int Arun::solve()
         Mat3 Vn;
         Vn << SVD.matrixV().topLeftCorner<3,2>(), -SVD.matrixV().topRightCorner<3,1>();
         R << Vn * SVD.matrixU().transpose();
+        std::cout << "R value = " << R << std::endl;
     }
 
     // 6) calculate translation as: t = cy - R * cx

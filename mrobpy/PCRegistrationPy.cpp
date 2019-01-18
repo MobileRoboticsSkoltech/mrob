@@ -36,6 +36,14 @@ class ArunPy : public Arun
 };
 
 
+SE3 ArunSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y)
+{
+    Arun a(X,Y);
+    if (a.solve())
+        std::cout << "no solution\n"; // TODO what if it fails?
+    return a.getT();
+}
+
 class GicpPy : public Gicp
 {
   public:
@@ -51,6 +59,7 @@ void init_PCRegistration(py::module &m)
             .def("solve", &ArunPy::solve)
             .def("getT", &ArunPy::getT)
             ;
+    m.def("ArunSolve", &ArunSolve);
     py::class_<GicpPy>(m, "Gicp")
             .def(py::init<const py::EigenDRef<const MatX> , const py::EigenDRef<const MatX> ,
                     const py::EigenDRef<const MatX> , const py::EigenDRef<const MatX> >())

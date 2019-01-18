@@ -181,6 +181,11 @@ SO3 SE3::R() const
     return R;
 }
 
+Mat31 SE3::t() const
+{
+    return (Mat31) this->topRightCorner<3,1>();
+}
+
 void SE3::print(void) const
 {
     std::cout << *this << std::endl;

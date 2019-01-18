@@ -51,6 +51,8 @@ class PySE3 {
     PySE3(const Mat61 &xi) : T_(xi) { };
     PySE3(const Mat4 &T) : T_(T) { };
     Mat4 T() {return (Mat4)T_;};
+    Mat3 R() {return (Mat3)T_.R();}
+    Mat31 t() {return T_.t();}
     void update(const Mat61 &dxi) {T_.update(dxi);};
     Mat61 ln() {return T_.ln_vee();};
     Mat31 transform(const Mat31 &p) {return T_.transform(p); }
@@ -70,6 +72,8 @@ void init_SE3(py::module &m) {
         .def(py::init<const Mat61 &>())
         .def(py::init<const Mat4 &>())
         .def("T", &PySE3::T) // makes a copy of the 4x4 Transformation
+        .def("R", &PySE3::R)
+        .def("t", &PySE3::t)
         .def("update", &PySE3::update)
         .def("ln", &PySE3::ln)
         .def("transform", &PySE3::transform)

@@ -111,6 +111,10 @@ public:
      * R method returns an SO3 rotation corresponding to the subblock matrix
      */
     SO3 R() const;
+    /**
+     * t method returns translation
+     */
+    Mat31 t() const;
     void print(void) const;
     void print_lie(void) const;
 
