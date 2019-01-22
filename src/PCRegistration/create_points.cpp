@@ -12,7 +12,6 @@
 
 #include "mrob/create_points.hpp"
 
-#include <random>
 #include <chrono>
 #include <assert.h>
 #include <iostream>

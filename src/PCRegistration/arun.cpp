@@ -9,26 +9,23 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#include "mrob/arun.hpp"
+#include "mrob/PCRegistration.hpp"
 
 #include <Eigen/LU>
 #include <Eigen/SVD>
+
+#include <memory>
 #include <iostream>
 
 using namespace mrob;
 using namespace Eigen;
 
-Arun::Arun(const MatX &X, const MatX &Y):
-        BaseTransf(X,Y)
+int PCRegistration::Arun(const Ref<const MatX> X, const Ref<const MatX> Y, SE3 &T)
 {
-}
-
-Arun::~Arun()
-{
-}
-
-int Arun::solve()
-{
+    assert(X.rows() == 3  && "PCRegistration::Arun: Incorrect sizing, we expect 3xN");
+    assert(X.cols() >= 3  && "PCRegistration::Arun: Incorrect sizing, we expect at least 3 correspondences (not aligned)");
+    assert(Y.cols() == X.cols()  && "PCRegistration::Arun: Same number of correspondences");
+    uint_t N = X.cols();
     /** Algorithm:
      *  1) calculate centroids cx = sum x_i. cy = sum y_i
      *  2) calculate dispersion from centroids qx = x_i - cx
@@ -42,21 +39,17 @@ int Arun::solve()
      */
     // We have already asserted in base_T that they are 3xN matrices. (and the same length).
 
-    std::cout << "X: \n" << X_ << "\nY:\n" << Y_ << std::endl;
-    std::cout << "X_cols: \n" << X_.cols() << "\nX size: \n" << X_.size() << std::endl;
+    std::cout << "X: \n" << X << "\nY:\n" << Y << std::endl;
     // 1) calculate centroids cx = E{x_i}. cy = E{y_i}
-    MatX sum_weight = MatX::Constant(N_,1, 1.0/(double)N_);
-    std::cout << "X: \n" << X_ << "\n";
-    std::cout << "\nY: \n" << Y_ << "\n";
-    Mat31 cxm = X_*sum_weight;
-    Mat31 cym = Y_*sum_weight;
+    //More efficient than creating a matrix of ones when on Release mode (not is Debug mode)
+    Mat31 cxm = X.rowwise().sum();
+    cxm /= (double)N;
+    Mat31 cym = Y.rowwise().sum();
+    cym /= (double)N;
 
     // 2)  calculate dispersion from centroids qx = x_i - cx
-    MatX ones = MatX::Constant(1,N_, -1.0);
-    MatX qx = cxm * ones; // vector of centroids
-    qx += X_; //substraction inplace with data X
-    MatX qy = cym * ones; // vector of centroids
-    qy += Y_; //substraction inplace with data X
+    MatX qx = X.colwise() - cxm;
+    MatX qy = Y.colwise() - cym;
 
 
     // 3) calculate matrix H = sum qx_i * qy_i^T
@@ -66,9 +59,9 @@ int Arun::solve()
     JacobiSVD<Matrix3d> SVD(H, ComputeFullU | ComputeFullV);//Full matrices indicate Square matrices
 
     //test: prints results so far
-    std::cout << "Checking matrix SVD: \n" << SVD.singularValues() <<
+    /*std::cout << "Checking matrix SVD: \n" << SVD.singularValues() <<
                  ",\n U = " << SVD.matrixU() <<
-                 ",\n V = " << SVD.matrixV() << std::endl;
+                 ",\n V = " << SVD.matrixV() << std::endl;*/
 
 
     // 4.5) look for co-linear solutions, that is 2 of the 3 singular values are equal
@@ -85,7 +78,7 @@ int Arun::solve()
 
     // 5) Calculate the rotation solution R = V*U'
     Mat3 R = SVD.matrixV() * SVD.matrixU().transpose();
-    std::cout << "R det = " << R.determinant() << std::endl;
+
     // 5.5) check for correct solution (det = +1) or reflection (det = -1)
     // that is, solve the problem for co-planar set of points and centroid, when is l1 > l2 > l3 = 0
     // Since H = D1*u1*v1' + D2*u2*v2' + D3*u3*v3',    and D3 = 0, we can swap signs in V
@@ -102,7 +95,7 @@ int Arun::solve()
     Mat31 t = cym - R*cxm;
 
     // 7) return result
-    this->T_ << R, t,
+    T << R, t,
          0,0,0,1;
 
     return 1;

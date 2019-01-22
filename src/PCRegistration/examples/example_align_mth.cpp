@@ -10,10 +10,8 @@
  */
 
 
-#include "mrob/base_transf.hpp"
-#include "mrob/arun.hpp"
-#include "mrob/gicp.hpp"
-#include "mrob/create_points.hpp"
+#include "mrob/PCRegistration.hpp"
+#include <iostream>
 
 
 int main()
@@ -33,9 +31,10 @@ int main()
     MatX Y = T.transformArray(X);
     std::cout << "Y data: \n" << Y << std::endl;
 
-    mrob::Arun arun(X,Y);
-    arun.solve();
-    arun.getT().print();
+    mrob::SE3 T_arun;
+    mrob::PCRegistration::Arun(X,Y,T_arun);
+    std::cout << "T solved by Arun method: \n" << std::endl;
+    T_arun.print();
 
     // Solve for GICP
     MatX covX(3,3*N);
@@ -45,12 +44,12 @@ int main()
         covX.block<3,3>(0,3*i) = Mat3::Identity();
         covY.block<3,3>(0,3*i) = Mat3::Identity();
     }
-    mrob::Gicp gicp(X,Y,covX,covY);
-    gicp.solve();
-    gicp.solve();
-    gicp.solve();
-    gicp.solve();
-    gicp.getT().print();
+    mrob::SE3 T_gicp;
+    mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
+    mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
+    mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
+    std::cout << "T solved by GICP method: \n" << std::endl;
+    T_gicp.print();
 
 
 

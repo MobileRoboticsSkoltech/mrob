@@ -22,7 +22,8 @@ ENDIF (NOT CMAKE_BUILD_TYPE)
 # flag _REENTRANT for safe threads and NDEBUG to disable asserts
 SET(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -D_REENTRANT")
 SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -D_REENTRANT -DNDEBUG")
-SET(CMAKE_CXX_STANDARD 11)
+#SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD 14)
 
 # ===================================================================
 # DEPENDENCIES: locate the necessary dependencies for the project
@@ -38,7 +39,7 @@ ENDIF(Eigen_FOUND)
 INCLUDE_DIRECTORIES(${Eigen_INCLUDE_DIRS})
 
 # DEPENDENCIES: pybind11
-SET(PYBIND11_CPP_STANDARD -std=c++11)
+SET(PYBIND11_CPP_STANDARD -std=c++14)
 ADD_SUBDIRECTORY(./pybind11)
 
 

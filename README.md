@@ -7,9 +7,11 @@ The Skoltech Mobile Robotics library (mrob) is our common framework for implemen
 * [mrobPy]() Python bindings (using pybind11) for some of the above methods.
 
 ## Dependencies
-* C++'11
+* C++'14
 * [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) (requires installation)
 * [pybind11](https://github.com/pybind/pybind11) (no action required, it is a submodule)
+  - python3-distutils
+  - python3-dev
 
 
 ## Coding conventions

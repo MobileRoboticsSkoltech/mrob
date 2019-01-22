@@ -9,26 +9,22 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#include "mrob/gicp.hpp"
+#include "mrob/PCRegistration.hpp"
+#include <Eigen/LU> // for inverse and determinant
+
+#include <memory>
+#include <iostream>
 
 
 using namespace mrob;
 
-Gicp::Gicp(const MatX &X, const MatX &Y, const MatX &covX, const MatX &covY):
-        BaseTransf(X,Y), covX_(covX), covY_(covY)
+int PCRegistration::Gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
+           const Eigen::Ref<const MatX> covX, const Eigen::Ref<const MatX> covY, SE3 &T)
 {
-    // Check for covariances data, stored as 3x3 blocks
-    assert(covX.rows() == 3 && "Gicp::Gicp: Incorrect size of data, rows not 3");
-    assert(covX.cols() == 3*N_ && "Gicp::Gicp: Incorrect size of data, cols");
-}
-
-Gicp::~Gicp()
-{
-
-}
-
-int Gicp::solve()
-{
+    assert(X.rows() == 3  && "PCRegistration::Gicp: Incorrect sizing, we expect 3xN");
+    assert(X.cols() >= 3  && "PCRegistration::Gicp: Incorrect sizing, we expect at least 3 correspondences (not aligned)");
+    assert(Y.cols() == X.cols()  && "PCRegistration::Gicp: Same number of correspondences");
+    uint_t N = X.cols();
     // TODO precalculation of T by reduced Arun
     // TODO different number of iterations and convergence criterion
 
@@ -37,12 +33,12 @@ int Gicp::solve()
     Mat6 H = Mat6::Zero();
 
     // not vectoried operations (due to Jacobian)
-    for ( uint_t i = 0; i < N_ ; ++i)
+    for ( uint_t i = 0; i < N ; ++i)
     {
         // 1) Calculate residual r = y - Tx and the inverse of joint covariance
-        Mat31 Txi = T_.transform(X_.col(i));
-        Mat31 r = Y_.col(i) - Txi;
-        Mat3 Li = (covY_.block<3,3>(0,3*i) + T_.R() * covX_.block<3,3>(0,3*i) * T_.R().transpose()).inverse();
+        Mat31 Txi = T.transform(X.col(i));
+        Mat31 r = Y.col(i) - Txi;
+        Mat3 Li = (covY.block<3,3>(0,3*i) + T.R() * covX.block<3,3>(0,3*i) * T.R().transpose()).inverse();
 
         // 2) Calculate Jacobian for residual Jf = df1/d xi = r1' Li * Jr, where Jr = [(Tx)^ ; -I])
         Mat<3,6> Jr;
@@ -56,6 +52,6 @@ int Gicp::solve()
     }
     // 4) Update Solution
     Mat61 dxi = -H.inverse()*J;
-    T_.update(dxi); //Left side update
+    T.update(dxi); //Left side update
     return 1; // number of iterations
 }

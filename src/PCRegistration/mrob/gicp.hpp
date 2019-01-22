@@ -34,12 +34,13 @@ namespace mrob{
 
 class Gicp:  public BaseTransf {
   public:
-    Gicp(const MatX &X, const MatX &Y, const MatX &covX, const MatX &covY);
+    Gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
+            const Eigen::Ref<const MatX> covX, const Eigen::Ref<const MatX> covY);
     virtual ~Gicp();
     virtual int solve();
 
   protected:
-    const MatX &covX_, &covY_;
+    const MatX covX_, covY_;
 };
 
 }//end namespace

@@ -38,7 +38,8 @@ namespace mrob{
 
 class Arun : public BaseTransf {
   public:
-    Arun(const MatX &X, const MatX &Y);
+    Arun(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y);
+    //Arun(const MatX &X, const MatX &Y);
     virtual ~Arun();
     virtual int solve();
 

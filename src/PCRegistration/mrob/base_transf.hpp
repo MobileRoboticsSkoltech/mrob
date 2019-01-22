@@ -50,14 +50,15 @@ public:
 
 class BaseTransf{
   public:
-    BaseTransf(const MatX &X, const MatX &Y);
+    //BaseTransf(const MatX &X, const MatX &Y);
+    BaseTransf(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y);
     virtual ~BaseTransf();
     virtual int solve(void) = 0;
     SE3 getT(){return T_;};
   protected:
-    // Data is referred as a constant reference to an Eigen object, allocated outside this class.
+    // Data is passed through an Eigen::Ref object, allocated outside this class.
     // it is the designer responsability to allocate these data.
-    const MatX &X_, &Y_;
+    const MatX X_, Y_;
     SE3 T_;
     uint_t N_;
 

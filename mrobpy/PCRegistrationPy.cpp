@@ -20,52 +20,33 @@
 namespace py = pybind11;
 
 
-#include "mrob/arun.hpp"
-#include "mrob/gicp.hpp"
+#include "mrob/PCRegistration.hpp"
 
+#include "SE3py.hpp"
 
 using namespace mrob;
 
 
-class ArunPy : public Arun
+PySE3 ArunSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y)
 {
-  public:
-    // wrapper for handling EIgen::Ref, as the only way to pass by reference in pybind11
-    ArunPy(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y) :
-        Arun(X,Y) {};
-};
-
-
-SE3 ArunSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y)
-{
-    Arun a(X,Y);
-    if (a.solve())
-        std::cout << "no solution\n"; // TODO what if it fails?
-    return a.getT();
+    SE3 res;
+    PCRegistration::Arun(X,Y,res);
+    return PySE3(res);
 }
 
-class GicpPy : public Gicp
+
+PySE3 GicpSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y,
+        const py::EigenDRef<const MatX> covX, const py::EigenDRef<const MatX> covY)
 {
-  public:
-    GicpPy(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y,
-           const py::EigenDRef<const MatX> covX, const py::EigenDRef<const MatX> covY ) :
-        Gicp(X,Y,covX,covY) {};
-};
+    SE3 res;
+    PCRegistration::Gicp(X,Y,covX,covY,res);
+    return PySE3(res);
+}
 
 void init_PCRegistration(py::module &m)
 {
-    py::class_<ArunPy>(m, "Arun")
-            .def(py::init<py::EigenDRef<const MatX> , py::EigenDRef<const MatX> >())
-            .def("solve", &ArunPy::solve)
-            .def("getT", &ArunPy::getT)
-            ;
     m.def("ArunSolve", &ArunSolve);
-    py::class_<GicpPy>(m, "Gicp")
-            .def(py::init<const py::EigenDRef<const MatX> , const py::EigenDRef<const MatX> ,
-                    const py::EigenDRef<const MatX> , const py::EigenDRef<const MatX> >())
-            .def("solve", &Gicp::solve)
-            .def("getT", &Gicp::getT)
-            ;
+    m.def("GicpSolve", &GicpSolve);
 }
 
 

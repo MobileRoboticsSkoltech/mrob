@@ -8,8 +8,9 @@
  *              g.ferrer@skoltech.ru
  *              Mobile Robotics Lab, Skoltech 
  */
-
 #include "mrob/base_transf.hpp"
+
+
 
 using namespace mrob;
 
@@ -33,7 +34,8 @@ void Point3_t::print(void)
     std::cout << "[" << x << ", " << y << ", "<< z << "]" << std::endl;
 }
 
-BaseTransf::BaseTransf(const MatX &X, const MatX &Y):
+//TODO Ref is copying things, what is woroing!!!
+BaseTransf::BaseTransf(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y):
         X_(X), Y_(Y)
 {
     assert(X.rows() == 3  && "BaseTransf::BaseTransf: Incorrect sizing, we expect 3xN");

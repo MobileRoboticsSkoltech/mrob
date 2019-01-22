@@ -3,18 +3,13 @@
 
 # extra source files
 SET(sources
-    base_transf.cpp
-    create_points.cpp
     arun.cpp
     gicp.cpp
 )
 
 # extra header files
 SET(headers
-    mrob/base_transf.hpp
-    mrob/create_points.cpp
-    mrob/arun.hpp
-    mrob/gicp.hpp
+    mrob/PCRegistration.hpp
 )
 
 # create the shared library

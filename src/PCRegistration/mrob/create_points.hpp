@@ -13,7 +13,7 @@
 #define CREATE_POINTS_HPP_
 
 #include "mrob/SE3.hpp"
-
+#include <random>
 
 namespace mrob{
 
