@@ -79,6 +79,13 @@ public:
     //TODO
     void saveGraph() const;
     void loadGraph();
+
+    /**
+     * Get all nodes of the graph.
+     * For now it is used for saving nodes positions in file.
+     * If no other uses found then replace it by saveGraph.*/
+    std::vector<std::shared_ptr<Node>> getNodes();
+
 protected:
     /**
 	 *  XXX is set better than vector for what we are using them?

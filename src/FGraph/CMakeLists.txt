@@ -20,13 +20,19 @@ SET(factors_headers
     mrob/factors/nodePose3d.hpp
     mrob/factors/factor2Poses3d.hpp
     mrob/factors/factor1Pose3d.hpp
-)
+    mrob/factors/nodePose2d.h
+    mrob/factors/factor1Pose2d.h
+    mrob/factors/factor2Poses2d.h
+    mrob/factors/factor2Odometry2d.h
+    mrob/factors/factor2Observation2d.h)
 
 SET(factors_sources
     factors/nodePose3d.cpp
     factors/factor2Poses3d.cpp
     factors/factor1Pose3d.cpp
-)
+    factors/nodePose2d.cpp
+    factors/factor1Pose2d.cpp
+    factors/factor2Poses2d.cpp factors/factor2Odometry2d.cpp factors/factor2Observation2d.cpp mrob/CustomCholesky.h)
 
 # create the shared library
 ADD_LIBRARY(FGraph SHARED  ${sources} ${factors_sources})

@@ -13,6 +13,8 @@
 #include "mrob/factor_graph.hpp"
 
 #include <iostream>
+#include <mrob/factor_graph.hpp>
+
 
 using namespace mrob;
 
@@ -67,4 +69,8 @@ void FGraph::print(bool completePrint) const
         for (auto f : factors_)
             f->print();
     }
+}
+
+std::vector<std::shared_ptr<Node>> FGraph::getNodes() {
+    return nodes_;
 }
