@@ -22,6 +22,11 @@ SO3::SO3(const Mat31 &w) : Mat3(Mat3::Identity())
     //std::cout << "SO3 with Mat31" << std::endl;
     this->exp(hat3(w));
 }
+SO3::SO3(const Mat3 &R) :
+        Mat3(R)
+{
+}
+
 template<typename OtherDerived>
 SO3::SO3(const Eigen::MatrixBase<OtherDerived>& other)  :
 Mat3(other)

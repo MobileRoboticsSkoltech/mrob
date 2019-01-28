@@ -27,8 +27,8 @@ int main()
           1, 2, 1, 2, 6, -1,
           3, -3, 2, -4 ,7, 7;
 
-    std::cout << "1st Arun\n" << *X << std::endl;
     mrob::Arun arun(X,Y);
+    std::cout << "1st Arun\n" << *X << std::endl;
     arun.solve();
     arun.getT().print();
 
