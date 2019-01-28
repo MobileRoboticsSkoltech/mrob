@@ -9,13 +9,12 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#include "mrob/PCRegistration.hpp"
-
 #include <Eigen/LU>
 #include <Eigen/SVD>
 
 #include <memory>
 #include <iostream>
+#include "mrob/pc_registration.hpp"
 
 using namespace mrob;
 using namespace Eigen;

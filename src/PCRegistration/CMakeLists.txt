@@ -5,11 +5,13 @@
 SET(sources
     arun.cpp
     gicp.cpp
+    create_points.cpp
 )
 
 # extra header files
 SET(headers
     mrob/PCRegistration.hpp
+    mrob/create_points.hpp
 )
 
 # create the shared library

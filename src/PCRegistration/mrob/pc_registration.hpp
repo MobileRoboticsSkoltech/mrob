@@ -9,8 +9,8 @@
  *              Mobile Robotics Lab, Skoltech
  */
 
-#ifndef SRC_PCREGISTRATION_MROB_PCREGISTRATION_HPP_
-#define SRC_PCREGISTRATION_MROB_PCREGISTRATION_HPP_
+#ifndef PC_REGISTRATION_HPP_
+#define PC_REGISTRATION_HPP_
 
 #include "mrob/matrix_base.hpp"
 #include "mrob/SE3.hpp"
@@ -66,4 +66,4 @@ int Gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
 
 
 }}//namespace
-#endif /* SRC_PCREGISTRATION_MROB_PCREGISTRATION_HPP_ */
+#endif /* PC_REGISTRATION_HPP_ */

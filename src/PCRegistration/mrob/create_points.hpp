@@ -14,6 +14,10 @@
 
 #include "mrob/SE3.hpp"
 #include <random>
+#include <Eigen/StdVector> // for fixed size SE3 objects
+
+
+using namespace Eigen;
 
 namespace mrob{
 
@@ -22,12 +26,14 @@ namespace mrob{
  * uniform distribution U(-R_range, R_range)
  * or any implemented distribution
  */
-class Csample_uniform_SE3{
+class CsampleUniformSE3{
   public:
-    Csample_uniform_SE3(double R_range, double t_range);
-    Csample_uniform_SE3(double R_min, double R_max, double t_min, double t_max);
-    ~Csample_uniform_SE3();
-    SE3 sample();
+    CsampleUniformSE3(double R_range, double t_range);
+    CsampleUniformSE3(double R_min, double R_max, double t_min, double t_max);
+    ~CsampleUniformSE3();
+    SE3 samplePose();
+    Mat31 samplePosition();
+    SO3 sampleOrientation();
   protected:
     std::default_random_engine generator_;
     std::uniform_real_distribution<double> R_uniform_;
@@ -38,36 +44,44 @@ class Csample_uniform_SE3{
 
 
 /**
- * Class generating a pair of pointclouds given some specifications.
- * It also produces normals and planes, as if we had pre-processed points
+ * Class generating a sequence of pointClouds given some specifications.
  */
-class Cpair_PC{
+class CreatePoints{
 public:
-    Cpair_PC();
-    ~Cpair_PC();
-    // samples a new transformation, and random
-    void sample();
-    // Point cloud data generated
-    Eigen::MatrixXd X, Y;
-    SE3 T_ground_truth;
+    /**
+     * Creates a class
+     */
+    CreatePoints(uint_t N = 1000, uint_t numberPlanes = 4, double noisePerPoint = 1.0);
+    ~CreatePoints();
 
-    // generation parameters
-    int N;
-    double R_range;
-    double t_range;
-    double std_y;
-    double lamda_outlier;
-    double R_normal;
-    double normal_noise;
-    double normal_noise_per_point;
-    double epsilon;
-    double cov_with_dist;
-    double range;
-    int sample_on_plane;
-    int count_points_on_plane;
-    int max_number_point_on_plane;
-    double weight_factors;
+    const Ref<const MatX> get_point_cloud(uint_t t);
+
+
 protected:
+    // generation parameters
+    uint_t N_; // Number of points
+    uint_t numberPlanes_; // Number of planes in the virtual environment
+    double noisePerPoint_;
+    double R_range_;
+    double t_range_;
+    double lamdaOutlier_;
+    CsampleUniformSE3 samplePoses_;
+
+    // Point cloud data generated
+    std::vector<MatX> X_;
+    // this should be a vectors of 3d/4d points as well
+    //std::vector<Mat31> X_;
+    std::vector<SE3> poseGroundTruth_;
+
+    // Trajectory parameters
+    double xRange_, yRange_; // dimension of the workspace
+    SE3 initialPose, finalPose;
+    uint_t numberPoses_;
+
+    // Generation of planes
+    MatX sample_plane(uint_t nPoints);
+    std::vector<SE3> planes_;
+
 };
 
 }

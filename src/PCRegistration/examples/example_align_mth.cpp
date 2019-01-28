@@ -10,8 +10,8 @@
  */
 
 
-#include "mrob/PCRegistration.hpp"
 #include <iostream>
+#include "../mrob/pc_registration.hpp"
 
 
 int main()

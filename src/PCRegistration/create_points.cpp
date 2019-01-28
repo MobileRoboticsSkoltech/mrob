@@ -19,28 +19,28 @@
 
 using namespace mrob;
 
-Csample_uniform_SE3::Csample_uniform_SE3(double R_range, double t_range):
+CsampleUniformSE3::CsampleUniformSE3(double R_range, double t_range):
     R_uniform_(-R_range, R_range), t_uniform_(-t_range, t_range)
 {
     auto seed = std::chrono::system_clock::now().time_since_epoch().count();
     generator_.seed(seed);
 }
 
-Csample_uniform_SE3::Csample_uniform_SE3(double R_min, double R_max, double t_min, double t_max):
+CsampleUniformSE3::CsampleUniformSE3(double R_min, double R_max, double t_min, double t_max):
     R_uniform_(R_min, R_max), t_uniform_(t_min, t_max)
 {
-    assert(R_min <= R_max && "\nCsample_uniform_SE3::Csample_uniform_SE3 incorrect R bounds");
-    assert(t_min <= t_max && "\nCsample_uniform_SE3::Csample_uniform_SE3 incorrect t bounds");
+    assert(R_min <= R_max && "\nCsampleUniformSE3::CsampleUniformSE3 incorrect R bounds");
+    assert(t_min <= t_max && "\nCsampleUniformSE3::CsampleUniformSE3 incorrect t bounds");
     auto seed = std::chrono::system_clock::now().time_since_epoch().count();
     generator_.seed(seed);
 }
 
 
-Csample_uniform_SE3::~Csample_uniform_SE3()
+CsampleUniformSE3::~CsampleUniformSE3()
 {
 }
 
-SE3 Csample_uniform_SE3::sample()
+SE3 CsampleUniformSE3::samplePose()
 {
     // xi = [w , v]^T
     Mat61 xi;
@@ -53,27 +53,47 @@ SE3 Csample_uniform_SE3::sample()
     return SE3(xi);
 }
 
-Cpair_PC::Cpair_PC():
-        N(10),
-        R_range(M_PI),
-        t_range(10.0),
-        std_y(1.5),
-        lamda_outlier(0.0),
-        R_normal(M_PI/10),
-        normal_noise(0.1),
-        normal_noise_per_point(0.0), //deprecated?
-        epsilon(1e-3),
-        cov_with_dist(0.1),
-        range(30),
-        sample_on_plane(1), // 0 for sampling over the point, 1 for sampling over the plane
-        count_points_on_plane(0), // 0 for not counting the number of planes, 1 for "counting" point
-        max_number_point_on_plane(100),
-        weight_factors(1.0)
-{
 
+Mat31 CsampleUniformSE3::samplePosition()
+{
+    return Mat31(t_uniform_(generator_), t_uniform_(generator_), t_uniform_(generator_));
 }
 
-Cpair_PC::~Cpair_PC()
+SO3 CsampleUniformSE3::sampleOrientation()
+{
+    Mat31 w(R_uniform_(generator_), R_uniform_(generator_), R_uniform_(generator_));
+    return SO3(w);
+}
+
+const Ref<const MatX> CreatePoints::get_point_cloud(uint_t t)
+{
+    assert(t < numberPoses_ && "CreatePoints::getPointCloud: temporal index larger than number of calculated poses\n");
+    return X_[t];//.at(t);
+}
+
+CreatePoints::CreatePoints(uint_t N, uint_t numberPlanes, double noisePerPoint):
+        N_(10),
+        numberPlanes_(numberPlanes),
+        noisePerPoint_(noisePerPoint),
+        R_range_(M_PI),
+        t_range_(10.0),
+        lamdaOutlier_(0.0),
+        samplePoses_(R_range_,t_range_),
+        // Trajectory parameters
+        xRange_(10.0),
+        yRange_(10.0),
+        numberPoses_(6)
+{
+    // 1) generate planes
+    for (uint_t i = 0; i < numberPlanes_ ; ++i)
+    {
+
+    }
+    // 2) generate trajectory, from x_o = 0,,..,0, to x_f = at xRange, yRange, z
+    // 3) generate points for each plane
+}
+
+CreatePoints::~CreatePoints()
 {
 
 }

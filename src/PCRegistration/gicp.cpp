@@ -9,11 +9,11 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#include "mrob/PCRegistration.hpp"
 #include <Eigen/LU> // for inverse and determinant
 
 #include <memory>
 #include <iostream>
+#include "mrob/pc_registration.hpp"
 
 
 using namespace mrob;
