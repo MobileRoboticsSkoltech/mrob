@@ -8,11 +8,13 @@ The Skoltech Mobile Robotics library (mrob) is our common framework for implemen
 
 ## Dependencies
 * C++'14
+* CMake
 * [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) (requires installation)
 * [pybind11](https://github.com/pybind/pybind11) (no action required, it is a submodule)
   - python3-distutils
   - python3-dev
 
+`sudo apt install build-essential cmake python3-distutils python3-dev`
 
 ## Coding conventions
 Coding conventions are necessary to maintain homogeneity and readability across all the project. Here are some conventions that we _should_ follow:
