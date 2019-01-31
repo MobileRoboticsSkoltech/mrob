@@ -20,7 +20,7 @@
 namespace py = pybind11;
 
 
-#include "../src/PCRegistration/mrob/pc_registration.hpp"
+#include "mrob/pc_registration.hpp"
 
 #include "SE3py.hpp"
 

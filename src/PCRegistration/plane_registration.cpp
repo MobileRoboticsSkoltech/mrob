@@ -10,5 +10,5 @@
  */
 
 
-#include "mrob/planeRegistration.hpp"
+#include "mrob/plane_registration.hpp"
 

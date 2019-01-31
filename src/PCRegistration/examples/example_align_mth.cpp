@@ -11,7 +11,7 @@
 
 
 #include <iostream>
-#include "../mrob/pc_registration.hpp"
+#include "mrob/pc_registration.hpp"
 
 
 int main()

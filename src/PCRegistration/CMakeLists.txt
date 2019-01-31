@@ -5,12 +5,14 @@
 SET(sources
     arun.cpp
     gicp.cpp
+    plane_registration.cpp
     create_points.cpp
 )
 
 # extra header files
 SET(headers
     mrob/PCRegistration.hpp
+    mrob/plane_registration.hpp
     mrob/create_points.hpp
 )
 
