@@ -63,7 +63,10 @@ void FGraphSolve::solveOnce()
 void FGraphSolve::solveIncremental()
 {
     // TODO incremental update should check for loop closures
-    // NOTE: it works only with odometry factors
+    /**
+     * NOTE: it works only with odometry factors
+     * and also requires matrix to have at least 2 nodes
+     */
     solveCholIncremental();
 
     // Keep indices of last node and factor
@@ -300,26 +303,36 @@ void FGraphSolve::solveChol()
     I_ = (A_.transpose() * W_.selfadjointView<Eigen::Upper>() * A_).selfadjointView<Eigen::Upper>();
     b_ = A_.transpose() * W_.selfadjointView<Eigen::Upper>() * r_;
 
-//    cout << I_.toDense() << endl;
-//    std::cout << b_ << std::endl;
-
     /**
      * Solve LSQ via sparse Cholesky
      * TODO reordering
      */
     CustomCholesky<SMat> cholesky(I_);
-    L_ = cholesky.getL();
-    auto dx_ = cholesky.solve(b_);
+    y_ = cholesky.matrixL().solve(b_);
+    auto dx_ = cholesky.matrixU().solve(y_);
 
-    cout << L_.toDense() << endl;
-//    cout << dx_ << endl;
+    cout << cholesky.getL().toDense() << endl;
+    cout << y_ << endl;
+    cout << endl;
+    cout << dx_ << endl;
 
+    // TODO uncomment later
 //    updateNodes(dx_);
+
+    // Save data for incremental update
+    long intersection = nodes_.back()->getDim(),
+            starting_index = I_.cols() - intersection,
+            correlation = (*(nodes_.end() - 2))->getDim();
+
+    L00 = cholesky.getL().block(0, 0, starting_index, starting_index);
+    L10 = cholesky.getL().block(starting_index, starting_index - correlation, intersection, correlation);
+    L11 = cholesky.getL().block(starting_index, starting_index, intersection, intersection);
+    I11 = I_.block(starting_index, starting_index, intersection, intersection);
 }
 
 
 void FGraphSolve::solveCholIncremental() {
-    // 0) Build information form of new update
+    // 0) Build information form of the update
     SMat A_new, W_new;
     MatX1 r_new;
     buildAdjacency(A_new, W_new, r_new);
@@ -327,86 +340,118 @@ void FGraphSolve::solveCholIncremental() {
     SMat I_new = (A_new.transpose() * W_new.selfadjointView<Eigen::Upper>() * A_new).selfadjointView<Eigen::Upper>();
     MatX1 b_new = A_new.transpose() * W_new.selfadjointView<Eigen::Upper>() * r_new;
 
-//    cout << I_new.toDense()<< endl;
-//    cout << b_new << endl;
-
-//    incrementalViaInformation(I_new, b_new);
-    incrementalViaL(I_new, b_new);
-}
-
-void FGraphSolve::incrementalViaInformation(SMat &I_new, MatX1 &b_new) {
-    // 1) Allocate memory for update
-    SMat I_updated;
-    MatX1 b_updated;
-
-    I_updated.resize(stateDim_, stateDim_);
-    b_updated.resize(stateDim_, 1);
-
-    std::vector<uint_t> reservationI;
-    reservationI.reserve(stateDim_);
-
-    // Put I_ space usage first
-    for (int i = 0; i < I_.outerSize(); i++) {
-        auto    curr = *(I_.outerIndexPtr() + i),
-                next = *(I_.outerIndexPtr() + i + 1);
-        reservationI.push_back(static_cast<unsigned int &&>(next - curr));
-    }
-
-    // Then add I_new terms
-    int intersection = (last_solved_node == -1 ? 0 : nodes_[last_solved_node]->getDim()),
-            starting_index = static_cast<int>(I_.cols()) - intersection;
-
-    for(int i = 0; i < intersection; i++) {
-        auto    curr = *(I_new.outerIndexPtr() + i),
-                next = *(I_new.outerIndexPtr() + i + 1);
-        reservationI[starting_index + i] += static_cast<unsigned int>(next - curr) - intersection;
-    }
-
-    for (int i = intersection; i < I_new.outerSize(); i++) {
-        auto    curr = *(I_new.outerIndexPtr() + i),
-                next = *(I_new.outerIndexPtr() + i + 1);
-        reservationI.push_back(static_cast<unsigned int>(next - curr));
-    }
-
-    I_updated.reserve(reservationI);
-
-    // 2) Join I_ and I_new together
+    // 1) Make I_new suitable for Cholesky
     vector<Eigen::Triplet<matData_t>> tripletList;
 
-    for (int i = 0; i < I_.outerSize(); ++i) {
-        for (SMat::InnerIterator it(I_, i); it; ++it) {
+    // Copy the matrix itself
+    for (int i = 0; i < I_new.outerSize(); ++i) {
+        for (SMat::InnerIterator it(I_new, i); it; ++it) {
             tripletList.emplace_back(it.row(), it.col(), it.value());
         }
     }
 
-    for (int i = 0; i < I_new.outerSize(); ++i) {
-        for (SMat::InnerIterator it(I_new, i); it; ++it) {
-            tripletList.emplace_back(it.row() + starting_index, it.col() + starting_index, it.value());
+    // Add old information
+    for (int i = 0; i < I11.cols(); ++i) {
+        for (SMat::InnerIterator it(I11, i); it; ++it) {
+            tripletList.emplace_back(it.row(), it.col(), it.value());
         }
     }
 
-    I_updated.setFromTriplets(tripletList.begin(), tripletList.end());
+    SMat _LLT = -1 * L10 * L10.transpose();
 
-    // 3) Join b_ and b_new together
-    b_updated.block(0, 0, b_.rows(), 1) << b_;
-    b_updated.block(starting_index, 0, b_new.rows(), 1) += b_new;
+    // Subtract cross-terms
+    for (int i = 0; i < _LLT.outerSize(); ++i) {
+        for (SMat::InnerIterator it(_LLT, i); it; ++it) {
+            tripletList.emplace_back(it.row(), it.col(), it.value());
+        }
+    }
 
-//    cout << I_updated.toDense() << endl;
-//    cout << b_updated << endl;
+    I_new.setFromTriplets(tripletList.begin(), tripletList.end());
 
-    // 4) Solve it
-    SimplicialLLT<SMat> chol(I_updated);
-    MatX1 dx_ = chol.solve(b_updated);
+    // 2) Calculate L11_new and y10_new incrementally
+    long old_intersection = (last_solved_node == -1 ? 0 : nodes_[last_solved_node]->getDim()),
+            old_starting_index = L00.cols();
 
-    //TODO we probalbliy should save updated values
+    CustomCholesky<SMat> cholesky;
+    cholesky.compute(I_new);
 
+    MatX1 y10 = y_.block(old_starting_index, 0, old_intersection, 1);
+    b_new.block(0, 0, old_intersection, 1) += L11 * y10;
+
+    MatX1 y_new, y10_new = cholesky.matrixL().solve(b_new);
+
+    cout << y_ << endl;
+
+    y_new.resize(stateDim_, 1);
+    y_new.block(0, 0, old_starting_index, 1) << y_.block(0, 0, old_starting_index, 1);
+    y_new.block(old_starting_index, 0, y10_new.rows(), 1) << y10_new;
+
+    SMat L11_new = cholesky.getL();
+
+    // 3) Join L00, L10 and L11_new together
+    SMat L_new;
+    std::vector<uint_t> reservationL;
+
+    L_new.resize(stateDim_, stateDim_);
+    reservationL.reserve(stateDim_);
+
+    for (int i = 0; i < L00.outerSize(); i++) {
+        auto    curr = *(L00.outerIndexPtr() + i),
+                next = *(L00.outerIndexPtr() + i + 1);
+        reservationL.push_back(static_cast<unsigned int &&>(next - curr));
+    }
+
+    for (int i = 0; i < L11.outerSize(); i++) {
+        auto    curr = *(L11.outerIndexPtr() + i),
+                next = *(L11.outerIndexPtr() + i + 1);
+        reservationL.push_back(static_cast<unsigned int &&>(next - curr));
+    }
+
+    L_new.reserve(reservationL);
+
+    tripletList.clear();
+
+    long old_correlation = (last_solved_node == -1 ? 0 : nodes_[last_solved_node - 1]->getDim());
+
+    for (int i = 0; i < L00.outerSize(); ++i) {
+        for (SMat::InnerIterator it(L00, i); it; ++it) {
+            tripletList.emplace_back(it.row(), it.col(), it.value());
+        }
+    }
+
+    for (int i = 0; i < L10.outerSize(); ++i) {
+        for (SMat::InnerIterator it(L10, i); it; ++it) {
+            tripletList.emplace_back(it.row() + old_starting_index, it.col() + old_starting_index - old_correlation, it.value());
+        }
+    }
+
+    for (int i = 0; i < L11_new.outerSize(); ++i) {
+        for (SMat::InnerIterator it(L11_new, i); it; ++it) {
+            tripletList.emplace_back(it.row() + old_starting_index, it.col() + old_starting_index, it.value());
+        }
+    }
+
+    L_new.setFromTriplets(tripletList.begin(), tripletList.end());
+
+    // 4) Solve Rdx = y
+    auto dx_ = L_new.adjoint().triangularView<Eigen::Upper>().solve(y_new);
+
+    cout << L_new.toDense() << endl;
+    cout << y_new << endl;
+    cout << endl;
     cout << dx_ << endl;
 
+    // TODO uncomment later
 //    updateNodes(dx_);
-}
 
-void FGraphSolve::incrementalViaL(SMat &I_new, MatX1 &b_new) {
-
+    // Save data for incremental update
+    long intersection = nodes_.back()->getDim(),
+            starting_index = L_new.cols() - intersection,
+            correlation = (*(nodes_.end() - 2))->getDim();
+    L00 = L_new.block(0, 0, starting_index, starting_index);
+    L10 = L_new.block(starting_index, starting_index - correlation, intersection, correlation);
+    L11 = L_new.block(starting_index, starting_index, intersection, intersection);
+    I11 = I_new.block(I_new.rows() - intersection, I_new.cols() - intersection, intersection, intersection);
 }
 
 
@@ -419,3 +464,6 @@ void FGraphSolve::updateNodes(const MatX1 &dx_) {
         acc_start += node->getDim();
     }
 }
+
+
+

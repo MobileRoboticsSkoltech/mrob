@@ -57,10 +57,7 @@ protected:
     void buildDirectInfo();
     void solveQR();
     void solveChol();
-
     void solveCholIncremental();
-    void incrementalViaInformation(SMat &I_new, MatX1 &b_new);
-    void incrementalViaL(SMat &I_new, MatX1 &b_new);
 
     void updateNodes(const MatX1 &dx_);
 
@@ -76,7 +73,8 @@ protected:
 
     // Variables for incremental solve
     long last_solved_node, last_solved_factor; // Index of last solved node and factor
-    SMat L_; // Lower part of Cholesky decomposition of I_ matrix
+    SMat L00, L10, L11, I11; // Lower part of Cholesky decomposition of I_ matrix
+    MatX1 y_; // Solution of Ly = b
 };
 
 
