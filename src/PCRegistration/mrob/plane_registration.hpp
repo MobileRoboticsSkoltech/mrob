@@ -14,24 +14,38 @@
 
 
 #include "mrob/SE3.hpp"
+#include <Eigen/StdVector>
 
 
 
 namespace mrob{
 
 
+
+/**
+ * class Plane stores a vector of point clouds from different observations
+ * and  provides the gradients with respect to those poses.
+ *
+ */
 class Plane{
   public:
-    Plane(SE3);
+    Plane(uint_t timeLength);
     ~Plane();
+    void set_plane(SE3 &);
+    SE3 get_plane(void);
 
 
   protected:
-    // Overparametrized plane, as a transformation
-    SE3 plane_, estimatedPlane_;
-    // for now a vector, is it necessary a queue to remove data?
+    // index of time,
+    uint_t timeLength_;
+    std::vector<uint_t> timeIndex_;
+
+    // Overparametrized plane, as a transformation in SE3
+    SE3 plane_;
+
     // Local copy of points
-    std::vector<MatX> data_;
+    // XXX for now a vector, is it necessary a queue to remove data?
+    std::vector<MatX> points_;
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -49,7 +63,7 @@ class PlaneRegistration{
     ~PlaneRegistration();
 
     int solve();
-    std::vector<SE3> get_transformations();//if solved
+    std::vector<SE3>& get_transformations();//if solved
 
   protected:
     std::vector<Plane> planes_;//we should include here references
