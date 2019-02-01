@@ -2,11 +2,11 @@
 Point Cloud Registration. Different methods implemente for point cloud registration:
 * Arun, and SVD-based method (Arun'1983)
 * GICP
-* NICP
+* NICP?
 
 
 ## Dependencies
-C++'11, Eigen
+C++'14, Eigen
 
 
 
