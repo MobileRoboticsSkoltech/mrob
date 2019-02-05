@@ -27,6 +27,7 @@ using namespace Eigen;
 
 FGraphSolve::FGraphSolve(solveType type, uint_t potNumberNodes, uint_t potNumberFactors):
 	FGraph(potNumberNodes, potNumberFactors), type_(type),
+    last_stateDim(-1), last_obsDim(-1),
 	last_solved_node(-1), last_solved_factor(-1)
 {
 
@@ -53,25 +54,53 @@ void FGraphSolve::buildProblem()
 
 void FGraphSolve::solveOnce()
 {
+    /**
+     * Before doing solve update positions of the graph with last valid solution.
+     * This solution would be either last solveOnce() or last solveIncremental()
+     */
+    if(last_solved_node != 0) updateNodes();
+
     solveChol();
 
-    // Keep indices of last node and factor
+    // Keep indices of last node and factor, as well as dimensions
+    last_stateDim = stateDim_;
+    last_obsDim = obsDim_;
+
     last_solved_node = nodes_.size() - 1;
     last_solved_factor = factors_.size() - 1;
 }
 
 void FGraphSolve::solveIncremental()
 {
-    // TODO incremental update should check for loop closures
     /**
      * NOTE: it works only with odometry factors
      * and also requires matrix to have at least 2 nodes
+     *
+     * NOTE: mechanism for evaluation time of the incremental update vs
+     * batch update is not present
      */
     solveCholIncremental();
 
     // Keep indices of last node and factor
+    last_stateDim = stateDim_;
+    last_obsDim = obsDim_;
+
     last_solved_node = nodes_.size() - 1;
     last_solved_factor = factors_.size() - 1;
+}
+
+std::vector<MatX1> FGraphSolve::getEstimatedPositions() {
+    vector<MatX1> results;
+    int acc_start = 0;
+
+    for (int i = 0; i <= last_solved_node; i++) {
+        MatX1 updated_pos = nodes_[i]->getState() + dx_.block(acc_start, 0, nodes_[i]->getDim(), 1);
+        results.emplace_back(updated_pos);
+
+        acc_start += nodes_[i]->getDim();
+    }
+
+    return results;
 }
 
 
@@ -198,8 +227,9 @@ void FGraphSolve::buildAdjacency()
 }
 
 void FGraphSolve::buildAdjacency(SMat &A_new, SMat &W_new, MatX1 &r_new) {
-    auto    state_dim = stateDim_ - I_.cols() + (last_solved_node == -1 ? 0 : nodes_[last_solved_node]->getDim()) ,
-            obs_dim = obsDim_ - I_.rows();
+    auto    state_dim = stateDim_ - last_stateDim + (last_solved_node == -1 ? 0 : nodes_[last_solved_node]->getDim()),
+            obs_dim = obsDim_ - last_obsDim;
+
     A_new.resize(obs_dim, state_dim);
     W_new.resize(obs_dim, obs_dim);
     r_new.resize(obs_dim, 1);
@@ -309,15 +339,12 @@ void FGraphSolve::solveChol()
      */
     CustomCholesky<SMat> cholesky(I_);
     y_ = cholesky.matrixL().solve(b_);
-    auto dx_ = cholesky.matrixU().solve(y_);
+    dx_ = cholesky.matrixU().solve(y_);
 
-    cout << cholesky.getL().toDense() << endl;
-    cout << y_ << endl;
-    cout << endl;
-    cout << dx_ << endl;
-
-    // TODO uncomment later
-//    updateNodes(dx_);
+//    cout << cholesky.getL().toDense() << endl;
+//    cout << y_ << endl;
+//    cout << endl;
+//    cout << dx_ << endl;
 
     // Save data for incremental update
     long intersection = nodes_.back()->getDim(),
@@ -378,13 +405,10 @@ void FGraphSolve::solveCholIncremental() {
     MatX1 y10 = y_.block(old_starting_index, 0, old_intersection, 1);
     b_new.block(0, 0, old_intersection, 1) += L11 * y10;
 
-    MatX1 y_new, y10_new = cholesky.matrixL().solve(b_new);
+    MatX1 y10_new = cholesky.matrixL().solve(b_new);
 
-    cout << y_ << endl;
-
-    y_new.resize(stateDim_, 1);
-    y_new.block(0, 0, old_starting_index, 1) << y_.block(0, 0, old_starting_index, 1);
-    y_new.block(old_starting_index, 0, y10_new.rows(), 1) << y10_new;
+    y_.conservativeResize(stateDim_, 1);
+    y_.block(old_starting_index, 0, y10_new.rows(), 1) << y10_new;
 
     SMat L11_new = cholesky.getL();
 
@@ -434,15 +458,12 @@ void FGraphSolve::solveCholIncremental() {
     L_new.setFromTriplets(tripletList.begin(), tripletList.end());
 
     // 4) Solve Rdx = y
-    auto dx_ = L_new.adjoint().triangularView<Eigen::Upper>().solve(y_new);
+    dx_ = L_new.adjoint().triangularView<Eigen::Upper>().solve(y_);
 
-    cout << L_new.toDense() << endl;
-    cout << y_new << endl;
-    cout << endl;
-    cout << dx_ << endl;
-
-    // TODO uncomment later
-//    updateNodes(dx_);
+//    cout << L_new.toDense() << endl;
+//    cout << y_new << endl;
+//    cout << endl;
+//    cout << dx_ << endl;
 
     // Save data for incremental update
     long intersection = nodes_.back()->getDim(),
@@ -455,13 +476,13 @@ void FGraphSolve::solveCholIncremental() {
 }
 
 
-void FGraphSolve::updateNodes(const MatX1 &dx_) {
+void FGraphSolve::updateNodes() {
     int acc_start = 0;
-    for (auto &node : nodes_) {
-        auto node_update = dx_.block(acc_start, 0, node->getDim(), 1);
-        node->update(node_update);
+    for (int i = 0; i <= last_solved_node; i++) {
+        auto node_update = dx_.block(acc_start, 0, nodes_[i]->getDim(), 1);
+        nodes_[i]->update(node_update);
 
-        acc_start += node->getDim();
+        acc_start += nodes_[i]->getDim();
     }
 }
 

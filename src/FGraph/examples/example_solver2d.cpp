@@ -4,6 +4,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <chrono>
+
 #include "mrob/factor_graph_solve.hpp"
 #include "mrob/factors/factor1Pose2d.h"
 #include "mrob/factors/factor2Odometry2d.h"
@@ -17,9 +19,11 @@
 //#include <Eigen/S>
 
 using namespace std;
+using namespace std::chrono;
 
 struct LoadedData {
     double a1, a2, a3, a4;
+    vector<MatX1> true_positions;
     vector<std::shared_ptr<mrob::Node>> predictions;
     vector<Mat31> motions;
 };
@@ -45,7 +49,10 @@ LoadedData load_graph(const string &file_path, bool show_output) {
         double x, y, theta;
         in >> x >> y >> theta;
 
-        if(show_output) cout << x << " " << y << " " << theta << endl;
+        Mat31 pos;
+        pos << x, y, theta;
+
+        data.true_positions.push_back(pos);
     }
 
     if(show_output) {
@@ -95,22 +102,6 @@ LoadedData load_graph(const string &file_path, bool show_output) {
     return data;
 }
 
-void save_graph(mrob::FGraphSolve &graph) {
-    auto nodes = graph.getNodes();
-
-    ofstream out("out.txt");
-
-    out << nodes.size() << endl;
-
-    for (auto &i: nodes) {
-        out << i->getState()[0] << " " << i->getState()[1] << " " << i->getState()[2] << endl;
-    }
-
-    out.close();
-}
-
-
-
 std::shared_ptr<mrob::Factor> getOdometryFactor(int i, LoadedData data) {
     Mat3 motion_cov;
     double  drot1_sq = data.motions[i][0] * data.motions[i][0],
@@ -151,6 +142,14 @@ void construct(mrob::FGraphSolve &graph, LoadedData data, int from, int to) {
     }
 }
 
+void write_node(ofstream &out, MatX1 &state) {
+    out << state[0] << " " << state[1] << " " << state[2] << endl;
+}
+
+void write_nodes(ofstream &out, std::vector<MatX1> states) {
+    for (auto &i: states) write_node(out, i);
+}
+
 
 int main ()
 {
@@ -160,62 +159,103 @@ int main ()
     mrob::FGraphSolve   graph_full(mrob::FGraphSolve::CHOL_ADJ,50,50),
                         graph_incremental(mrob::FGraphSolve::CHOL_ADJ,50,50);
 
-    construct(graph_full, data, 0, 4);
+    ofstream out("out.txt");
+
+    high_resolution_clock::time_point t1, t2;
+    vector<MatX1> fullSolvePositions, incrementalSolvePositions;
+
+    /**
+     * At first, lets try to construct A matrix and solve the problem from scratch
+     * each time a new node and factor is added.
+     */
+    out << data.predictions.size() << endl;
+
+    t1 = high_resolution_clock::now();
+    // Build initial problem from 3 nodes and solve it
+    construct(graph_full, data, 0, 3);
+
     graph_full.buildProblem();
     graph_full.solveOnce();
 
-    cout << endl;
+    write_nodes(out, graph_full.getEstimatedPositions());
 
+    // Solve problem fully at each step
+    for (int i = 3; i < data.predictions.size(); i++) {
+        construct(graph_full, data, i, i + 1);
+
+        graph_full.buildProblem();
+        graph_full.solveOnce();
+
+        MatX1 last = graph_full.getEstimatedPositions().back();
+        write_node(out, last);
+        fullSolvePositions.push_back(last);
+    }
+
+    t2 = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>(t2 - t1).count();
+    out << duration << endl;
+
+    float mse = 0.0f;
+    for (int i = 0; i < fullSolvePositions.size(); i++) {
+        MatX1 diff = fullSolvePositions[i] - data.true_positions[i + 3];
+        mse += diff.squaredNorm();
+    }
+
+    out << mse << endl;
+
+    /**
+     * Now, lest do the process incrementally, doing batch updates only 3 times
+     */
+    out << data.predictions.size() << endl;
+
+    t1 = high_resolution_clock::now();
+    // Build initial problem from 3 nodes and solve it
     construct(graph_incremental, data, 0, 3);
+
     graph_incremental.buildProblem();
     graph_incremental.solveOnce();
 
-    cout << endl;
+    write_nodes(out, graph_incremental.getEstimatedPositions());
 
-    construct(graph_incremental, data, 3, 4);
-    graph_incremental.solveIncremental();
+    unsigned long diff = (data.predictions.size() - 3) / 3;
+    for (int i = 0; i < 3; i++) {
+        int start = 3 + diff * i, end = start + diff - 1;
+        // Solve intermediate nodes incrementally
+        for (int j = start; j < end; j++) {
+            construct(graph_incremental, data, j, j + 1);
+
+            graph_incremental.solveIncremental();
+
+            MatX1 last = graph_incremental.getEstimatedPositions().back();
+            write_node(out, last);
+            incrementalSolvePositions.push_back(last);
+        }
+        // Solve principal nodes fully
+        construct(graph_incremental, data, end, end + 1);
+
+        graph_incremental.buildProblem();
+        graph_incremental.solveOnce();
+
+        MatX1 last = graph_incremental.getEstimatedPositions().back();
+        write_node(out, last);
+        incrementalSolvePositions.push_back(last);
+    }
+
+    t2 = high_resolution_clock::now();
+
+    duration = duration_cast<microseconds>(t2 - t1).count();
+    out << duration << endl;
+
+    mse = 0.0f;
+    for (int i = 0; i < incrementalSolvePositions.size(); i++) {
+        MatX1 diff = incrementalSolvePositions[i] - data.true_positions[i + 3];
+        mse += diff.squaredNorm();
+    }
+
+    out << mse << endl;
+
+    out.close();
 
     return 0;
 }
-
-
-
-//    Mat2 matrix;
-//    matrix <<   4,-2,
-//                -2, 10;
-//
-//    Mat21 rhs;
-//    rhs << 4, 10;
-//
-//    Eigen::LLT<Mat2> solver(matrix);
-//    auto dx_1 = solver.solve(rhs);
-//    cout << dx_1 << endl;
-//
-//    auto y_1 = solver.matrixL().solve(rhs);
-//    auto dx_2 = solver.matrixU().solve(y_1);
-//    cout << dx_2 << endl;
-//
-//    auto R = solver.matrixU().toDenseMatrix();
-//    auto L = solver.matrixL().toDenseMatrix();
-//
-//    Eigen::TriangularView<Eigen::Matrix<double, 2, 2, 0, 2, 2>, Eigen::Lower> solver_2(L);
-//    auto y_2 = solver_2.solve(rhs);
-//    Eigen::TriangularView<Eigen::Matrix<double, 2, 2, 1, 2, 2>, Eigen::Upper> solver_3(R);
-//    auto dx_3 = solver_3.solve(y_2);
-//    cout << dx_3 << endl;
-
-//    Mat31 z1, z2;
-//    z1 << -0.089545, 0.03355436, 0.01867014;
-//    z2 << -0.0464949, 0.07584124, -0.50885916;
-//
-//    Mat3 obsCov;
-//    obsCov <<   1e-12, 0, 0,
-//            0, 1e-12, 0,
-//            0, 0, 1e-12;
-//
-//    std::shared_ptr<mrob::Factor>   obs_factor1(new mrob::Factor2Observation2d(z1, data.predictions[2],
-//            data.predictions[14], obsCov.inverse())),
-//            obs_factor2(new mrob::Factor2Observation2d(z2, data.predictions[3], data.predictions[15], obsCov.inverse()));
-//
-//    graph.addFactor(obs_factor1);
-//    graph.addFactor(obs_factor2);

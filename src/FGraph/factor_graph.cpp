@@ -70,7 +70,3 @@ void FGraph::print(bool completePrint) const
             f->print();
     }
 }
-
-std::vector<std::shared_ptr<Node>> FGraph::getNodes() {
-    return nodes_;
-}

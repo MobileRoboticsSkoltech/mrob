@@ -41,6 +41,8 @@ public:
     void solveOnce();
     void solveIncremental();
 
+    std::vector<MatX1> getEstimatedPositions();
+
 protected:
     /**
      * This protected method creates an Adjacency matrix, iterating over
@@ -59,7 +61,7 @@ protected:
     void solveChol();
     void solveCholIncremental();
 
-    void updateNodes(const MatX1 &dx_);
+    void updateNodes();
 
     // Variables for full solve
     solveType type_;
@@ -72,9 +74,13 @@ protected:
     MatX1 b_; // Post-processed residuals, either A'*W*r for the normal equation or W*r for QR solvers
 
     // Variables for incremental solve
+    long last_stateDim, last_obsDim; // stateDim and obsDim of the last solve
     long last_solved_node, last_solved_factor; // Index of last solved node and factor
     SMat L00, L10, L11, I11; // Lower part of Cholesky decomposition of I_ matrix
     MatX1 y_; // Solution of Ly = b
+
+    // Correction deltas
+    MatX1 dx_;
 };
 
 
