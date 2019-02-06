@@ -45,15 +45,18 @@ SE3 Plane::get_plane(void)
 
 void Plane::push_back_point(Mat31 &point, uint_t t)
 {
+
     if (t < timeLength_)
     {
-        Mat41 homogeneousPoint;
-        homogeneousPoint << point, 1.0;
-        allPlanePoints_[t].push_back(homogeneousPoint);
+        //TODO why homogeneous?
+        //Mat41 homogeneousPoint;
+        //homogeneousPoint << point, 1.0;
+        //allPlanePoints_[t].push_back(homogeneousPoint);
+        allPlanePoints_[t].push_back(point);
     }
 }
 
-std::vector<Mat41>& Plane::get_points(uint_t t)
+std::vector<Mat31>& Plane::get_points(uint_t t)
 {
     if (t >= timeLength_)
         return allPlanePoints_.back();

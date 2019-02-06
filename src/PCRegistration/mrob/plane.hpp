@@ -38,7 +38,7 @@ class Plane{
      * Internally, we will save a copy of them
      */
     void push_back_point(Mat31 &point, uint_t t);
-    std::vector<Mat41>& get_points(uint_t t);
+    std::vector<Mat31>& get_points(uint_t t);
     void clear_points();
 
 
@@ -52,7 +52,7 @@ class Plane{
 
     // Data is allocated outside the Plane class as a MatX of homogeneous points,
     // and we just store the pointers on a vector with temporal indices
-    std::vector< std::vector<Mat41> > allPlanePoints_;
+    std::vector< std::vector<Mat31> > allPlanePoints_;
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

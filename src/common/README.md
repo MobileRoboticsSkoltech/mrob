@@ -4,7 +4,7 @@ Common strucutres and data conventions taken acrros all project. This includes:
 * typedef of some data types.
 
 ## Dependencies
-C++'11, Eigen
+C++'14, Eigen
 
 
 

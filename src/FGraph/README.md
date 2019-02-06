@@ -3,7 +3,7 @@ Factor Graph library. WIP
 
 
 ## Dependencies
-C++'11, Eigen
+C++'14, Eigen
 
 
 

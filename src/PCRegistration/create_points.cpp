@@ -65,7 +65,7 @@ SO3 CsampleUniformSE3::sampleOrientation()
     return SO3(w);
 }
 
-const Ref<const MatX> CreatePoints::get_point_cloud(uint_t t)
+std::vector<Mat31>& CreatePoints::get_point_cloud(uint_t t)
 {
     assert(t < numberPoses_ && "CreatePoints::getPointCloud: temporal index larger than number of calculated poses\n");
     return X_[t];//.at(t);
@@ -96,4 +96,15 @@ CreatePoints::CreatePoints(uint_t N, uint_t numberPlanes, double noisePerPoint):
 CreatePoints::~CreatePoints()
 {
 
+}
+
+
+void CreatePoints::sample_plane(uint_t nPoints, uint_t id, uint_t t)
+{
+    for (uint_t i = 0; i < nPoints; ++i)
+    {
+        // generate point
+        // transform point
+        // push_back to the corresponding instant of time
+    }
 }

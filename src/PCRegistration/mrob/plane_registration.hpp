@@ -38,6 +38,10 @@ class PlaneRegistration{
     // flag for detecting when is has been solved
     uint_t isSolved_;
     uint_t time_;
+
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 };
 
 

@@ -7,7 +7,7 @@ So this library provides the mapping from SE(n), SO(n) to a vector of real value
 The present library is meant to be part of the mrob library, by implementing methods to solve the representation of Rigid Body Transfromations.
 
 ## Dependencies
-C++'11, Eigen
+C++'14, Eigen
 
 
 

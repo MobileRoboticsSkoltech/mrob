@@ -4,13 +4,13 @@ The Skoltech Mobile Robotics library (mrob) is our common framework for implemen
 * [SE3](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/src/SE3): Rigid Body Transformations library.
 * [Fgraph](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/src/FGraph): Factor Graph (WIP)
 * [PCReg](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/src/PCRegistration): Point Cloud Registration (WIP)
-* [mrobPy]() Python bindings (using pybind11) for some of the above methods.
+* [mrobPy](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/mrobpy) Python bindings (using pybind11) for some of the above methods.
 
 ## Dependencies
 * C++'14
 * CMake
 * [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) (requires installation)
-* [pybind11](https://github.com/pybind/pybind11) (no action required, it is a submodule)
+* [pybind11](https://github.com/pybind/pybind11)
   - python3-distutils
   - python3-dev
 

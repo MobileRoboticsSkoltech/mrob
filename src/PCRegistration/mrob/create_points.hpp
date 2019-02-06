@@ -54,7 +54,8 @@ public:
     CreatePoints(uint_t N = 1000, uint_t numberPlanes = 4, double noisePerPoint = 1.0);
     ~CreatePoints();
 
-    const Ref<const MatX> get_point_cloud(uint_t t);
+    std::vector<Mat31>& get_point_cloud(uint_t t);
+    std::vector<int>& get_plane_ids(uint_t t);
 
 
 protected:
@@ -68,18 +69,18 @@ protected:
     CsampleUniformSE3 samplePoses_;
 
     // Point cloud data generated
-    std::vector<MatX> X_;
-    // this should be a vectors of 3d/4d points as well
-    //std::vector<Mat31> X_;
-    std::vector<SE3> poseGroundTruth_;
+    std::vector< std::vector<Mat31> > X_;
+    // IDs for facilitating the task of DA and normal computation
+    std::vector< std::vector<uint_t>> pointId_;
 
     // Trajectory parameters
     double xRange_, yRange_; // dimension of the workspace
     SE3 initialPose, finalPose;
+    std::vector<SE3> poseGroundTruth_;
     uint_t numberPoses_;
 
     // Generation of planes
-    MatX sample_plane(uint_t nPoints);
+    void sample_plane(uint_t nPoints, uint_t id, uint_t t);
     std::vector<SE3> planes_;
 
 };
