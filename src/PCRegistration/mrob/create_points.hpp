@@ -68,7 +68,7 @@ public:
     /**
      * Creates a class
      */
-    CreatePoints(uint_t N = 1000, uint_t numberPlanes = 4, double noisePerPoint = 1.0);
+    CreatePoints(uint_t N = 10, uint_t numberPlanes = 4, uint_t numberPoses = 2, double noisePerPoint = 0.1);
     ~CreatePoints();
 
     std::vector<Mat31>& get_point_cloud(uint_t t);
@@ -76,10 +76,12 @@ public:
 
     std::vector<SE3>& get_poses() {return poseGroundTruth_;};
 
+    void print() const;
+
 
 protected:
     // generation parameters
-    uint_t N_; // Number of points
+    uint_t numberPoints_; // Number of points
     uint_t numberPlanes_; // Number of planes in the virtual environment
     double noisePerPoint_;
     double rotationRange_;

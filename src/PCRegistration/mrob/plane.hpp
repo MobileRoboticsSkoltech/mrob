@@ -54,9 +54,6 @@ class Plane{
     // and we just store the pointers on a vector with temporal indices
     std::vector< std::vector<Mat31> > allPlanePoints_;
 
-  public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
 };
 }
 

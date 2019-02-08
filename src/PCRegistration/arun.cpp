@@ -38,21 +38,21 @@ int PCRegistration::Arun(const Ref<const MatX> X, const Ref<const MatX> Y, SE3 &
      */
     // We have already asserted in base_T that they are 3xN matrices. (and the same length).
 
-    std::cout << "X: \n" << X << "\nY:\n" << Y << std::endl;
+    //std::cout << "X: \n" << X << "\nY:\n" << Y << std::endl;
     // 1) calculate centroids cx = E{x_i}. cy = E{y_i}
     //More efficient than creating a matrix of ones when on Release mode (not is Debug mode)
-    Mat31 cxm;// = X.rowwise().sum();
+    Mat31 cxm = X.rowwise().sum();
     cxm /= (double)N;
-    Mat31 cym;// = Y.rowwise().sum();
+    Mat31 cym = Y.rowwise().sum();
     cym /= (double)N;
 
     // 2)  calculate dispersion from centroids qx = x_i - cx
-    MatX qx;// = X.colwise() - cxm;
-    MatX qy;// = Y.colwise() - cym;
+    MatX qx = X.colwise() - cxm;
+    MatX qy = Y.colwise() - cym;
 
 
     // 3) calculate matrix H = sum qx_i * qy_i^T
-    Mat3 H;// = qx * qy.transpose();
+    Mat3 H = qx * qy.transpose();
 
     // 4) svd decomposition: H = U*D*V'
     JacobiSVD<Matrix3d> SVD(H, ComputeFullU | ComputeFullV);//Full matrices indicate Square matrices

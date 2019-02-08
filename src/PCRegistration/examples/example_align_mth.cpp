@@ -32,7 +32,7 @@ int main()
     std::cout << "Y data: \n" << Y << std::endl;
 
     mrob::SE3 T_arun;
-//    mrob::PCRegistration::Arun(X,Y,T_arun);
+    mrob::PCRegistration::Arun(X,Y,T_arun);
     std::cout << "T solved by Arun method: \n" << std::endl;
     T_arun.print();
 
@@ -46,8 +46,8 @@ int main()
     }
     mrob::SE3 T_gicp;
     mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
-//    mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
-//    mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
+    mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
+    mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
     std::cout << "T solved by GICP method: \n" << std::endl;
     T_gicp.print();
 

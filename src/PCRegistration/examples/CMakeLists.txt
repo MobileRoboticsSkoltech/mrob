@@ -1,2 +1,6 @@
 ADD_EXECUTABLE(example_align_mth  example_align_mth.cpp)
 TARGET_LINK_LIBRARIES(example_align_mth PCRegistration)
+
+ADD_EXECUTABLE(example_synthetic_plane_traj  example_synthetic_plane_traj.cpp)
+TARGET_LINK_LIBRARIES(example_synthetic_plane_traj PCRegistration)
+
