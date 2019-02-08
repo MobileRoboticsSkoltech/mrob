@@ -20,6 +20,8 @@
 int main()
 {
 
+
+    // TODO please write me as a test unit!!!
     // SO3 tests
     // ========================================================
 
@@ -74,7 +76,7 @@ int main()
 
     std::cout << "testing inverse"  << std::endl;
     mrob::SO3 Rt = R.inv();
-    std::cout << "invers = " << Rt  << std::endl;
+    std::cout << "invers = " << Rt.R()  << std::endl;
     }
 
 
@@ -92,7 +94,7 @@ int main()
     xi << 1e-9,0,0, 20, 100, 4;
     mrob::SE3 T(xi);
     T.print();
-    std::cout << "Identity element plus epsilon= " << (T.ln_vee() - xi).norm() << std::endl;
+    std::cout << "random element plus epsilon= " << (T.ln_vee() - xi).norm() << std::endl;
     }
     {
     Mat61 xi;
@@ -126,27 +128,45 @@ int main()
     xi << T.ln_vee();
     mrob::SE3 T2(xi);
     T2.print();
-    std::cout << "Matrix distance = " << (T-T2).norm() << std::endl;
+    std::cout << "Matrix distance = " << (T.T()-T2.T()).norm() << std::endl;
 
     std::cout << "testing update\n";
     T2.update(xi);
     T2.print();
     Mat41 v;
     v << 1.0, 3.2, -1.2, 1.0;
-    std::cout << T2*v << std::endl;
-    v = T2*v;
+    std::cout << T2.T()*v << std::endl;
+    v = T2.T()*v;
     std::cout << v << std::endl;
 
     std::cout << "testing inverse"  << std::endl;
     mrob::SE3 Tt = T2.inv();
-    std::cout << "invers = " << Tt  << std::endl;
-    std::cout << "Matrix distance = " << (Tt-T2.inverse()).norm() << std::endl;
+    std::cout << "invers = " << Tt.T()  << std::endl;
+    std::cout << "Matrix distance = " << (Tt.T()-T2.T().inverse()).norm() << std::endl;
     Mat61 xi2 = -T2.ln_vee();
     mrob::SE3 T22( xi2);
-    std::cout << "Matrix distance by negating= " << (T22-T2.inverse()).norm() << std::endl;
+    std::cout << "Matrix distance by negating= " << (T22.T()-T2.T().inverse()).norm() << std::endl;
 
     std::cout << "testing adjoint"  << std::endl;
     std::cout << "Adjoint= " << Tt.adj()  << std::endl;
+
+
+    // testing subblock matrices
+    std::cout << "Subblock methods an matrix:"  << std::endl;
+    T.print();
+    std::cout << "\nT = " << T.T()  << std::endl;
+    std::cout << "\nR = " << T.R()  << std::endl;
+    std::cout << "\nt = " << T.t()  << std::endl;
+
+    // Acess inner matrix
+    T.ref2T() << 1, 0, 0, 0,
+             0, 1, 0, 0,
+             0, 0, 5, 0,
+             0, 0, 0 , 1;
+    T.print();
+
+
+    //testing SE3 multiplications
 
 
 

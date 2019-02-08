@@ -12,7 +12,7 @@ SET(sources
 
 # extra header files
 SET(headers
-    mrob/PCRegistration.hpp
+    mrob/pc_registration.hpp
     mrob/plane.hpp
     mrob/plane_registration.hpp
     mrob/create_points.hpp

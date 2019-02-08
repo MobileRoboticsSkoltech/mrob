@@ -17,6 +17,9 @@
 #include <Eigen/StdVector>
 #include "mrob/plane.hpp"
 
+#include <unordered_map>
+#include <memory>
+
 
 namespace mrob{
 
@@ -33,7 +36,7 @@ class PlaneRegistration{
     std::vector<SE3>& get_transformations();//if solved
 
   protected:
-    std::vector<Plane> planes_;//we should include here references
+    std::unordered_map<int, std::shared_ptr<Plane>> planes_;
     std::vector<SE3> transformations_;
     // flag for detecting when is has been solved
     uint_t isSolved_;

@@ -17,6 +17,7 @@
 #include <Eigen/StdVector> // for fixed size SE3 objects
 
 
+
 using namespace Eigen;
 
 namespace mrob{
@@ -26,22 +27,38 @@ namespace mrob{
  * uniform distribution U(-R_range, R_range)
  * or any implemented distribution
  */
-class CsampleUniformSE3{
+class SampleUniformSE3{
   public:
-    CsampleUniformSE3(double R_range, double t_range);
-    CsampleUniformSE3(double R_min, double R_max, double t_min, double t_max);
-    ~CsampleUniformSE3();
+    SampleUniformSE3(double R_range, double t_range);
+    SampleUniformSE3(double R_min, double R_max, double t_min, double t_max);
+    ~SampleUniformSE3();
     SE3 samplePose();
     Mat31 samplePosition();
     SO3 sampleOrientation();
   protected:
     std::default_random_engine generator_;
-    std::uniform_real_distribution<double> R_uniform_;
-    std::uniform_real_distribution<double> t_uniform_;
+    std::uniform_real_distribution<double> rotationUniform_;
+    std::uniform_real_distribution<double> tUniform_;
 };
 
+/**
+ * Class samples a point on a surface over the plane XY
+ * according to a fixed noise on height
+ */
+class SamplePlanarSurface{
+  public:
+    SamplePlanarSurface(double zStd);
+    ~SamplePlanarSurface();
+    /**
+     * samples a point with noise on a square of given length
+     */
+    Mat31 samplePoint(double length);
 
-
+  protected:
+    std::default_random_engine generator_;
+    std::uniform_real_distribution<double> x_, y_;
+    std::normal_distribution<double> z_;
+};
 
 /**
  * Class generating a sequence of pointClouds given some specifications.
@@ -57,16 +74,19 @@ public:
     std::vector<Mat31>& get_point_cloud(uint_t t);
     std::vector<int>& get_plane_ids(uint_t t);
 
+    std::vector<SE3>& get_poses() {return poseGroundTruth_;};
+
 
 protected:
     // generation parameters
     uint_t N_; // Number of points
     uint_t numberPlanes_; // Number of planes in the virtual environment
     double noisePerPoint_;
-    double R_range_;
-    double t_range_;
+    double rotationRange_;
+    double transRange_;
     double lamdaOutlier_;
-    CsampleUniformSE3 samplePoses_;
+    SampleUniformSE3 samplePoses_;
+    SamplePlanarSurface samplePoints_;
 
     // Point cloud data generated
     std::vector< std::vector<Mat31> > X_;
@@ -75,7 +95,7 @@ protected:
 
     // Trajectory parameters
     double xRange_, yRange_; // dimension of the workspace
-    SE3 initialPose, finalPose;
+    SE3 initialPose_, finalPose_;
     std::vector<SE3> poseGroundTruth_;
     uint_t numberPoses_;
 

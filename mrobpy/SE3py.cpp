@@ -24,7 +24,7 @@ namespace py = pybind11;
 
 
 
-void init_SE3(py::module &m) {
+/*void init_SE3(py::module &m) {
     py::class_<PySE3>(m, "SE3")
         .def(py::init<const Mat61 &>())
         .def(py::init<const Mat4 &>())
@@ -46,6 +46,33 @@ void init_SE3(py::module &m) {
         .def("ln", &PySO3::ln)
         .def("inv", &PySO3::inv)
         .def("adj", &PySO3::adj)
+        ;
+}*/
+
+void init_SE3(py::module &m) {
+    py::class_<SE3>(m, "SE3")
+        .def(py::init<const Mat61 &>())
+        .def(py::init<const Mat4 &>())
+        .def(py::init<const SE3 &>())
+        .def("T", &SE3::T) // makes a copy of the 4x4 Transformation
+        .def("R", &SE3::R)
+        .def("t", &SE3::t)
+        .def("update", &SE3::update)
+        .def("ln", &SE3::ln_vee)
+        .def("transform", &SE3::transform)
+        .def("transformArray", &SE3::transformArray)
+        .def("inv", &SE3::inv)
+        .def("adj", &SE3::adj)
+        ;
+    py::class_<SO3>(m, "SO3")
+        .def(py::init<const Mat31 &>())
+        .def(py::init<const Mat3 &>())
+        .def(py::init<const SO3 &>())
+        .def("R", &SO3::R) // makes a copy of the 3x3 Transformation
+        .def("update", &SO3::update )
+        .def("ln", &SO3::ln_vee)
+        .def("inv", &SO3::inv)
+        .def("adj", &SO3::adj)
         ;
 }
 

@@ -44,7 +44,7 @@ int PCRegistration::Gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const 
         Mat<3,6> Jr;
         Jr << hat3(Txi) , -Mat3::Identity();
         Mat<1,6> Ji = r.transpose() * Li * Jr;
-        J += Ji;
+        J += Ji;//Eigen manages this for us
 
         // 3) Hessian Hi ~ Jr' * Li * Jr
         Mat6 Hi = Jr.transpose() * Li * Jr;

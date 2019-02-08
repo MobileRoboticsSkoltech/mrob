@@ -35,37 +35,49 @@
 namespace mrob{
 
 
-class SE3 : public Mat4
+class SE3
 {
 public:
+    /**
+     * Constructor, requires the Transformation matrix 4x4
+     */
+    SE3(const Mat4 &T = Mat4::Identity() );
     /**
      * Constructor, requires the Lie algebra xi^ \in se3 representing the rigid body
      * transformation around the identity, by default generates T = exp(0^) = I
      */
-    SE3(const Mat61 &xi = Mat61::Zero());
+    SE3(const Mat61 &xi);
     /**
-     * Constructor, requires the Transformation matrix 4x4 XXX is this necessary?
+     * Constructor, requires the Transformation in Se3
      */
-    SE3(const Mat4 &T);
+    SE3(const SE3 &T);
     /**
-     * This constructor allows you to construct from Eigen expressions
+     * This constructor allows to construct from Eigen expressions
      * Eigen suggestion: TopicCustomizingEigen.html
      */
     template<typename OtherDerived>
-    SE3(const Eigen::MatrixBase<OtherDerived>& other);
-
+    SE3(const Eigen::MatrixBase<OtherDerived>& rhs);
     /**
      * This method allows you to assign Eigen expressions to SE3
-     * Eigen suggestion: TopicCustomizingEigen.html
      */
-    template<typename OtherDerived>
-    SE3& operator=(const Eigen::MatrixBase <OtherDerived>& other);
+    SE3& operator=(const SE3& rhs);
 
     /**
+     * This method allows you to Multiply SE3 expressions
+     */
+    SE3 operator*(const SE3& rhs);
+
+    /**
+     * This is our *default* way to update transformations
      * Updates the current transformation with the incremental dxi \in se3
-     * T'=exp(dxi^)*T
+     * T'=exp(dxi^) * T
      */
     void update(const Mat61 &dxi);
+    /**
+     * Updates the current transformation with the incremental dxi \in se3
+     * T'= T * exp(dxi^)
+     */
+    void updateRhs(const Mat61 &dxi);
     /**
      *  Exponential mapping of a skew symetric matrix in se3.
      *  exp(xi^) = [exp(w^)  Vv], where exp(w^) is the so3_exp and
@@ -108,9 +120,18 @@ public:
      */
     Mat6 adj() const;
     /**
-     * R method returns an SO3 rotation corresponding to the subblock matrix
+     * T method returns a matrix 4x4 of the SE3 transformation corresponding to the subblock matrix
+     * We return a non-const reference for manipulation and updating as well.
      */
-    SO3 R() const;
+    Mat4 T() const;
+    /**
+     * ref2T returns a non-const reference to the matrix T to modify its content directly
+     */
+    Mat4& ref2T();
+    /**
+     * R method returns a matrix 3x3 of the SO3 rotation corresponding to the subblock matrix
+     */
+    Mat3 R() const;
     /**
      * t method returns translation
      */
@@ -119,6 +140,10 @@ public:
     void print_lie(void) const;
 
 protected:
+    Mat4 T_;
+
+public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 

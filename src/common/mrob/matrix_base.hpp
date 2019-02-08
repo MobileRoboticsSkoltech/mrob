@@ -18,7 +18,7 @@
 //#include <Eigen/LU> // for inverse and determinant
 #include <Eigen/Sparse>
 
-//#define EIGEN_DEFAULT_TO_ROW_MAJOR
+#define EIGEN_DEFAULT_TO_ROW_MAJOR
 
 // data types conventions
 typedef double matData_t;
@@ -51,7 +51,7 @@ typedef Eigen::Matrix<matData_t, Eigen::Dynamic,1> MatX1;
 
 // Definition of templated-based fixed matrices using c'11 aliases
 template<int D>
-using Vect = Eigen::Matrix<matData_t, D,1>;
+using Vect = Eigen::Matrix<matData_t, D,1, Eigen::RowMajor>;
 template<int Rw,int Col>
 using Mat = Eigen::Matrix<matData_t, Rw, Col, Eigen::RowMajor>;
 

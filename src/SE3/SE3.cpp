@@ -17,35 +17,52 @@
 
 using namespace mrob;
 
-SE3::SE3(const Mat61 &xi) : Mat4(Mat4::Identity())
+SE3::SE3(const Mat4 &T) :
+        T_(T)
+{
+}
+
+SE3::SE3(const Mat61 &xi) : T_(Mat4::Identity())
 {
     //std::cout << "SE3 MAT31" << std::endl;
     this->exp(hat6(xi));
 }
 
-SE3::SE3(const Mat4 &T) :
-        Mat4(T)
+SE3::SE3(const SE3 &T): T_(T.T())
 {
 }
 
 template<typename OtherDerived>
-SE3::SE3(const Eigen::MatrixBase<OtherDerived>& other)  :
-Mat4(other)
+SE3::SE3(const Eigen::MatrixBase<OtherDerived>& rhs)  :
+    T_(rhs)
 {    //std::cout << "SE3 MAT4" << std::endl;
 }
 
-template<typename OtherDerived>
-SE3& SE3::operator=(const Eigen::MatrixBase <OtherDerived>& other)
+
+SE3& SE3::operator=(const SE3& rhs)
 {
-    std::cout << "SE3 operator =" << std::endl;
-    this->Mat4::operator=(other);
+    // check for self assignment TODO
+    if (this == &rhs)
+        return *this;
+    T_ = rhs.T();
     return *this;
+}
+
+SE3 SE3::operator*(const SE3& rhs)
+{
+    Mat4 res = T_ * rhs.T();
+    return SE3(res);
 }
 
 void SE3::update(const Mat61 &dxi)
 {
     SE3 dT(dxi);
-    *this << dT * (*this);
+    T_ = dT.T() * T_;
+}
+void SE3::updateRhs(const Mat61 &dxi)
+{
+    SE3 dT(dxi);
+    T_ = T_ * dT.T();
 }
 
 Mat61 mrob::vee6(const Mat4 &xi_hat)
@@ -72,7 +89,7 @@ void SE3::exp(const Mat4 &xi_hat)
     Mat61 xi = vee6(xi_hat);
     Mat31 w = xi.head<3>();
     Mat31 v = xi.tail<3>();
-    SO3 R(w);
+    SO3 rotation(w);
     Mat3 w_hat = xi_hat.topLeftCorner<3,3>();
 
     // Calculate the closed form of V
@@ -93,17 +110,16 @@ void SE3::exp(const Mat4 &xi_hat)
     // compose the rigid body motion matrix T = [R, t]
     //this->topLeftCorner<3,3>() = R;
     //this->topRightCorner<3,1>() = t;
-    *this << R, t,
-             0,0,0,1;
+    T_  << rotation.R(), t,
+           0,0,0,1;
 }
 
 Mat4 SE3::ln(void) const
 {
-    SO3 R;
-    R << this->topLeftCorner<3,3>();
+    SO3 rotation(this->R());
     // Logarithmic mapping of the rotations
     double o;
-    Mat3 w_hat = R.ln(&o);
+    Mat3 w_hat = rotation.ln(&o);
 
     // calculate v = V^1 t
     // V^-1 = I - 0.5w^ + k1 (w^)^2
@@ -119,7 +135,7 @@ Mat4 SE3::ln(void) const
     }
 
     // v = V^-1 t
-    Mat31 v = Vinv * this->topRightCorner<3,1>();
+    Mat31 v = Vinv * T_.topRightCorner<3,1>();
 
     // create a vector containing the components
     Mat4 xi_hat = Mat4::Zero();
@@ -136,7 +152,7 @@ Mat61 SE3::ln_vee() const
 
 Mat31 SE3::transform(const Mat31 & p) const
 {
-    return this->topLeftCorner<3,3>()*p + this->topRightCorner<3,1>();
+    return R()*p + t();
 }
 
 MatX SE3::transformArray(const MatX &P) const
@@ -152,43 +168,48 @@ MatX SE3::transformArray(const MatX &P) const
 
 SE3 SE3::inv(void) const
 {
-    SE3 inv(Mat4::Identity());
-    Mat3 R = this->topLeftCorner<3,3>();
+    Mat4 inv;
+    Mat3 R = this->R();
     R.transposeInPlace();
-    Mat31 t = this->topRightCorner<3,1>();
-    inv.topLeftCorner<3,4>() << R , -R*t;
-    return inv;
+    inv << R, -R * this->t(),
+           0,0,0,1;
+    return SE3(inv);
 
 }
 
 Mat6 SE3::adj() const
 {
     Mat6 res(Mat6::Zero());
-    SO3 R;
-    R << this->topLeftCorner<3,3>();// the operator = has not been defined here.
-    Mat31 t = this->topRightCorner<3,1>();
-    Mat3 tx = hat3(t);
-    res.topLeftCorner<3,3>() << R;
-    res.bottomRightCorner<3,3>() << R;
-    res.topRightCorner<3,3>() << tx*R;
+    Mat3 tx = hat3( this->t() );
+    res.topLeftCorner<3,3>() << R();
+    res.bottomRightCorner<3,3>() << R();
+    res.topRightCorner<3,3>() << tx*R();
     return res;
 }
 
-SO3 SE3::R() const
+Mat4 SE3::T() const
 {
-    SO3 R;
-    R << this->topLeftCorner<3,3>();
-    return R;
+    return T_;
+}
+
+Mat4& SE3::ref2T()
+{
+    return T_;
+}
+
+Mat3 SE3::R() const
+{
+    return T_.topLeftCorner<3,3>();
 }
 
 Mat31 SE3::t() const
 {
-    return (Mat31) this->topRightCorner<3,1>();
+    return T_.topRightCorner<3,1>();
 }
 
 void SE3::print(void) const
 {
-    std::cout << *this << std::endl;
+    std::cout << T_ << std::endl;
 }
 
 

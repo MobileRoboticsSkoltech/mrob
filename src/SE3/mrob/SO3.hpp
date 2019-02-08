@@ -31,38 +31,51 @@
 namespace mrob{
 
 
-class SO3 : public Mat3
+class SO3
 {
 public:
+    /**
+     * Constructor from a Matrix transformation
+     *
+     */
+    SO3(const Mat3 &R = Mat3::Identity());
     /**
      * Constructor, requires the Lie algebra w \in so3 representing the
      * rotation around the identity, by default generates R = exp(0^) = I
      *
      */
-    SO3(const Mat31 &w = Mat31::Zero());
+    SO3(const Mat31 &w);
     /**
-     * Constructor from a transformation
+     * Constructor from an SO3 transformation
      *
      */
-    SO3(const Mat3 &R);
+    SO3(const SO3 &R);
     /**
      * This constructor allows to construct from Eigen expressions
      * Eigen suggestion: TopicCustomizingEigen.html
      */
     template<typename OtherDerived>
-    SO3(const Eigen::MatrixBase<OtherDerived>& other);
+    SO3(const Eigen::MatrixBase<OtherDerived>& rhs);
+    /**
+     * This method allows you to assign Eigen expressions to SO3
+     */
+    SO3& operator=(const SO3& rhs);
 
     /**
-     * This method allows to assign Eigen expressions to SO3
-     * Eigen suggestion: TopicCustomizingEigen.html
+     * This method allows you to Multiply SO3 expressions
      */
-    template<typename OtherDerived>
-    SO3& operator=(const Eigen::MatrixBase <OtherDerived>& other);
+    SO3 operator*(const SO3& rhs);
     /**
+     * This is our *default* way to update transformations
      * Updates the current transformation with the incremental dw \in so3
      * R'=exp(dw^)*R
      */
     void update(const Mat31 &dw);
+    /**
+     * Updates the current transformation with the incremental dw \in so3
+     * R'=R*exp(dw^)
+     */
+    void updateRhs(const Mat31 &dw);
     /**
      *  Exponential mapping of a skew symetric matrix in so3. The Rodrigues formula provides
      *  an exact solution to the Taylor expansion of exp(A) = I + A + c2*A^2 + ...
@@ -89,10 +102,23 @@ public:
      * Adjoint: Adj_w = R
      */
     Mat3 adj() const;
+    /**
+     * R method returns the matrix 3x3 of the SO3 rotation
+     */
+    Mat3 R() const;
+    /**
+     * ref to R method returns the reference to modify R
+     */
+    Mat3& ref2R();
     void print(void) const;
     void print_lie(void) const;
 
+
 protected:
+    Mat3 R_;
+
+public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 

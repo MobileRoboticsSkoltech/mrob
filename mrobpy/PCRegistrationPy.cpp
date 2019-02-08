@@ -27,20 +27,20 @@ namespace py = pybind11;
 using namespace mrob;
 
 
-PySE3 ArunSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y)
+SE3 ArunSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y)
 {
     SE3 res;
     PCRegistration::Arun(X,Y,res);
-    return PySE3(res);
+    return res;
 }
 
 
-PySE3 GicpSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y,
+SE3 GicpSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y,
         const py::EigenDRef<const MatX> covX, const py::EigenDRef<const MatX> covY)
 {
     SE3 res;
     PCRegistration::Gicp(X,Y,covX,covY,res);
-    return PySE3(res);
+    return res;
 }
 
 void init_PCRegistration(py::module &m)
