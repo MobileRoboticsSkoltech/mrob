@@ -41,17 +41,17 @@ class Plane{
     std::vector<Mat31>& get_points(uint_t t);
     void clear_points();
 
+    void print() const;
+
 
   protected:
-    // index of time,
+    // max index of time, or trajectory length
     uint_t timeLength_;
-    std::vector<uint_t> timeIndex_;
+    //std::vector<uint_t> timeIndex_;// not used now, but it would be useful for non-consecutive obs
 
     // Overparametrized plane, as a transformation in SE3
     SE3 plane_;
 
-    // Data is allocated outside the Plane class as a MatX of homogeneous points,
-    // and we just store the pointers on a vector with temporal indices
     std::vector< std::vector<Mat31> > allPlanePoints_;
 
 };

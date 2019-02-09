@@ -166,6 +166,18 @@ int main()
     T.print();
 
 
+    // testing transformation
+    {
+    Mat61 xi;
+    xi << 1,0,-0.2, 5, 10, 2;
+    mrob::SE3 T(xi);
+    Mat31 p,p2;
+    p << 2,3,-1;
+    p2 = p;
+    p = T.transform(p);
+    p = T.inv().transform(p);
+    std::cout << "Testing transformations = " << (p-p2).norm() << std::endl;
+    }
     //testing SE3 multiplications
 
 

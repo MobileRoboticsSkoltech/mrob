@@ -13,7 +13,10 @@
 #define CREATE_POINTS_HPP_
 
 #include "mrob/SE3.hpp"
+#include "mrob/plane.hpp"
 #include <random>
+#include <memory>
+#include <utility>
 #include <Eigen/StdVector> // for fixed size SE3 objects
 
 
@@ -68,13 +71,16 @@ public:
     /**
      * Creates a class
      */
-    CreatePoints(uint_t N = 10, uint_t numberPlanes = 4, uint_t numberPoses = 2, double noisePerPoint = 0.1);
+    CreatePoints(uint_t N = 10, uint_t numberPlanes = 4, uint_t numberPoses = 2, double noisePerPoint = 0.01);
     ~CreatePoints();
 
     std::vector<Mat31>& get_point_cloud(uint_t t);
-    std::vector<int>& get_plane_ids(uint_t t);
+    std::vector<uint_t>& get_point_plane_ids(uint_t t);
 
-    std::vector<SE3>& get_poses() {return poseGroundTruth_;};
+    std::vector<SE3>& get_poses() {return poses_;};
+
+    std::vector<SE3>& get_plane_poses() {return planePoses_;};
+    std::vector<std::pair<uint_t, std::shared_ptr<Plane> >>& get_planes() {return planes_;}
 
     void print() const;
 
@@ -98,12 +104,12 @@ protected:
     // Trajectory parameters
     double xRange_, yRange_; // dimension of the workspace
     SE3 initialPose_, finalPose_;
-    std::vector<SE3> poseGroundTruth_;
+    std::vector<SE3> poses_;
     uint_t numberPoses_;
 
     // Generation of planes
-    void sample_plane(uint_t nPoints, uint_t id, uint_t t);
-    std::vector<SE3> planes_;
+    std::vector<SE3> planePoses_;
+    std::vector<std::pair<uint_t, std::shared_ptr<Plane> >> planes_;
 
 };
 

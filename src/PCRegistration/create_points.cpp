@@ -85,12 +85,6 @@ Mat31 SamplePlanarSurface::samplePoint(double length)
     return Mat31(x_(generator_), y_(generator_), z_(generator_) );
 }
 
-std::vector<Mat31>& CreatePoints::get_point_cloud(uint_t t)
-{
-    assert(t < numberPoses_ && "CreatePoints::getPointCloud: temporal index larger than number of calculated poses\n");
-    return X_[t];//.at(t);
-}
-
 CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numberPoses, double noisePerPointStd):
         numberPoints_(numberPoints),
         numberPlanes_(numberPlanes),
@@ -108,7 +102,8 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     // 0) initialize vectors and variables
     X_.reserve(numberPoses_);
     pointId_.reserve(numberPoses_);
-    poseGroundTruth_.reserve(numberPoses_);
+    poses_.reserve(numberPoses_);
+    planePoses_.reserve(numberPlanes_);
     planes_.reserve(numberPlanes_);
     for (uint_t i = 0; i < numberPoses_; ++i)
     {
@@ -120,13 +115,20 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     // 1) generate planes
     for (uint_t i = 0; i < numberPlanes_ ; ++i)
     {
-        planes_.push_back(samplePoses_.samplePose());
+        planePoses_.push_back(samplePoses_.samplePose());
+
+        // generates data structure for planes
+        std::shared_ptr<Plane> plane(new Plane(numberPoses_));
+        std::pair<uint_t, std::shared_ptr<Plane> > pairElement(i,plane);
+        planes_.push_back(pairElement);
     }
 
     // 2) generate initial and final pose, TODO We could add more intermediate points
-    initialPose_ = samplePoses_.samplePose();
+    initialPose_ = SE3(); //samplePoses_.samplePose();
     SE3 initialPoseInv = initialPose_.inv();
-    finalPose_  = samplePoses_.samplePose();
+    Mat61 xi;
+    xi << 0,0,0,5,0,0;
+    finalPose_  = SE3(xi);//samplePoses_.samplePose();
     SE3 dx =  finalPose_ * initialPoseInv;
     Mat61 dxi = dx.ln_vee();
 
@@ -137,19 +139,26 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         // (1-t)ln(T0) + t ln(T1) only works if |dw| < pi, which we can not guarantee on these sampling conditions
         Mat61 tdx =  double(t) / double(numberPoses_-1) * dxi;
         SE3 pose = SE3( tdx ) * initialPose_;
-        poseGroundTruth_.push_back(pose);
+        poses_.push_back(pose);
     }
 
     // 3) generate points for each plane
     for (uint_t t = 0; t < numberPoses_ ; ++t)
     {
+        SE3 transInvPose = poses_[t].inv();
         // prepare permutation of points
         for (uint_t i = 0; i < numberPoints_ ; ++i)
         {
             // parameter is the legnth of the observed plane
-            uint_t planeId = std::round((float)i * (float)numberPlanes_/ (float)numberPoints_);
-            X_[t].push_back( planes_[planeId].transform( samplePoints_.samplePoint( 2.0 ) ) );
+            uint_t planeId = std::floor((float)i * (float)numberPlanes_/ (float)numberPoints_);
+            Mat31 point = planePoses_[planeId].transform( samplePoints_.samplePoint( 2.0 ) );
+            point = transInvPose.transform(point);
+            X_[t].push_back( point );
             pointId_[t].push_back(planeId);
+
+            // add information to plane structure
+            planes_[planeId].second->push_back_point(point,t);
+
         }
     }
 }
@@ -159,15 +168,16 @@ CreatePoints::~CreatePoints()
 
 }
 
-
-void CreatePoints::sample_plane(uint_t nPoints, uint_t id, uint_t t)
+std::vector<Mat31>& CreatePoints::get_point_cloud(uint_t t)
 {
-    for (uint_t i = 0; i < nPoints; ++i)
-    {
-        // generate point
-        // transform point
-        // push_back to the corresponding instant of time
-    }
+    assert(t < numberPoses_ && "CreatePoints::getPointCloud: temporal index larger than number of calculated poses\n");
+    return X_[t];
+}
+
+std::vector<uint_t>& CreatePoints::get_point_plane_ids(uint_t t)
+{
+    assert(t < numberPoses_ && "CreatePoints::get_plane_id: temporal index larger than number of calculated poses\n");
+    return pointId_[t];
 }
 
 void CreatePoints::print() const
@@ -175,12 +185,12 @@ void CreatePoints::print() const
     std::cout << "Printing generated scene:\n - Trajectory:\n";
     for (uint_t t = 0; t < numberPoses_; ++t)
     {
-        poseGroundTruth_[t].print();
+        poses_[t].print();
     }
     std::cout << "\n - Planes:\n";
     for (uint_t t = 0; t < numberPlanes_; ++t)
     {
-        planes_[t].print();
+        planePoses_[t].print();
     }
     std::cout << "\n - Pointcloud:\n";
     for (uint_t t = 0; t < numberPoses_; ++t)
@@ -192,6 +202,14 @@ void CreatePoints::print() const
             //std::cout << "plane id = " << pointId_[t][i] << std::endl;
         }
     }
-
+    if (1)
+    {
+        std::cout << "\n - Planes:\n";
+        for (uint_t i = 0 ; i < numberPlanes_; ++i)
+        {
+            std::cout << "plane id :" << planes_[i].first << std::endl;
+            planes_[i].second->print();
+        }
+    }
 
 }

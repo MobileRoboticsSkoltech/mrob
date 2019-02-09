@@ -15,8 +15,14 @@
 
 int main()
 {
-    mrob::CreatePoints scene(100,1);
+    // 1) define problem conditions
+    mrob::CreatePoints scene(10,2,4,0.0001);
     scene.print();
+
+
+    // 2) evaluate
+
+
 
     return 1;
 }

@@ -12,6 +12,7 @@
 
 
 #include "mrob/plane.hpp"
+#include <iostream>
 
 
 
@@ -21,6 +22,11 @@ Plane::Plane(uint_t timeLength): timeLength_(timeLength)
 {
     allPlanePoints_.reserve(timeLength_);
     // there should be an indivudual reversation of points
+    for (uint_t i = 0; i < timeLength_; ++i)
+    {
+        // estimated number of points per observation TODO
+        allPlanePoints_[i].reserve(512);
+    }
 }
 
 Plane::~Plane()
@@ -45,14 +51,13 @@ SE3 Plane::get_plane(void)
 
 void Plane::push_back_point(Mat31 &point, uint_t t)
 {
-
+    // XXX for now it ony works on consecutives observations TODO
     if (t < timeLength_)
     {
-        //TODO why homogeneous?
-        //Mat41 homogeneousPoint;
         //homogeneousPoint << point, 1.0;
         //allPlanePoints_[t].push_back(homogeneousPoint);
         allPlanePoints_[t].push_back(point);
+        std::cout << "here we are" << t << " and time length" << timeLength_ << std::endl;
     }
 }
 
@@ -66,4 +71,14 @@ std::vector<Mat31>& Plane::get_points(uint_t t)
 void Plane::clear_points()
 {
     allPlanePoints_.clear();
+}
+
+void Plane::print() const
+{
+    for (uint_t t = 0; t <  timeLength_; ++t)
+    {
+        std::cout << "Plane time = " << t << std::endl;
+        for (Mat31 p : allPlanePoints_[t])
+            std::cout << p.transpose() << std::endl;
+    }
 }
