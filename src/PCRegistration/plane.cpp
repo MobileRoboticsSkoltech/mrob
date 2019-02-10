@@ -57,7 +57,6 @@ void Plane::push_back_point(Mat31 &point, uint_t t)
         //homogeneousPoint << point, 1.0;
         //allPlanePoints_[t].push_back(homogeneousPoint);
         allPlanePoints_[t].push_back(point);
-        std::cout << "here we are" << t << " and time length" << timeLength_ << std::endl;
     }
 }
 

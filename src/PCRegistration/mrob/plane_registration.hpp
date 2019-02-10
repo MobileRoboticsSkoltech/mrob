@@ -29,7 +29,7 @@ namespace mrob{
  */
 class PlaneRegistration{
   public:
-    PlaneRegistration();
+    PlaneRegistration(uint_t numberPlanes = 8, uint_t numberPoses = 8);
     ~PlaneRegistration();
 
     int solve();
@@ -38,7 +38,10 @@ class PlaneRegistration{
     /**
      * add_plane adds a plane structure already initialized and filled with data
      */
-    void add_plane(std::shared_ptr<Plane> &plane, uint_t id) {planes_.emplace(id, plane);};
+    void add_plane(uint_t id, std::shared_ptr<Plane> &plane) {planes_.emplace(id, plane);};
+    std::shared_ptr<Plane> & get_plane(uint_t id);
+
+    void print() const;
 
 
 
