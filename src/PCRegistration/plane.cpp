@@ -13,20 +13,24 @@
 
 #include "mrob/plane.hpp"
 #include <iostream>
+#include <Eigen/SVD>
 
 
 
 using namespace mrob;
 
-Plane::Plane(uint_t timeLength): timeLength_(timeLength)
+Plane::Plane(uint_t timeLength):
+        timeLength_(timeLength), isPlaneEstimated_(false)
 {
     allPlanePoints_.reserve(timeLength_);
-    // there should be an indivudual reversation of points
+    // there should be an individual reservation of points
     for (uint_t i = 0; i < timeLength_; ++i)
     {
         // estimated number of points per observation TODO
         allPlanePoints_[i].reserve(512);
     }
+    matrixS_.reserve(timeLength_);
+    matrixQ_.reserve(timeLength_);
 }
 
 Plane::~Plane()
@@ -72,12 +76,134 @@ void Plane::clear_points()
     allPlanePoints_.clear();
 }
 
+
+void Plane::estimate_plane()
+{
+    if (matrixS_.empty()) calculate_all_matrices_S();
+    calculate_all_matrices_Q();
+    Mat4 Q = Mat4::Zero();
+    for (Mat4 &Qi: matrixQ_)
+    {
+        Q += Qi;
+        //std::cout << Qi << std::endl;
+    }
+
+    // sum( v * p_i )
+    Eigen::JacobiSVD<Mat4> svd(Q, Eigen::ComputeFullU );
+    planeEstimation_ = svd.matrixU().col(3);
+    //std::cout << svd.matrixU() << "\n and solution \n" << planeEstimation_ <<  std::endl;
+
+
+    // new estimation is done, set flags
+    isPlaneEstimated_ = true;
+}
+
+
+void Plane::calculate_all_matrices_S()
+{
+    matrixS_.clear();
+    for (uint_t t = 0; t < timeLength_; ++t)
+    {
+        Mat4 S = Mat4::Zero();
+        for ( Mat31 &p : allPlanePoints_[t])
+        {
+            Mat41 pHomog;
+            pHomog << p , 1.0;
+            S += pHomog * pHomog.transpose();
+        }
+        matrixS_.push_back(S);
+    }
+}
+
+void Plane::calculate_all_matrices_Q()
+{
+    matrixQ_.clear();
+    for (uint_t t = 0; t < timeLength_; ++t)
+    {
+        Mat4 Q;
+        Q.noalias() = trajectory_->at(t).T() * matrixS_[t] * trajectory_->at(t).T().transpose();
+        matrixQ_.push_back(Q);
+    }
+}
+
+Mat61 Plane::calculate_jacobian(uint_t t)
+{
+    Mat61 jacobian;
+    // calculate dQ/dxi for the submatrix S
+    Mat4 dQ, &Q = matrixQ_[t];
+
+    // dQ / d xi(0) = [0
+    //               -q3
+    //                q2
+    //                 0]
+    dQ.setZero();
+    dQ.row(1) << -Q.row(2);
+    dQ.row(2) <<  Q.row(1);
+    dQ += dQ.transpose().eval();
+    jacobian(0) = planeEstimation_.dot(dQ*planeEstimation_);
+
+    // dQ / d xi(1) = [q3
+    //                 0
+    //                -q1
+    //                 0]
+    dQ.setZero();
+    dQ.row(0) <<  Q.row(2);
+    dQ.row(2) << -Q.row(0);
+    dQ += dQ.transpose().eval();
+    jacobian(1) = planeEstimation_.dot(dQ*planeEstimation_);
+
+    // dQ / d xi(2) = [-q2
+    //                 q1
+    //                 0
+    //                 0]
+    dQ.setZero();
+    dQ.row(0) << -Q.row(1);
+    dQ.row(1) <<  Q.row(0);
+    dQ += dQ.transpose().eval();
+    jacobian(2) = planeEstimation_.dot(dQ*planeEstimation_);
+
+    // dQ / d xi(3) = [q4
+    //                 0
+    //                 0
+    //                 0]
+    dQ.setZero();
+    dQ.row(0) << Q.row(3);
+    dQ += dQ.transpose().eval();
+    jacobian(3) = planeEstimation_.dot(dQ*planeEstimation_);
+
+    // dQ / d xi(4) = [0
+    //                 q4
+    //                 0
+    //                 0]
+    dQ.setZero();
+    dQ.row(1) << Q.row(3);
+    dQ += dQ.transpose().eval();
+    jacobian(4) = planeEstimation_.dot(dQ*planeEstimation_);
+
+    // dQ / d xi(5) = [0
+    //                 0
+    //                 q4
+    //                 0]
+    dQ.setZero();
+    dQ.row(2) << Q.row(3);
+    dQ += dQ.transpose().eval();
+    jacobian(5) = planeEstimation_.dot(dQ*planeEstimation_);
+
+
+    return jacobian;
+}
+
+void build_jacobian_from_S(uint_t timeIdex)
+{
+
+}
+
 void Plane::print() const
 {
     for (uint_t t = 0; t <  timeLength_; ++t)
     {
         std::cout << "Plane time = " << t << std::endl;
         for (Mat31 p : allPlanePoints_[t])
-            std::cout << p.transpose() << std::endl;
+            std::cout << p(0) << ", " << p(1) << ", " << p(2) << std::endl;
     }
 }

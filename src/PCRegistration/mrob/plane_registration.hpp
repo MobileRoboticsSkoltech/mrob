@@ -38,7 +38,7 @@ class PlaneRegistration{
     /**
      * add_plane adds a plane structure already initialized and filled with data
      */
-    void add_plane(uint_t id, std::shared_ptr<Plane> &plane) {planes_.emplace(id, plane);};
+    void add_plane(uint_t id, std::shared_ptr<Plane> &plane);
     std::shared_ptr<Plane> & get_plane(uint_t id);
 
     void print() const;
@@ -46,11 +46,11 @@ class PlaneRegistration{
 
 
   protected:
-    std::unordered_map<uint_t, std::shared_ptr<Plane>> planes_;
-    std::vector<SE3> transformations_;
     // flag for detecting when is has been solved
     uint_t isSolved_;
     uint_t time_;
+    std::unordered_map<uint_t, std::shared_ptr<Plane>> planes_;
+    std::shared_ptr<std::vector<SE3>> trajectory_;
 
 };
 
