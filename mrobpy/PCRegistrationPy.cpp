@@ -20,9 +20,11 @@
 namespace py = pybind11;
 
 
+#include "mrob/SE3.hpp"
 #include "mrob/pc_registration.hpp"
+#include "mrob/create_points.hpp"
+#include "mrob/plane_registration.hpp"
 
-#include "SE3py.hpp"
 
 using namespace mrob;
 
@@ -47,6 +49,14 @@ void init_PCRegistration(py::module &m)
 {
     m.def("ArunSolve", &ArunSolve);
     m.def("GicpSolve", &GicpSolve);
+    py::class_<CreatePoints>(m,"CreatePoints")
+            .def(py::init<uint_t, uint_t, uint_t, double>())
+            .def("get_point_cloud", &CreatePoints::get_point_cloud)
+            .def("create_plane_registration", &CreatePoints::create_plane_registration)
+            ;
+    py::class_<PlaneRegistration>(m,"PlaneRegistration")
+            .def(py::init<uint_t,uint_t>())
+            ;
 }
 
 
