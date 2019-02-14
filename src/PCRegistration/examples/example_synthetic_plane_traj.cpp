@@ -12,31 +12,45 @@
 
 #include "mrob/create_points.hpp"
 #include "mrob/plane_registration.hpp"
+#include <iostream>
 
 
 int main()
 {
+    uint_t numPlanes = 6, numPoses = 6;
     // 1) define problem conditions
-    mrob::CreatePoints scene(10,1,2,0.0001);
+    mrob::CreatePoints scene(100,numPlanes,numPoses,0.0001);
     //scene.print();
 
-    mrob::PlaneRegistration contPlanes(1,2);
-    auto planes = scene.get_planes();
-    for (auto plane_element : planes)
-    {
-        contPlanes.add_plane(plane_element.first, plane_element.second);
-    }
+    mrob::PlaneRegistration contPlanes(numPlanes,numPoses);
+    scene.create_plane_registration(contPlanes);
     contPlanes.print();
 
 
-    // 2) evaluate planes
-    if (1)
-    {
-        planes[0].second->estimate_plane();
-        planes[0].second->calculate_jacobian(0);
-    }
-
-
+    // 3) evaluate alignment
+    contPlanes.solve();
+    contPlanes.print(false);
+    contPlanes.solve();
+    contPlanes.print(false);
+    contPlanes.solve();
+    contPlanes.print(false);
+    contPlanes.solve();
+    contPlanes.print(false);
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
 
 
     return 1;

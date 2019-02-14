@@ -31,6 +31,7 @@ class Plane{
   public:
     Plane(uint_t timeLength);
     ~Plane();
+
     void reserve(uint_t d, uint_t t);
     void set_plane(SE3 &);
     SE3 get_plane(void);
@@ -40,11 +41,19 @@ class Plane{
      */
     void push_back_point(Mat31 &point, uint_t t);
     std::vector<Mat31>& get_points(uint_t t);
+    uint_t get_number_points(uint_t t) {return allPlanePoints_[t].size();};
     void clear_points();
     void set_trajectory(const std::shared_ptr<const std::vector<SE3>> &trajectory) {trajectory_ = trajectory;};
 
-
-    void estimate_plane();
+    /**
+     * Estimates the plane parameters: v = [n', d]'_{4x1}, where v is unitary, (due to the SVD solution)
+     * although for standard plane estimation we could enforce unitary on the normal vector n.
+     */
+    double estimate_plane();
+    /**
+     * get error: returns the error as the min eigenvalue
+     */
+    double get_error() const {return lambda_;};
 
     /**
      *  calculates the matrix S = sum(p*p'), where p = [x,y,z,1]
@@ -66,6 +75,7 @@ class Plane{
      */
     Mat61 calculate_jacobian(uint_t t);
 
+
     void print() const;
 
 
@@ -77,6 +87,7 @@ class Plane{
     // Overparametrized plane, as a transformation in SE3 TODO needed?
     SE3 plane_;
     Mat41 planeEstimation_;
+    double lambda_;
     bool isPlaneEstimated_;
 
     // subset of pointcloud for the given plane

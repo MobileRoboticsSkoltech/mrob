@@ -124,10 +124,10 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     }
 
     // 2) generate initial and final pose, TODO We could add more intermediate points
-    initialPose_ = SE3(); //samplePoses_.samplePose();
+    initialPose_ = SE3(); // the initial pose is a relative pose for the following poses
     SE3 initialPoseInv = initialPose_.inv();
     Mat61 xi;
-    xi << 0,0,0,0,0,0;
+    xi << 0,0,0,0,5,0;
     finalPose_  = SE3(xi);//samplePoses_.samplePose();
     SE3 dx =  finalPose_ * initialPoseInv;
     Mat61 dxi = dx.ln_vee();
@@ -137,6 +137,8 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     {
         // proper interpolation in SE3 is exp( t * ln( T1*T0^-1) )T0
         // (1-t)ln(T0) + t ln(T1) only works if |dw| < pi, which we can not guarantee on these sampling conditions
+        // If T0 = I, then the previous condition will always hold (|dw| < pi), we we can interpolate as
+        //    T(t) = exp (t ln(T1))
         Mat61 tdx =  double(t) / double(numberPoses_-1) * dxi;
         SE3 pose = SE3( tdx ) * initialPose_;
         poses_.push_back(pose);
@@ -166,6 +168,15 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
 CreatePoints::~CreatePoints()
 {
 
+}
+
+void CreatePoints::create_plane_registration(PlaneRegistration& planeReg)
+{
+    planeReg.set_number_planes_and_poses(numberPlanes_,numberPoses_);
+    for (auto plane_element : planes_)
+    {
+        planeReg.add_plane(plane_element.first, plane_element.second);
+    }
 }
 
 std::vector<Mat31>& CreatePoints::get_point_cloud(uint_t t)

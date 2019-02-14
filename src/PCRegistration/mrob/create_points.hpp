@@ -14,6 +14,7 @@
 
 #include "mrob/SE3.hpp"
 #include "mrob/plane.hpp"
+#include "mrob/plane_registration.hpp"
 #include <random>
 #include <memory>
 #include <utility>
@@ -73,6 +74,8 @@ public:
      */
     CreatePoints(uint_t N = 10, uint_t numberPlanes = 4, uint_t numberPoses = 2, double noisePerPoint = 0.01);
     ~CreatePoints();
+
+    void create_plane_registration(PlaneRegistration& planeReg);
 
     std::vector<Mat31>& get_point_cloud(uint_t t);
     std::vector<uint_t>& get_point_plane_ids(uint_t t);

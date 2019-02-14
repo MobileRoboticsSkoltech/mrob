@@ -77,7 +77,7 @@ void Plane::clear_points()
 }
 
 
-void Plane::estimate_plane()
+double Plane::estimate_plane()
 {
     if (matrixS_.empty()) calculate_all_matrices_S();
     calculate_all_matrices_Q();
@@ -92,10 +92,13 @@ void Plane::estimate_plane()
     Eigen::JacobiSVD<Mat4> svd(Q, Eigen::ComputeFullU );
     planeEstimation_ = svd.matrixU().col(3);
     //std::cout << svd.matrixU() << "\n and solution \n" << planeEstimation_ <<  std::endl;
+    //std::cout << "plane estimation error: " << svd.singularValues() <<  std::endl;
+    lambda_ = svd.singularValues()(3);
 
-
-    // new estimation is done, set flags
+    // new estimation is done, set flags TODO why?
     isPlaneEstimated_ = true;
+
+    return lambda_;
 }
 
 
@@ -113,6 +116,7 @@ void Plane::calculate_all_matrices_S()
         }
         matrixS_.push_back(S);
     }
+    std::cout << "plane::calculate_all_matrices_S:\n";
 }
 
 void Plane::calculate_all_matrices_Q()
@@ -191,11 +195,6 @@ Mat61 Plane::calculate_jacobian(uint_t t)
 
 
     return jacobian;
-}
-
-void build_jacobian_from_S(uint_t timeIdex)
-{
-
 }
 
 void Plane::print() const
