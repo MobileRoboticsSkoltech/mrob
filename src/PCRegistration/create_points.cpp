@@ -102,7 +102,7 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     // 0) initialize vectors and variables
     X_.reserve(numberPoses_);
     pointId_.reserve(numberPoses_);
-    poses_.reserve(numberPoses_);
+    goundTruthTrajectory_.reserve(numberPoses_);
     planePoses_.reserve(numberPlanes_);
     planes_.reserve(numberPlanes_);
     for (uint_t i = 0; i < numberPoses_; ++i)
@@ -110,7 +110,6 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         X_[i].reserve(numberPoints_);
         pointId_[i].reserve(numberPoints_);
     }
-
 
     // 1) generate planes
     for (uint_t i = 0; i < numberPlanes_ ; ++i)
@@ -127,7 +126,7 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     initialPose_ = SE3(); // the initial pose is a relative pose for the following poses
     SE3 initialPoseInv = initialPose_.inv();
     Mat61 xi;
-    xi << 0,0,0,0,5,0;
+    xi << 0,0,0,0,1,0;
     finalPose_  = SE3(xi);//samplePoses_.samplePose();
     SE3 dx =  finalPose_ * initialPoseInv;
     Mat61 dxi = dx.ln_vee();
@@ -141,13 +140,13 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         //    T(t) = exp (t ln(T1))
         Mat61 tdx =  double(t) / double(numberPoses_-1) * dxi;
         SE3 pose = SE3( tdx ) * initialPose_;
-        poses_.push_back(pose);
+        goundTruthTrajectory_.push_back(pose);
     }
 
     // 3) generate points for each plane
     for (uint_t t = 0; t < numberPoses_ ; ++t)
     {
-        SE3 transInvPose = poses_[t].inv();
+        SE3 transInvPose = goundTruthTrajectory_[t].inv();
         // prepare permutation of points
         for (uint_t i = 0; i < numberPoints_ ; ++i)
         {
@@ -155,6 +154,8 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
             uint_t planeId = std::floor((float)i * (float)numberPlanes_/ (float)numberPoints_);
             Mat31 point = planePoses_[planeId].transform( samplePoints_.samplePoint( 2.0 ) );
             point = transInvPose.transform(point);
+            // TODO some problem here on python
+            std::cout << "number points" << planeId << " size of X" << X_.size() <<" number poses" << numberPoses_ << std::endl;
             X_[t].push_back( point );
             pointId_[t].push_back(planeId);
 
@@ -196,7 +197,7 @@ void CreatePoints::print() const
     std::cout << "Printing generated scene:\n - Trajectory:\n";
     for (uint_t t = 0; t < numberPoses_; ++t)
     {
-        poses_[t].print();
+        goundTruthTrajectory_[t].print();
     }
     std::cout << "\n - Planes:\n";
     for (uint_t t = 0; t < numberPlanes_; ++t)

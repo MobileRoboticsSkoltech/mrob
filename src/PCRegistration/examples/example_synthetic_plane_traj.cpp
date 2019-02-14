@@ -17,12 +17,12 @@
 
 int main()
 {
-    uint_t numPlanes = 6, numPoses = 6;
+    uint_t numPlanes = 6, numPoses = 2;
     // 1) define problem conditions
     mrob::CreatePoints scene(100,numPlanes,numPoses,0.0001);
     //scene.print();
 
-    mrob::PlaneRegistration contPlanes(numPlanes,numPoses);
+    mrob::PlaneRegistration contPlanes;
     scene.create_plane_registration(contPlanes);
     contPlanes.print();
 
@@ -35,22 +35,22 @@ int main()
     contPlanes.solve();
     contPlanes.print(false);
     contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
+    contPlanes.solve();
     contPlanes.print(false);
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
 
 
     return 1;

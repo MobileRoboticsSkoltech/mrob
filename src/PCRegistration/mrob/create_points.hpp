@@ -80,7 +80,7 @@ public:
     std::vector<Mat31>& get_point_cloud(uint_t t);
     std::vector<uint_t>& get_point_plane_ids(uint_t t);
 
-    std::vector<SE3>& get_poses() {return poses_;};
+    std::vector<SE3>& get_grounf_truth_trajectory() {return goundTruthTrajectory_;};
 
     std::vector<SE3>& get_plane_poses() {return planePoses_;};
     std::vector<std::pair<uint_t, std::shared_ptr<Plane> >>& get_planes() {return planes_;}
@@ -107,7 +107,7 @@ protected:
     // Trajectory parameters
     double xRange_, yRange_; // dimension of the workspace
     SE3 initialPose_, finalPose_;
-    std::vector<SE3> poses_;
+    std::vector<SE3> goundTruthTrajectory_;// ground truth trajectory
     uint_t numberPoses_;
 
     // Generation of planes

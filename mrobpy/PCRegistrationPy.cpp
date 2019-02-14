@@ -17,6 +17,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
+#include <pybind11/stl.h>
 namespace py = pybind11;
 
 
@@ -52,10 +53,13 @@ void init_PCRegistration(py::module &m)
     py::class_<CreatePoints>(m,"CreatePoints")
             .def(py::init<uint_t, uint_t, uint_t, double>())
             .def("get_point_cloud", &CreatePoints::get_point_cloud)
+            .def("get_point_plane_ids", &CreatePoints::get_point_plane_ids)
             .def("create_plane_registration", &CreatePoints::create_plane_registration)
             ;
     py::class_<PlaneRegistration>(m,"PlaneRegistration")
             .def(py::init<uint_t,uint_t>())
+            .def("solve", &PlaneRegistration::solve)
+            .def("print", &PlaneRegistration::print)
             ;
 }
 
