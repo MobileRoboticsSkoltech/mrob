@@ -38,6 +38,9 @@ enum TrajectoryMode{SEQUENCE=0, INTERPOLATION};
     ~PlaneRegistration();
 
     void set_number_planes_and_poses(uint_t numPlanes, uint_t numPoses);
+    uint_t get_number_planes() const {return numberPlanes_;};
+    uint_t get_number_poses() const {return numberPoses_;};
+
     /**
      * solve() calculates the poses on trajectory such that the minimization objective
      * is met: J = sum (lamda_min_plane)
@@ -48,7 +51,7 @@ enum TrajectoryMode{SEQUENCE=0, INTERPOLATION};
      * is met: J = sum (lamda_min_plane), and the trajectory is described as a
      */
     uint_t solve_interpolation();
-    std::vector<SE3>& get_transformations();//if solved
+    std::shared_ptr<std::vector<SE3>>& get_transformations() {return trajectory_;};//if solved
 
     /**
      * add_plane adds a plane structure already initialized and filled with data
@@ -56,12 +59,15 @@ enum TrajectoryMode{SEQUENCE=0, INTERPOLATION};
     void add_plane(uint_t id, std::shared_ptr<Plane> &plane);
     std::shared_ptr<Plane> & get_plane(uint_t id);
 
+    std::unordered_map<uint_t, std::shared_ptr<Plane>>& get_all_planes() {return planes_;};
+
     void print(bool plotPlanes = true) const;
 
 
 
   protected:
     // flag for detecting when is has been solved
+    uint_t numberPlanes_, numberPoses_;
     uint_t isSolved_;
     PlaneRegistration::TrajectoryMode trajMode_;
     uint_t time_;

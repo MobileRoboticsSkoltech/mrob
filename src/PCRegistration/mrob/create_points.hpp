@@ -80,10 +80,13 @@ public:
     std::vector<Mat31>& get_point_cloud(uint_t t);
     std::vector<uint_t>& get_point_plane_ids(uint_t t);
 
-    std::vector<SE3>& get_grounf_truth_trajectory() {return goundTruthTrajectory_;};
+    uint_t get_number_planes() const {return numberPlanes_;};
+    uint_t get_number_poses() const {return numberPoses_;};
+
+    std::vector<SE3>& get_ground_truth_trajectory() {return goundTruthTrajectory_;};
 
     std::vector<SE3>& get_plane_poses() {return planePoses_;};
-    std::vector<std::pair<uint_t, std::shared_ptr<Plane> >>& get_planes() {return planes_;}
+    std::vector<std::pair<uint_t, std::shared_ptr<Plane> >>& get_all_planes() {return planes_;}
 
     void print() const;
 

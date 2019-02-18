@@ -154,19 +154,14 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         {
             // parameter is the legnth of the observed plane
             uint_t planeId = std::floor((float)i * (float)numberPlanes_/ (float)numberPoints_);
-            Mat31 point = planePoses_[planeId].transform( samplePoints_.samplePoint( 2.0 ) );
+            Mat31 point = planePoses_[planeId].transform( samplePoints_.samplePoint( 0.5 ) );
             point = transInvPose.transform(point);
             // TODO some problem here on python
-            std::cout << "\nnumber points  " << planeId;
+            //std::cout << "\n point being pushed back            " << point;
             X_[t].push_back( point );
-            std::cout << "\n point size = " << pointId_[t].size();
-            std::cout << "\n time stamp " << t;
-            // TODO, here it crashes regarless of the instruction. What is going on?
-            std::cout << "\n point number            " << i;
             pointId_[t].push_back(planeId);
             // add information to plane structure
             planes_[planeId].second->push_back_point(point,t);
-            std::cout << "\n point being pushed back            " << point;
         }
     }
 }

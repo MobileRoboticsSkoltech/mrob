@@ -17,12 +17,13 @@ using namespace mrob;
 
 
 PlaneRegistration::PlaneRegistration():
-        isSolved_(0), trajectory_(new std::vector<SE3>(8,SE3()))
+        numberPlanes_(0), numberPoses_(0),isSolved_(0), trajectory_(new std::vector<SE3>(8,SE3()))
 {
 }
 
 PlaneRegistration::PlaneRegistration(uint_t numberPlanes, uint_t numberPoses):
-        isSolved_(0), trajMode_(TrajectoryMode::SEQUENCE), trajectory_(new std::vector<SE3>(numberPoses, SE3()))
+        numberPlanes_(numberPlanes), numberPoses_(numberPoses),isSolved_(0),
+        trajMode_(TrajectoryMode::SEQUENCE), trajectory_(new std::vector<SE3>(numberPoses, SE3()))
 {
     planes_.reserve(numberPlanes);
 }
@@ -39,6 +40,8 @@ void PlaneRegistration::set_number_planes_and_poses(uint_t numberPlanes, uint_t 
     planes_.reserve(numberPlanes);
     trajectory_->clear();
     trajectory_->resize(numberPoses, SE3());
+    numberPlanes_ = numberPlanes;
+    numberPoses_ = numberPoses;
 }
 
 uint_t PlaneRegistration::solve()

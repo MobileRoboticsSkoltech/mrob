@@ -58,7 +58,7 @@ std::vector<Mat31>& Plane::get_points(uint_t t)
 {
     if (t >= timeLength_)
         return allPlanePoints_.back();
-    return allPlanePoints_.at(t);
+    return allPlanePoints_[t];
 }
 
 void Plane::clear_points()
