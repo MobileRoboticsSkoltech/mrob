@@ -33,8 +33,7 @@ class Plane{
     ~Plane();
 
     void reserve(uint_t d, uint_t t);
-    void set_plane(SE3 &);
-    SE3 get_plane(void);
+    Mat41 get_plane(void) {return planeEstimation_;};
     /**
      * This function is intended to add a point that belongs to the plane at time t
      * Internally, we will save a copy of them
@@ -85,7 +84,7 @@ class Plane{
     //std::vector<uint_t> timeIndex_;// not used now, but it would be useful for non-consecutive obs
 
     // Overparametrized plane, as a transformation in SE3 TODO needed?
-    SE3 plane_;
+    //SE3 plane_;
     Mat41 planeEstimation_;
     double lambda_;
     bool isPlaneEstimated_;

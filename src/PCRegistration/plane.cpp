@@ -43,16 +43,6 @@ void Plane::reserve(uint_t d, uint_t t)
         allPlanePoints_[t].reserve(d);
 }
 
-void Plane::set_plane(SE3 &T)
-{
-    plane_ = T;
-}
-
-SE3 Plane::get_plane(void)
-{
-    return plane_;
-}
-
 void Plane::push_back_point(Mat31 &point, uint_t t)
 {
     // XXX for now it ony works on consecutives observations TODO

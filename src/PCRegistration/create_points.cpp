@@ -107,7 +107,9 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     planes_.reserve(numberPlanes_);
     for (uint_t i = 0; i < numberPoses_; ++i)
     {
+        X_.push_back(std::vector<Mat31>());
         X_[i].reserve(numberPoints_);
+        pointId_.push_back(std::vector<uint_t>());
         pointId_[i].reserve(numberPoints_);
     }
 
@@ -155,13 +157,16 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
             Mat31 point = planePoses_[planeId].transform( samplePoints_.samplePoint( 2.0 ) );
             point = transInvPose.transform(point);
             // TODO some problem here on python
-            std::cout << "number points" << planeId << " size of X" << X_.size() <<" number poses" << numberPoses_ << std::endl;
+            std::cout << "\nnumber points  " << planeId;
             X_[t].push_back( point );
+            std::cout << "\n point size = " << pointId_[t].size();
+            std::cout << "\n time stamp " << t;
+            // TODO, here it crashes regarless of the instruction. What is going on?
+            std::cout << "\n point number            " << i;
             pointId_[t].push_back(planeId);
-
             // add information to plane structure
             planes_[planeId].second->push_back_point(point,t);
-
+            std::cout << "\n point being pushed back            " << point;
         }
     }
 }
