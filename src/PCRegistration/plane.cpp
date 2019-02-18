@@ -26,6 +26,7 @@ Plane::Plane(uint_t timeLength):
     // there should be an individual reservation of points
     for (uint_t i = 0; i < timeLength_; ++i)
     {
+        allPlanePoints_.push_back(std::vector<Mat31>());
         // estimated number of points per observation TODO
         allPlanePoints_[i].reserve(512);
     }
