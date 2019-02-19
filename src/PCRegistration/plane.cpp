@@ -72,15 +72,15 @@ double Plane::estimate_plane()
 {
     if (matrixS_.empty()) calculate_all_matrices_S();
     calculate_all_matrices_Q();
-    Mat4 Q = Mat4::Zero();
+    accumulatedQ_ = Mat4::Zero();
     for (Mat4 &Qi: matrixQ_)
     {
-        Q += Qi;
+        accumulatedQ_ += Qi;
         //std::cout << Qi << std::endl;
     }
 
     // sum( v * p_i )
-    Eigen::JacobiSVD<Mat4> svd(Q, Eigen::ComputeFullU );
+    Eigen::JacobiSVD<Mat4> svd(accumulatedQ_, Eigen::ComputeFullU );
     planeEstimation_ = svd.matrixU().col(3);
     //std::cout << svd.matrixU() << "\n and solution \n" << planeEstimation_ <<  std::endl;
     //std::cout << "plane estimation error: " << svd.singularValues() <<  std::endl;
@@ -92,6 +92,18 @@ double Plane::estimate_plane()
     return lambda_;
 }
 
+
+double Plane::get_error_incremental(uint_t t) const
+{
+    Mat4 Q = accumulatedQ_;
+    //std::cout << "accumulated Q from prev version " << accumulatedQ_ << std::endl;
+    Q -= matrixQ_[t];
+    //std::cout << "substract: Q " << Q << std::endl;
+    Q +=  trajectory_->at(t).T() * matrixS_[t] * trajectory_->at(t).T().transpose();
+    //std::cout << "new acc Q " << Q << std::endl;
+    Eigen::JacobiSVD<Mat4> svd(Q, Eigen::ComputeFullU );
+    return svd.singularValues()(3);
+}
 
 void Plane::calculate_all_matrices_S()
 {

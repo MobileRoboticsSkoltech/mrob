@@ -53,6 +53,11 @@ class Plane{
      * get error: returns the error as the min eigenvalue
      */
     double get_error() const {return lambda_;};
+    /**
+     * get error incremental: returns the error as the min eigenvalue only updating the
+     * value of Q_t, at time step t. Nothing insie gets updated
+     */
+    double get_error_incremental(uint_t) const;
 
     /**
      *  calculates the matrix S = sum(p*p'), where p = [x,y,z,1]
@@ -97,6 +102,7 @@ class Plane{
 
     // gradient calculation Q
     std::vector<Mat4> matrixS_, matrixQ_;
+    Mat4 accumulatedQ_;//Q matrix of accumulated values for the incremental update of the error.
 
   public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

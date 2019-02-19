@@ -30,6 +30,7 @@ namespace mrob{
 class PlaneRegistration{
 
 enum TrajectoryMode{SEQUENCE=0, INTERPOLATION};
+enum SolveMode{BFGS=0, GRADIENT_DESCENT_NAIVE, GRADIENT_DESCENT_BACKTRACKING};
 
 
   public:
@@ -73,6 +74,12 @@ enum TrajectoryMode{SEQUENCE=0, INTERPOLATION};
     uint_t time_;
     std::unordered_map<uint_t, std::shared_ptr<Plane>> planes_;
     std::shared_ptr<std::vector<SE3>> trajectory_, trajectoryInterpolated_;
+
+    // Quasi Newton methods if used
+    PlaneRegistration::SolveMode solveMode_;
+    std::vector<Mat6> inverseHessian_;
+    std::vector<Mat61> previousJacobian_;
+    double c1_, c2_; //parameters for the Wolfe conditions DEPRECATED?
 
 };
 

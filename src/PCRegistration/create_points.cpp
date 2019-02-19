@@ -129,7 +129,7 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     SE3 initialPoseInv = initialPose_.inv();
     Mat61 xi;
     xi << 0,0,0,0,1,0;
-    finalPose_  = SE3(xi);//samplePoses_.samplePose();
+    finalPose_ = samplePoses_.samplePose();
     SE3 dx =  finalPose_ * initialPoseInv;
     Mat61 dxi = dx.ln_vee();
 
