@@ -28,6 +28,7 @@ Coding conventions are necessary to maintain homogeneity and readability across 
 * Constants and enumerations are in uppercase. For example `M_PI`.
 * Class definitions proceed in the following order:
 
+  - public enums
   - public constructors and the destructor
   - public virtual functions
   - public non-virtual member functions

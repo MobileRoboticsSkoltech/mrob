@@ -18,22 +18,21 @@ using namespace mrob;
 
 PlaneRegistration::PlaneRegistration():
         numberPlanes_(0), numberPoses_(0),isSolved_(0), trajectory_(new std::vector<SE3>(8,SE3())),
-        solveMode_(SolveMode::BFGS),
-        c1_(1e-4), c2_(0.9)
+        solveMode_(SolveMode::GRADIENT_DESCENT_NAIVE),
+        c1_(1e-4), c2_(0.9), beta_(1e-2)
 {
-    solveMode_ = SolveMode::GRADIENT_DESCENT_BACKTRACKING;
-    //solveMode_ = SolveMode::GRADIENT_DESCENT_NAIVE;
 }
 
 PlaneRegistration::PlaneRegistration(uint_t numberPlanes, uint_t numberPoses):
         numberPlanes_(numberPlanes), numberPoses_(numberPoses),isSolved_(0),
         trajMode_(TrajectoryMode::SEQUENCE), trajectory_(new std::vector<SE3>(numberPoses, SE3())),
-        solveMode_(SolveMode::BFGS),
-        c1_(1e-4), c2_(0.9)
+        solveMode_(SolveMode::GRADIENT_DESCENT_NAIVE),
+        c1_(1e-4), c2_(0.9), beta_(1e-2)
 {
     planes_.reserve(numberPlanes);
     inverseHessian_.resize(numberPoses, 1e-3 * Mat6::Identity());
     previousJacobian_.resize(numberPoses, Mat61::Zero());
+    previousState_.resize(numberPoses, Mat61::Zero());
 }
 
 PlaneRegistration::~PlaneRegistration()
@@ -55,6 +54,8 @@ void PlaneRegistration::set_number_planes_and_poses(uint_t numberPlanes, uint_t 
     inverseHessian_.resize(numberPoses, 1e-3 * Mat6::Identity());
     previousJacobian_.clear();
     previousJacobian_.resize(numberPoses, Mat61::Zero());
+    previousState_.clear();
+    previousState_.resize(numberPoses, Mat61::Zero());
 }
 
 uint_t PlaneRegistration::solve()
@@ -68,7 +69,7 @@ uint_t PlaneRegistration::solve()
     // TODO iterative process, on what convergence basis?
     uint_t solveIters = 0;
     double previousError = 1e20, diffError = 10;
-    while(diffError > 1e-4)
+    //while(diffError > 1e-4)
     {
 
         // 1) calculate plane estimation given the current trajectory
@@ -98,18 +99,63 @@ uint_t PlaneRegistration::solve()
             }
 
             // 3) update results Ti = exp(-dxi) * Ti (our convention, we expanded from the left)
-            // 3.1) first atempt: gradient decent with fixed step upgrade alpha = 1/N
+            // 3.1) gradient decent with fixed step upgrade alpha = 1/N
             if (solveMode_ == SolveMode::GRADIENT_DESCENT_NAIVE)
             {
                 Mat61 dxi = -jacobian/(1.5*numberPoints);// dxi = alpha * p_k = alpha *(-Grad f)
-                std::cout << "jacobian : = " << jacobian.norm() << std::endl;
+                //std::cout << "jacobian : = " << jacobian.norm() << std::endl;
                 trajectory_->at(t).update(dxi);
             }
 
-        // line search to satisfy t`he Wolfe conditions
-        // (I)  f(x_k + a_k p_k) - f(x_k) <= c1 a_k Grad f_k p_k
-        // (II) Grad f(x_k + a_k dx_k)'p_k >= c2 Grad f_k' dx_k
-            // 3.2) gradient decent with line search using the Backtracking algorithm (Nocedal p.37)
+            // 3.2) Heavy Ball: Gradient decent with averaging: x_k+1 = x_k - alpha Grad + beta (xk - x_k-1)
+            // Results: does not really improve over fixed gradient
+            if (solveMode_ == SolveMode::HEAVYBALL)
+            {
+                double alpha = 1.0/numberPoints;
+                Mat61 currentState = trajectory_->at(t).ln_vee();
+                std::cout << "diff in state : "<< (currentState - previousState_[t]).norm() <<  ", alpha gradient : = " << (alpha * jacobian).norm() << std::endl;
+                Mat61 dxi = -alpha * jacobian + 0.1 * (currentState - previousState_[t]);
+                previousState_[t] = currentState;
+                trajectory_->at(t).update(dxi);
+            }
+
+            // 3.3) Momentum: Gradient decent where D x_k = beta * D x_k - alpha Grad
+            //                                    and x_k+1 = x_k + D x_k
+            // Results: works great
+            if (solveMode_ == SolveMode::MOMENTUM)
+            {
+                double alpha = 1.0/numberPoints;
+                Mat61 dxi = -alpha * jacobian + 0.1 * previousState_[t];
+                previousState_[t] = dxi;
+                std::cout << "diff in state : "<< dxi.norm() <<  ", alpha gradient : = " << (alpha * jacobian).norm() << std::endl;
+                trajectory_->at(t).update(dxi);
+            }
+
+            // 3.3-B) Momentum with adapted params: Gradient decent where D x_k = beta * D x_k - alpha Grad
+            //                                    and x_k+1 = x_k + D x_k
+            // Results:
+            if (solveMode_ == SolveMode::MOMENTUM_ADA)
+            {
+                //
+                double alpha = 1.0/numberPoints;
+                double beta = 0.1; // adaptive depending on the gradient, sequence: 0.5,0.9,0.99
+                Mat61 dxi = -alpha * jacobian + beta * previousState_[t];
+                previousState_[t] = dxi;
+                std::cout << "diff in state : "<< dxi.norm() <<  ", alpha gradient : = " << (alpha * jacobian).norm() << std::endl;
+                trajectory_->at(t).update(dxi);
+            }
+
+            // 3.4) Nesterov's Accelerated method:
+            // Results:
+            if (solveMode_ == SolveMode::NESTEROV)
+            {
+                double gamma = 0.9;
+                double alpha = 1.0/numberPoints
+            }
+            // line search to satisfy t`he Wolfe conditions
+            // (I)  f(x_k + a_k p_k) - f(x_k) <= c1 a_k Grad f_k p_k
+            // (II) Grad f(x_k + a_k dx_k)'p_k >= c2 Grad f_k' dx_k
+            // 3.X) NOT WORKING gradient decent with line search using the Backtracking algorithm (Nocedal p.37)
             if (solveMode_ == SolveMode::GRADIENT_DESCENT_BACKTRACKING)
             {
                 double alpha = 0.05; // alpha \in (0,1)
@@ -136,7 +182,7 @@ uint_t PlaneRegistration::solve()
                 //std::cout << "update error = " << updateError << ", initial error = " << initialError << ", and alpha = " << alpha << ", iter = "<< iters << std::endl;
             }
 
-            // 3.3) BFGS, a first approach for alpha = 1 (no line search) or checking of Wolfe conditions.
+            // 3.X) NOT WORKING: BFGS, a first approach for alpha = 1 (no line search) or checking of Wolfe conditions.
             //         We assume the problem to be behave as a quadratic function, which is accurate on the manifold of SE3
             if (solveMode_ == SolveMode::BFGS)
             {
@@ -152,7 +198,7 @@ uint_t PlaneRegistration::solve()
                 previousJacobian_[t] = jacobian;
             }
 
-            // 3.3) SR1
+            // 3.X) SR1
         }
         std::cout << "error =                                                 " << initialError << std::endl;
         solveIters++;

@@ -29,9 +29,9 @@ namespace mrob{
  */
 class PlaneRegistration{
 
-enum TrajectoryMode{SEQUENCE=0, INTERPOLATION};
-enum SolveMode{BFGS=0, GRADIENT_DESCENT_NAIVE, GRADIENT_DESCENT_BACKTRACKING};
-
+  public:
+    enum TrajectoryMode{SEQUENCE=0, INTERPOLATION};
+    enum SolveMode{GRADIENT_DESCENT_NAIVE=0, HEAVYBALL, MOMENTUM, MOMENTUM_ADA, NESTEROV, GRADIENT_DESCENT_BACKTRACKING, BFGS};
 
   public:
     PlaneRegistration();
@@ -41,6 +41,8 @@ enum SolveMode{BFGS=0, GRADIENT_DESCENT_NAIVE, GRADIENT_DESCENT_BACKTRACKING};
     void set_number_planes_and_poses(uint_t numPlanes, uint_t numPoses);
     uint_t get_number_planes() const {return numberPlanes_;};
     uint_t get_number_poses() const {return numberPoses_;};
+
+    void set_solving_method(SolveMode mode) {solveMode_ = mode;};
 
     /**
      * solve() calculates the poses on trajectory such that the minimization objective
@@ -78,8 +80,8 @@ enum SolveMode{BFGS=0, GRADIENT_DESCENT_NAIVE, GRADIENT_DESCENT_BACKTRACKING};
     // Quasi Newton methods if used
     PlaneRegistration::SolveMode solveMode_;
     std::vector<Mat6> inverseHessian_;
-    std::vector<Mat61> previousJacobian_;
-    double c1_, c2_; //parameters for the Wolfe conditions DEPRECATED?
+    std::vector<Mat61> previousJacobian_, previousState_;
+    double c1_, c2_, beta_; //parameters for the Wolfe conditions DEPRECATED?
 
 };
 
