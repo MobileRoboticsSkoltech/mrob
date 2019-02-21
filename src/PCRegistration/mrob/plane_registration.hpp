@@ -31,7 +31,7 @@ class PlaneRegistration{
 
   public:
     enum TrajectoryMode{SEQUENCE=0, INTERPOLATION};
-    enum SolveMode{GRADIENT_DESCENT_NAIVE=0, HEAVYBALL, MOMENTUM, MOMENTUM_ADA, NESTEROV, GRADIENT_DESCENT_BACKTRACKING, BFGS};
+    enum SolveMode{GRADIENT_DESCENT_NAIVE=0, STEEPEST, HEAVYBALL, MOMENTUM, MOMENTUM_SEQ, BENGIOS_NAG, GRADIENT_DESCENT_BACKTRACKING, BFGS};
 
   public:
     PlaneRegistration();
@@ -48,14 +48,24 @@ class PlaneRegistration{
      * solve() calculates the poses on trajectory such that the minimization objective
      * is met: J = sum (lamda_min_plane)
      */
-    uint_t solve();
+    uint_t solve(bool singleIteration = false);
     /**
-     * solve() calculates the poses on trajectory such that the minimization objective
+     * solve_interpolation() calculates the poses on trajectory such that the minimization objective
      * is met: J = sum (lamda_min_plane), and the trajectory is described as a
      */
     uint_t solve_interpolation();
+    double get_current_error();
+    /**
+     * Get transformation returns a smart pointer to the vector of transformations,
+     * which is already shared by all Plane objects.
+     * It serves for checking the solution and for modyfying the initial conditions for optimization (if any).
+     */
     std::shared_ptr<std::vector<SE3>>& get_transformations() {return trajectory_;};//if solved
-
+    /**
+     * reset transformations: clears and fills in the vector of trajectories
+     * for new calculation starting at the initial point x_t = I for all t \in [0,T]
+     */
+    void reset_transformations();
     /**
      * add_plane adds a plane structure already initialized and filled with data
      */
@@ -64,8 +74,12 @@ class PlaneRegistration{
 
     std::unordered_map<uint_t, std::shared_ptr<Plane>>& get_all_planes() {return planes_;};
 
-    void print(bool plotPlanes = true) const;
+    void set_alpha_parameter(double alpha) {alpha_ = alpha;};
+    void set_beta_parameter(double beta) {beta_ = beta;};
 
+    double calculate_poses_rmse(std::vector<SE3> & groundTruth) const;
+
+    void print(bool plotPlanes = true) const;
 
 
   protected:
@@ -81,7 +95,8 @@ class PlaneRegistration{
     PlaneRegistration::SolveMode solveMode_;
     std::vector<Mat6> inverseHessian_;
     std::vector<Mat61> previousJacobian_, previousState_;
-    double c1_, c2_, beta_; //parameters for the Wolfe conditions DEPRECATED?
+    double c1_, c2_;    //parameters for the Wolfe conditions DEPRECATED?
+    double alpha_, beta_;
 
 };
 

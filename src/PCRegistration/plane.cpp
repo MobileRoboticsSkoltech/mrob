@@ -119,7 +119,6 @@ void Plane::calculate_all_matrices_S()
         }
         matrixS_.push_back(S);
     }
-    std::cout << "plane::calculate_all_matrices_S:\n";
 }
 
 void Plane::calculate_all_matrices_Q()
