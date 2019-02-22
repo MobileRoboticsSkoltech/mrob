@@ -51,17 +51,19 @@ class SampleUniformSE3{
  */
 class SamplePlanarSurface{
   public:
-    SamplePlanarSurface(double zStd);
+    SamplePlanarSurface(double zStd, double bias = 0.0);
     ~SamplePlanarSurface();
     /**
      * samples a point with noise on a square of given length
      */
     Mat31 samplePoint(double length);
+    void sampleBias();
 
   protected:
     std::default_random_engine generator_;
     std::uniform_real_distribution<double> x_, y_;
-    std::normal_distribution<double> z_;
+    std::normal_distribution<double> z_, bias_;
+    double xBias_, yBias_;
 };
 
 /**
@@ -72,9 +74,13 @@ public:
     /**
      * Creates a class
      */
-    CreatePoints(uint_t N = 10, uint_t numberPlanes = 4, uint_t numberPoses = 2, double noisePerPoint = 0.01);
+    CreatePoints(uint_t N = 10, uint_t numberPlanes = 4, uint_t numberPoses = 2, double noisePerPoint = 0.01, double noiseBias = 0.1);
     ~CreatePoints();
 
+    /**
+     * Fill the Planeregistration class with planes calcualted here (reset)
+     * and a new initial traejctory set to I's
+     */
     void create_plane_registration(PlaneRegistration& planeReg);
 
     std::vector<Mat31>& get_point_cloud(uint_t t);
@@ -95,7 +101,7 @@ protected:
     // generation parameters
     uint_t numberPoints_; // Number of points
     uint_t numberPlanes_; // Number of planes in the virtual environment
-    double noisePerPoint_;
+    double noisePerPoint_, noiseBias_;
     double rotationRange_;
     double transRange_;
     double lamdaOutlier_;

@@ -63,8 +63,19 @@ class Plane{
      *  calculates the matrix S = sum(p*p'), where p = [x,y,z,1]
      * for all planes, as an aggregation of the outer product of all
      * homogeneous points
+     * If reset = true, clears all information and recalculates S
+     * If reset = false (default) only calculates S if there is no calculation yet
      */
-    void calculate_all_matrices_S();
+    void calculate_all_matrices_S(bool reset=false);
+    /**
+     * get mean point calculates the mean of the pointcloud observed at time t,
+     * given that S = sum p * p' =  sum ([x2 xy xz x
+     *                                    yx y2 yz y
+     *                                    zx zy z2 z
+     *                                    x   y  z 1]
+     * ser we just calcualte S and return
+     */
+    Mat31 get_mean_point(uint_t t);
     /**
      *  calculates the matrix Qi = 1^T_i * Si * (1^T_i)^transp
      *  for all planes. Since this is an iterative process on T's,
@@ -80,6 +91,7 @@ class Plane{
     Mat61 calculate_jacobian(uint_t t);
 
 
+    void reset();
     void print() const;
 
 
@@ -92,7 +104,7 @@ class Plane{
     //SE3 plane_;
     Mat41 planeEstimation_;
     double lambda_;
-    bool isPlaneEstimated_;
+    bool isPlaneEstimated_;// XXX used or deprecated?
 
     // subset of pointcloud for the given plane
     std::vector< std::vector<Mat31> > allPlanePoints_;

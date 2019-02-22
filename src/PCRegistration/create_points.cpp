@@ -67,8 +67,8 @@ SO3 SampleUniformSE3::sampleOrientation()
     return SO3(w);
 }
 
-SamplePlanarSurface::SamplePlanarSurface(double zStd):
-        x_(-1.0,1.0), y_(-1.0,1.0), z_(0.0,zStd)
+SamplePlanarSurface::SamplePlanarSurface(double zStd, double biasStd):
+        x_(-1.0,1.0), y_(-1.0,1.0), z_(0.0,zStd), bias_(0.0,biasStd)
 {
     assert(zStd >= 0.0 && "\nSamplePlanarSurface::SamplePlanarSurfaceincorrect z bounds");
     auto seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -79,21 +79,28 @@ SamplePlanarSurface::~SamplePlanarSurface()
 {
 }
 
-Mat31 SamplePlanarSurface::samplePoint(double length)
+void SamplePlanarSurface::sampleBias()
 {
-
-    return Mat31(x_(generator_), y_(generator_), z_(generator_) );
+    xBias_ = bias_(generator_);
+    yBias_ = bias_(generator_);
 }
 
-CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numberPoses, double noisePerPointStd):
+Mat31 SamplePlanarSurface::samplePoint(double length)
+{
+    return Mat31(x_(generator_) + xBias_, y_(generator_) + yBias_, z_(generator_) );
+}
+
+CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numberPoses,
+                           double noisePerPointStd, double noiseBias):
         numberPoints_(numberPoints),
         numberPlanes_(numberPlanes),
         noisePerPoint_(noisePerPointStd),
+        noiseBias_(noiseBias),
         rotationRange_(M_PI),
-        transRange_(1.0),
+        transRange_(10.0),
         lamdaOutlier_(0.0),
         samplePoses_(rotationRange_,transRange_),
-        samplePoints_(noisePerPoint_),
+        samplePoints_(noisePerPoint_, noiseBias_),
         // Trajectory parameters
         xRange_(10.0),
         yRange_(10.0),
@@ -150,6 +157,7 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     {
         SE3 transInvPose = goundTruthTrajectory_[t].inv();
         // prepare permutation of points
+        samplePoints_.sampleBias();
         for (uint_t i = 0; i < numberPoints_ ; ++i)
         {
             // parameter is the legnth of the observed plane
@@ -176,6 +184,7 @@ void CreatePoints::create_plane_registration(PlaneRegistration& planeReg)
     planeReg.set_number_planes_and_poses(numberPlanes_,numberPoses_);
     for (auto plane_element : planes_)
     {
+        plane_element.second->reset();
         planeReg.add_plane(plane_element.first, plane_element.second);
     }
 }

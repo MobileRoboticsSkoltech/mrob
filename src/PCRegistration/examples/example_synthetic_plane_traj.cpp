@@ -19,7 +19,7 @@ int main()
 {
     uint_t numPlanes = 4, numPoses = 2;
     // 1) define problem conditions
-    mrob::CreatePoints scene(40,numPlanes,numPoses,0.001);
+    mrob::CreatePoints scene(40,numPlanes,numPoses,0.001, 0.1);
     //scene.print();
 
     mrob::PlaneRegistration contPlanes;

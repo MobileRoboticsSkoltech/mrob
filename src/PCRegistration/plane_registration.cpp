@@ -10,6 +10,7 @@
  */
 
 
+#include "mrob/pc_registration.hpp"
 #include "mrob/plane_registration.hpp"
 #include <iostream>
 
@@ -66,7 +67,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
     //Mat61 previousJacobian = Mat61::Zero();
 
 
-    // TODO iterative process, on what convergence basis?
+    // iterative process, on convergence basis | error_k - error_k-1| < tol
     uint_t solveIters = 0;
     double previousError = 1e20, diffError = 10;
     do
@@ -81,7 +82,8 @@ uint_t PlaneRegistration::solve(bool singleIteration)
         diffError = previousError - initialError;
         previousError = initialError;
 
-        // 2) calculate Jacobians
+        // 2) calculate Gradient = Jacobian^T. We maintain the nomenclature Jacobian for coherence on the project,
+        //    but actually this Jacobian should be transposed.
         Mat61 jacobian;
         double  numberPoints;
         // it should start at t = 1 because t = 0 is the fixed reference frame T0 = I
@@ -207,7 +209,8 @@ uint_t PlaneRegistration::solve(bool singleIteration)
             }
 
             // 3.X) NOT WORKING: BFGS, a first approach for alpha = 1 (no line search) or checking of Wolfe conditions.
-            //         We assume the problem to be behave as a quadratic function, which is accurate on the manifold of SE3
+            //         We assume the problem to be behave as a quadratic function, which is accurate on the manifold of SE3 but not for a sequence of
+            //         poses. That makes the update state too agressive and the solution diverges
             if (solveMode_ == SolveMode::BFGS)
             {
                 // dxi = - D * grad f  | for alpha = 1
@@ -225,12 +228,49 @@ uint_t PlaneRegistration::solve(bool singleIteration)
             // 3.X) SR1
             // ------------------------------------------------------------------------------------------------------
         }
-        //std::cout << "error =                                                 " << initialError << std::endl;
+
         solveIters++;
-    }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters < 1e3);
+    }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters < 1e4);
     //}while(!singleIteration && solveIters < 200);
 
     return solveIters;
+}
+
+uint_t PlaneRegistration::solve_initialize()
+{
+    // TODO Maybe solve this as a plane-to-point alignment wrt T0
+    // Initialize matrices of points
+    MatX X(3,numberPlanes_), Y(3,numberPlanes_);
+
+    // create points Y (from frame t =0), minimum 3 planes per pose
+    uint_t t = 0;
+    for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
+    {
+        it->second->calculate_all_matrices_S();
+        Y.col(t) = it->second->get_mean_point(0);
+        ++t;
+    }
+
+    // create points X, for t = 1, ... T, minimum 3 planes per pose
+    for (t = 1; t < numberPoses_; ++t)
+    {
+        uint_t cont = 0;
+        X.setZero();
+        for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
+        {
+            X.col(cont) = it->second->get_mean_point(t);
+            ++cont;
+        }
+        // Arun solver
+        SE3 estimatedPose;
+        if (!PCRegistration::Arun(X,Y,estimatedPose))
+            return 0;
+        trajectory_->at(t) = estimatedPose;
+    }
+
+
+    // update current trajectory
+    return 1;
 }
 
 double PlaneRegistration::get_current_error()
@@ -241,12 +281,6 @@ double PlaneRegistration::get_current_error()
     return currentError;
 }
 
-void PlaneRegistration::reset_transformations()
-{
-    trajectory_->clear();
-    trajectory_->resize(numberPoses_, SE3{});
-}
-
 void PlaneRegistration::add_plane(uint_t id, std::shared_ptr<Plane> &plane)
 {
     plane->set_trajectory(trajectory_);
@@ -255,15 +289,15 @@ void PlaneRegistration::add_plane(uint_t id, std::shared_ptr<Plane> &plane)
 
 double PlaneRegistration::calculate_poses_rmse(std::vector<SE3> & groundTruth) const
 {
-    assert(groundTruth.size() >= numberPoses_ && "PlaneRegistration::calculate_poses_rmse: number of poses fromg GT is incorrect\n");
+    assert(groundTruth.size() >= numberPoses_ && "PlaneRegistration::calculate_poses_rmse: number of poses from GT is incorrect\n");
     double rmse= 0.0;
     uint_t t = 0;
     // The first pose should be T0 = I, but optimizition slighly perturns it, so we correct it here
     SE3 invFirstPose = trajectory_->at(t).inv();
     for (auto &pose: groundTruth)
     {
-        Mat61 dxi = (pose * trajectory_->at(t) * invFirstPose).ln_vee();
-        std::cout << pose.ln_vee().transpose() << " and solution \n" << (trajectory_->at(t) * invFirstPose).ln_vee().transpose() <<std::endl;
+        Mat61 dxi = (invFirstPose * trajectory_->at(t) * pose.inv()).ln_vee();
+        //std::cout << pose.ln_vee().transpose() << " and solution inv first pose \n" << (invFirstPose * trajectory_->at(t) * pose.inv()).ln_vee().transpose() <<std::endl;
         rmse += dxi.dot(dxi)/(double)numberPoses_;
         ++t;
     }

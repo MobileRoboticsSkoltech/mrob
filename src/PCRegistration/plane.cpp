@@ -70,7 +70,7 @@ void Plane::clear_points()
 
 double Plane::estimate_plane()
 {
-    if (matrixS_.empty()) calculate_all_matrices_S();
+    calculate_all_matrices_S();
     calculate_all_matrices_Q();
     accumulatedQ_ = Mat4::Zero();
     for (Mat4 &Qi: matrixQ_)
@@ -105,20 +105,30 @@ double Plane::get_error_incremental(uint_t t) const
     return svd.singularValues()(3);
 }
 
-void Plane::calculate_all_matrices_S()
+void Plane::calculate_all_matrices_S(bool reset)
 {
-    matrixS_.clear();
-    for (uint_t t = 0; t < timeLength_; ++t)
+    if (reset)
+        matrixS_.clear();
+    if (matrixS_.empty())
     {
-        Mat4 S = Mat4::Zero();
-        for ( Mat31 &p : allPlanePoints_[t])
+        for (uint_t t = 0; t < timeLength_; ++t)
         {
-            Mat41 pHomog;
-            pHomog << p , 1.0;
-            S += pHomog * pHomog.transpose();
+            Mat4 S = Mat4::Zero();
+            for ( Mat31 &p : allPlanePoints_[t])
+            {
+                Mat41 pHomog;
+                pHomog << p , 1.0;
+                S += pHomog * pHomog.transpose();
+            }
+            matrixS_.push_back(S);
         }
-        matrixS_.push_back(S);
     }
+}
+
+Mat31 Plane::get_mean_point(uint_t t)
+{
+    assert(!matrixS_.empty() && "Plane::get_mean_point: S matrix empty");
+    return matrixS_[t].topRightCorner<3,1>()/matrixS_[t](3,3);
 }
 
 void Plane::calculate_all_matrices_Q()
@@ -207,4 +217,12 @@ void Plane::print() const
         for (Mat31 p : allPlanePoints_[t])
             std::cout << p(0) << ", " << p(1) << ", " << p(2) << std::endl;
     }
+}
+
+void Plane::reset()
+{
+    matrixS_.clear();
+    matrixQ_.clear();
+    accumulatedQ_ = Mat4::Zero();
+    planeEstimation_ = Mat41::Zero();
 }

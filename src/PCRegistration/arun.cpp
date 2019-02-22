@@ -88,11 +88,12 @@ int PCRegistration::Arun(const Ref<const MatX> X, const Ref<const MatX> Y, SE3 &
         Mat3 Vn;
         Vn << SVD.matrixV().topLeftCorner<3,2>(), -SVD.matrixV().topRightCorner<3,1>();
         R << Vn * SVD.matrixU().transpose();
-        std::cout << "R value = " << R << std::endl;
+        //std::cout << "R value = " << R << std::endl;
     }
 
     // 6) calculate translation as: t = cy - R * cx
     Mat31 t = cym - R*cxm;
+    //std::cout << "t = " << t << std::endl;
 
     // 7) return result
     T.ref2T() << R, t,

@@ -54,6 +54,11 @@ class PlaneRegistration{
      * is met: J = sum (lamda_min_plane), and the trajectory is described as a
      */
     uint_t solve_interpolation();
+    /**
+     * Initialization_solve give a first guess on all poses by using classical point-point
+     * methods SVD-based to calculate an initial condition closer to the true solution
+     */
+    uint_t solve_initialize();
     double get_current_error();
     /**
      * Get transformation returns a smart pointer to the vector of transformations,
@@ -61,11 +66,7 @@ class PlaneRegistration{
      * It serves for checking the solution and for modyfying the initial conditions for optimization (if any).
      */
     std::shared_ptr<std::vector<SE3>>& get_transformations() {return trajectory_;};//if solved
-    /**
-     * reset transformations: clears and fills in the vector of trajectories
-     * for new calculation starting at the initial point x_t = I for all t \in [0,T]
-     */
-    void reset_transformations();
+
     /**
      * add_plane adds a plane structure already initialized and filled with data
      */
