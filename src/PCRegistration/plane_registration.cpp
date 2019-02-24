@@ -14,6 +14,8 @@
 #include "mrob/plane_registration.hpp"
 #include <iostream>
 
+#include <chrono>
+
 using namespace mrob;
 
 
@@ -66,6 +68,11 @@ uint_t PlaneRegistration::solve(bool singleIteration)
     //inverseHessian_.resize(numberPoses, Mat6::Identity());
     //Mat61 previousJacobian = Mat61::Zero();
 
+    // for benchmarking. This should go away later
+    auto t1 = std::chrono::steady_clock::now();
+    auto t2 = std::chrono::steady_clock::now();
+    auto dif = std::chrono::duration_cast<Ttim>(t2 - t1);
+
 
     // iterative process, on convergence basis | error_k - error_k-1| < tol
     uint_t solveIters = 0;
@@ -109,11 +116,22 @@ uint_t PlaneRegistration::solve(bool singleIteration)
                 trajectory_->at(t).update(dxi);
             }
 
+            if (solveMode_ == SolveMode::GRADIENT_DESCENT_INCR)
+            {
+                double alpha = alpha_/numberPoints;
+                Mat61 dxi = -alpha * jacobian;// dxi = alpha * p_k = alpha *(-Grad f)
+                //std::cout << "jacobian : = " << jacobian.norm() << std::endl;
+                trajectory_->at(t).update(dxi);
+                for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
+                    //XXX we also return current new error lambda, it could be used
+                    it->second->estimate_plane_incrementally(t);// this updates the current solution v
+            }
+
             // 3.1-B) Steepest gradient decent with fixed step upgrade alpha = 1/N
             // results: incredibly slow, useless
             if (solveMode_ == SolveMode::STEEPEST)
             {
-                double alpha = 1e-1;
+                double alpha = 1e-2;
                 Mat61 dxi = - alpha/jacobian.norm() * jacobian; //dxi = alpha * p_k = alpha *(-Grad f)/norm(Grad)
                 trajectory_->at(t).update(dxi);
             }
@@ -214,13 +232,14 @@ uint_t PlaneRegistration::solve(bool singleIteration)
             if (solveMode_ == SolveMode::BFGS)
             {
                 // dxi = - D * grad f  | for alpha = 1
-                Mat61 dxi = - 0.5 * inverseHessian_[t]*jacobian ;
+                Mat61 dxi = - alpha_ * inverseHessian_[t]*jacobian ;
                 trajectory_->at(t).update(dxi);
                 // TODO Line search for updating alpha by satisfying Wolfe conditions
                 // update inverseHessian Dk
                 Mat61 y = jacobian - previousJacobian_[t];
                 double rho = y.dot(dxi);
-                std::cout << "inverse hessian = " << inverseHessian_[t] << std::endl;
+                //std::cout << "inverse hessian = " << inverseHessian_[t] << "\n gradient: "
+                //          <<  jacobian << std::endl;
                 inverseHessian_[t] = (Mat6::Identity() - dxi*y.transpose()/rho)*inverseHessian_[t]*(Mat6::Identity() - y*dxi.transpose()/rho) + dxi*dxi.transpose()/rho;
                 previousJacobian_[t] = jacobian;
             }
@@ -228,7 +247,6 @@ uint_t PlaneRegistration::solve(bool singleIteration)
             // 3.X) SR1
             // ------------------------------------------------------------------------------------------------------
         }
-
         solveIters++;
     }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters < 1e4);
     //}while(!singleIteration && solveIters < 200);

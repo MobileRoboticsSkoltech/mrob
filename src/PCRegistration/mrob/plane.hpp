@@ -50,6 +50,14 @@ class Plane{
      */
     double estimate_plane();
     /**
+     * Estimates Incremetally the plane parameters: v = [n', d]'_{4x1}, where v is unitary, (due to the SVD solution)
+     * although for standard plane estimation we could enforce unitary on the normal vector n.
+     *
+     * The difference with the previous estimate_plane() is that we update the matrix Q for the give time
+     * stamp and recalculate the solution, on constant time O(1)
+     */
+    double estimate_plane_incrementally(uint_t t);
+    /**
      * get error: returns the error as the min eigenvalue
      */
     double get_error() const {return lambda_;};
@@ -57,7 +65,7 @@ class Plane{
      * get error incremental: returns the error as the min eigenvalue only updating the
      * value of Q_t, at time step t. Nothing insie gets updated
      */
-    double get_error_incremental(uint_t) const;
+    double get_error_incremental(uint_t t) const;
 
     /**
      *  calculates the matrix S = sum(p*p'), where p = [x,y,z,1]

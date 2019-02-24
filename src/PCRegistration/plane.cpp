@@ -46,7 +46,7 @@ void Plane::reserve(uint_t d, uint_t t)
 
 void Plane::push_back_point(Mat31 &point, uint_t t)
 {
-    // XXX for now it ony works on consecutives observations TODO
+    // XXX for now it only works on consecutive observations TODO
     if (t < timeLength_)
     {
         //homogeneousPoint << point, 1.0;
@@ -92,6 +92,15 @@ double Plane::estimate_plane()
     return lambda_;
 }
 
+double Plane::estimate_plane_incrementally(uint_t t)
+{
+    accumulatedQ_ -= matrixQ_[t];
+    accumulatedQ_ +=  trajectory_->at(t).T() * matrixS_[t] * trajectory_->at(t).T().transpose();
+    //std::cout << "new acc Q " << accumulatedQ_ << std::endl;
+    Eigen::JacobiSVD<Mat4> svd(accumulatedQ_, Eigen::ComputeFullU );
+    planeEstimation_ = svd.matrixU().col(3);
+    return svd.singularValues()(3);
+}
 
 double Plane::get_error_incremental(uint_t t) const
 {
