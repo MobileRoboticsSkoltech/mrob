@@ -50,10 +50,10 @@ class PlaneRegistration{
      */
     uint_t solve(bool singleIteration = false);
     /**
-     * solve_interpolation() calculates the poses on trajectory such that the minimization objective
-     * is met: J = sum (lamda_min_plane), and the trajectory is described as a
+     * solve_interpolate() calculates the poses on trajectory such that the minimization objective
+     * is met: J = sum (lamda_min_plane), and the trajectory is described as an interpolation from I to T_f
      */
-    uint_t solve_interpolation();
+    uint_t solve_interpolate(bool singleIteration = false);
     /**
      * Initialization_solve give a first guess on all poses by using classical point-point
      * methods SVD-based to calculate an initial condition closer to the true solution
@@ -90,7 +90,7 @@ class PlaneRegistration{
     PlaneRegistration::TrajectoryMode trajMode_;
     uint_t time_;
     std::unordered_map<uint_t, std::shared_ptr<Plane>> planes_;
-    std::shared_ptr<std::vector<SE3>> trajectory_, trajectoryInterpolated_;
+    std::shared_ptr<std::vector<SE3>> trajectory_;
 
     // Quasi Newton methods if used
     PlaneRegistration::SolveMode solveMode_;

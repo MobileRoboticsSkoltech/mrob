@@ -120,6 +120,7 @@ void Plane::calculate_all_matrices_S(bool reset)
         matrixS_.clear();
     if (matrixS_.empty())
     {
+        numberPoints_ = 0;
         for (uint_t t = 0; t < timeLength_; ++t)
         {
             Mat4 S = Mat4::Zero();
@@ -130,6 +131,7 @@ void Plane::calculate_all_matrices_S(bool reset)
                 S += pHomog * pHomog.transpose();
             }
             matrixS_.push_back(S);
+            ++numberPoints_;
         }
     }
 }

@@ -41,6 +41,7 @@ class Plane{
     void push_back_point(Mat31 &point, uint_t t);
     std::vector<Mat31>& get_points(uint_t t);
     uint_t get_number_points(uint_t t) {return allPlanePoints_[t].size();};
+    uint_t get_total_number_points() {return numberPoints_;};
     void clear_points();
     void set_trajectory(const std::shared_ptr<const std::vector<SE3>> &trajectory) {trajectory_ = trajectory;};
 
@@ -116,6 +117,7 @@ class Plane{
 
     // subset of pointcloud for the given plane
     std::vector< std::vector<Mat31> > allPlanePoints_;
+    uint_t numberPoints_;
 
     // Transformations. We shared it across all planes that need it.
     std::shared_ptr<const std::vector<SE3>> trajectory_;

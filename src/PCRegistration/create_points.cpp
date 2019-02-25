@@ -97,7 +97,7 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         noisePerPoint_(noisePerPointStd),
         noiseBias_(noiseBias),
         rotationRange_(M_PI),
-        transRange_(10.0),
+        transRange_(4.0),
         lamdaOutlier_(0.0),
         samplePoses_(rotationRange_,transRange_),
         samplePoints_(noisePerPoint_, noiseBias_),
@@ -135,8 +135,8 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     initialPose_ = SE3(); // the initial pose is a relative pose for the following poses
     SE3 initialPoseInv = initialPose_.inv();
     Mat61 xi;
-    xi << 0,0,0,0,1,0;
-    finalPose_ = samplePoses_.samplePose();
+    xi << 0.3,1,-0.1,1,0,0;
+    finalPose_ = SE3(xi);//samplePoses_.samplePose();
     SE3 dx =  finalPose_ * initialPoseInv;
     Mat61 dxi = dx.ln_vee();
 
