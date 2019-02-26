@@ -113,13 +113,15 @@ uint_t PlaneRegistration::solve(bool singleIteration)
             // 3.1) gradient decent with fixed step upgrade alpha = 0.75/N
             if (solveMode_ == SolveMode::GRADIENT_DESCENT_NAIVE)
             {
+                // after some tuning, best values for alpha = 0.3
                 double alpha = alpha_/numberPoints;
                 Mat61 dxi = -alpha * jacobian;// dxi = alpha * p_k = alpha *(-Grad f)
-                std::cout << "\njacobian : = " << jacobian.transpose() << ", at time step " << t <<  std::endl;
+                //std::cout << "\njacobian : = " << jacobian.transpose() << ", at time step " << t <<  std::endl;
                 trajectory_->at(t).update(dxi);
 
             }
-
+            // 3.1-A) Incremental update after each pose
+            // Results: does not improve much for a hug increase on the overhead
             if (solveMode_ == SolveMode::GRADIENT_DESCENT_INCR)
             {
                 double alpha = alpha_/numberPoints;
@@ -168,7 +170,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
 
             // 3.3-B) Momentum with a given sequence of params: Gradient decent where D x_k = beta * D x_k - alpha Grad
             //                                    and x_k+1 = x_k + D x_k
-            // Results:
+            // Results: not implemented
             if (solveMode_ == SolveMode::MOMENTUM_SEQ)
             {
                 // select a sequence of parameters
@@ -186,6 +188,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
             // 3.4-B) Bengio's NAG: a modification to NAG as proposed in Bengio-2013. Fixed parameters
             //          1) momentum or velocity  v_k = beta_k-1 v _k-1 - alpha_k-1 Grad f (x_k-1)
             //          2) x_k+1 = x_k + beta_k+1 beta_k * v_k - (1 + beta_k+1)*alpha_k * Grad f(x_k)
+            // Restuls, works great, the default optimizer
             if (solveMode_ == SolveMode::BENGIOS_NAG)
             {
                 double alpha = alpha_/numberPoints; //raw alpha 1.0
@@ -297,7 +300,7 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
                 numberPoints += it->second->get_number_points(t);
             }
             // XXX this could be changed to time stamps later
-            accumulatedJacobian += tau * t /numberPoints / numberPoses_ * jacobian;
+            accumulatedJacobian += tau * t * jacobian;
 
         }
         // 3) update results Tf = exp(-dxi) * Tf (our convention, we expanded from the left)
@@ -305,7 +308,7 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
         Mat61 dxi, xiFinal;
         if (solveMode_ == SolveMode::GRADIENT_DESCENT_NAIVE)
         {
-            double alpha = alpha_;
+            double alpha = alpha_/numberPoints / numberPoses_;
             dxi = -alpha * accumulatedJacobian;
             //std::cout << "\nINterpolate jacobian : = " << accumulatedJacobian.transpose() << ", and increment update = " << dxi << std::endl;
         }
@@ -314,7 +317,7 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
         //          2) x_k+1 = x_k + beta_k+1 beta_k * v_k - (1 + beta_k+1)*alpha_k * Grad f(x_k)
         if (solveMode_ == SolveMode::BENGIOS_NAG)
         {
-            double alpha = alpha_;
+            double alpha = alpha_/numberPoints / numberPoses_;
             double beta = beta_;
             // x update
             dxi = beta * beta * previousState_.back() - (1 + beta) * alpha * accumulatedJacobian;

@@ -123,6 +123,7 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     // 1) generate planes
     for (uint_t i = 0; i < numberPlanes_ ; ++i)
     {
+        // TODO check for det of this base: for few planes this could be a problem
         planePoses_.push_back(samplePoses_.samplePose());
 
         // generates data structure for planes
