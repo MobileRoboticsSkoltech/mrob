@@ -48,7 +48,7 @@ SE3& SE3::operator=(const SE3& rhs)
     return *this;
 }
 
-SE3 SE3::operator*(const SE3& rhs)
+SE3 SE3::operator*(const SE3& rhs) const
 {
     Mat4 res = T_ * rhs.T();
     return SE3(res);
@@ -205,6 +205,11 @@ Mat3 SE3::R() const
 Mat31 SE3::t() const
 {
     return T_.topRightCorner<3,1>();
+}
+
+double SE3::distance(const SE3 &rhs) const
+{
+    return (*this * rhs.inv()).ln_vee().norm();
 }
 
 void SE3::print(void) const

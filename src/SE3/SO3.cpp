@@ -50,6 +50,13 @@ SO3& SO3::operator=(const SO3 &rhs)
     return *this;
 }
 
+SO3 SO3::operator*(const SO3& rhs) const
+{
+    Mat3 res = R_ * rhs.R();
+    return SO3(res);
+}
+
+
 void SO3::update(const Mat31 &dw)
 {
     SO3 dR(dw);
@@ -183,6 +190,11 @@ Mat3 SO3::R() const
 Mat3& SO3::ref2R()
 {
     return R_;
+}
+
+double SO3::distance(const SO3 &rhs) const
+{
+    return (*this * rhs.inv()).ln_vee().norm();
 }
 
 void SO3::print(void) const

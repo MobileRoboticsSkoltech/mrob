@@ -65,7 +65,7 @@ public:
     /**
      * This method allows you to Multiply SE3 expressions
      */
-    SE3 operator*(const SE3& rhs);
+    SE3 operator*(const SE3& rhs) const;
 
     /**
      * This is our *default* way to update transformations
@@ -136,6 +136,13 @@ public:
      * t method returns translation
      */
     Mat31 t() const;
+    /**
+     * Provide the distance as a norm on the tangent space
+     * of the ln(T * T_rhs^{-1})
+     */
+    double distance(const SE3 &rhs) const;
+
+
     void print(void) const;
     void print_lie(void) const;
 
@@ -158,6 +165,7 @@ Mat4 hat6(const Mat61 &xi);
  * Vee operator (v), the inverse of hat
  */
 Mat61 vee6(const Mat4 &xi_hat);
+
 
 }// end namespace
 #endif /* SE3_HPP_ */

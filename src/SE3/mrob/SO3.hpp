@@ -64,7 +64,7 @@ public:
     /**
      * This method allows you to Multiply SO3 expressions
      */
-    SO3 operator*(const SO3& rhs);
+    SO3 operator*(const SO3& rhs) const;
     /**
      * This is our *default* way to update transformations
      * Updates the current transformation with the incremental dw \in so3
@@ -110,6 +110,9 @@ public:
      * ref to R method returns the reference to modify R
      */
     Mat3& ref2R();
+
+    double distance(const SO3 &rhs) const;
+
     void print(void) const;
     void print_lie(void) const;
 
