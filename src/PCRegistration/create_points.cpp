@@ -99,7 +99,8 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         rotationRange_(M_PI),
         transRange_(10.0),
         lamdaOutlier_(0.0),
-        samplePoses_(rotationRange_,transRange_),
+        samplePoses_(M_PI,1.0),
+        samplePlanes_(rotationRange_,transRange_),
         samplePoints_(noisePerPoint_, noiseBias_),
         // Trajectory parameters
         xRange_(10.0),
@@ -124,7 +125,7 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     for (uint_t i = 0; i < numberPlanes_ ; ++i)
     {
         // TODO check for det of this base: for few planes this could be a problem
-        planePoses_.push_back(samplePoses_.samplePose());
+        planePoses_.push_back(samplePlanes_.samplePose());
 
         // generates data structure for planes
         std::shared_ptr<Plane> plane(new Plane(numberPoses_));
@@ -135,8 +136,8 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     // 2) generate initial and final pose, TODO We could add more intermediate points
     initialPose_ = SE3(); // the initial pose is a relative pose for the following poses
     SE3 initialPoseInv = initialPose_.inv();
-    //Mat61 xi; xi << 0.3,1,-0.1,1,0,0;
-    finalPose_ = samplePoses_.samplePose();
+    Mat61 xi; xi << 0.3,1,-0.1,1,0,0;
+    finalPose_ = SE3(xi);//samplePoses_.samplePose();
     SE3 dx =  finalPose_ * initialPoseInv;
     Mat61 dxi = dx.ln_vee();
 

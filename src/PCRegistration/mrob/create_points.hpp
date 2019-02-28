@@ -105,7 +105,7 @@ protected:
     double rotationRange_;
     double transRange_;
     double lamdaOutlier_;
-    SampleUniformSE3 samplePoses_;
+    SampleUniformSE3 samplePoses_,samplePlanes_;
     SamplePlanarSurface samplePoints_;
 
     // Point cloud data generated

@@ -300,7 +300,7 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
                 numberPoints += it->second->get_number_points(t);
             }
             // XXX this could be changed to time stamps later
-            accumulatedJacobian += tau * t * jacobian;
+            accumulatedJacobian +=  tau *  t  / numberPoints * jacobian;
 
         }
         // 3) update results Tf = exp(-dxi) * Tf (our convention, we expanded from the left)
@@ -308,7 +308,7 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
         Mat61 dxi, xiFinal;
         if (solveMode_ == SolveMode::GRADIENT_DESCENT_NAIVE)
         {
-            double alpha = alpha_/numberPoints / numberPoses_;
+            double alpha = alpha_;
             dxi = -alpha * accumulatedJacobian;
             //std::cout << "\nINterpolate jacobian : = " << accumulatedJacobian.transpose() << ", and increment update = " << dxi << std::endl;
         }
@@ -317,19 +317,19 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
         //          2) x_k+1 = x_k + beta_k+1 beta_k * v_k - (1 + beta_k+1)*alpha_k * Grad f(x_k)
         if (solveMode_ == SolveMode::BENGIOS_NAG)
         {
-            double alpha = alpha_/numberPoints / numberPoses_;
+            double alpha = alpha_;
             double beta = beta_;
             // x update
             dxi = beta * beta * previousState_.back() - (1 + beta) * alpha * accumulatedJacobian;
 
             // momentum
-            previousState_.back() = alpha * previousState_.back() - alpha * accumulatedJacobian;
+            previousState_.back() = beta * previousState_.back() - alpha * accumulatedJacobian;
         }
         trajectory_->back().update(dxi);
         xiFinal = trajectory_->back().ln_vee();
         for (uint_t t = 1 ; t < numberPoses_-1; ++t)
         {
-            dxi = tau*t*xiFinal;// SE3 does not like all derived classes TODO
+            dxi = tau * t * xiFinal;// SE3 does not like all derived classes TODO
             trajectory_->at(t) = SE3(dxi);
         }
         ++solveIters;
