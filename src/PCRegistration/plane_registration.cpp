@@ -198,7 +198,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
                 trajectory_->at(t).update(dxi);
 
                 // momentum
-                previousState_[t] = alpha * previousState_[t] - alpha * jacobian;
+                previousState_[t] = beta_ * previousState_[t] - alpha * jacobian;
 
             }
 
@@ -300,7 +300,7 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
                 numberPoints += it->second->get_number_points(t);
             }
             // XXX this could be changed to time stamps later
-            accumulatedJacobian +=  tau *  t  / numberPoints * jacobian;
+            accumulatedJacobian +=  (tau *  t  / numberPoints / numberPoses_) * jacobian;
 
         }
         // 3) update results Tf = exp(-dxi) * Tf (our convention, we expanded from the left)
@@ -393,11 +393,9 @@ double PlaneRegistration::calculate_poses_rmse(std::vector<SE3> & groundTruth) c
     assert(groundTruth.size() >= numberPoses_ && "PlaneRegistration::calculate_poses_rmse: number of poses from GT is incorrect\n");
     double rmse= 0.0;
     uint_t t = 0;
-    // The first pose should be T0 = I, but optimizition slighly perturns it, so we correct it here
-    SE3 invFirstPose = trajectory_->at(t).inv();
     for (auto &pose: groundTruth)
     {
-        Mat61 dxi = (invFirstPose * trajectory_->at(t) * pose.inv()).ln_vee();
+        Mat61 dxi = (trajectory_->at(t) * pose.inv()).ln_vee();
         //std::cout << pose.ln_vee().transpose() << " and solution inv first pose \n" << (invFirstPose * trajectory_->at(t) * pose.inv()).ln_vee().transpose() <<std::endl;
         rmse += dxi.dot(dxi)/(double)numberPoses_;
         ++t;
