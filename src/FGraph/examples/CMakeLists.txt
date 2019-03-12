@@ -7,5 +7,5 @@ TARGET_LINK_LIBRARIES(example_solver FGraph)
 ADD_EXECUTABLE(example_FGraph2d example_FGraph_2d.cpp)
 TARGET_LINK_LIBRARIES(example_FGraph2d FGraph)
 
-ADD_EXECUTABLE(example_solver2d example_solver2d.cpp)
+ADD_EXECUTABLE(example_solver2d example_solver2d.cpp TestingIO.h TestingIO.cpp Tester.h containers.h Tester.cpp)
 TARGET_LINK_LIBRARIES(example_solver2d FGraph)

@@ -103,6 +103,9 @@ std::vector<MatX1> FGraphSolve::getEstimatedPositions() {
     return results;
 }
 
+std::shared_ptr<Node>& FGraphSolve::getNode(int pos) {
+    return nodes_[pos];
+}
 
 void FGraphSolve::buildAdjacency()
 {
