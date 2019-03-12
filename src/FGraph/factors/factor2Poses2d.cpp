@@ -2,11 +2,10 @@
 // Created by Konstantin on 14/01/2019.
 //
 
-#include "mrob/factors/factor2Poses2d.h"
 
 #include <iostream>
 #include <Eigen/Cholesky>
-#include <mrob/factors/factor2Poses2d.h>
+#include <mrob/factors/factor2Poses2d.hpp>
 
 
 using namespace mrob;

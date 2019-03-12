@@ -1,7 +1,11 @@
-//
-// Created by Konstantin on 14/01/2019.
-//
-
+/* $COPYRIGHT SKOLTECH
+ * $LICENSE_LGPL
+ *
+ *  Created on: Jan 14, 2019
+ *      Author: Konstantin Pakulev
+ *              konstantin.pakulev@skoltech.ru
+ *              Mobile Robotics Lab, Skoltech
+ */
 #ifndef MROB_FACTOR2POSES2D_H
 #define MROB_FACTOR2POSES2D_H
 
@@ -17,13 +21,15 @@ namespace mrob{
                        std::shared_ptr<Node> &n2, const Mat3 &obsInf);
         ~Factor2Poses2d() override = default;
 
-        void print() const override;
+        void evaluate() override {};
+        matData_t evaluateError() override {return 0;};
 
         const Eigen::Ref<const MatX1> getObs() const override {return obs_;};
         const Eigen::Ref<const MatX1> getResidual() const override {return r_;};
         const Eigen::Ref<const MatX> getInvCovariance() const override {return W_;};
         const Eigen::Ref<const MatX> getWT2() const override {return WT2_;};
         const Eigen::Ref<const MatX> getJacobian() const override {return J_;};
+        void print() const override;
 
     protected:
         double wrap_angle(double angle);

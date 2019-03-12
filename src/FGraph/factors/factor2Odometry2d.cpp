@@ -2,7 +2,7 @@
 // Created by Konstantin on 17/01/2019.
 //
 
-#include <mrob/factors/factor2Odometry2d.h>
+#include <mrob/factors/factor2Odometry2d.hpp>
 
 using namespace mrob;
 

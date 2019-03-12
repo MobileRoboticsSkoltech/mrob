@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include <mrob/factors/factor2Observation2d.h>
+#include <mrob/factors/factor2Observation2d.hpp>
 
 using namespace mrob;
 

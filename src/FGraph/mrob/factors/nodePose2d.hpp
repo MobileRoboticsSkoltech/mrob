@@ -1,6 +1,11 @@
-//
-// Created by Konstantin on 14/01/2019.
-//
+/* $COPYRIGHT SKOLTECH
+ * $LICENSE_LGPL
+ *
+ *  Created on: Jan 14, 2019
+ *      Author: Konstantin Pakulev
+ *              konstantin.pakulev@skoltech.ru
+ *              Mobile Robotics Lab, Skoltech
+ */
 
 #ifndef MROB_NODEPOSE2D_H
 #define MROB_NODEPOSE2D_H

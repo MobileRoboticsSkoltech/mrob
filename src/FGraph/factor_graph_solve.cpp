@@ -11,7 +11,7 @@
 
 
 #include "mrob/factor_graph_solve.hpp"
-#include "mrob/CustomCholesky.h"
+#include "mrob/CustomCholesky.hpp"
 
 #include <iostream>
 #include <Eigen/SparseCore>

@@ -1,6 +1,13 @@
-//
-// Created by Konstantin on 27/01/2019.
-//
+/* $COPYRIGHT SKOLTECH
+ * $LICENSE_LGPL
+ *
+ * CustomCholesky.hpp
+ *
+ *  Created on: Jan 27, 2019
+ *      Author: Konstantin Pakulev
+ *              konstantin.pakulev@skoltech.ru
+ *              Mobile Robotics Lab, Skoltech
+ */
 
 #include <Eigen/SparseCholesky>
 #include <Eigen/SparseCore>

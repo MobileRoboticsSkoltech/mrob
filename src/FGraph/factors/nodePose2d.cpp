@@ -1,7 +1,7 @@
 //
 // Created by Konstantin on 14/01/2019.
 //
-#include "mrob/factors/nodePose2d.h"
+#include "mrob/factors/nodePose2d.hpp"
 #include <iostream>
 
 using namespace mrob;

@@ -7,10 +7,10 @@
 #include <chrono>
 
 #include "mrob/factor_graph_solve.hpp"
-#include "mrob/factors/factor1Pose2d.h"
-#include "mrob/factors/factor2Odometry2d.h"
-#include "mrob/factors/factor2Observation2d.h"
-#include "mrob/factors/nodePose2d.h"
+#include "mrob/factors/factor1Pose2d.hpp"
+#include "mrob/factors/factor2Odometry2d.hpp"
+#include "mrob/factors/factor2Observation2d.hpp"
+#include "mrob/factors/nodePose2d.hpp"
 
 #include <Eigen/Core>
 #include <Eigen/LU>
@@ -154,7 +154,9 @@ void write_nodes(ofstream &out, std::vector<MatX1> states) {
 int main ()
 {
     // You should specify full path to mrob/src/FGraph/examples/trajectory.txt
-    LoadedData data = load_graph("/Users/apple/CLionProjects/mrob/src/FGraph/examples/trajectory.txt", false);
+    //LoadedData data = load_graph("/Users/apple/CLionProjects/mrob/src/FGraph/examples/trajectory.txt", false);
+    LoadedData data = load_graph("~/mrob/mrob/src/FGraph/examples/trajectory.txt", false);
+
 
     mrob::FGraphSolve   graph_full(mrob::FGraphSolve::CHOL_ADJ,50,50),
                         graph_incremental(mrob::FGraphSolve::CHOL_ADJ,50,50);
@@ -173,6 +175,7 @@ int main ()
     t1 = high_resolution_clock::now();
     // Build initial problem from 3 nodes and solve it
     construct(graph_full, data, 0, 3);
+    cout << "something loadad\n";
 
     graph_full.buildProblem();
     graph_full.solveOnce();

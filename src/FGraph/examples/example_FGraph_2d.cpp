@@ -1,10 +1,15 @@
-//
-// Created by Konstantin on 14/01/2019.
-//
+/* $COPYRIGHT SKOLTECH
+ * $LICENSE_LGPL
+ *
+ *  Created on: Jan 14, 2019
+ *      Author: Konstantin Pakulev
+ *              konstantin.pakulev@skoltech.ru
+ *              Mobile Robotics Lab, Skoltech
+ */
 
 #include "mrob/factor_graph.hpp"
-#include "mrob/factors/factor2Poses2d.h"
-#include "mrob/factors/nodePose2d.h"
+#include "mrob/factors/factor2Poses2d.hpp"
+#include "mrob/factors/nodePose2d.hpp"
 
 int main()
 {

@@ -1,7 +1,7 @@
 //
 // Created by Konstantin on 14/01/2019.
 //
-#include "mrob/factors/factor1Pose2d.h"
+#include "mrob/factors/factor1Pose2d.hpp"
 
 #include <iostream>
 #include <Eigen/Cholesky>

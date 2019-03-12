@@ -1,11 +1,16 @@
-//
-// Created by Konstantin on 17/01/2019.
-//
+/* $COPYRIGHT SKOLTECH
+ * $LICENSE_LGPL
+ *
+ *  Created on: Jan 17, 2019
+ *      Author: Konstantin Pakulev
+ *              konstantin.pakulev@skoltech.ru
+ *              Mobile Robotics Lab, Skoltech
+ */
 
 #ifndef MROB_FACTOR2OBSERVATION2D_H
 #define MROB_FACTOR2OBSERVATION2D_H
 
-#include "mrob/factors/factor2Poses2d.h"
+#include "mrob/factors/factor2Poses2d.hpp"
 
 using namespace mrob;
 
