@@ -93,7 +93,7 @@ std::vector<MatX1> FGraphSolve::getEstimatedPositions() {
     vector<MatX1> results;
     int acc_start = 0;
 
-    for (int i = 0; i <= last_solved_node; i++) {
+    for (uint_t i = 0; i <= last_solved_node; i++) {
         MatX1 updated_pos = nodes_[i]->getState() + dx_.block(acc_start, 0, nodes_[i]->getDim(), 1);
         results.emplace_back(updated_pos);
 
@@ -229,7 +229,7 @@ void FGraphSolve::buildAdjacency()
 //    cout << endl << r_ << endl;
 }
 
-void FGraphSolve::buildAdjacency(SMat &A_new, SMat &W_new, MatX1 &r_new) {
+void FGraphSolve::buildAdjacency(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new) {
     auto    state_dim = stateDim_ - last_stateDim + (last_solved_node == -1 ? 0 : nodes_[last_solved_node]->getDim()),
             obs_dim = obsDim_ - last_obsDim;
 
@@ -340,7 +340,7 @@ void FGraphSolve::solveChol()
      * Solve LSQ via sparse Cholesky
      * TODO reordering
      */
-    CustomCholesky<SMat> cholesky(I_);
+    CustomCholesky<SMatCol> cholesky(I_);
     y_ = cholesky.matrixL().solve(b_);
     dx_ = cholesky.matrixU().solve(y_);
 
@@ -363,11 +363,11 @@ void FGraphSolve::solveChol()
 
 void FGraphSolve::solveCholIncremental() {
     // 0) Build information form of the update
-    SMat A_new, W_new;
+    SMatCol A_new, W_new;
     MatX1 r_new;
     buildAdjacency(A_new, W_new, r_new);
 
-    SMat I_new = (A_new.transpose() * W_new.selfadjointView<Eigen::Upper>() * A_new).selfadjointView<Eigen::Upper>();
+    SMatCol I_new = (A_new.transpose() * W_new.selfadjointView<Eigen::Upper>() * A_new).selfadjointView<Eigen::Upper>();
     MatX1 b_new = A_new.transpose() * W_new.selfadjointView<Eigen::Upper>() * r_new;
 
     // 1) Make I_new suitable for Cholesky
@@ -375,23 +375,23 @@ void FGraphSolve::solveCholIncremental() {
 
     // Copy the matrix itself
     for (int i = 0; i < I_new.outerSize(); ++i) {
-        for (SMat::InnerIterator it(I_new, i); it; ++it) {
+        for (SMatCol::InnerIterator it(I_new, i); it; ++it) {
             tripletList.emplace_back(it.row(), it.col(), it.value());
         }
     }
 
     // Add old information
     for (int i = 0; i < I11.cols(); ++i) {
-        for (SMat::InnerIterator it(I11, i); it; ++it) {
+        for (SMatCol::InnerIterator it(I11, i); it; ++it) {
             tripletList.emplace_back(it.row(), it.col(), it.value());
         }
     }
 
-    SMat _LLT = -1 * L10 * L10.transpose();
+    SMatCol _LLT = -1 * L10 * L10.transpose();
 
     // Subtract cross-terms
     for (int i = 0; i < _LLT.outerSize(); ++i) {
-        for (SMat::InnerIterator it(_LLT, i); it; ++it) {
+        for (SMatCol::InnerIterator it(_LLT, i); it; ++it) {
             tripletList.emplace_back(it.row(), it.col(), it.value());
         }
     }
@@ -402,7 +402,7 @@ void FGraphSolve::solveCholIncremental() {
     long old_intersection = (last_solved_node == -1 ? 0 : nodes_[last_solved_node]->getDim()),
             old_starting_index = L00.cols();
 
-    CustomCholesky<SMat> cholesky;
+    CustomCholesky<SMatCol> cholesky;
     cholesky.compute(I_new);
 
     MatX1 y10 = y_.block(old_starting_index, 0, old_intersection, 1);
@@ -413,10 +413,10 @@ void FGraphSolve::solveCholIncremental() {
     y_.conservativeResize(stateDim_, 1);
     y_.block(old_starting_index, 0, y10_new.rows(), 1) << y10_new;
 
-    SMat L11_new = cholesky.getL();
+    SMatCol L11_new = cholesky.getL();
 
     // 3) Join L00, L10 and L11_new together
-    SMat L_new;
+    SMatCol L_new;
     std::vector<uint_t> reservationL;
 
     L_new.resize(stateDim_, stateDim_);
@@ -441,19 +441,19 @@ void FGraphSolve::solveCholIncremental() {
     long old_correlation = (last_solved_node == -1 ? 0 : nodes_[last_solved_node - 1]->getDim());
 
     for (int i = 0; i < L00.outerSize(); ++i) {
-        for (SMat::InnerIterator it(L00, i); it; ++it) {
+        for (SMatCol::InnerIterator it(L00, i); it; ++it) {
             tripletList.emplace_back(it.row(), it.col(), it.value());
         }
     }
 
     for (int i = 0; i < L10.outerSize(); ++i) {
-        for (SMat::InnerIterator it(L10, i); it; ++it) {
+        for (SMatCol::InnerIterator it(L10, i); it; ++it) {
             tripletList.emplace_back(it.row() + old_starting_index, it.col() + old_starting_index - old_correlation, it.value());
         }
     }
 
     for (int i = 0; i < L11_new.outerSize(); ++i) {
-        for (SMat::InnerIterator it(L11_new, i); it; ++it) {
+        for (SMatCol::InnerIterator it(L11_new, i); it; ++it) {
             tripletList.emplace_back(it.row() + old_starting_index, it.col() + old_starting_index, it.value());
         }
     }

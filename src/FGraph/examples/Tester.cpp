@@ -31,7 +31,7 @@ BenchmarkResults Tester::solve_full(LoadedData data) {
 
     batch_update(graph, data, 0, 3, bench);
 
-    for (int i = 3; i < data.predictions.size(); i++) batch_update(graph, data, i, i + 1, bench);
+    for (uint_t i = 3; i < data.predictions.size(); i++) batch_update(graph, data, i, i + 1, bench);
 
     t2 = high_resolution_clock::now();
 
@@ -52,7 +52,7 @@ BenchmarkResults Tester::solve_inc(LoadedData data, vector<int> re_linearize) {
     batch_update(graph, data, 0, 3, bench);
 
     int i = 3;
-    for (int j = 0; j < re_linearize.size(); j++) {
+    for (uint_t j = 0; j < re_linearize.size(); j++) {
         for (; i < re_linearize[j] - 1; i++) {
           incremental_update(graph, data, i, i + 1, bench);
         }
@@ -60,7 +60,7 @@ BenchmarkResults Tester::solve_inc(LoadedData data, vector<int> re_linearize) {
         ++i;
     }
 
-    for (; i < data.predictions.size() - 1; i++) incremental_update(graph, data, i, i + 1, bench);
+    for (; i < (int)data.predictions.size() - 1; i++) incremental_update(graph, data, i, i + 1, bench);
 
     batch_update(graph, data, i, i + 1, bench);
 
@@ -139,7 +139,7 @@ std::shared_ptr<mrob::Factor> Tester::getOdometryFactor(mrob::FGraphSolve &graph
 double Tester::calculate_mse(vector<MatX1> optimized_trajectory, vector<MatX1> true_trajectory) {
     double mse = 0.0f;
 
-    for (int i = 0; i < optimized_trajectory.size(); i++) {
+    for (uint_t i = 0; i < optimized_trajectory.size(); i++) {
         MatX1 diff = optimized_trajectory[i] - true_trajectory[i];
         mse += diff.squaredNorm();
     }

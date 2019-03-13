@@ -39,7 +39,7 @@ namespace mrob{
         Mat31 obs_, r_; //and residuals
         Mat3 W_;//inverse of observation covariance (information matrix)
         Mat3 WT2_;//transpose and squared root of W.
-        MatD<3,6> J_;//Joint Jacobian
+        Mat<3,6> J_;//Joint Jacobian
 
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen

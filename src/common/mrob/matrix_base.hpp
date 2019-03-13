@@ -37,7 +37,6 @@ typedef Eigen::Matrix<matData_t, Eigen::Dynamic,Eigen::Dynamic, Eigen::RowMajor>
 //Sparse Matrices
 typedef Eigen::SparseMatrix<matData_t, Eigen::ColMajor> SMatCol;
 typedef Eigen::SparseMatrix<matData_t, Eigen::RowMajor> SMatRow;
-typedef Eigen::SparseMatrix<matData_t, Eigen::RowMajor> SMat; //TODO remove from project SMatRows, it is now by default
 typedef Eigen::Triplet<matData_t> Triplet;
 
 // Definition of column matrices (vectors)
