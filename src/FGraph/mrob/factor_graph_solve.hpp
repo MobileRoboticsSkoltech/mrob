@@ -42,6 +42,7 @@ public:
     void solveIncremental();
 
     std::vector<MatX1> getEstimatedPositions();
+    std::shared_ptr<Node>& getNode(int pos);
 
 protected:
     /**

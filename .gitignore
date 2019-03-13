@@ -3,6 +3,7 @@
 .\#*
 *.swp
 *.swo
+*.txt
 [#]*[#]
 .#*
 *.sublime-project
