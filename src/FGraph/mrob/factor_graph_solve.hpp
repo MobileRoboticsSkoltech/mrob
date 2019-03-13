@@ -15,7 +15,8 @@
 
 #include "mrob/factor_graph.hpp"
 
-namespace mrob{
+
+namespace mrob {
 
 
 /**
@@ -32,11 +33,16 @@ class FGraphSolve: public FGraph
 {
 public:
     enum solveType{QR = 0, CHOL_ADJ, CHOL, SCHUR};
+
     FGraphSolve(solveType type = CHOL_ADJ, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
     virtual ~FGraphSolve();
+
     void buildProblem();
     void solveOnce();
-    void solveIncremental();//TODO
+    void solveIncremental();
+
+    std::vector<MatX1> getEstimatedPositions();
+    std::shared_ptr<Node>& getNode(int pos);
 
 protected:
     /**
@@ -46,22 +52,36 @@ protected:
      * The residuals are also calculated as b = W^(1/2)*r or b = A^T * W *r
      */
     void buildAdjacency();
+    void buildAdjacency(SMat &A_new, SMat &W_new, MatX1 &r_new);
+
     /**
      * TODO directly allocating components of the Information matrix
      */
     void buildDirectInfo();
     void solveQR();
     void solveChol();
+    void solveCholIncremental();
 
+    void updateNodes();
 
+    // Variables for full solve
     solveType type_;
-    SMatRow A_;//Adjacency matrix, as a Row sparse matrix
-    SMat I_;//Information matrix
-    SMatRow W_;//a block diagonal information matrix. For types Adjacency it calculates its block transposed squared root
-    MatX1 r_;// residuals as given by the factors
-    MatX1 b_;// postprocessed residuals, either A'*W*r for the normal equation or W*r for QR solvers
 
+    SMatRow A_; //Adjacency matrix, as a Row sparse matrix
+    SMatRow W_; //A block diagonal information matrix. For types Adjacency it calculates its block transposed squared root
+    MatX1 r_; // Residuals as given by the factors
 
+    SMat I_; //Information matrix
+    MatX1 b_; // Post-processed residuals, either A'*W*r for the normal equation or W*r for QR solvers
+
+    // Variables for incremental solve
+    long last_stateDim, last_obsDim; // stateDim and obsDim of the last solve
+    long last_solved_node, last_solved_factor; // Index of last solved node and factor
+    SMat L00, L10, L11, I11; // Lower part of Cholesky decomposition of I_ matrix
+    MatX1 y_; // Solution of Ly = b
+
+    // Correction deltas
+    MatX1 dx_;
 };
 
 

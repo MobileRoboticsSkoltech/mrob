@@ -13,6 +13,8 @@
 #include "mrob/factor_graph.hpp"
 
 #include <iostream>
+#include <mrob/factor_graph.hpp>
+
 
 using namespace mrob;
 

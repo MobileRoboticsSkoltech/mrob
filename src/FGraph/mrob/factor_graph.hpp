@@ -79,6 +79,7 @@ public:
     //TODO
     void saveGraph() const;
     void loadGraph();
+
 protected:
     /**
 	 *  XXX is set better than vector for what we are using them?
