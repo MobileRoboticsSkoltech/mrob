@@ -261,7 +261,6 @@ uint_t PlaneRegistration::solve(bool singleIteration)
     // correct for the first pose
     // The first pose should be T0 = I, but optimizition slighly perturns it, so we correct it here
     SE3 invFirstPose = trajectory_->at(0).inv();
-    uint_t t = 1;
     for (SE3 &pose: *trajectory_)
     {
         pose = invFirstPose * pose;
