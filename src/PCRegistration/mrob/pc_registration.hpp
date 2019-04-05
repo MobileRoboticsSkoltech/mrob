@@ -54,7 +54,7 @@ int Arun(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y, SE3 &T)
  *  where  yh = R*xh + t
  *
  *
- * T = min sum || y - Tx ||S
+ * T = min sum || y - Tx ||_S^2
  *
  * The covariances provided are of the form S = R diag(e,1,1) R', so they MUST have been already processed.
  * The right way is a block matrix of covariances of the form Cov = [Cov_1, Cov_2,..., Cov_N], i.e, Cov \in R^{3x3N}
@@ -62,7 +62,26 @@ int Arun(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y, SE3 &T)
  * Returns the number of iterations until convergence
  */
 int Gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
-        const Eigen::Ref<const MatX> covX, const Eigen::Ref<const MatX> covY, SE3 &T);
+        const Eigen::Ref<const MatX> covX, const Eigen::Ref<const MatX> covY, SE3 &T, double tol = 1e-4);
+
+
+/**
+ * Weighted point Cloud registration using SE3 optimization
+ *
+ * This method calculates the transformation
+ *  T = [R t] between sets of points x in R^3 and y in R^3, such as:
+ *      [0 1],
+ *  where  yh = R*xh + t
+ *
+ *
+ * T = min sum w|| y - Tx ||^2
+ *
+ * The weights provided are of the form
+ *
+ * Returns the number of iterations until convergence
+ */
+int Weighted_point(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
+        const Eigen::Ref<const MatX1> w, SE3 &T, double tol = 1e-4);
 
 
 }}//namespace

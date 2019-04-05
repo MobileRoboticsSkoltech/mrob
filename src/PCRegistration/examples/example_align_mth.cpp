@@ -45,13 +45,17 @@ int main()
         covY.block<3,3>(0,3*i) = Mat3::Identity();
     }
     mrob::SE3 T_gicp;
-    mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
-    mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
-    mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
-    std::cout << "T solved by GICP method: \n" << std::endl;
+    uint_t iters = mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
+    std::cout << "T solved by GICP method on " << iters << " iters: \n" << std::endl;
     T_gicp.print();
 
 
+    // Solve for weighted point optimization
+    MatX1 weight = MatX1::Ones(N);
+    mrob::SE3 T_wp;
+    iters = mrob::PCRegistration::Weighted_point(X,Y,weight,T_wp);
+    std::cout << "T solved by Weight point Optimization method on " << iters << " iters: \n" << std::endl;
+    T_wp.print();
 
 
     //align_mth::Csample_uniform_SE3 s(0.3, 4);

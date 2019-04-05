@@ -11,7 +11,7 @@
 
 
 /**
- * This programm generates the Pyhton binding for the SE3 library
+ * This program generates the Python binding for the SE3 library
  * using the pybind11 library, here included as an external dependency,
  */
 
@@ -46,10 +46,20 @@ SE3 GicpSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX>
     return res;
 }
 
+SE3 WeightedSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y,
+        const py::EigenDRef<const MatX1> weight)
+{
+    SE3 res;
+    PCRegistration::Weighted_point(X,Y,weight,res);
+    return res;
+}
+
+
 void init_PCRegistration(py::module &m)
 {
     m.def("ArunSolve", &ArunSolve);
     m.def("GicpSolve", &GicpSolve);
+    m.def("WeightedSolve", &WeightedSolve);
     py::class_<CreatePoints>(m,"CreatePoints")
             .def(py::init<uint_t, uint_t, uint_t, double>())
             .def("get_point_cloud", &CreatePoints::get_point_cloud)

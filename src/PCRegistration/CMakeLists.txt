@@ -8,6 +8,7 @@ SET(sources
     plane.cpp
     plane_registration.cpp
     create_points.cpp
+    weight_point.cpp
 )
 
 # extra header files
