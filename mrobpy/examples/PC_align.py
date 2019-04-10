@@ -13,9 +13,9 @@ Y = T.transformArray(X)
 print('X = \n', X,'\n T = \n', T.T(),'\n Y =\n', Y)
 
 # solve the problem
-T_arun = mrob.ArunSolve(X,Y)
+T_arun = mrob.align_arun(X,Y)
 print('Arun solution =\n', T_arun.T())
 
 W = np.ones(N)
-T_wp = mrob.WeightedSolve(X,Y,W)
+T_wp = mrob.align_weighted(X,Y,W)
 print('Weighted point optimization solution =\n', T_wp.T())

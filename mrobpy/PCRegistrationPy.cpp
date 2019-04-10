@@ -57,9 +57,9 @@ SE3 WeightedSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const M
 
 void init_PCRegistration(py::module &m)
 {
-    m.def("ArunSolve", &ArunSolve);
-    m.def("GicpSolve", &GicpSolve);
-    m.def("WeightedSolve", &WeightedSolve);
+    m.def("align_arun", &ArunSolve);
+    m.def("align_gicp", &GicpSolve);
+    m.def("align_weighted", &WeightedSolve);
     py::class_<CreatePoints>(m,"CreatePoints")
             .def(py::init<uint_t, uint_t, uint_t, double>())
             .def("get_point_cloud", &CreatePoints::get_point_cloud)
