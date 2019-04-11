@@ -4,6 +4,8 @@
  *  Created on: Jan 14, 2019
  *      Author: Konstantin Pakulev
  *              konstantin.pakulev@skoltech.ru
+ *              Gonzalo Ferrer
+ *              g.ferrer@skoltech.ru
  *              Mobile Robotics Lab, Skoltech
  */
 
@@ -15,6 +17,11 @@
 
 namespace mrob{
 
+
+    /**
+     * This class NodePose2d for now is parametrized on XYT coordinates
+     * TODO compare with SE(2)
+     */
     class NodePose2d : public Node {
     public:
         /**

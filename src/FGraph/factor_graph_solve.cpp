@@ -89,7 +89,8 @@ void FGraphSolve::solveIncremental()
     last_solved_factor = factors_.size() - 1;
 }
 
-std::vector<MatX1> FGraphSolve::getEstimatedPositions() {
+std::vector<MatX1> FGraphSolve::getEstimatedPositions()
+{
     vector<MatX1> results;
     int acc_start = 0;
 
@@ -103,7 +104,8 @@ std::vector<MatX1> FGraphSolve::getEstimatedPositions() {
     return results;
 }
 
-std::shared_ptr<Node>& FGraphSolve::getNode(int pos) {
+std::shared_ptr<Node>& FGraphSolve::getNode(uint_t pos)
+{
     return nodes_[pos];
 }
 
