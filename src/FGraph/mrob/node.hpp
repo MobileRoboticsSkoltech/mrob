@@ -52,6 +52,15 @@ class Node{
      * as long as the dimension is correctly set
      */
     virtual const Eigen::Ref<const MatX1> getState() const = 0;
+    /**
+     * Returns a matrix to the last linearized state. This data structure is for the incre-
+     * metal implementation.
+     */
+    virtual const Eigen::Ref<const MatX1> getLastLinearizationState() const = 0;
+    /**
+     * Return the last delta X on the update. For incremental updates
+     */
+    virtual const Eigen::Ref<const MatX1> getLastDeltaX() const = 0;
     virtual void print() const {};
     id_t getId() const {return id_;};
     void setId(id_t id) {id_ = id;};

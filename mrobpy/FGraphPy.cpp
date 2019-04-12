@@ -18,5 +18,11 @@ namespace py = pybind11;
 
 void init_FGraph(py::module &m)
 {
-
+    // Define factors
+    m.def("");
+    // Fgraph class adding factors and providing method to solve the inference problem.
+    py::class_<Fgraph>(m,"FGraph")
+            .def(py::init<>())
+            .def
+            ;
 }

@@ -32,11 +32,15 @@ class NodePose3d : public Node
      */
     void update(const Eigen::Ref<const MatX1> &dx);
     virtual const Eigen::Ref<const MatX1> getState() const {return x_;};
+    virtual const Eigen::Ref<const MatX1> getLastLinearizationState() const {return linearization_x_;};
+    virtual const Eigen::Ref<const MatX1> getLastDeltaX() const {return dx_;};
     void print() const;
 
   protected:
     Mat61 x_;
     SE3 Tx_;//redundant state representation, now directly in SE(3)
+    Mat61 linearization_x_;
+    Mat61 dx_;
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen
