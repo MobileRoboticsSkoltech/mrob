@@ -68,11 +68,11 @@ public:
     SE3 operator*(const SE3& rhs) const;
 
     /**
-     * This is our *default* way to update transformations
+     * This is our *default* way to update transformations, from the Left hand side of T
      * Updates the current transformation with the incremental dxi \in se3
      * T'=exp(dxi^) * T
      */
-    void update(const Mat61 &dxi);
+    void updateLhs(const Mat61 &dxi);
     /**
      * Updates the current transformation with the incremental dxi \in se3
      * T'= T * exp(dxi^)

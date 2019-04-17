@@ -55,7 +55,7 @@ int PCRegistration::Weighted_point(const Eigen::Ref<const MatX> X, const Eigen::
         }
         // 4) Update Solution
         Mat61 dxi = -H.inverse()*J;
-        T.update(dxi); //Left side update
+        T.updateLhs(dxi); //Left side update
         deltaUpdate = dxi.norm();
         iters++;
 

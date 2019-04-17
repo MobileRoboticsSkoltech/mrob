@@ -131,7 +131,7 @@ int main()
     std::cout << "Matrix distance = " << (T.T()-T2.T()).norm() << std::endl;
 
     std::cout << "testing update\n";
-    T2.update(xi);
+    T2.updateLhs(xi);
     T2.print();
     Mat41 v;
     v << 1.0, 3.2, -1.2, 1.0;

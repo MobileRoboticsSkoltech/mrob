@@ -54,7 +54,7 @@ SE3 SE3::operator*(const SE3& rhs) const
     return SE3(res);
 }
 
-void SE3::update(const Mat61 &dxi)
+void SE3::updateLhs(const Mat61 &dxi)
 {
     SE3 dT(dxi);
     T_ = dT.T() * T_;

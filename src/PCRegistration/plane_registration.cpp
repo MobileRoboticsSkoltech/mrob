@@ -117,7 +117,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
                 double alpha = alpha_/numberPoints;
                 Mat61 dxi = -alpha * jacobian;// dxi = alpha * p_k = alpha *(-Grad f)
                 //std::cout << "\njacobian : = " << jacobian.transpose() << ", at time step " << t <<  std::endl;
-                trajectory_->at(t).update(dxi);
+                trajectory_->at(t).updateLhs(dxi);
 
             }
             // 3.1-A) Incremental update after each pose
@@ -127,7 +127,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
                 double alpha = alpha_/numberPoints;
                 Mat61 dxi = -alpha * jacobian;// dxi = alpha * p_k = alpha *(-Grad f)
                 //std::cout << "jacobian : = " << jacobian.norm() << std::endl;
-                trajectory_->at(t).update(dxi);
+                trajectory_->at(t).updateLhs(dxi);
                 for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
                     //XXX we also return current new error lambda, it could be used
                     it->second->estimate_plane_incrementally(t);// this updates the current solution v. XXX: SLOW
@@ -139,7 +139,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
             {
                 double alpha = 1e-2;
                 Mat61 dxi = - alpha/jacobian.norm() * jacobian; //dxi = alpha * p_k = alpha *(-Grad f)/norm(Grad)
-                trajectory_->at(t).update(dxi);
+                trajectory_->at(t).updateLhs(dxi);
             }
 
             // 3.2) Heavy Ball (Poliak'64): Gradient decent with averaging: x_k+1 = x_k - alpha Grad + beta (xk - x_k-1)
@@ -151,7 +151,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
                 std::cout << "diff in state : "<< (currentState - previousState_[t]).norm() <<  ", alpha gradient : = " << (alpha * jacobian).norm() << std::endl;
                 Mat61 dxi = -alpha * jacobian + 0.1 * (currentState - previousState_[t]);
                 previousState_[t] = currentState;
-                trajectory_->at(t).update(dxi);
+                trajectory_->at(t).updateLhs(dxi);
             }
 
             // 3.3) Momentum (Hinton84?):
@@ -165,7 +165,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
                 Mat61 dxi = -alpha * jacobian + beta_ * previousState_[t];
                 previousState_[t] = dxi;
                 std::cout << "diff in state : "<< dxi.norm() <<  ", alpha gradient : = " << (alpha * jacobian).norm() << std::endl;
-                trajectory_->at(t).update(dxi);
+                trajectory_->at(t).updateLhs(dxi);
             }
 
             // 3.3-B) Momentum with a given sequence of params: Gradient decent where D x_k = beta * D x_k - alpha Grad
@@ -179,7 +179,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
                 Mat61 dxi = -alpha * jacobian + beta * previousState_[t];
                 previousState_[t] = dxi;
                 std::cout << "diff in state : "<< dxi.norm() <<  ", alpha gradient : = " << (alpha * jacobian).norm() << std::endl;
-                trajectory_->at(t).update(dxi);
+                trajectory_->at(t).updateLhs(dxi);
             }
 
             // 3.4) Nesterov's Accelerated Gradient (NAG, by Nesterov): it can be understood as a momentum algorithm as well (see Sutskever'2013)
@@ -195,7 +195,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
                 //beta_ = 0.05;
                 // x update
                 Mat61 dxi = beta_ * beta_ * previousState_[t] - (1 + beta_) * alpha * jacobian;
-                trajectory_->at(t).update(dxi);
+                trajectory_->at(t).updateLhs(dxi);
 
                 // momentum
                 previousState_[t] = beta_ * previousState_[t] - alpha * jacobian;
@@ -217,8 +217,8 @@ uint_t PlaneRegistration::solve(bool singleIteration)
                 do
                 {
                     Mat61 dxi = alpha * p_k;
-                    trajectory_->at(t).update(-dxiOld);//XXX a little ugly...
-                    trajectory_->at(t).update(dxi);
+                    trajectory_->at(t).updateLhs(-dxiOld);//XXX a little ugly...
+                    trajectory_->at(t).updateLhs(dxi);
                     dxiOld = dxi;
                     // (I) calculate error at plane estimation for the current pose at time t
                     updateError = 0.0;
@@ -240,7 +240,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
             {
                 // dxi = - D * grad f  | for alpha = 1
                 Mat61 dxi = - alpha_ * inverseHessian_[t]*jacobian ;
-                trajectory_->at(t).update(dxi);
+                trajectory_->at(t).updateLhs(dxi);
                 // TODO Line search for updating alpha by satisfying Wolfe conditions
                 // update inverseHessian Dk
                 Mat61 y = jacobian/numberPoints - previousJacobian_[t];
