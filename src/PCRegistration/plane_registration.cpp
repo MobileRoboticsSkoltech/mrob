@@ -324,7 +324,7 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
             // momentum
             previousState_.back() = beta * previousState_.back() - alpha * accumulatedJacobian;
         }
-        trajectory_->back().update(dxi);
+        trajectory_->back().updateLhs(dxi);
         xiFinal = trajectory_->back().ln_vee();
         for (uint_t t = 1 ; t < numberPoses_-1; ++t)
         {

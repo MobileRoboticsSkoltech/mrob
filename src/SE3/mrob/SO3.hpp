@@ -70,7 +70,7 @@ public:
      * Updates the current transformation with the incremental dw \in so3
      * R'=exp(dw^)*R
      */
-    void update(const Mat31 &dw);
+    void updateLhs(const Mat31 &dw);
     /**
      * Updates the current transformation with the incremental dw \in so3
      * R'=R*exp(dw^)
