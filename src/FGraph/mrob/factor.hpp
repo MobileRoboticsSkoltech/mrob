@@ -45,7 +45,7 @@ public:
     /**
      * Jacobians are not evaluated, just the residuals
      */
-    virtual matData_t evaluateError() = 0;
+    virtual matData_t evaluate_error() = 0;
 
     /**
      * The print utility could be reimplemented on child classes
@@ -57,22 +57,27 @@ public:
      * all these variables as fixed size matrices, and ref takes care of
      * doing the conversion with minimal temporary artifacts
      */
-    virtual const Eigen::Ref<const MatX1> getObs() const = 0;
-    virtual const Eigen::Ref<const MatX1> getResidual() const = 0;
-    virtual const Eigen::Ref<const MatX> getInvCovariance() const = 0;
-    virtual const Eigen::Ref<const MatX> getWT2() const = 0;
-    // TODO test this with MatX pointers, might be faster and no Ref is needed
-    virtual const Eigen::Ref<const MatX> getJacobian() const = 0;
+    virtual const Eigen::Ref<const MatX1> get_obs() const = 0;
+    virtual const Eigen::Ref<const MatX1> get_residual() const = 0;
+    virtual const Eigen::Ref<const MatX> get_information_matrix() const = 0;
+    virtual const Eigen::Ref<const MatX> get_trans_sqrt_information_matrix() const = 0;
+    /**
+     * get_jacobian returns a block matrices stacking all the Jacobians on the factor.
+     * The convention is that Jacobians corresponding to
+     *
+     * TODO test this. Do we really need an ordered Jacobian??
+     */
+    virtual const Eigen::Ref<const MatX> get_jacobian() const = 0;
 
     //matData_t getChi2() const { return r_.dot(W_*r_);};//TODO do we need to calculate this?
-    matData_t getChi2() const { return chi2_;};
+    matData_t get_chi2() const { return chi2_;};
 
-    id_t getId() const {return id_;};
-    void setId(id_t id) {id_ = id;};
-    uint_t getDim() const {return dim_;};
-    uint_t getAllNodesDim(){ return allNodesDim_;};
+    id_t get_id() const {return id_;};
+    void set_id(id_t id) {id_ = id;};
+    uint_t get_dim() const {return dim_;};
+    uint_t get_all_nodes_dim(){ return allNodesDim_;};
     const std::vector<std::shared_ptr<Node> >*
-            getNeighbourNodes(void) const {return &neighbourNodes_;};
+            get_neighbour_nodes(void) const {return &neighbourNodes_;};
 
 protected:
     id_t id_;

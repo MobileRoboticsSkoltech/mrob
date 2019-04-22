@@ -54,12 +54,12 @@ SE3 SE3::operator*(const SE3& rhs) const
     return SE3(res);
 }
 
-void SE3::updateLhs(const Mat61 &dxi)
+void SE3::update_lhs(const Mat61 &dxi)
 {
     SE3 dT(dxi);
     T_ = dT.T() * T_;
 }
-void SE3::updateRhs(const Mat61 &dxi)
+void SE3::update_rhs(const Mat61 &dxi)
 {
     SE3 dT(dxi);
     T_ = T_ * dT.T();
@@ -155,7 +155,7 @@ Mat31 SE3::transform(const Mat31 & p) const
     return R()*p + t();
 }
 
-MatX SE3::transformArray(const MatX &P) const
+MatX SE3::transform_array(const MatX &P) const
 {
     assert(P.rows() == 3 && "SE3::transformArray: incorrect data structure");
     uint_t N = P.cols();

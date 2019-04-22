@@ -35,24 +35,24 @@ FGraph::~FGraph()
     nodes_.clear();
 }
 
-bool FGraph::addFactor(std::shared_ptr<Factor> &factor)
+bool FGraph::add_factor(std::shared_ptr<Factor> &factor)
 {
-	factor->setId(factors_.size()+1);//Starts at 1
+	factor->set_id(factors_.size()+1);//Starts at 1
 	factors_.push_back(factor);
-    auto list = factor->getNeighbourNodes();
+    auto list = factor->get_neighbour_nodes();
     for( auto n: *list)
     {
-        n->addFactor(factor);
+        n->add_factor(factor);
     }
-    obsDim_ += factor->getDim();
+    obsDim_ += factor->get_dim();
     return true;
 }
 
-bool FGraph::addNode(std::shared_ptr<Node> &node)
+bool FGraph::add_node(std::shared_ptr<Node> &node)
 {
-	node->setId(nodes_.size()+1);//XXX we assume that no node is deleted
+	node->set_id(nodes_.size()+1);//XXX we assume that no node is deleted
 	nodes_.push_back(node);
-	stateDim_ += node->getDim();
+	stateDim_ += node->get_dim();
 	return true;
 }
 

@@ -36,13 +36,13 @@ FGraphSolve::FGraphSolve(solveType type, uint_t potNumberNodes, uint_t potNumber
 FGraphSolve::~FGraphSolve() = default;
 
 
-void FGraphSolve::buildProblem()
+void FGraphSolve::build_problem()
 {
     switch(type_)
     {
     case QR:
     case CHOL_ADJ:
-        buildAdjacency();
+        build_adjacency();
         break;
     case CHOL:
     case SCHUR:
@@ -52,15 +52,12 @@ void FGraphSolve::buildProblem()
     }
 }
 
-void FGraphSolve::solveOnce()
+void FGraphSolve::solve_once()
 {
-    /**
-     * Before doing solve update positions of the graph with last valid solution.
-     * This solution would be either last solveOnce() or last solveIncremental()
-     */
-    if(last_solved_node != 0) updateNodes();
+    // Linearizes and calculates the Jacobians and required matrices
+    this->build_problem();
 
-    solveChol();
+    solve_cholesky();
 
     // Keep indices of last node and factor, as well as dimensions
     last_stateDim = stateDim_;
@@ -68,9 +65,10 @@ void FGraphSolve::solveOnce()
 
     last_solved_node = nodes_.size() - 1;
     last_solved_factor = factors_.size() - 1;
+    this->update_nodes();
 }
 
-void FGraphSolve::solveIncremental()
+void FGraphSolve::solve_incremental()
 {
     /**
      * NOTE: it works only with odometry factors
@@ -79,7 +77,7 @@ void FGraphSolve::solveIncremental()
      * NOTE: mechanism for evaluation time of the incremental update vs
      * batch update is not present
      */
-    solveCholIncremental();
+    solve_chol_incremental();
 
     // Keep indices of last node and factor
     last_stateDim = stateDim_;
@@ -89,27 +87,27 @@ void FGraphSolve::solveIncremental()
     last_solved_factor = factors_.size() - 1;
 }
 
-std::vector<MatX1> FGraphSolve::getEstimatedPositions()
+std::vector<MatX1> FGraphSolve::get_estimated_positions()
 {
     vector<MatX1> results;
     int acc_start = 0;
 
     for (uint_t i = 0; i <= last_solved_node; i++) {
-        MatX1 updated_pos = nodes_[i]->getState() + dx_.block(acc_start, 0, nodes_[i]->getDim(), 1);
+        MatX1 updated_pos = nodes_[i]->get_state() + dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
         results.emplace_back(updated_pos);
 
-        acc_start += nodes_[i]->getDim();
+        acc_start += nodes_[i]->get_dim();
     }
 
     return results;
 }
 
-std::shared_ptr<Node>& FGraphSolve::getNode(uint_t pos)
+std::shared_ptr<Node>& FGraphSolve::get_node(uint_t pos)
 {
     return nodes_[pos];
 }
 
-void FGraphSolve::buildAdjacency()
+void FGraphSolve::build_adjacency()
 {
     // 0) resize properly matrices (if needed)
     r_.resize(obsDim_,1);//dense vector
@@ -138,7 +136,7 @@ void FGraphSolve::buildAdjacency()
     for (uint_t i = 0; i < nodes->size(); ++i)
     {
         // calculate the indices to access
-        uint_t dim = (*nodes)[i]->getDim();
+        uint_t dim = (*nodes)[i]->get_dim();
         indNodesMatrix.push_back(N);
         N += dim;
     }
@@ -158,8 +156,8 @@ void FGraphSolve::buildAdjacency()
         f->evaluate();
 
         // calculate dimensions for reservation and bookeping vector
-        uint_t dim = f->getDim();
-        uint_t allDim = f->getAllNodesDim();
+        uint_t dim = f->get_dim();
+        uint_t allDim = f->get_all_nodes_dim();
         for (uint_t j = 0; j < dim; ++j)
         {
             reservationA.push_back(allDim);
@@ -179,27 +177,27 @@ void FGraphSolve::buildAdjacency()
         auto f = (*factors)[i];
 
         // 4) Get the calculated residual
-        r_.block(indFactorsMatrix[i], 0, f->getDim(), 1) << f->getResidual();
+        r_.block(indFactorsMatrix[i], 0, f->get_dim(), 1) << f->get_residual();
 
         // 5) build Adjacency matrix as a composition of rows
         // 5.1) Get the number of nodes involved. It is a sorted list
-        auto neighNodes = f->getNeighbourNodes();
+        auto neighNodes = f->get_neighbour_nodes();
         //TODO test if a local variable for jacobian speepds up things
         // Iterates over the Jacobian row
-        for (uint_t l=0; l < f->getDim() ; ++l)
+        for (uint_t l=0; l < f->get_dim() ; ++l)
         {
             uint_t totalK = 0;
             // Iterates over the number of neighbour Nodes (ordered by construction)
             for (uint_t j=0; j < neighNodes->size(); ++j)
             {
-                uint_t indNode = (*neighNodes)[j]->getId() -1;//Ids start at 1, while vector at 0
-                uint_t dimNode = (*neighNodes)[j]->getDim();
+                uint_t indNode = (*neighNodes)[j]->get_id() -1;//Ids start at 1, while vector at 0
+                uint_t dimNode = (*neighNodes)[j]->get_dim();
                 for(uint_t k = 0; k < dimNode; ++k)
                 {
                     uint_t iRow = indFactorsMatrix[i] + l;
                     uint_t iCol = indNodesMatrix[indNode] + k;
                     // This is an ordered insertion
-                    A_.insert(iRow,iCol) = f->getJacobian()(l, k + totalK);
+                    A_.insert(iRow,iCol) = f->get_jacobian()(l, k + totalK);
                 }
                 totalK += dimNode;
             }
@@ -207,20 +205,20 @@ void FGraphSolve::buildAdjacency()
 
 
         // 5) Get information matrix for every factor, ONLY for the QR we need W^T/2
-        for (uint_t l =0; l < f->getDim(); ++l)
+        for (uint_t l =0; l < f->get_dim(); ++l)
         {
             // only iterates over the upper triangular part
-            for (uint_t k = l; k < f->getDim(); ++k)
+            for (uint_t k = l; k < f->get_dim(); ++k)
             {
                 uint_t iRow = indFactorsMatrix[i] + l;
                 uint_t iCol = indFactorsMatrix[i] + k;
                 if (QR)
                 {
-                    W_.insert(iRow,iCol) = f->getWT2()(l,k);
+                    W_.insert(iRow,iCol) = f->get_trans_sqrt_information_matrix()(l,k);
                 }
                 else
                 {
-                    W_.insert(iRow,iCol) = f->getInvCovariance()(l,k);
+                    W_.insert(iRow,iCol) = f->get_information_matrix()(l,k);
                 }
             }
         }
@@ -231,8 +229,8 @@ void FGraphSolve::buildAdjacency()
 //    cout << endl << r_ << endl;
 }
 
-void FGraphSolve::buildAdjacency(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new) {
-    auto    state_dim = stateDim_ - last_stateDim + (last_solved_node == -1 ? 0 : nodes_[last_solved_node]->getDim()),
+void FGraphSolve::build_adjacency_incremental(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new) {
+    auto    state_dim = stateDim_ - last_stateDim + (last_solved_node == -1 ? 0 : nodes_[last_solved_node]->get_dim()),
             obs_dim = obsDim_ - last_obsDim;
 
     A_new.resize(obs_dim, state_dim);
@@ -253,7 +251,7 @@ void FGraphSolve::buildAdjacency(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new) {
     indNodesMatrix.reserve(states);
 
     for(auto i = nodes_.begin() + states; i != nodes_.end(); ++i) {
-        uint_t dim = (*i)->getDim();
+        uint_t dim = (*i)->get_dim();
         indNodesMatrix.push_back(N);
         N += dim;
     }
@@ -266,8 +264,8 @@ void FGraphSolve::buildAdjacency(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new) {
     for(auto i = factors_.begin() + states; i != factors_.end(); ++i) {
         (*i)->evaluate();
 
-        uint_t dim = (*i)->getDim();
-        uint_t allDim = (*i)->getAllNodesDim();
+        uint_t dim = (*i)->get_dim();
+        uint_t allDim = (*i)->get_all_nodes_dim();
         for (uint_t j = 0; j < dim; ++j)
         {
             reservationA.push_back(allDim);
@@ -280,33 +278,34 @@ void FGraphSolve::buildAdjacency(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new) {
     A_new.reserve(reservationA);
     W_new.reserve(reservationW);
 
+    // TODO solve this warning!
     for (auto i = last_factors_count; i < factors_.size(); i++) {
         auto f = factors_[i];
 
-        r_new.block(indFactorsMatrix[i - last_factors_count], 0, f->getDim(), 1) << f->getResidual();
+        r_new.block(indFactorsMatrix[i - last_factors_count], 0, f->get_dim(), 1) << f->get_residual();
 
-        auto neighNodes = f->getNeighbourNodes();
-        for (uint_t l = 0; l < f->getDim() ; ++l) {
+        auto neighNodes = f->get_neighbour_nodes();
+        for (uint_t l = 0; l < f->get_dim() ; ++l) {
             uint_t totalK = 0;
             for (auto &j: *neighNodes) {
-                uint_t indNode = j->getId() - 1 - last_solved_node;
-                uint_t dimNode = j->getDim();
+                uint_t indNode = j->get_id() - 1 - last_solved_node;
+                uint_t dimNode = j->get_dim();
                 for (uint_t k = 0; k < dimNode; ++k) {
                     uint_t iRow = indFactorsMatrix[i - last_factors_count] + l;
                     uint_t iCol = indNodesMatrix[indNode] + k;
 
-                    A_new.insert(iRow, iCol) = f->getJacobian()(l, k + totalK);
+                    A_new.insert(iRow, iCol) = f->get_jacobian()(l, k + totalK);
                 }
                 totalK += dimNode;
             }
         }
 
 
-        for (uint_t l = 0; l < f->getDim(); ++l) {
-            for (uint_t k = l; k < f->getDim(); ++k) {
+        for (uint_t l = 0; l < f->get_dim(); ++l) {
+            for (uint_t k = l; k < f->get_dim(); ++k) {
                 uint_t iRow = indFactorsMatrix[i - last_factors_count] + l;
                 uint_t iCol = indFactorsMatrix[i - last_factors_count] + k;
-                W_new.insert(iRow, iCol) = f->getInvCovariance()(l, k);
+                W_new.insert(iRow, iCol) = f->get_information_matrix()(l, k);
             }
         }
     }
@@ -317,19 +316,19 @@ void FGraphSolve::buildAdjacency(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new) {
 }
 
 
-void FGraphSolve::buildDirectInfo()
+void FGraphSolve::build_direct_info()
 {
     assert(0 && "FGraphSolve::buildProblemDirectInfo: Routine not implemented");
 }
 
-void FGraphSolve::solveQR()
+void FGraphSolve::solve_QR()
 {
     // W^T/2 corresponds to the upper triangular matrix, so we keep that format
     A_ = W_.triangularView<Eigen::Upper>() * A_;//creates a compressed Matrix
     b_ = W_.triangularView<Eigen::Upper>() * r_;
 }
 
-void FGraphSolve::solveChol()
+void FGraphSolve::solve_cholesky()
 {
     /**
      * I_ dx = b_ corresponds to the normal equation A'*W*A dx = A'*W*r
@@ -352,9 +351,9 @@ void FGraphSolve::solveChol()
 //    cout << dx_ << endl;
 
     // Save data for incremental update
-    long intersection = nodes_.back()->getDim(),
+    long intersection = nodes_.back()->get_dim(),
             starting_index = I_.cols() - intersection,
-            correlation = (*(nodes_.end() - 2))->getDim();
+            correlation = (*(nodes_.end() - 2))->get_dim();
 
     L00 = cholesky.getL().block(0, 0, starting_index, starting_index);
     L10 = cholesky.getL().block(starting_index, starting_index - correlation, intersection, correlation);
@@ -363,11 +362,11 @@ void FGraphSolve::solveChol()
 }
 
 
-void FGraphSolve::solveCholIncremental() {
+void FGraphSolve::solve_chol_incremental() {
     // 0) Build information form of the update
     SMatCol A_new, W_new;
     MatX1 r_new;
-    buildAdjacency(A_new, W_new, r_new);
+    build_adjacency_incremental(A_new, W_new, r_new);
 
     SMatCol I_new = (A_new.transpose() * W_new.selfadjointView<Eigen::Upper>() * A_new).selfadjointView<Eigen::Upper>();
     MatX1 b_new = A_new.transpose() * W_new.selfadjointView<Eigen::Upper>() * r_new;
@@ -401,7 +400,7 @@ void FGraphSolve::solveCholIncremental() {
     I_new.setFromTriplets(tripletList.begin(), tripletList.end());
 
     // 2) Calculate L11_new and y10_new incrementally
-    long old_intersection = (last_solved_node == -1 ? 0 : nodes_[last_solved_node]->getDim()),
+    long old_intersection = (last_solved_node == -1 ? 0 : nodes_[last_solved_node]->get_dim()),
             old_starting_index = L00.cols();
 
     CustomCholesky<SMatCol> cholesky;
@@ -440,7 +439,7 @@ void FGraphSolve::solveCholIncremental() {
 
     tripletList.clear();
 
-    long old_correlation = (last_solved_node == -1 ? 0 : nodes_[last_solved_node - 1]->getDim());
+    long old_correlation = (last_solved_node == -1 ? 0 : nodes_[last_solved_node - 1]->get_dim());
 
     for (int i = 0; i < L00.outerSize(); ++i) {
         for (SMatCol::InnerIterator it(L00, i); it; ++it) {
@@ -471,9 +470,9 @@ void FGraphSolve::solveCholIncremental() {
 //    cout << dx_ << endl;
 
     // Save data for incremental update
-    long intersection = nodes_.back()->getDim(),
+    long intersection = nodes_.back()->get_dim(),
             starting_index = L_new.cols() - intersection,
-            correlation = (*(nodes_.end() - 2))->getDim();
+            correlation = (*(nodes_.end() - 2))->get_dim();
     L00 = L_new.block(0, 0, starting_index, starting_index);
     L10 = L_new.block(starting_index, starting_index - correlation, intersection, correlation);
     L11 = L_new.block(starting_index, starting_index, intersection, intersection);
@@ -481,13 +480,15 @@ void FGraphSolve::solveCholIncremental() {
 }
 
 
-void FGraphSolve::updateNodes() {
+void FGraphSolve::update_nodes()
+{
+    // TODO reordering? not considered here
     int acc_start = 0;
     for (int i = 0; i <= last_solved_node; i++) {
-        auto node_update = dx_.block(acc_start, 0, nodes_[i]->getDim(), 1);
+        auto node_update = dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
         nodes_[i]->update(node_update);
 
-        acc_start += nodes_[i]->getDim();
+        acc_start += nodes_[i]->get_dim();
     }
 }
 

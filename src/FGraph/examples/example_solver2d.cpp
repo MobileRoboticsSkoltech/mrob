@@ -4,6 +4,8 @@
 #include "TestingIO.h"
 #include "Tester.h"
 
+// TODO remove soon
+
 int main ()
 {
     TestingIO testingIO;

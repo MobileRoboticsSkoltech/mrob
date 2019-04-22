@@ -72,12 +72,12 @@ public:
      * Updates the current transformation with the incremental dxi \in se3
      * T'=exp(dxi^) * T
      */
-    void updateLhs(const Mat61 &dxi);
+    void update_lhs(const Mat61 &dxi);
     /**
      * Updates the current transformation with the incremental dxi \in se3
      * T'= T * exp(dxi^)
      */
-    void updateRhs(const Mat61 &dxi);
+    void update_rhs(const Mat61 &dxi);
     /**
      *  Exponential mapping of a skew symetric matrix in se3.
      *  exp(xi^) = [exp(w^)  Vv], where exp(w^) is the so3_exp and
@@ -108,7 +108,7 @@ public:
      * The array is of the form 3xN
      * This function saves to transform to homogeneous coordinates.
      */
-    MatX transformArray(const MatX &P) const;
+    MatX transform_array(const MatX &P) const;
     /**
      * Inverse: T^-1 = [R', -R't]
      *                 [0      1]

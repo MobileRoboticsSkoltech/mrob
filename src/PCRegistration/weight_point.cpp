@@ -18,7 +18,7 @@
 
 using namespace mrob;
 
-int PCRegistration::Weighted_point(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
+int PCRegistration::weighted_point(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
            const Eigen::Ref<const MatX1> weight,  SE3 &T, double tol)
 {
     assert(X.rows() == 3  && "PCRegistration::Weighted_point: Incorrect sizing, we expect 3xN");
@@ -55,7 +55,7 @@ int PCRegistration::Weighted_point(const Eigen::Ref<const MatX> X, const Eigen::
         }
         // 4) Update Solution
         Mat61 dxi = -H.inverse()*J;
-        T.updateLhs(dxi); //Left side update
+        T.update_lhs(dxi); //Left side update
         deltaUpdate = dxi.norm();
         iters++;
 

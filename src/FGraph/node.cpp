@@ -23,13 +23,13 @@ Node::~Node()
 {
     neighbourFactors_.clear();
 }
-bool Node::addFactor(std::shared_ptr<Factor> &factor)
+bool Node::add_factor(std::shared_ptr<Factor> &factor)
 {
     neighbourFactors_.push_back(factor);
     return true;
 }
 
-bool Node::rmFactor(std::shared_ptr<Factor> &factor)
+bool Node::rm_factor(std::shared_ptr<Factor> &factor)
 {
     // exhaustive line search over the vector, this SHOULD be small, right?
     // still, it is very ineffcient O(n), but we have preferred using a vector

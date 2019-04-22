@@ -21,9 +21,9 @@ Factor2Poses2d::Factor2Poses2d(const Mat31 &observation, std::shared_ptr<Node> &
                                std::shared_ptr<Node> &n2, const Mat3 &obsInf):
         Factor(3, 6), obs_(observation), W_(obsInf)
 {
-    assert(n1->getId() && "Factor2Poses2d::Factor2Poses2d: Non initialized Node1. Add nodes first and then Factors to the FG\n");
-    assert(n2->getId() && "Factor2Poses2d::Factor2Poses2d: Non initialized Node2. Add nodes first and then Factors to the FG\n");
-    if (n1->getId() < n2->getId())
+    assert(n1->get_id() && "Factor2Poses2d::Factor2Poses2d: Non initialized Node1. Add nodes first and then Factors to the FG\n");
+    assert(n2->get_id() && "Factor2Poses2d::Factor2Poses2d: Non initialized Node2. Add nodes first and then Factors to the FG\n");
+    if (n1->get_id() < n2->get_id())
     {
         neighbourNodes_.push_back(n1);
         neighbourNodes_.push_back(n2);
@@ -40,7 +40,7 @@ Factor2Poses2d::Factor2Poses2d(const Mat31 &observation, std::shared_ptr<Node> &
 
 void Factor2Poses2d::evaluate() {
     // residuals
-    this->evaluateError();
+    this->evaluate_error();
 
     // Jacobians
     J_ <<   1, 0, 0, -1, 0, 0,
@@ -48,10 +48,10 @@ void Factor2Poses2d::evaluate() {
             0, 0, 1, 0, 0, -1;
 }
 
-matData_t Factor2Poses2d::evaluateError() {
+matData_t Factor2Poses2d::evaluate_error() {
     // Evaluation of h(i,j)
-    auto    node1 = getNeighbourNodes()->at(0).get()->getState(),
-            node2 = getNeighbourNodes()->at(1).get()->getState();
+    auto    node1 = get_neighbour_nodes()->at(0).get()->get_state(),
+            node2 = get_neighbour_nodes()->at(1).get()->get_state();
 
     auto h = node2 - node1;
 
@@ -65,7 +65,7 @@ void Factor2Poses2d::print() const
 {
     std::cout << "Printing Factor: " << id_ << ", obs= \n" << obs_
               << "\n Residuals= " << r_
-              << " \nand covariance\n" << W_
+              << " \nand Information matrix\n" << W_
               << "\n Calculated Jacobian = " << J_
               << "\n Chi2 error = " << chi2_
               << " and neighbour Nodes " << neighbourNodes_.size()
@@ -90,10 +90,10 @@ Factor2Poses2dOdom::Factor2Poses2dOdom(const Mat31 &observation, std::shared_ptr
 void Factor2Poses2dOdom::evaluate()
 {
     // residuals
-    this->evaluateError();
+    this->evaluate_error();
 
     // Get the position of node we are traversing from
-    auto node1 = getNeighbourNodes()->at(0).get()->getState();
+    auto node1 = get_neighbour_nodes()->at(0).get()->get_state();
 
     auto s = -obs_[1] * sin(node1[2]), c = obs_[1] * sin(node1[2]);
 
@@ -103,11 +103,11 @@ void Factor2Poses2dOdom::evaluate()
             0, 0, 1,    0, 0, -1;
 }
 
-matData_t Factor2Poses2dOdom::evaluateError()
+matData_t Factor2Poses2dOdom::evaluate_error()
 {
     // Evaluation of residuals as x[i] - f(x[i - 1], u[i])
-    auto    node1 = getNeighbourNodes()->at(0).get()->getState(), // x[i - 1]
-            node2 = getNeighbourNodes()->at(1).get()->getState(); // x[i]
+    auto    node1 = get_neighbour_nodes()->at(0).get()->get_state(), // x[i - 1]
+            node2 = get_neighbour_nodes()->at(1).get()->get_state(); // x[i]
     auto prediction = get_odometry_prediction(node1, obs_);
 
     r_ = node2 - prediction;

@@ -13,12 +13,12 @@
 
 #include <memory>
 #include <iostream>
-#include "mrob/pc_registration.hpp"
+#include "mrob/pc_registration.hpp" // GICP function is defined here
 
 
 using namespace mrob;
 
-int PCRegistration::Gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
+int PCRegistration::gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
            const Eigen::Ref<const MatX> covX, const Eigen::Ref<const MatX> covY, SE3 &T, double tol)
 {
     assert(X.rows() == 3  && "PCRegistration::Gicp: Incorrect sizing, we expect 3xN");
@@ -57,7 +57,7 @@ int PCRegistration::Gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const 
         }
         // 4) Update Solution
         Mat61 dxi = -H.inverse()*J;
-        T.updateLhs(dxi); //Left side update
+        T.update_lhs(dxi); //Left side update
         deltaUpdate = dxi.norm();
         iters++;
 

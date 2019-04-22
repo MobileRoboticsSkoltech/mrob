@@ -24,13 +24,13 @@ namespace mrob{
         ~Factor2Poses2d() override = default;
 
         void evaluate() override ;
-        matData_t evaluateError() override;
+        matData_t evaluate_error() override;
 
-        const Eigen::Ref<const MatX1> getObs() const override {return obs_;};
-        const Eigen::Ref<const MatX1> getResidual() const override {return r_;};
-        const Eigen::Ref<const MatX> getInvCovariance() const override {return W_;};
-        const Eigen::Ref<const MatX> getWT2() const override {return WT2_;};
-        const Eigen::Ref<const MatX> getJacobian() const override {return J_;};
+        const Eigen::Ref<const MatX1> get_obs() const override {return obs_;};
+        const Eigen::Ref<const MatX1> get_residual() const override {return r_;};
+        const Eigen::Ref<const MatX> get_information_matrix() const override {return W_;};
+        const Eigen::Ref<const MatX> get_trans_sqrt_information_matrix() const override {return WT2_;};
+        const Eigen::Ref<const MatX> get_jacobian() const override {return J_;};
         void print() const override;
 
     protected:
@@ -60,7 +60,7 @@ namespace mrob{
         /**
          * Jacobians are not evaluated, just the residuals
          */
-        matData_t evaluateError() override;
+        matData_t evaluate_error() override;
 
     private:
         Mat31 get_odometry_prediction(Mat31 state, Mat31 motion);

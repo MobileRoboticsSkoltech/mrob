@@ -57,13 +57,13 @@ SO3 SO3::operator*(const SO3& rhs) const
 }
 
 
-void SO3::updateLhs(const Mat31 &dw)
+void SO3::update_lhs(const Mat31 &dw)
 {
     SO3 dR(dw);
     R_ = dR.R() * R_;
 }
 
-void SO3::updateRhs(const Mat31 &dw)
+void SO3::update_rhs(const Mat31 &dw)
 {
     SO3 dR(dw);
     R_ = R_ * dR.R();

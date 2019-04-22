@@ -31,9 +31,9 @@ class NodePose3d : public Node
      * to T'=exp(dxi^)*T and x'=vee(ln(T'))
      */
     void update(const Eigen::Ref<const MatX1> &dx);
-    virtual const Eigen::Ref<const MatX1> getState() const {return x_;};
-    virtual const Eigen::Ref<const MatX1> getLastLinearizationState() const {return linearization_x_;};
-    virtual const Eigen::Ref<const MatX1> getLastDeltaX() const {return dx_;};
+    virtual const Eigen::Ref<const MatX1> get_state() const {return x_;};
+    virtual const Eigen::Ref<const MatX1> get_last_linearization_state() const {return linearization_x_;};
+    virtual const Eigen::Ref<const MatX1> get_last_deltaX() const {return dx_;};
     void print() const;
 
   protected:

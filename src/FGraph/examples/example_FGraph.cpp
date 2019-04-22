@@ -17,6 +17,8 @@
 #include "mrob/factors/nodePose3d.hpp"
 
 
+// TODO remove soon
+
 int main()
 {
     // create a simple FGraph testing the insertion and deletions of elements

@@ -28,11 +28,11 @@ int main()
     T.print();
 
 
-    MatX Y = T.transformArray(X);
+    MatX Y = T.transform_array(X);
     std::cout << "Y data: \n" << Y << std::endl;
 
     mrob::SE3 T_arun;
-    mrob::PCRegistration::Arun(X,Y,T_arun);
+    mrob::PCRegistration::arun(X,Y,T_arun);
     std::cout << "T solved by Arun method: \n" << std::endl;
     T_arun.print();
 
@@ -45,7 +45,7 @@ int main()
         covY.block<3,3>(0,3*i) = Mat3::Identity();
     }
     mrob::SE3 T_gicp;
-    uint_t iters = mrob::PCRegistration::Gicp(X,Y,covX,covY,T_gicp);
+    uint_t iters = mrob::PCRegistration::gicp(X,Y,covX,covY,T_gicp);
     std::cout << "T solved by GICP method on " << iters << " iters: \n" << std::endl;
     T_gicp.print();
 
@@ -53,7 +53,7 @@ int main()
     // Solve for weighted point optimization
     MatX1 weight = MatX1::Ones(N);
     mrob::SE3 T_wp;
-    iters = mrob::PCRegistration::Weighted_point(X,Y,weight,T_wp);
+    iters = mrob::PCRegistration::weighted_point(X,Y,weight,T_wp);
     std::cout << "T solved by Weight point Optimization method on " << iters << " iters: \n" << std::endl;
     T_wp.print();
 

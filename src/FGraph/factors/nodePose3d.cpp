@@ -32,7 +32,7 @@ void NodePose3d::update(const Eigen::Ref<const MatX1> &dx)
 {
     Eigen::Ref<const Mat61> dxf(dx);
     // Tx and x are always sync, i.e., Tx = exp(x^)
-    Tx_.updateLhs(dxf);
+    Tx_.update_lhs(dxf);
     x_ = Tx_.ln_vee();//this will cast to
 }
 

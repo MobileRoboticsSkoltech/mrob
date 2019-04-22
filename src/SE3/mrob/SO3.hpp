@@ -70,12 +70,12 @@ public:
      * Updates the current transformation with the incremental dw \in so3
      * R'=exp(dw^)*R
      */
-    void updateLhs(const Mat31 &dw);
+    void update_lhs(const Mat31 &dw);
     /**
      * Updates the current transformation with the incremental dw \in so3
      * R'=R*exp(dw^)
      */
-    void updateRhs(const Mat31 &dw);
+    void update_rhs(const Mat31 &dw);
     /**
      *  Exponential mapping of a skew symetric matrix in so3. The Rodrigues formula provides
      *  an exact solution to the Taylor expansion of exp(A) = I + A + c2*A^2 + ...

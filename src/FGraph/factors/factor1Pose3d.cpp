@@ -35,11 +35,11 @@ Factor1Pose3d::~Factor1Pose3d()
 void Factor1Pose3d::evaluate()
 {
     // Evaluate residual
-    evaluateError();
+    this->evaluate_error();
     // Evaluate Jacobian
 }
 
-matData_t Factor1Pose3d::evaluateError()
+matData_t Factor1Pose3d::evaluate_error()
 {
     r_ = Mat61::Identity();
     return 0.0;
@@ -49,7 +49,7 @@ void Factor1Pose3d::print() const
 {
     std::cout << "Printing Factor: " << id_ << ", obs= \n" << obs_
               << "\n Residuals= " << r_
-              << " \nand covariance\n" << W_
+              << " \nand Information matrix\n" << W_
               << "\n Calculated Jacobian = " << J_
               << "\n Chi2 error = " << chi2_
               << " and neighbour Nodes " << neighbourNodes_.size()

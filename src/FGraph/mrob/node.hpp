@@ -51,32 +51,32 @@ class Node{
      * it as an argument for the getState function, no need to be dynamic,
      * as long as the dimension is correctly set
      */
-    virtual const Eigen::Ref<const MatX1> getState() const = 0;
+    virtual const Eigen::Ref<const MatX1> get_state() const = 0;
     /**
      * Returns a matrix to the last linearized state. This data structure is for the incre-
      * metal implementation.
      */
-    virtual const Eigen::Ref<const MatX1> getLastLinearizationState() const = 0;
+    virtual const Eigen::Ref<const MatX1> get_last_linearization_state() const = 0;
     /**
      * Return the last delta X on the update. For incremental updates
      */
-    virtual const Eigen::Ref<const MatX1> getLastDeltaX() const = 0;
+    virtual const Eigen::Ref<const MatX1> get_last_deltaX() const = 0;
     virtual void print() const {};
-    id_t getId() const {return id_;};
-    void setId(id_t id) {id_ = id;};
-    uint_t getDim(void) const {return dim_;};
+    id_t get_id() const {return id_;};
+    void set_id(id_t id) {id_ = id;};
+    uint_t get_dim(void) const {return dim_;};
     /**
      * Adds a factor to the list of factors connected to this node.
      */
-    virtual bool addFactor(std::shared_ptr<Factor> &factor);
+    virtual bool add_factor(std::shared_ptr<Factor> &factor);
     /**
      * This function is very inefficient: it is an exhaustive search
      * so use only when necessary.
      */
-    virtual bool rmFactor(std::shared_ptr<Factor> &factor);
+    virtual bool rm_factor(std::shared_ptr<Factor> &factor);
     void clear() {neighbourFactors_.clear();};
     std::vector<std::shared_ptr<Factor> >*
-            getNeighbourFactors(void) {return &neighbourFactors_;};
+            get_neighbour_factors(void) {return &neighbourFactors_;};
 
   protected:
     // For highly connected nodes where removing is necessary, map should be better

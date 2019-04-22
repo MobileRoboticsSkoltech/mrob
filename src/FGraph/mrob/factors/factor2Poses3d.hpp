@@ -47,15 +47,15 @@ class Factor2Poses3d : public Factor
     /**
      * Jacobians are not evaluated, just the residuals
      */
-    matData_t evaluateError();
+    matData_t evaluate_error();
 
     void print() const;
 
-    const Eigen::Ref<const MatX1> getObs() const {return obs_;};
-    const Eigen::Ref<const MatX1> getResidual() const {return r_;};
-    const Eigen::Ref<const MatX> getInvCovariance() const {return W_;};
-    const Eigen::Ref<const MatX> getWT2() const{return WT2_;};
-    const Eigen::Ref<const MatX> getJacobian() const {return J_;};
+    const Eigen::Ref<const MatX1> get_obs() const {return obs_;};
+    const Eigen::Ref<const MatX1> get_residual() const {return r_;};
+    const Eigen::Ref<const MatX> get_information_matrix() const {return W_;};
+    const Eigen::Ref<const MatX> get_trans_sqrt_information_matrix() const{return WT2_;};
+    const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
 
   protected:
     // The Jacobians' correspondant nodes are ordered on the vector<Node>

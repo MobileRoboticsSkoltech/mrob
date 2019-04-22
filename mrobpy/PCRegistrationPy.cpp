@@ -30,36 +30,36 @@ namespace py = pybind11;
 using namespace mrob;
 
 
-SE3 ArunSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y)
+SE3 arun_solve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y)
 {
     SE3 res;
-    PCRegistration::Arun(X,Y,res);
+    PCRegistration::arun(X,Y,res);
     return res;
 }
 
 
-SE3 GicpSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y,
+SE3 gicp_solve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y,
         const py::EigenDRef<const MatX> covX, const py::EigenDRef<const MatX> covY)
 {
     SE3 res;
-    PCRegistration::Gicp(X,Y,covX,covY,res);
+    PCRegistration::gicp(X,Y,covX,covY,res);
     return res;
 }
 
-SE3 WeightedSolve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y,
+SE3 weighted_solve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const MatX> Y,
         const py::EigenDRef<const MatX1> weight)
 {
     SE3 res;
-    PCRegistration::Weighted_point(X,Y,weight,res);
+    PCRegistration::weighted_point(X,Y,weight,res);
     return res;
 }
 
 
 void init_PCRegistration(py::module &m)
 {
-    m.def("align_arun", &ArunSolve);
-    m.def("align_gicp", &GicpSolve);
-    m.def("align_weighted", &WeightedSolve);
+    m.def("align_arun", &arun_solve);
+    m.def("align_gicp", &gicp_solve);
+    m.def("align_weighted", &weighted_solve);
     py::class_<CreatePoints>(m,"CreatePoints")
             .def(py::init<uint_t, uint_t, uint_t, double>())
             .def("get_point_cloud", &CreatePoints::get_point_cloud)

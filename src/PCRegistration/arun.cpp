@@ -19,7 +19,7 @@
 using namespace mrob;
 using namespace Eigen;
 
-int PCRegistration::Arun(const Ref<const MatX> X, const Ref<const MatX> Y, SE3 &T)
+int PCRegistration::arun(const Ref<const MatX> X, const Ref<const MatX> Y, SE3 &T)
 {
     assert(X.rows() == 3  && "PCRegistration::Arun: Incorrect sizing, we expect 3xN");
     assert(X.cols() >= 3  && "PCRegistration::Arun: Incorrect sizing, we expect at least 3 correspondences (not aligned)");

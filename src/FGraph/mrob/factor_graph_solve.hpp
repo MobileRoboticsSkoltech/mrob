@@ -36,13 +36,11 @@ public:
 
     FGraphSolve(solveType type = CHOL_ADJ, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
     virtual ~FGraphSolve();
+    void solve_once();
+    void solve_incremental();
 
-    void buildProblem();// TODO function deprecated? include inside solve BaTCH
-    void solveOnce();
-    void solveIncremental();
-
-    std::vector<MatX1> getEstimatedPositions();
-    std::shared_ptr<Node>& getNode(uint_t pos);
+    std::vector<MatX1> get_estimated_positions();
+    std::shared_ptr<Node>& get_node(uint_t pos);
 
 protected:
     /**
@@ -51,18 +49,19 @@ protected:
      * on every row W^T/2 or W, depending on the solving method (QR or Chol)
      * The residuals are also calculated as b = W^(1/2)*r or b = A^T * W *r
      */
-    void buildAdjacency();
-    void buildAdjacency(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new);
+    void build_adjacency();
+    void build_adjacency_incremental(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new);
+    void build_problem();
 
     /**
      * TODO directly allocating components of the Information matrix
      */
-    void buildDirectInfo();
-    void solveQR();
-    void solveChol();
-    void solveCholIncremental();
+    void build_direct_info();
+    void solve_QR();
+    void solve_cholesky();
+    void solve_chol_incremental();
 
-    void updateNodes();
+    void update_nodes();// TODO this function deprecated?
 
     // Variables for full solve
     solveType type_;

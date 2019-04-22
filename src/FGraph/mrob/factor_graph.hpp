@@ -58,27 +58,27 @@ public:
      * Modifications of the structure of the graph are allowed
      * by removing the factor and adding the new updated one.
      */
-    bool addFactor(std::shared_ptr<Factor> &factor);
+    bool add_factor(std::shared_ptr<Factor> &factor);
     /**
       * Adds a node if it was not already on the set.
       */
-    bool addNode(std::shared_ptr<Node> &node);
+    bool add_node(std::shared_ptr<Node> &node);
     /**
      * TODO Removes a Factor and on all the connected Nodes
      * list of factors, it is removed as well
      */
-    void rmFactor(std::shared_ptr<Factor> &factor);
+    void rm_factor(std::shared_ptr<Factor> &factor);
     /**
      * TODO Removes Node from list. TODO should we eliminate
      * all factors pointing to that node?
      */
-    void rmNode(std::shared_ptr<Node> &node);
+    void rm_node(std::shared_ptr<Node> &node);
     void print(bool complete = false) const;
 
 
     //TODO
-    void saveGraph() const;
-    void loadGraph();
+    void save_graph() const;
+    void load_graph();
 
 protected:
     /**
