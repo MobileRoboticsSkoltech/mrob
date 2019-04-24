@@ -32,13 +32,20 @@ namespace mrob{
  *
  * In particular, the residual of this factor is: TODO better formulate
  *   r = ln(T2) - ln(T1*Tobs) = ln(T1^-1*T2) - ln(Tobs)
+ *
+ * Constructor functions will be overloaded to include the pointers of the nodes,
+ * The convention is from node origin, we observe node destination,
+ * such that: Factor2Poses3d(nodeOrigin, nodeTarget, ...
+ *
+ * The observations relate a pair of nodes. The order matters, since this will
+ * affect the order on the Jacobian block matrix
  */
 
 class Factor2Poses3d : public Factor
 {
   public:
-    Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
-            std::shared_ptr<Node> &n2, const Mat6 &obsInf);
+    Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &nodeOrigin,
+            std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf);
     ~Factor2Poses3d();
     /**
      * Evaluates residuals and Jacobians
@@ -47,7 +54,7 @@ class Factor2Poses3d : public Factor
     /**
      * Jacobians are not evaluated, just the residuals
      */
-    matData_t evaluate_error();
+    void evaluate_residuals() override;
 
     void print() const;
 
@@ -65,7 +72,7 @@ class Factor2Poses3d : public Factor
     SE3 Tobs_;
     Mat6 W_;//inverse of observation covariance (information matrix)
     Mat6 WT2_;//transpose and squared root of W.
-    Mat<6,12> J_;//Joint Jacobian TODO is this better defined as a dynamic matrix?
+    Mat<6,12> J_;//Joint Jacobian
 
 
   public:

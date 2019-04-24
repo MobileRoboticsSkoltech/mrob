@@ -20,7 +20,7 @@ using namespace mrob;
 
 Factor1Pose3d::Factor1Pose3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
              const Mat6 &obsInf):
-             Factor(6,6), obs_(observation), W_(obsInf), J_(Mat6::Random())
+             Factor(6,6), obs_(observation), W_(obsInf), J_(Mat6::Zero())
 {
     // Ordering here is not a problem, the node is unique
     neighbourNodes_.push_back(n1);
@@ -35,22 +35,23 @@ Factor1Pose3d::~Factor1Pose3d()
 void Factor1Pose3d::evaluate()
 {
     // Evaluate residual
-    this->evaluate_error();
+    this->evaluate_residuals();
+    chi2_ = r_.squaredNorm();
+
     // Evaluate Jacobian
 }
 
-matData_t Factor1Pose3d::evaluate_error()
+void Factor1Pose3d::evaluate_residuals()
 {
     r_ = Mat61::Identity();
-    return 0.0;
 }
 
 void Factor1Pose3d::print() const
 {
     std::cout << "Printing Factor: " << id_ << ", obs= \n" << obs_
-              << "\n Residuals= " << r_
+              << "\n Residuals= \n" << r_
               << " \nand Information matrix\n" << W_
-              << "\n Calculated Jacobian = " << J_
+              << "\n Calculated Jacobian = \n" << J_
               << "\n Chi2 error = " << chi2_
               << " and neighbour Nodes " << neighbourNodes_.size()
               << std::endl;

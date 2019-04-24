@@ -28,6 +28,16 @@ namespace mrob{
  * to indicate its node neighbours at the object declaration.
  * On the abstract class constructor they are not indicated, but should
  * be on any child class.
+ *
+ * Constructor functions will be overloaded to include the pointers of the nodes,
+ * The convention is from node 1, to node 2, and etc. such that: myfactor2poses(n1, n2, ...)
+ *
+ * Conventions (transparent for users, but good to know):
+ * - The connecting nodes are stores ordered on a vector. The user does not *have*
+ *   to provide such ordering, but at creation each factor such comply this.
+ *
+ * - Jacobian is a block matrix corresponding to the Jacobian of the first node J1,
+ *   then second node J2, etc, such that J = [J1, J2, ..., Jn],
  */
 
 class Factor{
@@ -43,9 +53,9 @@ public:
      */
     virtual void evaluate() = 0;
     /**
-     * Jacobians are not evaluated, just the residuals
+     * Jacobians are not evaluated, just the squared norm of the residuals
      */
-    virtual matData_t evaluate_error() = 0;
+    virtual void evaluate_residuals() = 0;
 
     /**
      * The print utility could be reimplemented on child classes
@@ -97,6 +107,7 @@ protected:
     //Mat6 WT2_;//transpose and squared root of W.
 
 };
+
 
 }
 

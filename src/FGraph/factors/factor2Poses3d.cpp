@@ -18,21 +18,24 @@
 using namespace mrob;
 
 
-Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
-        std::shared_ptr<Node> &n2, const Mat6 &obsInf):
+Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &nodeOrigin,
+        std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf):
         Factor(6,12), obs_(observation), Tobs_(observation), W_(obsInf)
 {
-    assert(n1->get_id() && "Factor2Poses3d::Factor2Poses3d: Non initialized Node1. Add nodes first and then Factors to the FG\n");
-    assert(n2->get_id() && "Factor2Poses3d::Factor2Poses3d: Non initialized Node2. Add nodes first and then Factors to the FG\n");
-    if (n1->get_id() < n2->get_id())
+    assert(nodeOrigin->get_id() && "Factor2Poses3d::Factor2Poses3d: Non initialized Node1. Add nodes first and then Factors to the FG\n");
+    assert(nodeTarget->get_id() && "Factor2Poses3d::Factor2Poses3d: Non initialized Node2. Add nodes first and then Factors to the FG\n");
+    if (nodeOrigin->get_id() < nodeTarget->get_id())
     {
-        neighbourNodes_.push_back(n1);
-        neighbourNodes_.push_back(n2);
+        neighbourNodes_.push_back(nodeOrigin);
+        neighbourNodes_.push_back(nodeTarget);
     }
     else
     {
-        neighbourNodes_.push_back(n2);
-        neighbourNodes_.push_back(n1);
+        neighbourNodes_.push_back(nodeTarget);
+        neighbourNodes_.push_back(nodeOrigin);
+
+        // inverse observations to correctly modify this
+        obs_ = -observation;
     }
     WT2_ = W_.llt().matrixU();
 }
@@ -44,24 +47,26 @@ Factor2Poses3d::~Factor2Poses3d()
 void Factor2Poses3d::evaluate()
 {
     // residuals
-    this->evaluate_error();
+    this->evaluate_residuals();
+
+    chi2_ = r_.squaredNorm();
+
 
     // TODO Jacobians
     J_ = Mat<6,12>::Random();
 }
-matData_t Factor2Poses3d::evaluate_error()
+void Factor2Poses3d::evaluate_residuals()
 {
     // TODO Evaluation of residuals
     r_ = Mat61::Random();
-    return 0.0;
 }
 
 void Factor2Poses3d::print() const
 {
     std::cout << "Printing Factor: " << id_ << ", obs= \n" << obs_
-              << "\n Residuals= " << r_
+              << "\n Residuals= \n" << r_
               << " \nand Information matrix\n" << W_
-              << "\n Calculated Jacobian = " << J_
+              << "\n Calculated Jacobian = \n" << J_
               << "\n Chi2 error = " << chi2_
               << " and neighbour Nodes " << neighbourNodes_.size()
               << std::endl;

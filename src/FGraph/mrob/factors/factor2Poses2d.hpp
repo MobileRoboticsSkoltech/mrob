@@ -17,14 +17,23 @@
 
 namespace mrob{
 
-    class Factor2Poses2d : public Factor {
+    /**
+     * Factor2Poses2d if a factor relating a 2 2dimensional poses
+     *  through a direct observation such that:
+     *  observation = h(nodeOrigin,nodeTarget) = x_dest - x_origin
+     *  or
+     *  residual =  x_origin + observation - x_destination
+     *
+     */
+    class Factor2Poses2d : public Factor
+    {
     public:
-        Factor2Poses2d(const Mat31 &observation, std::shared_ptr<Node> &n1,
-                       std::shared_ptr<Node> &n2, const Mat3 &obsInf);
+        Factor2Poses2d(const Mat31 &observation, std::shared_ptr<Node> &nodeOrigin,
+                       std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf);
         ~Factor2Poses2d() override = default;
 
         void evaluate() override ;
-        matData_t evaluate_error() override;
+        void evaluate_residuals() override;
 
         const Eigen::Ref<const MatX1> get_obs() const override {return obs_;};
         const Eigen::Ref<const MatX1> get_residual() const override {return r_;};
@@ -34,7 +43,6 @@ namespace mrob{
         void print() const override;
 
     protected:
-        double wrap_angle(double angle);
         // The Jacobian's correspondent nodes are ordered on the vector<Node>
         // being [0]->J1 and [1]->J2
         // declared here but initialized on child classes
@@ -47,10 +55,27 @@ namespace mrob{
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen
     };
 
-    class Factor2Poses2dOdom : public Factor2Poses2d {
+    /**
+     * Factor2Poses2dOdom if a factor expressing the relation between consecutive
+     * 2d nodes with odometry observations such that;
+     *     residual = g (x_origin, observation) - x_dest
+     *
+     * Observation = [drot1, dtrans, drot2]
+     *
+     * We assume that this factor also updates the value of node destination
+     * unless explicitly written
+     *
+     */
+    class Factor2Poses2dOdom : public Factor2Poses2d
+    {
     public:
-        Factor2Poses2dOdom(const Mat31 &observation, std::shared_ptr<Node> &n1,
-                           std::shared_ptr<Node> &n2, const Mat3 &obsInf);
+        /**
+         * Constructor of factor Odom. Conventions are:
+         * 1) obs = [drot1, dtrans, drot2]
+         * 2) This factor also updates the value of node destination according to obs
+         */
+        Factor2Poses2dOdom(const Mat31 &observation, std::shared_ptr<Node> &nodeOrigin,
+                           std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf, bool updateNodeTarget=true);
         ~Factor2Poses2dOdom() override = default;
 
         /**
@@ -60,10 +85,16 @@ namespace mrob{
         /**
          * Jacobians are not evaluated, just the residuals
          */
-        matData_t evaluate_error() override;
+        void evaluate_residuals() override;
 
     private:
         Mat31 get_odometry_prediction(Mat31 state, Mat31 motion);
+
+    };
+
+    // TODO
+    class Factor2Poses2dTwist : public Factor2Poses2d
+    {
 
     };
 

@@ -57,7 +57,7 @@ void FGraphSolve::solve_once()
     // Linearizes and calculates the Jacobians and required matrices
     this->build_problem();
 
-    solve_cholesky();
+    this->solve_cholesky();
 
     // Keep indices of last node and factor, as well as dimensions
     last_stateDim = stateDim_;
@@ -112,7 +112,7 @@ void FGraphSolve::build_adjacency()
     // 0) resize properly matrices (if needed)
     r_.resize(obsDim_,1);//dense vector
     A_.resize(obsDim_, stateDim_);//Sparse matrix clear data
-    W_.resize(obsDim_, obsDim_);//XXX shoulld we reinitialize this all the time? an incremental should be fairly easy
+    W_.resize(obsDim_, obsDim_);//TODO should we reinitialize this all the time? an incremental should be fairly easy
 
     // 1) create the vector's structures to iterate faster
     std::vector<std::shared_ptr<Factor> >* factors;

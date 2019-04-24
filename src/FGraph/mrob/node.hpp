@@ -94,6 +94,12 @@ class Node{
      */
 };
 
+/**
+ * utility function to wrap angles into [-pi,pi]
+ */
+double wrap_angle(double angle);
+
+
 }
 
 

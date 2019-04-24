@@ -40,13 +40,20 @@ int main ()
 
 
 
-    // Node 2, initialized at 1,0,0, and observes n1 at 1,1,0
-    x << 1, 0, 0;
+    // Node 2, initialized at 0,0,0
     std::shared_ptr<mrob::Node> n2(new mrob::NodePose2d(x));
     graph.add_node(n2);
-    obs << 1 , 1 , 0;
-    std::shared_ptr<mrob::Factor> f2(new mrob::Factor2Poses2d(obs,n1,n2,obsCov));
+
+    // Add odom factor = [drot1, dtrans, drot2]
+    obs << 0, 1, 0;
+    //obs << M_PI_2, 0.5, 0;
+    // this factor assumes that the current value of n2 (node destination) is updated according to obs
+    std::shared_ptr<mrob::Factor> f2(new mrob::Factor2Poses2dOdom(obs,n1,n2,obsCov));
     graph.add_factor(f2);
+
+    obs << -1 , -1 , 0;
+    std::shared_ptr<mrob::Factor> f3(new mrob::Factor2Poses2d(obs,n2,n1,obsCov));
+    graph.add_factor(f3);
 
 
 
@@ -54,8 +61,9 @@ int main ()
 
     // solve the Gauss Newton optimization
     graph.solve_once();
+    graph.solve_once();
 
-    std::cout << "\nSolved\n\n";
+    std::cout << "\nSolved, chi2 = " << graph.evaluate_chi2() << std::endl;
 
     graph.print(true);
     return 0;

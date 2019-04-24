@@ -39,6 +39,11 @@ public:
     void solve_once();
     void solve_incremental();
 
+    /**
+     * This function is called after solving the problem
+     */
+    double evaluate_chi2() {return r_.dot(r_);};
+
     std::vector<MatX1> get_estimated_positions();
     std::shared_ptr<Node>& get_node(uint_t pos);
 
@@ -61,7 +66,11 @@ protected:
     void solve_cholesky();
     void solve_chol_incremental();
 
-    void update_nodes();// TODO this function deprecated?
+    /**
+     * Auxiliary function that updates all nodes with the current solution,
+     * this should be called after solving the problem
+     */
+    void update_nodes();
 
     // Variables for full solve
     solveType type_;

@@ -4,6 +4,8 @@
  *  Created on: Jan 14, 2019
  *      Author: Konstantin Pakulev
  *              konstantin.pakulev@skoltech.ru
+ *              Gonzalo Ferrer
+ *              g.ferrer@skoltech.ru
  *              Mobile Robotics Lab, Skoltech
  */
 
@@ -15,8 +17,21 @@
 
 using namespace mrob;
 
+
+/**
+ * The Factor1Poses2d is a vertex representing the distribution
+ * of a nodePose2d, pretty much like an anchoring factor.
+ *
+ * The state is an observed RBT, coincident with the node state it is connected to.
+ *
+ * In particular, the residual of this factor is:
+ *   r = obs-x
+ */
+
+
 namespace mrob{
-    class Factor1Pose2d : public Factor{
+    class Factor1Pose2d : public Factor
+    {
     public:
         Factor1Pose2d(const Mat31 &observation, std::shared_ptr<Node> &n1,
                 const Mat3 &obsInf);
@@ -29,7 +44,7 @@ namespace mrob{
         /**
          * Returns the chi2 error and fills the residual vector
          */
-        matData_t evaluate_error();
+        void evaluate_residuals() override;
 
         void print() const;
 

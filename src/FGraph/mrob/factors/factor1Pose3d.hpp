@@ -42,7 +42,7 @@ class Factor1Pose3d : public Factor
     /**
      * Returns the chi2 error and fills the residual vector
      */
-    matData_t evaluate_error();
+    void evaluate_residuals() override;
 
     void print() const;
 

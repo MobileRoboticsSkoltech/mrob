@@ -44,3 +44,13 @@ bool Node::rm_factor(std::shared_ptr<Factor> &factor)
     neighbourFactors_.erase(f);
     return true;
 }
+
+double mrob::wrap_angle(double angle)
+{
+    double pi2 = 2 * M_PI;
+
+    while (angle < -M_PI) angle += pi2;
+    while (angle >= M_PI) angle -= pi2;
+
+    return angle;
+}
