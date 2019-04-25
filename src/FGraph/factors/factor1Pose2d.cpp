@@ -1,6 +1,14 @@
-//
-// Created by Konstantin on 14/01/2019.
-//
+/* $COPYRIGHT SKOLTECH
+ * $LICENSE_LGPL
+ *
+ *  Created on: Jan 14, 2019
+ *      Author: Konstantin Pakulev
+ *              konstantin.pakulev@skoltech.ru
+ *              Gonzalo Ferrer
+ *              g.ferrer@skoltech.ru
+ *              Mobile Robotics Lab, Skoltech
+ */
+
 #include "mrob/factors/factor1Pose2d.hpp"
 
 #include <iostream>
@@ -16,12 +24,8 @@ Factor1Pose2d::Factor1Pose2d(const Mat31 &observation, std::shared_ptr<Node> &n1
     WT2_ = W_.llt().matrixU();
 }
 
-void Factor1Pose2d::evaluate() {
-    // Evaluate residual
-    evaluate_residuals();
-    chi2_ = r_.squaredNorm();
-
-
+void Factor1Pose2d::evaluate_jacobians()
+{
     // Evaluate Jacobian
     J_ = -Mat3::Identity();
 }
@@ -29,6 +33,11 @@ void Factor1Pose2d::evaluate() {
 void Factor1Pose2d::evaluate_residuals()
 {
     r_ = get_neighbour_nodes()->at(0).get()->get_state() - obs_;
+}
+
+void Factor1Pose2d::evaluate_chi2()
+{
+    chi2_ = r_.dot(W_ * r_);
 }
 
 void Factor1Pose2d::print() const

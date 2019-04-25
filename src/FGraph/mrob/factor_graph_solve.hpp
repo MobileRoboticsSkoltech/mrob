@@ -32,7 +32,7 @@ namespace mrob {
 class FGraphSolve: public FGraph
 {
 public:
-    enum solveType{QR = 0, CHOL_ADJ, CHOL, SCHUR};
+    enum solveType{CHOL_ADJ=0, CHOL, SCHUR, QR};
 
     FGraphSolve(solveType type = CHOL_ADJ, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
     virtual ~FGraphSolve();
@@ -40,12 +40,14 @@ public:
     void solve_incremental();
 
     /**
-     * This function is called after solving the problem
+     * Evaluates the current problem, that is, evaluate residuals and chi2.
+     * at the current state.
+     *
      */
-    double evaluate_chi2() {return r_.dot(r_);};
+    matData_t evaluate_problem();
 
     std::vector<MatX1> get_estimated_positions();
-    std::shared_ptr<Node>& get_node(uint_t pos);
+
 
 protected:
     /**
@@ -82,14 +84,16 @@ protected:
     SMatCol I_; //Information matrix
     MatX1 b_; // Post-processed residuals, either A'*W*r for the normal equation or W*r for QR solvers
 
-    // Variables for incremental solve TODO remove long data type
+    // Variables for incremental solve
+    //TODO remove long data type, and check they are necessary
     long last_stateDim, last_obsDim; // stateDim and obsDim of the last solve
     long last_solved_node, last_solved_factor; // Index of last solved node and factor
     SMatCol L00, L10, L11, I11; // Lower part of Cholesky decomposition of I_ matrix
     MatX1 y_; // Solution of Ly = b
 
-    // Correction deltas
+    // Correction deltas DEPRECATED?
     MatX1 dx_;
+    //TODO ordering matrix for variables/nodes
 };
 
 

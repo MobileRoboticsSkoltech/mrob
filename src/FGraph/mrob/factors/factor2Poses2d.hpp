@@ -32,8 +32,9 @@ namespace mrob{
                        std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf);
         ~Factor2Poses2d() override = default;
 
-        void evaluate() override ;
         void evaluate_residuals() override;
+        void evaluate_jacobians() override;
+        void evaluate_chi2() override;
 
         const Eigen::Ref<const MatX1> get_obs() const override {return obs_;};
         const Eigen::Ref<const MatX1> get_residual() const override {return r_;};
@@ -78,14 +79,8 @@ namespace mrob{
                            std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf, bool updateNodeTarget=true);
         ~Factor2Poses2dOdom() override = default;
 
-        /**
-         * Evaluates residuals and Jacobians
-        */
-        void evaluate() override;
-        /**
-         * Jacobians are not evaluated, just the residuals
-         */
         void evaluate_residuals() override;
+        void evaluate_jacobians() override;
 
     private:
         Mat31 get_odometry_prediction(Mat31 state, Mat31 motion);

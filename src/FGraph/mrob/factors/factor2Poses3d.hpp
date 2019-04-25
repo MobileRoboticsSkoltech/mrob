@@ -48,13 +48,14 @@ class Factor2Poses3d : public Factor
             std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf);
     ~Factor2Poses3d();
     /**
-     * Evaluates residuals and Jacobians
-     */
-    void evaluate();
-    /**
      * Jacobians are not evaluated, just the residuals
      */
     void evaluate_residuals() override;
+    /**
+     * Evaluates residuals and Jacobians
+     */
+    void evaluate_jacobians() override;
+    void evaluate_chi2() override;
 
     void print() const;
 

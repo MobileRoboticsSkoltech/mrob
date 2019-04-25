@@ -41,19 +41,6 @@ Factor2Poses2d::Factor2Poses2d(const Mat31 &observation, std::shared_ptr<Node> &
 }
 
 
-
-void Factor2Poses2d::evaluate() {
-    // residuals
-    this->evaluate_residuals();
-
-    chi2_ = r_.squaredNorm();
-
-    // Jacobians
-    J_ <<   1, 0, 0, -1, 0, 0,
-            0, 1, 0, 0, -1, 0,
-            0, 0, 1, 0, 0, -1;
-}
-
 void Factor2Poses2d::evaluate_residuals() {
     // Evaluation of h(i,j)
     auto    node1 = get_neighbour_nodes()->at(0).get()->get_state(),
@@ -64,6 +51,19 @@ void Factor2Poses2d::evaluate_residuals() {
     r_ = h - obs_;
     r_[2] = wrap_angle(r_[2]);
 
+}
+
+void Factor2Poses2d::evaluate_jacobians()
+{
+    // Jacobians
+    J_ <<   1, 0, 0, -1, 0, 0,
+            0, 1, 0, 0, -1, 0,
+            0, 0, 1, 0, 0, -1;
+}
+
+void Factor2Poses2d::evaluate_chi2()
+{
+    chi2_ = r_.dot(W_ * r_);
 }
 
 void Factor2Poses2d::print() const
@@ -90,25 +90,6 @@ Factor2Poses2dOdom::Factor2Poses2dOdom(const Mat31 &observation, std::shared_ptr
     }
 }
 
-void Factor2Poses2dOdom::evaluate()
-{
-    // residuals
-    this->evaluate_residuals();
-
-    // chi2
-    chi2_ = r_.squaredNorm();
-
-    // Get the position of node we are traversing from
-    auto node1 = get_neighbour_nodes()->at(0).get()->get_state();
-
-    auto s = -obs_[1] * sin(node1[2]), c = obs_[1] * sin(node1[2]);
-
-    // Jacobians for odometry model which are: G and -I
-    J_ <<   1, 0, s,    -1, 0, 0,
-            0, 1, c,    0, -1, 0,
-            0, 0, 1,    0, 0, -1;
-}
-
 void Factor2Poses2dOdom::evaluate_residuals()
 {
     // Evaluation of residuals as g (x_origin, observation) - x_dest
@@ -120,6 +101,19 @@ void Factor2Poses2dOdom::evaluate_residuals()
     r_[2] = wrap_angle(r_[2]);
 
 }
+void Factor2Poses2dOdom::evaluate_jacobians()
+{
+    // Get the position of node we are traversing from
+    auto node1 = get_neighbour_nodes()->at(0).get()->get_state();
+
+    auto s = -obs_[1] * sin(node1[2]), c = obs_[1] * sin(node1[2]);
+
+    // Jacobians for odometry model which are: G and -I
+    J_ <<   1, 0, s,    -1, 0, 0,
+            0, 1, c,    0, -1, 0,
+            0, 0, 1,    0, 0, -1;
+}
+
 
 Mat31 Factor2Poses2dOdom::get_odometry_prediction(Mat31 state, Mat31 motion) {
     state[2] += motion[0];

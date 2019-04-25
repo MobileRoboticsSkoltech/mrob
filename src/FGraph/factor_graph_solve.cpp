@@ -102,10 +102,6 @@ std::vector<MatX1> FGraphSolve::get_estimated_positions()
     return results;
 }
 
-std::shared_ptr<Node>& FGraphSolve::get_node(uint_t pos)
-{
-    return nodes_[pos];
-}
 
 void FGraphSolve::build_adjacency()
 {
@@ -117,6 +113,7 @@ void FGraphSolve::build_adjacency()
     // 1) create the vector's structures to iterate faster
     std::vector<std::shared_ptr<Factor> >* factors;
     std::vector<std::shared_ptr<Node> >* nodes;
+    // TODO: optimizaing subgrapsh is not an option now
     if (isHoleProblem_)
     {
         factors = &factors_;
@@ -153,7 +150,8 @@ void FGraphSolve::build_adjacency()
     for (uint_t i = 0; i < factors->size(); ++i)
     {
         auto f = (*factors)[i];
-        f->evaluate();
+        f->evaluate_residuals();
+        f->evaluate_jacobians();
 
         // calculate dimensions for reservation and bookeping vector
         uint_t dim = f->get_dim();
@@ -229,7 +227,21 @@ void FGraphSolve::build_adjacency()
 //    cout << endl << r_ << endl;
 }
 
-void FGraphSolve::build_adjacency_incremental(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new) {
+matData_t FGraphSolve::evaluate_problem()
+{
+    matData_t totalChi2 = 0.0;
+    for (uint_t i = 0; i < factors_.size(); ++i)
+    {
+        auto f = factors_[i];
+        f->evaluate_residuals();
+        f->evaluate_chi2();
+        totalChi2 += f->get_chi2();
+    }
+    return totalChi2;
+}
+
+void FGraphSolve::build_adjacency_incremental(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new)
+{
     auto    state_dim = stateDim_ - last_stateDim + (last_solved_node == -1 ? 0 : nodes_[last_solved_node]->get_dim()),
             obs_dim = obsDim_ - last_obsDim;
 
@@ -262,7 +274,8 @@ void FGraphSolve::build_adjacency_incremental(SMatCol &A_new, SMatCol &W_new, Ma
     indFactorsMatrix.reserve(dims);
 
     for(auto i = factors_.begin() + states; i != factors_.end(); ++i) {
-        (*i)->evaluate();
+        (*i)->evaluate_residuals();
+        (*i)->evaluate_jacobians();
 
         uint_t dim = (*i)->get_dim();
         uint_t allDim = (*i)->get_all_nodes_dim();

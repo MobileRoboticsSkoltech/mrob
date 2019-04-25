@@ -34,7 +34,8 @@ namespace mrob{
  *  - Class Node
  *  - Class Factor
  *
- * Both data containers are stored in unordered sets whose keys are their adresses. By doing this, we can
+ * TODO, actually key as addresses won't work in python interface. Better use uint
+ * Both data containers are stored in vectors (unordered sets) whose keys are their adresses. By doing this, we can
  * iterate and quickly find elements in both data containers.
  *
  * Each problem instantaition should implement methods for solving the graph and storing the
@@ -74,6 +75,11 @@ public:
      */
     void rm_node(std::shared_ptr<Node> &node);
     void print(bool complete = false) const;
+
+    /**
+     * get_node returns the node given the node id key, now a position on the vector
+     */
+    std::shared_ptr<Node>& get_node(uint_t key);
 
 
     //TODO

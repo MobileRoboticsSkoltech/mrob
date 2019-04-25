@@ -56,6 +56,13 @@ bool FGraph::add_node(std::shared_ptr<Node> &node)
 	return true;
 }
 
+std::shared_ptr<Node>& FGraph::get_node(uint_t key)
+{
+    // TODO key on a set or map?
+    assert(key <= nodes_.size() && "FGraph::get_node: incorrect key");
+    return nodes_[key-1];
+}
+
 void FGraph::print(bool completePrint) const
 {
     std::cout << "Status of graph: " <<

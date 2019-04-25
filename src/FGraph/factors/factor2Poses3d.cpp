@@ -44,23 +44,22 @@ Factor2Poses3d::~Factor2Poses3d()
 {
 }
 
-void Factor2Poses3d::evaluate()
-{
-    // residuals
-    this->evaluate_residuals();
-
-    chi2_ = r_.squaredNorm();
-
-
-    // TODO Jacobians
-    J_ = Mat<6,12>::Random();
-}
 void Factor2Poses3d::evaluate_residuals()
 {
     // TODO Evaluation of residuals
     r_ = Mat61::Random();
 }
+void Factor2Poses3d::evaluate_jacobians()
+{
+    // it assumes you already have evaluated residuals
+    // TODO Jacobians
+    J_ = Mat<6,12>::Random();
+}
 
+void Factor2Poses3d::evaluate_chi2()
+{
+    chi2_ = r_.dot(W_ * r_);
+}
 void Factor2Poses3d::print() const
 {
     std::cout << "Printing Factor: " << id_ << ", obs= \n" << obs_

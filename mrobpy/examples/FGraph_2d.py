@@ -1,4 +1,21 @@
 #
 import mrob
+import numpy as np
 
-# program me, please! :(
+# example similar  to ./FGrpah/examples/example_FGraph_solve.cpp
+
+# create graph
+graph = mrob.FGraph()
+
+x = np.zeros(3)
+n1 = graph.add_node_pose_2d(x)
+x += 1
+n2 = graph.add_node_pose_2d(x)
+print('node 1 id = ', n1, ' , node 2 id = ', n2)
+
+
+invCov = np.identity(3)
+graph.add_factor_2poses_2d(x,n1,n2,invCov)
+
+
+graph.print(True)

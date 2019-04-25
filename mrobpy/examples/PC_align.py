@@ -8,7 +8,7 @@ import numpy as np
 N = 5
 X =  np.random.rand(3,N)
 T = mrob.SE3(np.random.rand(6))
-Y = T.transformArray(X)
+Y = T.transform_array(X)
 
 print('X = \n', X,'\n T = \n', T.T(),'\n Y =\n', Y)
 

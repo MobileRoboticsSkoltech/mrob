@@ -49,16 +49,22 @@ public:
     Factor(uint_t dim, uint_t allNodesDim, uint_t potNumberNodes = 5);
     virtual ~Factor();
     /**
-     * Evaluates residuals and Jacobians
-     */
-    virtual void evaluate() = 0;
-    /**
-     * Jacobians are not evaluated, just the squared norm of the residuals
+     * Residuals are evaluated. This function
      */
     virtual void evaluate_residuals() = 0;
-
     /**
-     * The print utility could be reimplemented on child classes
+     * Evaluates Jacobians.
+     * This function MOST likely needs to evaluate residuals first
+     */
+    virtual void evaluate_jacobians() = 0;
+    /**
+     * Evaluates chi2 of the current problem, with the given residuals.
+     * It may be required to evaluate_residuals() to obtain the new chi2 values
+     * This function MOST likely needs to evaluate residuals first
+     */
+    virtual void evaluate_chi2() = 0;
+    /**
+     * The print utility could be re-implemented on child classes
      * if there are special needs
      */
     virtual void print() const {};

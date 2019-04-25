@@ -36,13 +36,11 @@ class Factor1Pose3d : public Factor
              const Mat6 &obsInf);
     ~Factor1Pose3d();
     /**
-     * Evaluates residuals and Jacobians
-     */
-    void evaluate();
-    /**
      * Returns the chi2 error and fills the residual vector
      */
     void evaluate_residuals() override;
+    void evaluate_jacobians() override;
+    void evaluate_chi2() override;
 
     void print() const;
 

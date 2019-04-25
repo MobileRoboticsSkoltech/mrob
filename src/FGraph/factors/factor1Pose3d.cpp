@@ -32,18 +32,20 @@ Factor1Pose3d::~Factor1Pose3d()
 {
 }
 
-void Factor1Pose3d::evaluate()
-{
-    // Evaluate residual
-    this->evaluate_residuals();
-    chi2_ = r_.squaredNorm();
-
-    // Evaluate Jacobian
-}
 
 void Factor1Pose3d::evaluate_residuals()
 {
     r_ = Mat61::Identity();
+}
+
+void Factor1Pose3d::evaluate_jacobians()
+{
+    // Evaluate Jacobian
+}
+
+void Factor1Pose3d::evaluate_chi2()
+{
+    chi2_ = r_.dot(W_ * r_);
 }
 
 void Factor1Pose3d::print() const

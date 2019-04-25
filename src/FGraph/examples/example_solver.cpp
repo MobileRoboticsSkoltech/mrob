@@ -34,8 +34,8 @@ int main ()
     obs = Mat31::Zero();
     std::shared_ptr<mrob::Node> n1(new mrob::NodePose2d(x));
     graph.add_node(n1);
-    Mat3 obsCov = Mat3::Identity();
-    std::shared_ptr<mrob::Factor> f1(new mrob::Factor1Pose2d(obs,n1,obsCov*1e6));
+    Mat3 obsInformation= Mat3::Identity();
+    std::shared_ptr<mrob::Factor> f1(new mrob::Factor1Pose2d(obs,n1,obsInformation*1e6));
     graph.add_factor(f1);
 
 
@@ -48,22 +48,21 @@ int main ()
     obs << 0, 1, 0;
     //obs << M_PI_2, 0.5, 0;
     // this factor assumes that the current value of n2 (node destination) is updated according to obs
-    std::shared_ptr<mrob::Factor> f2(new mrob::Factor2Poses2dOdom(obs,n1,n2,obsCov));
+    std::shared_ptr<mrob::Factor> f2(new mrob::Factor2Poses2dOdom(obs,n1,n2,obsInformation));
     graph.add_factor(f2);
 
     obs << -1 , -1 , 0;
-    std::shared_ptr<mrob::Factor> f3(new mrob::Factor2Poses2d(obs,n2,n1,obsCov));
+    std::shared_ptr<mrob::Factor> f3(new mrob::Factor2Poses2d(obs,n2,n1,obsInformation));
     graph.add_factor(f3);
 
 
 
-    graph.print(true);
 
     // solve the Gauss Newton optimization
-    graph.solve_once();
+    graph.print(true);
     graph.solve_once();
 
-    std::cout << "\nSolved, chi2 = " << graph.evaluate_chi2() << std::endl;
+    std::cout << "\nSolved, chi2 = " << graph.evaluate_problem() << std::endl;
 
     graph.print(true);
     return 0;
