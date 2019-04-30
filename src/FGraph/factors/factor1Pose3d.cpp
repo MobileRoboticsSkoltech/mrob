@@ -45,7 +45,7 @@ void Factor1Pose3d::evaluate_jacobians()
 
 void Factor1Pose3d::evaluate_chi2()
 {
-    chi2_ = r_.dot(W_ * r_);
+    chi2_ = 0.5 * r_.dot(W_ * r_);
 }
 
 void Factor1Pose3d::print() const

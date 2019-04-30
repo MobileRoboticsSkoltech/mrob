@@ -36,7 +36,7 @@ public:
 
     FGraphSolve(solveType type = CHOL_ADJ, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
     virtual ~FGraphSolve();
-    void solve_once();
+    void solve_batch();
     void solve_incremental();
 
     /**

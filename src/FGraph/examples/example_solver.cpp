@@ -60,7 +60,7 @@ int main ()
 
     // solve the Gauss Newton optimization
     graph.print(true);
-    graph.solve_once();
+    graph.solve_batch();
 
     std::cout << "\nSolved, chi2 = " << graph.evaluate_problem() << std::endl;
 

@@ -63,7 +63,7 @@ void Factor2Poses2d::evaluate_jacobians()
 
 void Factor2Poses2d::evaluate_chi2()
 {
-    chi2_ = r_.dot(W_ * r_);
+    chi2_ = 0.5 * r_.dot(W_ * r_);
 }
 
 void Factor2Poses2d::print() const

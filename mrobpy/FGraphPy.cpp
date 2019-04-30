@@ -39,7 +39,12 @@ public:
         this->add_node(n);
         return n->get_id();
     }
-
+    void add_factor_1pose_2d(const py::EigenDRef<const Mat31> obs, uint_t nodeId, const py::EigenDRef<const Mat3> obsInvCov)
+    {
+        auto n1 = this->get_node(nodeId);
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose2d(obs,n1,obsInvCov));
+        this->add_factor(f);
+    }
     void add_factor_2poses_2d(const py::EigenDRef<const Mat31> obs, uint_t nodeOriginId, uint_t nodeTargetId, const py::EigenDRef<const Mat3> obsInvCov)
     {
         auto nO = this->get_node(nodeOriginId);
@@ -47,6 +52,7 @@ public:
         std::shared_ptr<mrob::Factor> f(new mrob::Factor2Poses2d(obs,nO,nT,obsInvCov));
         this->add_factor(f);
     }
+
 
 };
 
@@ -59,6 +65,9 @@ void init_FGraph(py::module &m)
             .def(py::init<>())
             .def("add_node_pose_2d", &FGraphPy::add_node_pose_2d)
             .def("add_factor_2poses_2d", &FGraphPy::add_factor_2poses_2d)
+            .def("add_factor_1pose_2d", &FGraphPy::add_factor_1pose_2d)
+            .def("solve_batch", &FGraphSolve::solve_batch)
+            .def("solve_incremental", &FGraphSolve::solve_incremental)
             .def("print",&FGraph::print)
             ;
 }

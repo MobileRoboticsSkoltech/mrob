@@ -52,7 +52,8 @@ void FGraphSolve::build_problem()
     }
 }
 
-void FGraphSolve::solve_once()
+// TODO separate this function into different funsiotn, same as build problem
+void FGraphSolve::solve_batch()
 {
     // Linearizes and calculates the Jacobians and required matrices
     this->build_problem();
