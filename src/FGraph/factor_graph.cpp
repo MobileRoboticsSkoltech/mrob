@@ -9,9 +9,6 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-
-#include "mrob/factor_graph.hpp"
-
 #include <iostream>
 #include <mrob/factor_graph.hpp>
 
@@ -37,7 +34,7 @@ FGraph::~FGraph()
 
 bool FGraph::add_factor(std::shared_ptr<Factor> &factor)
 {
-	factor->set_id(factors_.size()+1);//Starts at 1
+	factor->set_id(factors_.size()+1);//Starts at 1 TODO why? we should not do this?
 	factors_.push_back(factor);
     auto list = factor->get_neighbour_nodes();
     for( auto n: *list)

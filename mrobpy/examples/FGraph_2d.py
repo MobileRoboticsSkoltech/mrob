@@ -8,7 +8,7 @@ import numpy as np
 graph = mrob.FGraph()
 
 x = np.random.randn(3)
-n1 = graph.add_node_pose_2d(x) * 1e-1
+n1 = graph.add_node_pose_2d(x)
 x = 1 + np.random.randn(3)*1e-1
 n2 = graph.add_node_pose_2d(x)
 print('node 1 id = ', n1, ' , node 2 id = ', n2)
