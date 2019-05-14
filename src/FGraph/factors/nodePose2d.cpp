@@ -22,7 +22,7 @@ NodePose2d::NodePose2d(const Mat31 &initial_x) : Node(3), x_(initial_x) {
 void NodePose2d::update(const Eigen::Ref<const MatX1> &dx)
 {
     x_ += dx;
-    // TODO no pi2pi wraping? Must be on the obs functions at the cost of this growing unbounded...
+    x_(2) = wrap_angle(x_(2));
 }
 
 void NodePose2d::print() const

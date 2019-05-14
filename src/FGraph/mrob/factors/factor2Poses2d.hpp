@@ -2,10 +2,10 @@
  * $LICENSE_LGPL
  *
  *  Created on: Jan 14, 2019
- *      Author: Konstantin Pakulev
- *              konstantin.pakulev@skoltech.ru
- *              Gonzalo Ferrer
+ *      Author: Gonzalo Ferrer
  *              g.ferrer@skoltech.ru
+ *              konstantin.pakulev@skoltech.ru
+ *              Konstantin Pakulev
  *              Mobile Robotics Lab, Skoltech
  */
 #ifndef MROB_FACTOR2POSES2D_H
@@ -24,12 +24,16 @@ namespace mrob{
      *  or
      *  residual =  x_origin + observation - x_destination
      *
+     * It is possible to update the target node if it has not been initialized.
+     * By default is set to FALSE, so we must specify it to true in case we want
+     * to update (for instance, for displacement odometry factors)
+     *
      */
     class Factor2Poses2d : public Factor
     {
     public:
         Factor2Poses2d(const Mat31 &observation, std::shared_ptr<Node> &nodeOrigin,
-                       std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf);
+                       std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf, bool updateNodeTarget=false);
         ~Factor2Poses2d() override = default;
 
         void evaluate_residuals() override;
@@ -84,12 +88,6 @@ namespace mrob{
 
     private:
         Mat31 get_odometry_prediction(Mat31 state, Mat31 motion);
-
-    };
-
-    // TODO
-    class Factor2Poses2dTwist : public Factor2Poses2d
-    {
 
     };
 

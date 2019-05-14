@@ -25,8 +25,8 @@ using namespace std;
 using namespace Eigen;
 
 
-FGraphSolve::FGraphSolve(solveType type, uint_t potNumberNodes, uint_t potNumberFactors):
-	FGraph(potNumberNodes, potNumberFactors), type_(type),
+FGraphSolve::FGraphSolve(solveMethod method, uint_t potNumberNodes, uint_t potNumberFactors):
+	FGraph(potNumberNodes, potNumberFactors), method_(method),
     last_stateDim(-1), last_obsDim(-1),
 	last_solved_node(-1), last_solved_factor(-1)
 {
@@ -38,7 +38,7 @@ FGraphSolve::~FGraphSolve() = default;
 
 void FGraphSolve::build_problem()
 {
-    switch(type_)
+    switch(method_)
     {
     case QR:
     case CHOL_ADJ:

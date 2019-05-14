@@ -32,10 +32,12 @@ namespace mrob {
 class FGraphSolve: public FGraph
 {
 public:
-    enum solveType{CHOL_ADJ=0, CHOL, SCHUR, QR};
+    enum solveMethod{CHOL_ADJ=0, CHOL, SCHUR, QR};
 
-    FGraphSolve(solveType type = CHOL_ADJ, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
+    FGraphSolve(solveMethod method = CHOL_ADJ, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
     virtual ~FGraphSolve();
+    void set_solve_method(solveMethod method) {method_ = method;};
+    solveMethod get_solve_method() { return method_;};
     void solve_batch();
     void solve_incremental();
 
@@ -75,7 +77,7 @@ protected:
     void update_nodes();
 
     // Variables for full solve
-    solveType type_;
+    solveMethod method_;
 
     SMatRow A_; //Adjacency matrix, as a Row sparse matrix
     SMatRow W_; //A block diagonal information matrix. For types Adjacency it calculates its block transposed squared root
