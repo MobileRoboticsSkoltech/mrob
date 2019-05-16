@@ -85,6 +85,10 @@ void init_FGraph(py::module &m)
                     py::arg("potNumberNodes") = 512,
                     py::arg("potNumberFactors") = 512)
             //.def("set_solve_method", &FGraphSolve::set_solve_method)
+            .def("solve_batch", &FGraphSolve::solve_batch)
+            .def("solve_incremental", &FGraphSolve::solve_incremental)
+            .def("chi2", &FGraphSolve::chi2)
+            .def("get_estimated_state", &FGraphSolve::get_estimated_state)
             .def("add_node_pose_2d", &FGraphPy::add_node_pose_2d)
             .def("add_factor_1pose_2d", &FGraphPy::add_factor_1pose_2d)
             .def("add_factor_2poses_2d", &FGraphPy::add_factor_2poses_2d,
@@ -95,8 +99,6 @@ void init_FGraph(py::module &m)
                     py::arg("obsInvCov"),
                     py::arg("updateNodeTarget") = false)
             .def("add_factor_2poses_2d_odom", &FGraphPy::add_factor_2poses_2d_odom)
-            .def("solve_batch", &FGraphSolve::solve_batch)
-            .def("solve_incremental", &FGraphSolve::solve_incremental)
             .def("print", &FGraph::print)
             ;
 }

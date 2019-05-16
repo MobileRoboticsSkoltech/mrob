@@ -22,8 +22,6 @@ Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &
         std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf):
         Factor(6,12), obs_(observation), Tobs_(observation), W_(obsInf)
 {
-    assert(nodeOrigin->get_id() && "Factor2Poses3d::Factor2Poses3d: Non initialized Node1. Add nodes first and then Factors to the FG\n");
-    assert(nodeTarget->get_id() && "Factor2Poses3d::Factor2Poses3d: Non initialized Node2. Add nodes first and then Factors to the FG\n");
     if (nodeOrigin->get_id() < nodeTarget->get_id())
     {
         neighbourNodes_.push_back(nodeOrigin);

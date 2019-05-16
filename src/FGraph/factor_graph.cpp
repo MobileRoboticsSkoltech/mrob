@@ -20,7 +20,6 @@ FGraph::FGraph(uint_t potNumberNodes, uint_t potNumberFactors) :
         stateDim_(0),obsDim_(0),isHoleProblem_(true)
 {
     //For Sets:: max_load is 1, so it rehashes and augment the #bucklets in the same amount
-    std::cout << "number of factors = " << potNumberFactors << ", number of nodes = " << potNumberNodes;
     factors_.reserve(potNumberFactors);
     nodes_.reserve(potNumberNodes);
 }
@@ -35,7 +34,7 @@ FGraph::~FGraph()
 
 bool FGraph::add_factor(std::shared_ptr<Factor> &factor)
 {
-	factor->set_id(factors_.size()+1);//Starts at 1 TODO why? we should not do this?
+	factor->set_id(factors_.size());//XXX Test this works well again
 	factors_.push_back(factor);
     auto list = factor->get_neighbour_nodes();
     for( auto n: *list)
@@ -48,7 +47,7 @@ bool FGraph::add_factor(std::shared_ptr<Factor> &factor)
 
 bool FGraph::add_node(std::shared_ptr<Node> &node)
 {
-	node->set_id(nodes_.size()+1);//XXX we assume that no node is deleted
+	node->set_id(nodes_.size());//XXX test this again
 	nodes_.push_back(node);
 	stateDim_ += node->get_dim();
 	return true;
@@ -57,8 +56,8 @@ bool FGraph::add_node(std::shared_ptr<Node> &node)
 std::shared_ptr<Node>& FGraph::get_node(uint_t key)
 {
     // TODO key on a set or map?
-    assert(key <= nodes_.size() && "FGraph::get_node: incorrect key");
-    return nodes_[key-1];
+    assert(key < nodes_.size() && "FGraph::get_node: incorrect key");
+    return nodes_[key];// XXX test key  again
 }
 
 void FGraph::print(bool completePrint) const

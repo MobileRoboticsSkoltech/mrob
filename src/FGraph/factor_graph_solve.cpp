@@ -88,7 +88,7 @@ void FGraphSolve::solve_incremental()
     last_solved_factor = factors_.size() - 1;
 }
 
-std::vector<MatX1> FGraphSolve::get_estimated_positions()
+std::vector<MatX1> FGraphSolve::get_estimated_state()
 {
     vector<MatX1> results;
     int acc_start = 0;
@@ -114,7 +114,7 @@ void FGraphSolve::build_adjacency()
     // 1) create the vector's structures to iterate faster
     std::vector<std::shared_ptr<Factor> >* factors;
     std::vector<std::shared_ptr<Node> >* nodes;
-    // TODO: optimizaing subgrapsh is not an option now
+    // TODO: optimizing subgraph is not an option now
     if (isHoleProblem_)
     {
         factors = &factors_;
@@ -122,7 +122,7 @@ void FGraphSolve::build_adjacency()
     }
     else
     {
-        // XXX this option is not working now
+        // XXX this option is not implemented for now
         factors = &localFactors_;
         nodes = &localNodes_;
     }
@@ -189,7 +189,7 @@ void FGraphSolve::build_adjacency()
             // Iterates over the number of neighbour Nodes (ordered by construction)
             for (uint_t j=0; j < neighNodes->size(); ++j)
             {
-                uint_t indNode = (*neighNodes)[j]->get_id() -1;//Ids start at 1, while vector at 0
+                uint_t indNode = (*neighNodes)[j]->get_id(); //XXX changes on indices to 0
                 uint_t dimNode = (*neighNodes)[j]->get_dim();
                 for(uint_t k = 0; k < dimNode; ++k)
                 {
@@ -235,6 +235,18 @@ matData_t FGraphSolve::evaluate_problem()
     {
         auto f = factors_[i];
         f->evaluate_residuals();
+        f->evaluate_chi2();
+        totalChi2 += f->get_chi2();
+    }
+    return totalChi2;
+}
+
+matData_t FGraphSolve::chi2()
+{
+    matData_t totalChi2 = 0.0;
+    for (uint_t i = 0; i < factors_.size(); ++i)
+    {
+        auto f = factors_[i];
         f->evaluate_chi2();
         totalChi2 += f->get_chi2();
     }
@@ -351,6 +363,8 @@ void FGraphSolve::solve_cholesky()
     I_ = (A_.transpose() * W_.selfadjointView<Eigen::Upper>() * A_).selfadjointView<Eigen::Upper>();
     b_ = A_.transpose() * W_.selfadjointView<Eigen::Upper>() * r_;
 
+    //cout << I_.toDense().diagonal() << endl;
+
     /**
      * Solve LSQ via sparse Cholesky
      * TODO reordering
@@ -365,6 +379,7 @@ void FGraphSolve::solve_cholesky()
 //    cout << dx_ << endl;
 
     // Save data for incremental update
+    /*
     long intersection = nodes_.back()->get_dim(),
             starting_index = I_.cols() - intersection,
             correlation = (*(nodes_.end() - 2))->get_dim();
@@ -373,6 +388,7 @@ void FGraphSolve::solve_cholesky()
     L10 = cholesky.getL().block(starting_index, starting_index - correlation, intersection, correlation);
     L11 = cholesky.getL().block(starting_index, starting_index, intersection, intersection);
     I11 = I_.block(starting_index, starting_index, intersection, intersection);
+    */
 }
 
 
@@ -498,8 +514,11 @@ void FGraphSolve::update_nodes()
 {
     // TODO reordering? not considered here
     int acc_start = 0;
-    for (int i = 0; i <= last_solved_node; i++) {
-        auto node_update = dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
+    for (int i = 0; i <= last_solved_node; i++)
+    {
+        // node update is the negative of dx just calculated.
+        //x = x - alhpa * H^(-1) * Grad = - dx    \ alpha = 1 since we are always close to the solution
+        auto node_update = -dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
         nodes_[i]->update(node_update);
 
         acc_start += nodes_[i]->get_dim();

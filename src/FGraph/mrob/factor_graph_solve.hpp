@@ -47,8 +47,12 @@ public:
      *
      */
     matData_t evaluate_problem();
+    /**
+     * Evaluates the current solution. No calculation of residuals.
+     */
+    matData_t chi2();
 
-    std::vector<MatX1> get_estimated_positions();
+    std::vector<MatX1> get_estimated_state();
 
 
 protected:

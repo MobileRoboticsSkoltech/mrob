@@ -21,8 +21,6 @@ Factor2Poses2d::Factor2Poses2d(const Mat31 &observation, std::shared_ptr<Node> &
                                std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf, bool updateNodeTarget):
         Factor(3, 6), obs_(observation), W_(obsInf)
 {
-    assert(nodeOrigin->get_id() && "Factor2Poses2d::Factor2Poses2d: Non initialized Node1. Add nodes first and then Factors to the FG\n");
-    assert(nodeTarget->get_id() && "Factor2Poses2d::Factor2Poses2d: Non initialized Node2. Add nodes first and then Factors to the FG\n");
     if (nodeOrigin->get_id() < nodeTarget->get_id())
     {
         neighbourNodes_.push_back(nodeOrigin);
@@ -48,33 +46,36 @@ Factor2Poses2d::Factor2Poses2d(const Mat31 &observation, std::shared_ptr<Node> &
 
 void Factor2Poses2d::evaluate_residuals() {
     // Evaluation of h(i,j)
-    auto    node1 = get_neighbour_nodes()->at(0).get()->get_state(),
-            node2 = get_neighbour_nodes()->at(1).get()->get_state();
+    Mat31   nodeOrigin = get_neighbour_nodes()->at(0).get()->get_state(),
+            nodeTarget = get_neighbour_nodes()->at(1).get()->get_state();
 
     // r = h(i,j) - obs = Ri^T * (xj- xi) - obs .  From "i", i.e, at its reference frame, we observe xj
-    auto h = node2 - node1;
+    Mat31 h = nodeTarget - nodeOrigin;
     Mat2 RiT;
-    double c1 = cos(node1(2)), s1 = sin(node1(2));
+    double c1 = cos(nodeOrigin(2)),
+           s1 = sin(nodeOrigin(2));
     RiT <<  c1, s1,
            -s1, c1;
     h.head(2) = RiT * h.head(2);
     r_ = h - obs_;
-    r_[2] = wrap_angle(r_[2]);
+    r_(2) = wrap_angle(r_(2));
 }
 
 void Factor2Poses2d::evaluate_jacobians()
 {
-    auto    node1 = get_neighbour_nodes()->at(0).get()->get_state(),
-            node2 = get_neighbour_nodes()->at(1).get()->get_state();
+    Mat31   nodeOrigin = get_neighbour_nodes()->at(0).get()->get_state(),
+            nodeTarget = get_neighbour_nodes()->at(1).get()->get_state();
 
     // r =  Ri^T * (xj- xi) - obs
     // J1 = [-R1^T,    J2 = [R1^T 0]
     //      [  ]           [0    1]
-    double c1 = cos(node1(2)), s1 = sin(node1(2));
-    double dx, dy;//TODO calculate
-    J_ <<   -c1, -s1, s1*dx - c1*dy,     c1, s1, 0,
-             s1, -c1, c1*dx + s1*dy,    -s1, c1, 0,
-              0,   0,     1,              0,  0, 1;
+    double c1 = cos(nodeOrigin(2)),
+           s1 = sin(nodeOrigin(2)),
+           dx = nodeTarget(0) - nodeOrigin(0),
+           dy = nodeTarget(1) - nodeOrigin(1);
+    J_ <<   -c1, -s1, -s1*dx + c1*dy,     c1, s1, 0,
+             s1, -c1, -c1*dx - s1*dy,    -s1, c1, 0,
+              0,   0,    -1,              0,  0, 1;
 }
 
 void Factor2Poses2d::evaluate_chi2()
@@ -113,7 +114,7 @@ void Factor2Poses2dOdom::evaluate_residuals()
             stateTarget = get_neighbour_nodes()->at(1).get()->get_state(); // x[i]
     auto prediction = get_odometry_prediction(stateOrigin, obs_);
 
-    r_ = stateTarget - prediction;
+    r_ =  prediction - stateTarget;
     r_[2] = wrap_angle(r_[2]);
 
 }

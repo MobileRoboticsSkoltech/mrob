@@ -32,7 +32,7 @@ void Factor1Pose2d::evaluate_jacobians()
 
 void Factor1Pose2d::evaluate_residuals()
 {
-    r_ = get_neighbour_nodes()->at(0).get()->get_state() - obs_;
+    r_ = obs_ - get_neighbour_nodes()->at(0).get()->get_state();
 }
 
 void Factor1Pose2d::evaluate_chi2()

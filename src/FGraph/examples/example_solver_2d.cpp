@@ -30,8 +30,11 @@ int main ()
 
     // Initial node is defined at 0,0,0, and anchor factor actually observing it at 0
     Mat31 x, obs;
-    x = Mat31::Zero();
+    x = Mat31::Random()*0.1;
     obs = Mat31::Zero();
+    // Nodes and factors are added to the graph using polymorphism. That is why
+    // we need to declare here what specific kind of nodes or factors we use
+    // while the definition is an abstract class (Node or Factor)
     std::shared_ptr<mrob::Node> n1(new mrob::NodePose2d(x));
     graph.add_node(n1);
     Mat3 obsInformation= Mat3::Identity();
@@ -41,6 +44,7 @@ int main ()
 
 
     // Node 2, initialized at 0,0,0
+    if (0){
     std::shared_ptr<mrob::Node> n2(new mrob::NodePose2d(x));
     graph.add_node(n2);
 
@@ -54,12 +58,14 @@ int main ()
     obs << -1 , -1 , 0;
     std::shared_ptr<mrob::Factor> f3(new mrob::Factor2Poses2d(obs,n2,n1,obsInformation));
     graph.add_factor(f3);
-
+    }
 
 
 
     // solve the Gauss Newton optimization
     graph.print(true);
+    graph.solve_batch();
+    graph.solve_batch();
     graph.solve_batch();
 
     std::cout << "\nSolved, chi2 = " << graph.evaluate_problem() << std::endl;
