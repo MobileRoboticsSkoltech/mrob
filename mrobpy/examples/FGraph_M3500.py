@@ -15,7 +15,7 @@ def print_2d_graph(graph):
     prev_p = np.zeros(3)
     plt.figure()
     for p in x:
-        plt.plot(p[0],p[1],'ob')
+        #plt.plot(p[0],p[1],'ob')
         plt.plot((prev_p[0],p[0]),(prev_p[1],p[1]) , '-b')
         prev_p = p
     plt.show()
@@ -27,7 +27,7 @@ def print_2d_graph(graph):
 vertex_ini = {}
 factors = {}
 factors_dictionary = {}
-N = 200 #3500
+N = 1500
 
 # load file
 with open('../../datasets/M3500.txt', 'r') as file:
@@ -53,6 +53,7 @@ x = np.zeros(3)
 n = graph.add_node_pose_2d(x)
 print('node 0 id = ', n) # id starts at 1
 graph.add_factor_1pose_2d(x,n,1e9*np.identity(3))
+processing_time = []
 
 # start events, we solve for each node, adding it and it corresponding factors
 # in total takes 0.3s to read all datastructure
@@ -80,20 +81,25 @@ for t in range(1,N):
     start = time.time()
     graph.solve_batch()
     end = time.time()
-    print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation = ', end - start)
+    print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    processing_time.append(1e3*(end - start))
     
     # problem error or xi2
     #print('X2', t)
 
     # plot the current problem
-    if t % 50 == 0:
-        print_2d_graph(graph)
+    if (t+1) % 1500 == 0:
+        #print_2d_graph(graph)
+        pass
 
 
 
 
 graph.print(False)
-
+plt.figure()
+plt.plot(processing_time)
+plt.title('Eigen simplicial LLT with Natural Ordering')
+plt.show()
 
 
 

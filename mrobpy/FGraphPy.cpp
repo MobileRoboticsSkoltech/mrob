@@ -26,7 +26,8 @@ using namespace mrob;
 
 
 /**
- * Create auxiliary class to include all functions creates factors and nodes
+ * Create auxiliary class to include all functions:
+ *    - creates specific factors and nodes (while the cpp maintains a polymorphic data structure)
  *
  */
 
@@ -36,7 +37,7 @@ public:
     /**
      * Constructor for the python binding. By default uses the Cholesky adjoint solving type, and some estimated number of nodes and factors.
      */
-    FGraphPy(uint_t potNumberNodes, uint_t potNumberFactors) : FGraphSolve(FGraphSolve::solveMethod::CHOL_ADJ,potNumberNodes,potNumberFactors) {};
+    FGraphPy(uint_t potNumberNodes, uint_t potNumberFactors) : FGraphSolve(FGraphSolve::solveMethod::CHOL,potNumberNodes,potNumberFactors) {};
     id_t add_node_pose_2d(const py::EigenDRef<const Mat31> x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodePose2d(x));
@@ -72,9 +73,7 @@ public:
 void init_FGraph(py::module &m)
 {
     py::enum_<FGraphSolve::solveMethod>(m, "FGraph.solveMethod")
-        .value("CHOL_ADJ", FGraphSolve::solveMethod::CHOL_ADJ)
         .value("CHOL", FGraphSolve::solveMethod::CHOL)
-        .value("QR", FGraphSolve::solveMethod::QR)
         .value("SCHUR", FGraphSolve::solveMethod::SCHUR)
         .export_values()
         ;
@@ -87,7 +86,9 @@ void init_FGraph(py::module &m)
             //.def("set_solve_method", &FGraphSolve::set_solve_method)
             .def("solve_batch", &FGraphSolve::solve_batch)
             .def("solve_incremental", &FGraphSolve::solve_incremental)
-            .def("chi2", &FGraphSolve::chi2)
+            .def("chi2", &FGraphSolve::chi2,
+                    "Calculated the chi2 of the problem. By default re-evaluates residuals, set to false if doesn't",
+                    py::arg("evaluateResidualsFlag") = true)
             .def("get_estimated_state", &FGraphSolve::get_estimated_state)
             .def("add_node_pose_2d", &FGraphPy::add_node_pose_2d)
             .def("add_factor_1pose_2d", &FGraphPy::add_factor_1pose_2d)

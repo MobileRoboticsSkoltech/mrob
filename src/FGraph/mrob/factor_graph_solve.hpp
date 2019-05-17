@@ -32,45 +32,55 @@ namespace mrob {
 class FGraphSolve: public FGraph
 {
 public:
-    enum solveMethod{CHOL_ADJ=0, CHOL, SCHUR, QR};
+    enum solveMethod{CHOL=0, SCHUR};
 
-    FGraphSolve(solveMethod method = CHOL_ADJ, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
+    FGraphSolve(solveMethod method = CHOL, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
     virtual ~FGraphSolve();
-    void set_solve_method(solveMethod method) {method_ = method;};
-    solveMethod get_solve_method() { return method_;};
+    /**
+     * Solves the batch problem, by linearizing, ordering
+     */
     void solve_batch();
+    /**
+     * Solve incremental, uses previous solution and linearization point
+     * to incrementally solve the problem
+     */
     void solve_incremental();
 
     /**
-     * Evaluates the current problem, that is, evaluate residuals and chi2.
-     * at the current state.
+     * Evaluates the current solution chi2.
      *
+     * Variable relinearizeProblemFlag:
+     *      - (default) true: Recalculates residuals.
+     *      - false: Uses the previous calculated residuals
      */
-    matData_t evaluate_problem();
-    /**
-     * Evaluates the current solution. No calculation of residuals.
-     */
-    matData_t chi2();
+    matData_t chi2(bool evaluateResidualsFlag = true);
 
     std::vector<MatX1> get_estimated_state();
+    //TODO are this necessary?
+    void set_solve_method(solveMethod method) {method_ = method;};
+    solveMethod get_solve_method() { return method_;};
 
 
 protected:
     /**
      * This protected method creates an Adjacency matrix, iterating over
-     * all factors in the FG and including the squared root of the information
-     * on every row W^T/2 or W, depending on the solving method (QR or Chol)
-     * The residuals are also calculated as b = W^(1/2)*r or b = A^T * W *r
+     * all factors in the FG and creates a block diagonal matrix W with each factors information.
+     *
+     * During build adjacency also we keep track of the number of factors for each
+     * node and order them according to the minimum order degree. The permutation vector
+     * is stored on the class variable permutation_
+     *
      */
     void build_adjacency();
     void build_adjacency_incremental(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new);
-    void build_problem();
+    void build_direct_info();//TODO
 
     /**
-     * TODO directly allocating components of the Information matrix
+     * Solve the systems using Cholesky decomposition.
+     * In addition, it creates the information matrix as
+     *              I = A^T * W * A
+     * The residuals are also calculated as b = A^T * W *r
      */
-    void build_direct_info();
-    void solve_QR();
     void solve_cholesky();
     void solve_chol_incremental();
 
@@ -80,15 +90,16 @@ protected:
      */
     void update_nodes();
 
-    // Variables for full solve
+    // Variables for solving the FG
     solveMethod method_;
 
+    std::vector<id_t> permutation_;
     SMatRow A_; //Adjacency matrix, as a Row sparse matrix
     SMatRow W_; //A block diagonal information matrix. For types Adjacency it calculates its block transposed squared root
     MatX1 r_; // Residuals as given by the factors
 
     SMatCol I_; //Information matrix
-    MatX1 b_; // Post-processed residuals, either A'*W*r for the normal equation or W*r for QR solvers
+    MatX1 b_; // Post-processed residuals, A'*W*r
 
     // Variables for incremental solve
     //TODO remove long data type, and check they are necessary

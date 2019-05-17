@@ -97,19 +97,16 @@ protected:
      *
      */
     //std::unordered_set<std::shared_ptr<Node> >   nodes_;
-    std::vector<std::shared_ptr<Node> >   nodes_, localNodes_;
+    std::vector<std::shared_ptr<Node> >   nodes_;
 
     //std::unordered_set<std::shared_ptr<Factor> > factors_;
-    std::vector<std::shared_ptr<Factor> > factors_, localFactors_;
+    std::vector<std::shared_ptr<Factor> > factors_;
 
     /**
      * Total accumulated dimensions on both the state (nodes)
      * and the observations (factors)
      */
     uint_t stateDim_, obsDim_;
-    // This variable is for selecting subsets of nodes and factors stored on
-    // localNodes and localFactors. TODO
-    bool isHoleProblem_;
 };
 
 

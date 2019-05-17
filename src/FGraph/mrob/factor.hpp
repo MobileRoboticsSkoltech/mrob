@@ -49,11 +49,11 @@ public:
     Factor(uint_t dim, uint_t allNodesDim, uint_t potNumberNodes = 5);
     virtual ~Factor();
     /**
-     * Residuals are evaluated. This function
+     * Residuals are evaluated with respect to the current solution
      */
     virtual void evaluate_residuals() = 0;
     /**
-     * Evaluates Jacobians.
+     * Evaluates Jacobians, this also creates a new linearization point.
      * This function MOST likely needs to evaluate residuals first
      */
     virtual void evaluate_jacobians() = 0;
@@ -76,12 +76,12 @@ public:
     virtual const Eigen::Ref<const MatX1> get_obs() const = 0;
     virtual const Eigen::Ref<const MatX1> get_residual() const = 0;
     virtual const Eigen::Ref<const MatX> get_information_matrix() const = 0;
+    //XXX since we dont use QR this may be deprecated, isnt it?
     virtual const Eigen::Ref<const MatX> get_trans_sqrt_information_matrix() const = 0;
     /**
      * get_jacobian returns a block matrices stacking all the Jacobians on the factor.
      * The convention is that Jacobians corresponding to
      *
-     * TODO test this. Do we really need an ordered Jacobian??
      */
     virtual const Eigen::Ref<const MatX> get_jacobian() const = 0;
 

@@ -36,27 +36,11 @@ FGraphSolve::FGraphSolve(solveMethod method, uint_t potNumberNodes, uint_t potNu
 FGraphSolve::~FGraphSolve() = default;
 
 
-void FGraphSolve::build_problem()
-{
-    switch(method_)
-    {
-    case QR:
-    case CHOL_ADJ:
-        build_adjacency();
-        break;
-    case CHOL:
-    case SCHUR:
-    default:
-        assert(0 && "FGraphSolve::buildProblem: Method not implemented\n");
-        break;
-    }
-}
-
 // TODO separate this function into different funsiotn, same as build problem
 void FGraphSolve::solve_batch()
 {
     // Linearizes and calculates the Jacobians and required matrices
-    this->build_problem();
+    build_adjacency();
 
     this->solve_cholesky();
 
@@ -88,6 +72,7 @@ void FGraphSolve::solve_incremental()
     last_solved_factor = factors_.size() - 1;
 }
 
+
 std::vector<MatX1> FGraphSolve::get_estimated_state()
 {
     vector<MatX1> results;
@@ -111,21 +96,12 @@ void FGraphSolve::build_adjacency()
     A_.resize(obsDim_, stateDim_);//Sparse matrix clear data
     W_.resize(obsDim_, obsDim_);//TODO should we reinitialize this all the time? an incremental should be fairly easy
 
-    // 1) create the vector's structures to iterate faster
+    // 1) create the vector's structures
     std::vector<std::shared_ptr<Factor> >* factors;
     std::vector<std::shared_ptr<Node> >* nodes;
     // TODO: optimizing subgraph is not an option now
-    if (isHoleProblem_)
-    {
-        factors = &factors_;
-        nodes = &nodes_;
-    }
-    else
-    {
-        // XXX this option is not implemented for now
-        factors = &localFactors_;
-        nodes = &localNodes_;
-    }
+    factors = &factors_;
+    nodes = &nodes_;
 
     // 2) vector structure to bookkeep the starting Nodes indices inside A
     std::vector<uint_t> indNodesMatrix;
@@ -211,14 +187,9 @@ void FGraphSolve::build_adjacency()
             {
                 uint_t iRow = indFactorsMatrix[i] + l;
                 uint_t iCol = indFactorsMatrix[i] + k;
-                if (QR)
-                {
-                    W_.insert(iRow,iCol) = f->get_trans_sqrt_information_matrix()(l,k);
-                }
-                else
-                {
-                    W_.insert(iRow,iCol) = f->get_information_matrix()(l,k);
-                }
+                W_.insert(iRow,iCol) = f->get_information_matrix()(l,k);
+                // If QR, then we need
+                //W_.insert(iRow,iCol) = f->get_trans_sqrt_information_matrix()(l,k);
             }
         }
     } //end factors loop
@@ -226,27 +197,17 @@ void FGraphSolve::build_adjacency()
 //    std::cout << A_ << std::endl;
 //    std::cout << W_ << std::endl;
 //    cout << endl << r_ << endl;
+
 }
 
-matData_t FGraphSolve::evaluate_problem()
+matData_t FGraphSolve::chi2(bool evaluateResidualsFlag)
 {
     matData_t totalChi2 = 0.0;
     for (uint_t i = 0; i < factors_.size(); ++i)
     {
         auto f = factors_[i];
-        f->evaluate_residuals();
-        f->evaluate_chi2();
-        totalChi2 += f->get_chi2();
-    }
-    return totalChi2;
-}
-
-matData_t FGraphSolve::chi2()
-{
-    matData_t totalChi2 = 0.0;
-    for (uint_t i = 0; i < factors_.size(); ++i)
-    {
-        auto f = factors_[i];
+        if (evaluateResidualsFlag)
+            f->evaluate_residuals();
         f->evaluate_chi2();
         totalChi2 += f->get_chi2();
     }
@@ -347,32 +308,32 @@ void FGraphSolve::build_direct_info()
     assert(0 && "FGraphSolve::buildProblemDirectInfo: Routine not implemented");
 }
 
-void FGraphSolve::solve_QR()
-{
-    // W^T/2 corresponds to the upper triangular matrix, so we keep that format
-    A_ = W_.triangularView<Eigen::Upper>() * A_;//creates a compressed Matrix
-    b_ = W_.triangularView<Eigen::Upper>() * r_;
-}
-
 void FGraphSolve::solve_cholesky()
 {
     /**
      * I_ dx = b_ corresponds to the normal equation A'*W*A dx = A'*W*r
      * only store the lower part of the information matrix (symmetric)
+     *
+     * XXX: In terms of speed, using the selfadjointview does not improve,
+     * we store a temporary object and then copy only the upper part.
      */
     I_ = (A_.transpose() * W_.selfadjointView<Eigen::Upper>() * A_).selfadjointView<Eigen::Upper>();
     b_ = A_.transpose() * W_.selfadjointView<Eigen::Upper>() * r_;
 
-    //cout << I_.toDense().diagonal() << endl;
-
-    /**
-     * Solve LSQ via sparse Cholesky
-     * TODO reordering
-     */
+    if (1)
+    {
     CustomCholesky<SMatCol> cholesky(I_);
     y_ = cholesky.matrixL().solve(b_);
     dx_ = cholesky.matrixU().solve(y_);
+    }
 
+    // TODO remove this, only for comparison
+    if (0)
+    {
+        SimplicialLLT<SMatCol,Lower,NaturalOrdering<int>> cholesky;
+        cholesky.compute(I_);
+        dx_ = cholesky.solve(b_);
+    }
 //    cout << cholesky.getL().toDense() << endl;
 //    cout << y_ << endl;
 //    cout << endl;
@@ -517,7 +478,7 @@ void FGraphSolve::update_nodes()
     for (int i = 0; i <= last_solved_node; i++)
     {
         // node update is the negative of dx just calculated.
-        //x = x - alhpa * H^(-1) * Grad = - dx    \ alpha = 1 since we are always close to the solution
+        //x = x - alhpa * H^(-1) * Grad = x - dx    \ alpha = 1 since we are close to the solution
         auto node_update = -dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
         nodes_[i]->update(node_update);
 
