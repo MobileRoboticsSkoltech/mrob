@@ -27,7 +27,7 @@ def print_2d_graph(graph):
 vertex_ini = {}
 factors = {}
 factors_dictionary = {}
-N = 1500
+N = 25#3500
 
 # load file
 with open('../../datasets/M3500.txt', 'r') as file:
@@ -45,7 +45,7 @@ with open('../../datasets/M3500.txt', 'r') as file:
             # create an empty list of pairs of nodes (factor) connected to each node
             factors_dictionary[int(d[1])] = []
 
-print(factors_dictionary)
+#print(factors_dictionary)
 
 # Initialize FG
 graph = mrob.FGraph(3500,5500)
@@ -88,8 +88,8 @@ for t in range(1,N):
     #print('X2', t)
 
     # plot the current problem
-    if (t+1) % 1500 == 0:
-        #print_2d_graph(graph)
+    if (t+1) % 3500 == 0:
+        print_2d_graph(graph)
         pass
 
 

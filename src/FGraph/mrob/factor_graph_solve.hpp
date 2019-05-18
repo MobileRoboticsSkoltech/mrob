@@ -93,7 +93,12 @@ protected:
     // Variables for solving the FG
     solveMethod method_;
 
-    std::vector<id_t> permutation_;
+    /**
+     * Minimum degree ordering data structures.
+     * permutation: from the node vector index to the ordered index
+     * permutationInverse_;  back from the ordered index to the node vector
+     */
+    std::vector<id_t> permutation_, permutationInverse_;
     SMatRow A_; //Adjacency matrix, as a Row sparse matrix
     SMatRow W_; //A block diagonal information matrix. For types Adjacency it calculates its block transposed squared root
     MatX1 r_; // Residuals as given by the factors

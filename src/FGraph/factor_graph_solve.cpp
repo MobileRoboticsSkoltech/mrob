@@ -19,6 +19,7 @@
 #include <Eigen/SparseCholesky>
 #include <mrob/factor_graph_solve.hpp>
 
+#include <chrono>
 
 using namespace mrob;
 using namespace std;
@@ -99,20 +100,48 @@ void FGraphSolve::build_adjacency()
     // 1) create the vector's structures
     std::vector<std::shared_ptr<Factor> >* factors;
     std::vector<std::shared_ptr<Node> >* nodes;
-    // TODO: optimizing subgraph is not an option now
+    // TODO: optimizing subgraph is not an option now, but we maintain generality
     factors = &factors_;
     nodes = &nodes_;
 
     // 2) vector structure to bookkeep the starting Nodes indices inside A
+    // 2.1) Node ordering and permutations vector
+    // TODO remove natural node ordering, results are not good.
+    std::vector<std::pair<id_t,id_t>> permutation;
+    permutation.reserve(nodes->size());
+    for (id_t i = 0; i < nodes->size(); ++i)
+    {
+        // create a vector with the number of factors for reordering
+        //TODO could this be incremental? very minor gain
+        permutation.push_back(std::make_pair((*nodes)[i]->get_neighbour_factors()->size(),i));
+    }
+    std::sort(permutation.begin(), permutation.end());
+
+    // 2.2) fill permutation and inverse
+    permutation_.resize(nodes->size());
+    permutationInverse_.resize(nodes->size());
+    for (id_t i = 0; i < permutation.size(); ++i)
+    {
+        //permutationInverse_[permutation[i].second] = i;
+        //permutation_[i] = permutation[i].second;
+        // no permutation
+        permutation_[i] = i;
+        permutationInverse_[i] = i;
+    }
+
+    // 2.2) Node indixes bookeept
     std::vector<uint_t> indNodesMatrix;
     indNodesMatrix.reserve(nodes->size());
+
+
     uint_t N = 0;
-    for (uint_t i = 0; i < nodes->size(); ++i)
+    for (id_t i = 0; i < nodes->size(); ++i)
     {
         // calculate the indices to access
-        uint_t dim = (*nodes)[i]->get_dim();
+        uint_t dim = (*nodes)[permutation_[i]]->get_dim();
         indNodesMatrix.push_back(N);
         N += dim;
+
     }
     assert(N == stateDim_ && "FGraphSolve::buildAdjacency: State Dimensions are not coincident\n");
 
@@ -146,7 +175,7 @@ void FGraphSolve::build_adjacency()
     W_.reserve(reservationW); //same
 
 
-    // This could be subject to parallelization, maybe on two steps: eval + build
+    // XXX This could be subject to parallelization, maybe on two steps: eval + build
     for (uint_t i = 0; i < factors->size(); ++i)
     {
         auto f = (*factors)[i];
@@ -155,9 +184,8 @@ void FGraphSolve::build_adjacency()
         r_.block(indFactorsMatrix[i], 0, f->get_dim(), 1) << f->get_residual();
 
         // 5) build Adjacency matrix as a composition of rows
-        // 5.1) Get the number of nodes involved. It is a sorted list
+        // 5.1) Get the number of nodes involved. It is a vector of nodes
         auto neighNodes = f->get_neighbour_nodes();
-        //TODO test if a local variable for jacobian speepds up things
         // Iterates over the Jacobian row
         for (uint_t l=0; l < f->get_dim() ; ++l)
         {
@@ -165,13 +193,14 @@ void FGraphSolve::build_adjacency()
             // Iterates over the number of neighbour Nodes (ordered by construction)
             for (uint_t j=0; j < neighNodes->size(); ++j)
             {
-                uint_t indNode = (*neighNodes)[j]->get_id(); //XXX changes on indices to 0
+                uint_t indNode = permutationInverse_[(*neighNodes)[j]->get_id()];
                 uint_t dimNode = (*neighNodes)[j]->get_dim();
                 for(uint_t k = 0; k < dimNode; ++k)
                 {
+                    // order according to the permutation vector
                     uint_t iRow = indFactorsMatrix[i] + l;
                     uint_t iCol = indNodesMatrix[indNode] + k;
-                    // This is an ordered insertion
+                    // XXX This is not an ordered insertion. Is it better to order and then insert?
                     A_.insert(iRow,iCol) = f->get_jacobian()(l, k + totalK);
                 }
                 totalK += dimNode;
@@ -179,8 +208,8 @@ void FGraphSolve::build_adjacency()
         }
 
 
-        // 5) Get information matrix for every factor, ONLY for the QR we need W^T/2
-        for (uint_t l =0; l < f->get_dim(); ++l)
+        // 5) Get information matrix for every factor
+        for (uint_t l = 0; l < f->get_dim(); ++l)
         {
             // only iterates over the upper triangular part
             for (uint_t k = l; k < f->get_dim(); ++k)
@@ -317,27 +346,28 @@ void FGraphSolve::solve_cholesky()
      * XXX: In terms of speed, using the selfadjointview does not improve,
      * we store a temporary object and then copy only the upper part.
      */
-    I_ = (A_.transpose() * W_.selfadjointView<Eigen::Upper>() * A_).selfadjointView<Eigen::Upper>();
+    I_ = (A_.transpose() * W_.selfadjointView<Eigen::Upper>() * A_);
     b_ = A_.transpose() * W_.selfadjointView<Eigen::Upper>() * r_;
 
-    if (1)
+    if (0)
     {
     CustomCholesky<SMatCol> cholesky(I_);
     y_ = cholesky.matrixL().solve(b_);
     dx_ = cholesky.matrixU().solve(y_);
     }
-
     // TODO remove this, only for comparison
-    if (0)
+    else
     {
-        SimplicialLLT<SMatCol,Lower,NaturalOrdering<int>> cholesky;
+        //SimplicialLLT<SMatCol,Lower,NaturalOrdering<int>> cholesky;
+        //SimplicialLLT<SMatCol,Lower,COLAMDOrdering<int>> cholesky;//Not implemented, results as natural ordering
+        SimplicialLLT<SMatCol,Lower, AMDOrdering<int>> cholesky;//Best results.
         cholesky.compute(I_);
         dx_ = cholesky.solve(b_);
     }
-//    cout << cholesky.getL().toDense() << endl;
+//    cout << I_.toDense() << endl;
 //    cout << y_ << endl;
 //    cout << endl;
-//    cout << dx_ << endl;
+    cout << r_ << endl;
 
     // Save data for incremental update
     /*
@@ -475,14 +505,15 @@ void FGraphSolve::update_nodes()
 {
     // TODO reordering? not considered here
     int acc_start = 0;
-    for (int i = 0; i <= last_solved_node; i++)
+    //for (int i = 0; i <= last_solved_node; i++)
+    for (int i = 0; i < nodes_.size(); i++)
     {
         // node update is the negative of dx just calculated.
         //x = x - alhpa * H^(-1) * Grad = x - dx    \ alpha = 1 since we are close to the solution
-        auto node_update = -dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
-        nodes_[i]->update(node_update);
+        auto node_update = -dx_.block(acc_start, 0, nodes_[permutation_[i]]->get_dim(), 1);
+        nodes_[permutation_[i]]->update(node_update);
 
-        acc_start += nodes_[i]->get_dim();
+        acc_start += nodes_[permutation_[i]]->get_dim();
     }
 }
 
