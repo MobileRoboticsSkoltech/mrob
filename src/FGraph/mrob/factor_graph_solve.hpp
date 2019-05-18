@@ -73,7 +73,8 @@ protected:
      */
     void build_adjacency();
     void build_adjacency_incremental(SMatCol &A_new, SMatCol &W_new, MatX1 &r_new);
-    void build_direct_info();//TODO
+    void build_info_adjacency();
+    void build_info_direct();//TODO
 
     /**
      * Solve the systems using Cholesky decomposition.
@@ -93,12 +94,6 @@ protected:
     // Variables for solving the FG
     solveMethod method_;
 
-    /**
-     * Minimum degree ordering data structures.
-     * permutation: from the node vector index to the ordered index
-     * permutationInverse_;  back from the ordered index to the node vector
-     */
-    std::vector<id_t> permutation_, permutationInverse_;
     SMatRow A_; //Adjacency matrix, as a Row sparse matrix
     SMatRow W_; //A block diagonal information matrix. For types Adjacency it calculates its block transposed squared root
     MatX1 r_; // Residuals as given by the factors
@@ -116,6 +111,8 @@ protected:
     // Correction deltas DEPRECATED?
     MatX1 dx_;
     //TODO ordering matrix for variables/nodes
+
+    std::vector<double> time_profiles_;//used for time profiling functions
 };
 
 

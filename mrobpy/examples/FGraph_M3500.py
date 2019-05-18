@@ -27,7 +27,7 @@ def print_2d_graph(graph):
 vertex_ini = {}
 factors = {}
 factors_dictionary = {}
-N = 25#3500
+N = 3500
 
 # load file
 with open('../../datasets/M3500.txt', 'r') as file:

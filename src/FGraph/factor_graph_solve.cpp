@@ -20,6 +20,7 @@
 #include <mrob/factor_graph_solve.hpp>
 
 #include <chrono>
+typedef std::chrono::microseconds Ttim;
 
 using namespace mrob;
 using namespace std;
@@ -40,10 +41,37 @@ FGraphSolve::~FGraphSolve() = default;
 // TODO separate this function into different funsiotn, same as build problem
 void FGraphSolve::solve_batch()
 {
-    // Linearizes and calculates the Jacobians and required matrices
-    build_adjacency();
+    /**
+     * 2800 nodes
+     * Time profile :13.902 % build Adjacency matrix,
+     *               34.344 % build Information,
+     *               48.0506 % build Cholesky,
+     *               2.3075 % solve forward and back subtitution,
+     *               1.3959 % update values,
+     *
+     */
 
+    // Linearizes and calculates the Jacobians and required matrices
+    time_profiles_.clear();
+    auto t1 = std::chrono::steady_clock::now();
+    build_adjacency();
+    auto t2 = std::chrono::steady_clock::now();
+    auto dif = std::chrono::duration_cast<Ttim>(t2 - t1);
+    time_profiles_.push_back(dif.count());
+
+    t1 = std::chrono::steady_clock::now();
+    build_info_adjacency();
+    t2 = std::chrono::steady_clock::now();
+    dif = std::chrono::duration_cast<Ttim>(t2 - t1);
+    time_profiles_.push_back(dif.count());
+
+
+
+    t1 = std::chrono::steady_clock::now();
     this->solve_cholesky();
+    t2 = std::chrono::steady_clock::now();
+    dif = std::chrono::duration_cast<Ttim>(t2 - t1);
+    time_profiles_.push_back(dif.count());
 
     // Keep indices of last node and factor, as well as dimensions
     last_stateDim = stateDim_;
@@ -51,7 +79,19 @@ void FGraphSolve::solve_batch()
 
     last_solved_node = nodes_.size() - 1;
     last_solved_factor = factors_.size() - 1;
+    t1 = std::chrono::steady_clock::now();
     this->update_nodes();
+    t2 = std::chrono::steady_clock::now();
+    dif = std::chrono::duration_cast<Ttim>(t2 - t1);
+    time_profiles_.push_back(dif.count());
+
+    double sum = 0;
+    for (auto t : time_profiles_)
+        sum += t;
+
+    std::cout << "\nTime profile :";
+    for (auto t : time_profiles_)
+        std::cout << t/sum *100 << ", ";
 }
 
 void FGraphSolve::solve_incremental()
@@ -105,40 +145,16 @@ void FGraphSolve::build_adjacency()
     nodes = &nodes_;
 
     // 2) vector structure to bookkeep the starting Nodes indices inside A
-    // 2.1) Node ordering and permutations vector
-    // TODO remove natural node ordering, results are not good.
-    std::vector<std::pair<id_t,id_t>> permutation;
-    permutation.reserve(nodes->size());
-    for (id_t i = 0; i < nodes->size(); ++i)
-    {
-        // create a vector with the number of factors for reordering
-        //TODO could this be incremental? very minor gain
-        permutation.push_back(std::make_pair((*nodes)[i]->get_neighbour_factors()->size(),i));
-    }
-    std::sort(permutation.begin(), permutation.end());
 
-    // 2.2) fill permutation and inverse
-    permutation_.resize(nodes->size());
-    permutationInverse_.resize(nodes->size());
-    for (id_t i = 0; i < permutation.size(); ++i)
-    {
-        //permutationInverse_[permutation[i].second] = i;
-        //permutation_[i] = permutation[i].second;
-        // no permutation
-        permutation_[i] = i;
-        permutationInverse_[i] = i;
-    }
-
-    // 2.2) Node indixes bookeept
+    // 2.2) Node indexes bookeept
     std::vector<uint_t> indNodesMatrix;
     indNodesMatrix.reserve(nodes->size());
-
 
     uint_t N = 0;
     for (id_t i = 0; i < nodes->size(); ++i)
     {
         // calculate the indices to access
-        uint_t dim = (*nodes)[permutation_[i]]->get_dim();
+        uint_t dim = (*nodes)[i]->get_dim();
         indNodesMatrix.push_back(N);
         N += dim;
 
@@ -193,7 +209,7 @@ void FGraphSolve::build_adjacency()
             // Iterates over the number of neighbour Nodes (ordered by construction)
             for (uint_t j=0; j < neighNodes->size(); ++j)
             {
-                uint_t indNode = permutationInverse_[(*neighNodes)[j]->get_id()];
+                uint_t indNode = (*neighNodes)[j]->get_id();
                 uint_t dimNode = (*neighNodes)[j]->get_dim();
                 for(uint_t k = 0; k < dimNode; ++k)
                 {
@@ -227,6 +243,21 @@ void FGraphSolve::build_adjacency()
 //    std::cout << W_ << std::endl;
 //    cout << endl << r_ << endl;
 
+}
+
+void FGraphSolve::build_info_adjacency()
+{
+    /**
+     * I_ dx = b_ corresponds to the normal equation A'*W*A dx = A'*W*r
+     * only store the lower part of the information matrix (symmetric)
+     *
+     * XXX: In terms of speed, using the selfadjointview does not improve,
+     * we store a temporary object and then copy only the upper part.
+     *
+     *
+     */
+    I_ = (A_.transpose() * W_.selfadjointView<Eigen::Upper>() * A_);
+    b_ = A_.transpose() * W_.selfadjointView<Eigen::Upper>() * r_;
 }
 
 matData_t FGraphSolve::chi2(bool evaluateResidualsFlag)
@@ -332,22 +363,14 @@ void FGraphSolve::build_adjacency_incremental(SMatCol &A_new, SMatCol &W_new, Ma
 }
 
 
-void FGraphSolve::build_direct_info()
+void FGraphSolve::build_info_direct()
 {
     assert(0 && "FGraphSolve::buildProblemDirectInfo: Routine not implemented");
 }
 
 void FGraphSolve::solve_cholesky()
 {
-    /**
-     * I_ dx = b_ corresponds to the normal equation A'*W*A dx = A'*W*r
-     * only store the lower part of the information matrix (symmetric)
-     *
-     * XXX: In terms of speed, using the selfadjointview does not improve,
-     * we store a temporary object and then copy only the upper part.
-     */
-    I_ = (A_.transpose() * W_.selfadjointView<Eigen::Upper>() * A_);
-    b_ = A_.transpose() * W_.selfadjointView<Eigen::Upper>() * r_;
+
 
     if (0)
     {
@@ -367,7 +390,7 @@ void FGraphSolve::solve_cholesky()
 //    cout << I_.toDense() << endl;
 //    cout << y_ << endl;
 //    cout << endl;
-    cout << r_ << endl;
+//    cout << r_ << endl;
 
     // Save data for incremental update
     /*
@@ -510,10 +533,10 @@ void FGraphSolve::update_nodes()
     {
         // node update is the negative of dx just calculated.
         //x = x - alhpa * H^(-1) * Grad = x - dx    \ alpha = 1 since we are close to the solution
-        auto node_update = -dx_.block(acc_start, 0, nodes_[permutation_[i]]->get_dim(), 1);
-        nodes_[permutation_[i]]->update(node_update);
+        auto node_update = -dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
+        nodes_[i]->update(node_update);
 
-        acc_start += nodes_[permutation_[i]]->get_dim();
+        acc_start += nodes_[i]->get_dim();
     }
 }
 
