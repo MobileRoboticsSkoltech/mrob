@@ -53,7 +53,7 @@ namespace mrob{
         // declared here but initialized on child classes
         Mat31 obs_, r_; //and residuals
         Mat3 W_;//inverse of observation covariance (information matrix)
-        Mat3 WT2_;//transpose and squared root of W.
+        Mat3 WT2_;//transpose and squared root of W = RT R = W1/2 * WT/2.
         Mat<3,6> J_;//Joint Jacobian
 
     public:

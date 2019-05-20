@@ -89,17 +89,19 @@ for t in range(1,N):
 
     # plot the current problem
     if (t+1) % 3500 == 0:
-        print_2d_graph(graph)
+        #print_2d_graph(graph)
         pass
 
 
 
 
 graph.print(False)
-plt.figure()
-plt.plot(processing_time)
-plt.title('Eigen simplicial LLT with Natural Ordering')
-plt.show()
+if 0:
+    plt.figure()
+    plt.plot(processing_time)
+    plt.title('Eigen simplicial LLT with Natural Ordering')
+    plt.show()
+    
 
 
 

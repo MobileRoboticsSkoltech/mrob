@@ -395,9 +395,11 @@ void FGraphSolve::solve_cholesky()
     // TODO remove this, only for comparison
     else
     {
-        //SimplicialLLT<SMatCol,Lower,NaturalOrdering<int>> cholesky;
-        //SimplicialLLT<SMatCol,Lower,COLAMDOrdering<int>> cholesky;//Not implemented, results as natural ordering
+        //SimplicialLLT<SMatCol,Lower,NaturalOrdering<SMatCol::StorageIndex>> cholesky;
+        //SimplicialLLT<SMatCol,Lower,COLAMDOrdering<SMatCol::StorageIndex>> cholesky; I_.makeCompressed();
         SimplicialLLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;//Best results.
+        //SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;//good results
+
         cholesky.compute(I_);
         dx_ = cholesky.solve(b_);
     }
