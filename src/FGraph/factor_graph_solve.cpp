@@ -17,7 +17,7 @@
 #include <Eigen/SparseCore>
 #include <Eigen/SparseLU>
 #include <Eigen/SparseCholesky>
-#include <mrob/factor_graph_solve.hpp>
+#include <Eigen/SparseQR>
 
 #include <chrono>
 typedef std::chrono::microseconds Ttim;
@@ -117,13 +117,12 @@ void FGraphSolve::solve_incremental()
 std::vector<MatX1> FGraphSolve::get_estimated_state()
 {
     vector<MatX1> results;
-    int acc_start = 0;
+    results.reserve(nodes_.size());
 
-    for (uint_t i = 0; i <= last_solved_node; i++) {
-        MatX1 updated_pos = nodes_[i]->get_state() + dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
+    for (uint_t i = 0; i < nodes_.size(); i++) {
+        MatX1 updated_pos = nodes_[i]->get_state();
         results.emplace_back(updated_pos);
 
-        acc_start += nodes_[i]->get_dim();
     }
 
     return results;
@@ -197,7 +196,7 @@ void FGraphSolve::build_adjacency()
         auto f = (*factors)[i];
 
         // 4) Get the calculated residual
-        r_.block(indFactorsMatrix[i], 0, f->get_dim(), 1) << f->get_residual();
+        r_.block(indFactorsMatrix[i], 0, f->get_dim(), 1) <<  f->get_residual();
 
         // 5) build Adjacency matrix as a composition of rows
         // 5.1) Get the number of nodes involved. It is a vector of nodes
@@ -374,16 +373,31 @@ void FGraphSolve::solve_cholesky()
 
     if (0)
     {
-    CustomCholesky<SMatCol> cholesky(I_);
-    y_ = cholesky.matrixL().solve(b_);
-    dx_ = cholesky.matrixU().solve(y_);
+    //CustomCholesky<SMatCol> cholesky(I_);
+    //y_ = cholesky.matrixL().solve(b_);
+    //dx_ = cholesky.matrixU().solve(y_);
+        SparseQR<SMatCol,AMDOrdering<int>> qr;
+
+        //A_ = W_.selfadjointView<Eigen::Upper>() * A_;
+        A_.makeCompressed();
+        qr.compute(A_);
+        if(qr.info() != Eigen::Success) {
+            // decomposition failed
+            std::cout << "cpute failed\n";
+          }
+        dx_ = qr.solve(r_);
+        //dx_ = qr.solve(W_.selfadjointView<Eigen::Upper>() * r_);
+        if(qr.info() != Eigen::Success) {
+            // solving failed
+            std::cout << "back substitution failed\n";
+        }
     }
     // TODO remove this, only for comparison
     else
     {
         //SimplicialLLT<SMatCol,Lower,NaturalOrdering<int>> cholesky;
         //SimplicialLLT<SMatCol,Lower,COLAMDOrdering<int>> cholesky;//Not implemented, results as natural ordering
-        SimplicialLLT<SMatCol,Lower, AMDOrdering<int>> cholesky;//Best results.
+        SimplicialLLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;//Best results.
         cholesky.compute(I_);
         dx_ = cholesky.solve(b_);
     }

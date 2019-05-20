@@ -32,7 +32,7 @@ namespace mrob {
 class FGraphSolve: public FGraph
 {
 public:
-    enum solveMethod{CHOL=0, SCHUR};
+    enum solveMethod{CHOL_ADJ=0, CHOL, QR, SCHUR};
 
     FGraphSolve(solveMethod method = CHOL, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
     virtual ~FGraphSolve();
