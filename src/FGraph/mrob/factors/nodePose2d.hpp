@@ -32,6 +32,7 @@ namespace mrob{
 
         void update(const Eigen::Ref<const MatX1> &dx);
         virtual const Eigen::Ref<const MatX1> get_state() const {return x_;};
+        virtual const Eigen::Ref<const MatX> get_stateT() const {return Mat3::Zero();}
         virtual const Eigen::Ref<const MatX1> get_last_linearization_state() const {return linearization_x_;};
         virtual const Eigen::Ref<const MatX1> get_last_deltaX() const {return dx_;};
         void print() const;

@@ -25,13 +25,20 @@ class NodePose3d : public Node
      * For initialization, requires an initial estimation of the state.
      */
     NodePose3d(const Mat61 &initial_x);
+    /**
+     * Initialization directly on SE3
+     */
+    NodePose3d(const Mat4 &initial_T);
     virtual ~NodePose3d();
     /**
-     * The update operation corresponds to the augmented sum, which is equivalent
-     * to T'=exp(dxi^)*T and x'=vee(ln(T'))
+     * Left update operation corresponds to
+     * T'=exp(dxi^)*T
+     * x'=vee(ln(T'))
      */
     void update(const Eigen::Ref<const MatX1> &dx);
     virtual const Eigen::Ref<const MatX1> get_state() const {return x_;};
+    // function returning the transformation
+    virtual const Eigen::Ref<const MatX> get_stateT() const {return Tx_.T();};
     virtual const Eigen::Ref<const MatX1> get_last_linearization_state() const {return linearization_x_;};
     virtual const Eigen::Ref<const MatX1> get_last_deltaX() const {return dx_;};
     void print() const;

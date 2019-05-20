@@ -53,6 +53,11 @@ class Node{
      */
     virtual const Eigen::Ref<const MatX1> get_state() const = 0;
     /**
+     * returns the state Transformation, equivalent to state
+     * but direcly the matrix representing the rotation or RBT
+     */
+    virtual const Eigen::Ref<const MatX> get_stateT() const = 0;
+    /**
      * Returns a matrix to the last linearized state. This data structure is for the incre-
      * metal implementation.
      */

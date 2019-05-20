@@ -48,6 +48,16 @@ int main()
     std::cout << "Exponent and Log test " << (R.ln_vee() - w).norm() << std::endl;
     }
 
+    //testing bool function isSO3
+    {
+    Mat31 w;
+    w << 1.2, -0.3, 0.2;
+    mrob::SO3 R(w);
+    std::cout << "Matris is SO3: " << mrob::isSO3(R.R()) << std::endl;
+    Mat3 notR = Mat3::Random();
+    std::cout << "Matris is SO3: " << mrob::isSO3(notR) << std::endl;
+    }
+
     // Testing Pi
     {
     Mat31 w;
@@ -102,6 +112,16 @@ int main()
     mrob::SE3 T(xi);
     //T.print();
     std::cout << "Some normal element error = " << (T.ln_vee() - xi).norm() << std::endl;
+    }
+
+    //testing bool function isSE3
+    {
+    Mat61 xi;
+    xi << 1,0,-0.2, 5, 10, 2;
+    mrob::SE3 T(xi);
+    std::cout << "input SE3 and Matris is SE3?: " << mrob::isSE3(T.T()) << std::endl;
+    Mat4 notT = Mat4::Random();
+    std::cout << "Random Matris is SE3: " << mrob::isSE3(notT) << std::endl;
     }
     {
     Mat61 xi;

@@ -166,6 +166,7 @@ Mat4 hat6(const Mat61 &xi);
  */
 Mat61 vee6(const Mat4 &xi_hat);
 
+bool isSE3(Mat4 T);
 
 }// end namespace
 #endif /* SE3_HPP_ */

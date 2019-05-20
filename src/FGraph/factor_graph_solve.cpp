@@ -257,8 +257,7 @@ void FGraphSolve::solve_cholesky()
 void FGraphSolve::update_nodes()
 {
     int acc_start = 0;
-    //for (int i = 0; i <= last_solved_node; i++)
-    for (int i = 0; i < nodes_.size(); i++)
+    for (uint_t i = 0; i < nodes_.size(); i++)
     {
         // node update is the negative of dx just calculated.
         //x = x - alhpa * H^(-1) * Grad = x - dx    \ alpha = 1 since we are close to the solution

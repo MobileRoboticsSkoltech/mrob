@@ -13,6 +13,7 @@
 #include "mrob/SO3.hpp"
 #include <cmath>
 #include <iostream>
+#include <Eigen/LU> // for determinant
 
 
 using namespace mrob;
@@ -208,4 +209,15 @@ void SO3::print_lie(void) const
 
     Mat31 w =  this->ln_vee();
     std::cout << w << std::endl;
+}
+
+bool mrob::isSO3(Mat3 R)
+{
+    matData_t det = R.determinant();
+    if (det  < 0)
+        return false;
+    if ( fabs(det - 1.0) > 1e-6)
+        return false;
+    return true;
+
 }

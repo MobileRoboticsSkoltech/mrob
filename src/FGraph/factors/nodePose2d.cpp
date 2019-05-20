@@ -14,7 +14,8 @@
 
 using namespace mrob;
 
-NodePose2d::NodePose2d(const Mat31 &initial_x) : Node(3), x_(initial_x), linearization_x_(initial_x) {
+NodePose2d::NodePose2d(const Mat31 &initial_x) : Node(3), x_(initial_x), linearization_x_(initial_x)
+{
     assert(initial_x.rows() == 3 && "NodePose2d:: Incorrect dimension on initial state rows");
     assert(initial_x.cols() == 1 && "NodePose2d:: Incorrect dimension on initial state cols");
 }

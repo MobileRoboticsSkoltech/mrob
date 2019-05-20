@@ -223,3 +223,14 @@ void SE3::print_lie(void) const
 
     std::cout << this->ln_vee() << std::endl;
 }
+
+bool mrob::isSE3(Mat4 T)
+{
+    if (!isSO3(T.topLeftCorner<3,3>()) )
+        return false;
+    Mat<1,4> one;
+    one << 0,0,0,1;
+    if ( (T.row(3)-one).sum() > 1e-6 )
+        return false;
+    return true;
+}
