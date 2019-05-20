@@ -34,8 +34,8 @@ namespace mrob{
  *  - Class Node
  *  - Class Factor
  *
- * TODO, actually key as addresses won't work in python interface. Better use uint
- * Both data containers are stored in vectors (unordered sets) whose keys are their adresses. By doing this, we can
+ * XXX, actually key as addresses won't work in python interface. Better use uint
+ * Both data containers are stored in vectors (XXX prev unordered sets) whose keys are their adresses. By doing this, we can
  * iterate and quickly find elements in both data containers.
  *
  * Each problem instantaition should implement methods for solving the graph and storing the

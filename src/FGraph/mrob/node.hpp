@@ -58,6 +58,7 @@ class Node{
      */
     virtual const Eigen::Ref<const MatX1> get_last_linearization_state() const = 0;
     /**
+     * TODO is this necessary?
      * Return the last delta X on the update. For incremental updates
      */
     virtual const Eigen::Ref<const MatX1> get_last_deltaX() const = 0;
