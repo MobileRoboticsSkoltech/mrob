@@ -19,7 +19,7 @@ using namespace mrob;
 
 
 Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &nodeOrigin,
-        std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf):
+        std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf, bool updateNodeTarget):
         Factor(6,12), obs_(observation), Tobs_(observation), W_(obsInf)
 {
     if (nodeOrigin->get_id() < nodeTarget->get_id())
@@ -34,8 +34,17 @@ Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &
 
         // inverse observations to correctly modify this
         obs_ = -observation;
+        Tobs_ = SE3(obs_);
     }
     WT2_ = W_.llt().matrixU();
+    if (updateNodeTarget)
+    {
+        // dx =  Tobs * T_xO * Tx_t^-1
+        Mat4 TxOrigin = nodeOrigin->get_stateT();
+        Mat4 TxTarget = nodeTarget->get_stateT();
+        SE3 dT = Tobs_ * SE3(TxOrigin) * SE3(TxTarget).inv();
+        nodeTarget->update(dT.ln_vee());
+    }
 }
 
 Factor2Poses3d::~Factor2Poses3d()
@@ -44,14 +53,18 @@ Factor2Poses3d::~Factor2Poses3d()
 
 void Factor2Poses3d::evaluate_residuals()
 {
-    // TODO Evaluation of residuals
-    r_ = Mat61::Random();
+    // r = h(x_O,x_T) - z (in general). From Origin we observe Target
+    // Tr = Tobs * Tx1 * Txt^-1
+    Mat4 TxOrigin = get_neighbour_nodes()->at(0)->get_stateT();
+    Mat4 TxTarget = get_neighbour_nodes()->at(1)->get_stateT();
+    Tr_ = Tobs_ * SE3(TxOrigin) * SE3(TxTarget).inv();
+    r_ = Tr_.ln_vee();
 }
 void Factor2Poses3d::evaluate_jacobians()
 {
     // it assumes you already have evaluated residuals
-    // TODO Jacobians
-    J_ = Mat<6,12>::Random();
+    J_.topLeftCorner<6,6>() = Tobs_.adj();
+    J_.topRightCorner<6,6>() = -Tr_.adj();
 }
 
 void Factor2Poses3d::evaluate_chi2()

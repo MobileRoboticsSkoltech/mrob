@@ -45,7 +45,7 @@ class Factor2Poses3d : public Factor
 {
   public:
     Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &nodeOrigin,
-            std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf);
+            std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf, bool updateNodeTarget=false);
     ~Factor2Poses3d();
     /**
      * Jacobians are not evaluated, just the residuals
@@ -67,10 +67,10 @@ class Factor2Poses3d : public Factor
 
   protected:
     // The Jacobians' correspondant nodes are ordered on the vector<Node>
-    // being [0]->J1 and [1]->J2
+    // being [0]->J_origin and [1]->J_target
     // declared here but initialized on child classes
     Mat61 obs_, r_; //and residuals
-    SE3 Tobs_;
+    SE3 Tobs_, Tr_; // Transformation from observation and residual
     Mat6 W_;//inverse of observation covariance (information matrix)
     Mat6 WT2_;//transpose and squared root of W.
     Mat<6,12> J_;//Joint Jacobian

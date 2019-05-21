@@ -53,7 +53,7 @@ class Factor1Pose3d : public Factor
 
   protected:
     Mat61 obs_, r_; //and residuals
-    SE3 Tobs_;
+    SE3 Tobs_, Tr_;//Transformation for the observation and the residual
     Mat6 W_;//inverse of observation covariance (information matrix)
     Mat6 WT2_;//transpose and squared root of W. We could delete this variable...
     Mat6 J_;//Jacobian

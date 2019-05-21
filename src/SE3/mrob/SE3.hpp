@@ -121,7 +121,7 @@ public:
     Mat6 adj() const;
     /**
      * T method returns a matrix 4x4 of the SE3 transformation. Ref<> is more convinient than
-     * the matrix for the factor/nodes base class definitions
+     * the matrix for the factor/nodes base class definitions and python bindings
      */
     //Mat4 T() const;
     const Eigen::Ref<const Mat4> T() const;
