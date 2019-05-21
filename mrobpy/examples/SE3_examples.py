@@ -37,12 +37,15 @@ for i in range(6):
     xi[:,i] = np.linspace(xi_ini[i],xi_fin[i],N, dtype='float64')
 t = np.linspace(0,1,N, dtype='float64')
 
+
 # interpolation in the manifold of se(3)^vee
 # and proper interpolation in SE(3)
 T_0 = mrob.SE3(xi_ini)
 T_0_inv = T_0.inv()
 T_1 = mrob.SE3(xi_fin)
-print(T_1)
+T_1.print()
+print('direct T1\n',T_1.T())
+mrob.SE3(T_1.T()).print()
 dxi = mrob.SE3( (T_1.T() @ T_0_inv.T()) ).ln()
 for i in range(N):
     Ti = mrob.SE3(xi[i,:])
@@ -77,4 +80,4 @@ if 1:
     R = mrob.SO3(w)
     print('SO3 matrix: \n', R.R() )
     print('SO3 in the tangent space: \n', R.ln())
-
+    

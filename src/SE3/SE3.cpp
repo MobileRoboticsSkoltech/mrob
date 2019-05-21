@@ -187,7 +187,8 @@ Mat6 SE3::adj() const
     return res;
 }
 
-Mat4 SE3::T() const
+//Mat4 SE3::T() const
+const Eigen::Ref<const Mat4> SE3::T() const
 {
     return T_;
 }

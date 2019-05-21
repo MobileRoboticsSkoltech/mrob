@@ -120,10 +120,11 @@ public:
      */
     Mat6 adj() const;
     /**
-     * T method returns a matrix 4x4 of the SE3 transformation corresponding to the subblock matrix
-     * We return a non-const reference for manipulation and updating as well.
+     * T method returns a matrix 4x4 of the SE3 transformation. Ref<> is more convinient than
+     * the matrix for the factor/nodes base class definitions
      */
-    Mat4 T() const;
+    //Mat4 T() const;
+    const Eigen::Ref<const Mat4> T() const;
     /**
      * ref2T returns a non-const reference to the matrix T to modify its content directly
      */

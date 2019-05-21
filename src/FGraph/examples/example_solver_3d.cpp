@@ -29,7 +29,7 @@ int main ()
 
     // Initial node is defined at 0,0,0, 0,0,0 and anchor factor actually observing it at 0
     Mat61 x, obs;
-    x = Mat61::Random()*0.1;
+    x = Mat61::Random()*0.05;
     obs = Mat61::Zero();
     std::shared_ptr<mrob::Node> n1(new mrob::NodePose3d(x));
     graph.add_node(n1);
@@ -38,11 +38,12 @@ int main ()
     graph.add_factor(f1);
 
 
+
+
+
     // solve the Gauss Newton optimization
     graph.print(true);
     graph.solve_batch();
-
-    //TODO Something on the residuals and Jacobians is not rioght. The T is not what the node has stored!
 
     std::cout << "\nSolved, chi2 = " << graph.chi2() << std::endl;
 

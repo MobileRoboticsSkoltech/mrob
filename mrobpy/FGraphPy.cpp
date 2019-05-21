@@ -37,7 +37,7 @@ public:
     /**
      * Constructor for the python binding. By default uses the Cholesky adjoint solving type, and some estimated number of nodes and factors.
      */
-    FGraphPy(uint_t potNumberNodes, uint_t potNumberFactors) : FGraphSolve(FGraphSolve::solveMethod::CHOL,potNumberNodes,potNumberFactors) {};
+    FGraphPy(uint_t potNumberNodes, uint_t potNumberFactors) : FGraphSolve(FGraphSolve::solveMethod::CHOL_ADJ,potNumberNodes,potNumberFactors) {};
     id_t add_node_pose_2d(const py::EigenDRef<const Mat31> x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodePose2d(x));
@@ -73,6 +73,7 @@ public:
 void init_FGraph(py::module &m)
 {
     py::enum_<FGraphSolve::solveMethod>(m, "FGraph.solveMethod")
+        .value("CHOL_ADJ", FGraphSolve::solveMethod::CHOL_ADJ)
         .value("CHOL", FGraphSolve::solveMethod::CHOL)
         .value("SCHUR", FGraphSolve::solveMethod::SCHUR)
         .export_values()
@@ -85,7 +86,7 @@ void init_FGraph(py::module &m)
                     py::arg("potNumberFactors") = 512)
             //.def("set_solve_method", &FGraphSolve::set_solve_method)
             .def("solve_batch", &FGraphSolve::solve_batch)
-            .def("solve_incremental", &FGraphSolve::solve_incremental)
+            //.def("solve_incremental", &FGraphSolve::solve_incremental)//TODO not implemented yet
             .def("chi2", &FGraphSolve::chi2,
                     "Calculated the chi2 of the problem. By default re-evaluates residuals, set to false if doesn't",
                     py::arg("evaluateResidualsFlag") = true)

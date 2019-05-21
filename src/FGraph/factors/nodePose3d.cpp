@@ -17,7 +17,7 @@
 using namespace mrob;
 
 NodePose3d::NodePose3d(const Mat61 &initial_x) :
-        Node(6), x_(initial_x),Tx_(initial_x)
+        Node(6), x_(initial_x),Tx_(initial_x), linearization_x_(initial_x)
 {
     assert(initial_x.rows() == 6 && "NodePose3d:: Incorrect dimension on initial state rows" );
     assert(initial_x.cols() == 1 && "NodePose3d:: Incorrect dimension on initial state cols" );
@@ -43,11 +43,16 @@ void NodePose3d::update(const Eigen::Ref<const MatX1> &dx)
     x_ = Tx_.ln_vee();//this will cast to
 }
 
+const Eigen::Ref<const MatX> NodePose3d::get_stateT() const
+{
+    return Tx_.T();
+}
 
 void NodePose3d::print() const
 {
     std::cout << "Printing NodePose3d: " << id_
-        << ", state = \n" << x_
-        <<  "\nand neighbour factors " << neighbourFactors_.size()
+        << ", state = \n" << x_ << ",\n SE3 matrix: \n";
+    Tx_.print();
+    std::cout  <<  "\nand neighbour factors " << neighbourFactors_.size()
         << std::endl;
 }

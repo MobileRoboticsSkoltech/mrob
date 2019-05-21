@@ -37,10 +37,8 @@ void Factor1Pose3d::evaluate_residuals()
 {
     // In general we write residuals as r = obs- x
     // r = ln(Tobs * x^-1) = - ln(X * Tobs^-1)
-    Mat4 dT = get_neighbour_nodes()->at(0).get()->get_stateT() * Tobs_.inv().T();// SE3 does not like Ref inputs...could it be done better?
-    std::cout << "matrix = " << get_neighbour_nodes()->at(0).get()->get_stateT() << std::endl;
+    Mat4 dT = get_neighbour_nodes()->at(0).get()->get_stateT() * Tobs_.inv().T();
     r_ = -SE3(dT).ln_vee();
-    std::cout << "residual = " << r_ << std::endl;
 }
 
 void Factor1Pose3d::evaluate_jacobians()

@@ -38,6 +38,7 @@ void init_SE3(py::module &m) {
         .def("transform_array", &SE3::transform_array)
         .def("inv", &SE3::inv)
         .def("adj", &SE3::adj)
+        .def("print", &SE3::print)
         ;
     py::class_<SO3>(m, "SO3")
         .def(py::init<const Mat31 &>())
@@ -50,6 +51,7 @@ void init_SE3(py::module &m) {
         .def("ln", &SO3::ln_vee)
         .def("inv", &SO3::inv)
         .def("adj", &SO3::adj)
+        .def("print", &SO3::print)
         ;
 }
 

@@ -47,7 +47,8 @@ class Node{
      */
     virtual void update(const Eigen::Ref<const MatX1> &dx) = 0;
     /**
-     * We will return a Reference to a fixed size matrix at run time and provide
+     * Declared as a dynamic matrix reference to allow any size to be returned.
+     * At run time returns a Reference to a fixed size matrix and provide
      * it as an argument for the getState function, no need to be dynamic,
      * as long as the dimension is correctly set
      */

@@ -88,8 +88,8 @@ for t in range(1,N):
     #print('X2', t)
 
     # plot the current problem
-    if (t+1) % 3500 == 0:
-        #print_2d_graph(graph)
+    if (t+1) % 500 == 0:
+        print_2d_graph(graph)
         pass
 
 
