@@ -112,32 +112,6 @@ Mat3 quat_to_so3(const py::EigenDRef<const Mat41> v)
  * Function converting from roll pitch yaw v = [r, p, y](Eigen convention)
  * to a rotation matrix 3x3
  */
-Mat3 rpy_to_so3_2(const py::EigenDRef<const Mat31> v)
-{
-    Mat3 R;
-    // function taken from gtsam to adapt their sphere dataset
-    double x=v(0),y=v(1),z=v(2);
-    double cx=cos(x),sx=sin(x);
-    double cy=cos(y),sy=sin(y);
-    double cz=cos(z),sz=sin(z);
-    double ss_ = sx * sy;
-    double cs_ = cx * sy;
-    double sc_ = sx * cy;
-    double cc_ = cx * cy;
-    double c_s = cx * sz;
-    double s_s = sx * sz;
-    double _cs = cy * sz;
-    double _cc = cy * cz;
-    double s_c = sx * cz;
-    double c_c = cx * cz;
-    double ssc = ss_ * cz, csc = cs_ * cz, sss = ss_ * sz, css = cs_ * sz;
-    R << _cc,- c_s + ssc,  s_s + csc,
-         _cs,  c_c + sss, -s_c + css,
-         -sy,        sc_,        cc_;
-    return R;
-}
-
-
 Mat3 rpy_to_so3(const py::EigenDRef<const Mat31> v)
 {
     Mat3 R;
@@ -196,5 +170,4 @@ void init_FGraph(py::module &m)
             ;
         m.def("quat_to_so3", &quat_to_so3,"Suport function from quaternion to a rotation");
         m.def("rpy_to_so3",  &rpy_to_so3,"Suport function from roll pitch yaw to a rotation");
-        m.def("rpy_to_so3_2",  &rpy_to_so3_2,"Suport function from roll pitch yaw to a rotation");
 }
