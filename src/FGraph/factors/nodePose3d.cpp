@@ -23,13 +23,6 @@ NodePose3d::NodePose3d(const Mat61 &initial_x) :
     assert(initial_x.cols() == 1 && "NodePose3d:: Incorrect dimension on initial state cols" );
 }
 
-NodePose3d::NodePose3d(const Mat4 &initialT):
-    Node(6), Tx_(initialT)
-{
-    assert(isSE3(initialT) && "NodePose3d:: Input is not a valid SE3 matrix" );
-    x_ = Tx_.ln_vee();
-}
-
 NodePose3d::~NodePose3d()
 {
 

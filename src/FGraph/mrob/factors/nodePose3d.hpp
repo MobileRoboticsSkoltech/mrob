@@ -27,8 +27,9 @@ class NodePose3d : public Node
     NodePose3d(const Mat61 &initial_x);
     /**
      * Initialization directly on SE3
+     * XXX to be replaced, just to keep consistency with factors, that can't accept transformations
      */
-    NodePose3d(const Mat4 &initial_T);
+    //NodePose3d(const SE3 &initial_T);
     virtual ~NodePose3d();
     /**
      * Left update operation corresponds to

@@ -25,7 +25,7 @@ using namespace mrob;
 void init_SE3(py::module &m) {
     py::class_<SE3>(m, "SE3")
         .def(py::init<const Mat61 &>())
-        .def(py::init<const Mat4 &>())
+        .def(py::init<const Mat4 &>(), "don't print (python function) a directly created SE3 object with T(), it doesn't work well")
         .def(py::init<const SE3 &>())
         .def("T", &SE3::T) // makes a copy of the 4x4 Transformation
         .def("R", &SE3::R)

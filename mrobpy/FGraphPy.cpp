@@ -15,10 +15,15 @@
 
 
 #include "mrob/factor_graph_solve.hpp"
+#include "mrob/factors/nodePose2d.hpp"
 #include "mrob/factors/factor1Pose2d.hpp"
 #include "mrob/factors/factor2Poses2d.hpp"
-#include "mrob/factors/nodePose2d.hpp"
+#include "mrob/factors/nodePose3d.hpp"
+#include "mrob/factors/factor1Pose3d.hpp"
+#include "mrob/factors/factor2Poses3d.hpp"
 
+
+#include <Eigen/Geometry>
 
 namespace py = pybind11;
 using namespace mrob;
@@ -66,8 +71,42 @@ public:
         this->add_factor(f);
     }
 
+    // 3D factor graph. TODO add a constructor admitting SE3 inputs as well
+    id_t add_node_pose_3d(const py::EigenDRef<const Mat61> x)
+    {
+        std::shared_ptr<mrob::Node> n(new mrob::NodePose3d(x));
+        this->add_node(n);
+        return n->get_id();
+    }
+    void add_factor_1pose_3d(const py::EigenDRef<const Mat61> obs, uint_t nodeId, const py::EigenDRef<const Mat6> obsInvCov)
+    {
+        auto n1 = this->get_node(nodeId);
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose3d(obs,n1,obsInvCov));
+        this->add_factor(f);
+    }
+    void add_factor_2poses_3d(const py::EigenDRef<const Mat61> obs, uint_t nodeOriginId, uint_t nodeTargetId,
+            const py::EigenDRef<const Mat6> obsInvCov, bool updateNodeTarget)
+    {
+        auto nO = this->get_node(nodeOriginId);
+        auto nT = this->get_node(nodeTargetId);
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor2Poses3d(obs,nO,nT,obsInvCov, updateNodeTarget));
+        this->add_factor(f);
+    }
+
 };
 
+
+/**
+ * Function converting from quaternion q = [qx, qy, qz, qw](Eigen convention)
+ * to a rotation matrix 3x3
+ * XXX: ref eigen did not returned a valid matrix (probably lifetime was managed from cpp and this object was local to this scope)
+ */
+Mat3 quat_to_so3(const py::EigenDRef<const Mat41> v)
+{
+    Eigen::Quaternion<matData_t> q(v);
+    //std::cout << "Initial vector : " << v << ", transformed quaternion" << q.vec() << "\n and w = \n" << q.toRotationMatrix() << std::endl;
+    return q.normalized().toRotationMatrix();
+}
 
 
 void init_FGraph(py::module &m)
@@ -91,6 +130,9 @@ void init_FGraph(py::module &m)
                     "Calculated the chi2 of the problem. By default re-evaluates residuals, set to false if doesn't",
                     py::arg("evaluateResidualsFlag") = true)
             .def("get_estimated_state", &FGraphSolve::get_estimated_state)
+            .def("print", &FGraph::print)
+            // -----------------------------------------------------------------------------
+            // Specific call to 2D
             .def("add_node_pose_2d", &FGraphPy::add_node_pose_2d)
             .def("add_factor_1pose_2d", &FGraphPy::add_factor_1pose_2d)
             .def("add_factor_2poses_2d", &FGraphPy::add_factor_2poses_2d,
@@ -101,6 +143,18 @@ void init_FGraph(py::module &m)
                     py::arg("obsInvCov"),
                     py::arg("updateNodeTarget") = false)
             .def("add_factor_2poses_2d_odom", &FGraphPy::add_factor_2poses_2d_odom)
-            .def("print", &FGraph::print)
+            // -----------------------------------------------------------------------------
+            // Specific call to 3D
+            .def("add_node_pose_3d", &FGraphPy::add_node_pose_3d,
+                    "Input are SE3 matrices directly")
+            .def("add_factor_1pose_3d", &FGraphPy::add_factor_1pose_3d)
+            .def("add_factor_2poses_3d", &FGraphPy::add_factor_2poses_3d,
+                            "Factors connecting 2 poses. If last input set to true (by default false), also updates the value of the target Node according to the new obs + origin node",
+                            py::arg("obs"),
+                            py::arg("nodeOridingId"),
+                            py::arg("nodeTargetId"),
+                            py::arg("obsInvCov"),
+                            py::arg("updateNodeTarget") = false)
             ;
+        m.def("quat_to_so3", &quat_to_so3,"Suport function from quaternion to a rotation");
 }
