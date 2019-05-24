@@ -70,7 +70,8 @@ class Factor2Poses3d : public Factor
     // being [0]->J_origin and [1]->J_target
     // declared here but initialized on child classes
     Mat61 obs_, r_; //and residuals
-    SE3 Tobs_, Tr_; // Transformation from observation and residual
+    SE3 Tobs_; // Transformation from observation. NOTE: In Xorigin frame
+    SE3 Tr_; // Residual Transformation
     Mat6 W_;//inverse of observation covariance (information matrix)
     Mat6 WT2_;//transpose and squared root of W.
     Mat<6,12> J_;//Joint Jacobian

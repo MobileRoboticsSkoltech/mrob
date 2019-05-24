@@ -38,6 +38,7 @@ void init_SE3(py::module &m) {
         .def("transform_array", &SE3::transform_array)
         .def("inv", &SE3::inv)
         .def("adj", &SE3::adj)
+        .def("distance", &SE3::distance)
         .def("print", &SE3::print)
         ;
     py::class_<SO3>(m, "SO3")

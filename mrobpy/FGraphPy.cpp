@@ -71,7 +71,7 @@ public:
         this->add_factor(f);
     }
 
-    // 3D factor graph. TODO add a constructor admitting SE3 inputs as well
+    // 3D factor graph
     id_t add_node_pose_3d(const py::EigenDRef<const Mat61> x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodePose3d(x));
@@ -168,6 +168,7 @@ void init_FGraph(py::module &m)
                             py::arg("obsInvCov"),
                             py::arg("updateNodeTarget") = false)
             ;
+        // AUxiliary functions to support other conventions (TORO, g2o)
         m.def("quat_to_so3", &quat_to_so3,"Suport function from quaternion to a rotation");
         m.def("rpy_to_so3",  &rpy_to_so3,"Suport function from roll pitch yaw to a rotation");
 }

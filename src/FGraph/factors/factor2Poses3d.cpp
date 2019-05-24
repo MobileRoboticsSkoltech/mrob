@@ -39,10 +39,13 @@ Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &
     WT2_ = W_.llt().matrixU();
     if (updateNodeTarget)
     {
-        // dx =  Tobs * T_xO * Tx_t^-1
+        // dx =  T_xO * (xo frame)Tobs * Tx_t^-1
+        // NOTE: carefull on the reference frame that Tobs is expressed on the X_origin frame, hence this change:
+        // T_xo * (xo reference)T_obs = (global)T_obs * T_xo.
+        // We could also use the adjoint to refer the manifold coordinates obs on the xo to the global frame (identity)
         Mat4 TxOrigin = nodeOrigin->get_stateT();
         Mat4 TxTarget = nodeTarget->get_stateT();
-        SE3 dT = Tobs_ * SE3(TxOrigin) * SE3(TxTarget).inv();
+        SE3 dT = SE3(TxOrigin) * Tobs_ * SE3(TxTarget).inv();
         nodeTarget->update(dT.ln_vee());
     }
 }
@@ -54,16 +57,19 @@ Factor2Poses3d::~Factor2Poses3d()
 void Factor2Poses3d::evaluate_residuals()
 {
     // r = h(x_O,x_T) - z (in general). From Origin we observe Target
-    // Tr = Tobs * Tx1 * Txt^-1
+    // Tr = Txo * (xo frame)Tobs * Txt^-1
+    // NOTE: carefull on the reference frame that Tobs is expressed on the X_origin frame, hence this change:
+    // T_xo * (xo reference)T_obs = (global)T_obs * T_xo.
+    // We could also use the adjoint to refer the manifold coordinates obs on the xo to the global frame (identity)
     Mat4 TxOrigin = get_neighbour_nodes()->at(0)->get_stateT();
     Mat4 TxTarget = get_neighbour_nodes()->at(1)->get_stateT();
-    Tr_ = Tobs_ * SE3(TxOrigin) * SE3(TxTarget).inv();
+    Tr_ = SE3(TxOrigin) * Tobs_ * SE3(TxTarget).inv();
     r_ = Tr_.ln_vee();
 }
 void Factor2Poses3d::evaluate_jacobians()
 {
     // it assumes you already have evaluated residuals
-    J_.topLeftCorner<6,6>() = Tobs_.adj();
+    J_.topLeftCorner<6,6>() = Mat6::Identity();
     J_.topRightCorner<6,6>() = -Tr_.adj();
 }
 

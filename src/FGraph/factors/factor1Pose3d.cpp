@@ -37,6 +37,7 @@ void Factor1Pose3d::evaluate_residuals()
 {
     // Anchor residuals as r = obs - x
     // r = ln(Tobs * x^-1) = - ln(X * Tobs^-1)
+    // NOTE Tobs is a global observation (reference identity)
     Mat4 x = get_neighbour_nodes()->at(0).get()->get_stateT();
     Tr_ = Tobs_ * SE3(x).inv();
     r_ = Tr_.ln_vee();

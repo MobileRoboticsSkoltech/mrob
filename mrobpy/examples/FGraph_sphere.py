@@ -19,13 +19,24 @@ def print_3d_graph(graph):
     for xi in x:
         Ti = mrob.SE3(xi)
         p = Ti.T()[:3,3]
-        print(Ti.T())
+        #print(Ti.T())
         ax.plot((prev_p[0],p[0]),(prev_p[1],p[1]),(prev_p[2],p[2]) , '-b')
         prev_p = np.copy(p)
     plt.show()
 
 
 
+def plot_from_vertex(vertex):
+    "given a dictionary of vertex plots the xyz"
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    prev_p = vertex[0]
+    for i in range(1,N):
+        p = vertex[i]
+        #ax.scatter(p[0],p[1],p[2],color='green')
+        ax.plot((prev_p[0],p[0]),(prev_p[1],p[1]),(prev_p[2],p[2]) , '-b')
+        prev_p = np.copy(p)
+    plt.show()
 
 # Initialize data structures
 #vertex_ini = {}
@@ -60,7 +71,13 @@ with open('../../datasets/sphere2500_groundtruth.txt', 'r') as file:
             T[0, 3] = d[3]
             T[1, 3] = d[4]
             T[2, 3] = d[5]
+            print('ds: ', d[1], d[2], d[3],d[4],d[5],d[6],d[7],d[8])
+            print(T)
             factors[int(d[1]),int(d[2])] = mrob.SE3(T).ln()
+
+            #test we are transforming correctly
+            #Tres = mrob.SE3(factors[int(d[1]),int(d[2])])
+            #print(Tres.distance(mrob.SE3(T)))
 
             # matrix information. g2o and TORO convention
             W = np.array(
@@ -76,8 +93,6 @@ with open('../../datasets/sphere2500_groundtruth.txt', 'r') as file:
             P[3:,:3] = np.eye(3)
             factor_inf[int(d[1]), int(d[2])] = P @ W @ P.transpose()
             factors_dictionary[int(d[2])].append(int(d[1]))
-
-
 
 
 # Initialize FG
@@ -112,17 +127,19 @@ for t in range(1,N):
         
     # solve the problem 7s 2500nodes
     start = time.time()
-    #graph.solve_batch()
+    graph.solve_batch()
     end = time.time()
-    print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    #print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))
 
 
     # plot the current problem
-    if (t+1) % 53 == 0:
+    if (t+1) % 2500 == 0:
         #graph.print(True)
         print_3d_graph(graph)
         pass
+
+
 
 
 
@@ -130,7 +147,33 @@ for t in range(1,N):
 #print('chi2 = ', graph.chi2())
 #graph.solve_batch()
 print('chi2 = ', graph.chi2())
-graph.print(True)
+#graph.print(True)
+
+# testing that transformation are correctly handled by our preprocessing
+if 0:
+    vertex_gt = []
+    vertex_gt_xyz = []
+    vertex_gt.append(np.eye(4))
+    vertex_gt_xyz.append(np.zeros(3))
+    for t in range(1, N):
+        # find odom factors
+        connecting_nodes = factors_dictionary[t]
+
+        print(connecting_nodes, '\n and current node index= ', t)
+        for nodeOrigin in factors_dictionary[t]:
+            if t - nodeOrigin == 1:
+                obs = factors[nodeOrigin, t]
+                print('size of = ', len(vertex_gt), '\n and node: ', nodeOrigin)
+                xtp = mrob.SE3(obs)
+                xt = vertex_gt[nodeOrigin] @ xtp.T()
+                xtp.print()
+                print(vertex_gt[nodeOrigin])
+                print(xt)
+                vertex_gt.append(xt)
+                vertex_gt_xyz.append(xt[:3,3])
+
+    print(vertex_gt_xyz)
+    plot_from_vertex(vertex_gt_xyz)
 
     
 

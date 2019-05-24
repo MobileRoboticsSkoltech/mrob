@@ -15,7 +15,7 @@ def print_3d_graph(graph):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     x = graph.get_estimated_state()
-    prev_p = vertex_ini[0]
+    prev_p = vertex_ini[0][3:]
     for xi in x:
         Ti = mrob.SE3(xi)
         p = Ti.T()[:3,3]
@@ -24,7 +24,17 @@ def print_3d_graph(graph):
     plt.show()
 
 
-
+def plot_from_vertex(vertex):
+    "given a dictionary of vertex plots the xyz"
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    for i in range(1,N):
+        p = mrob.SE3(vertex[i]).T()[:3,3]
+        prev_p = mrob.SE3(vertex[i-1]).T()[:3,3]
+        #ax.scatter(p[0],p[1],p[2],color='green')
+        ax.plot((prev_p[0],p[0]),(prev_p[1],p[1]),(prev_p[2],p[2]) , '-b')
+        #prev_p = np.copy(p)
+    plt.show()
 
 # Initialize data structures
 vertex_ini = {}
@@ -84,11 +94,16 @@ with open('../../datasets/sphere_bignoise_vertex3.g2o', 'r') as file:
             T[0, 3] = d[2]
             T[1, 3] = d[3]
             T[2, 3] = d[4]
+            #print('ds: ', d[1], d[2], d[3],d[4],d[5],d[6],d[7],d[8])
+            #print(T)
             vertex_ini[int(d[1])] = mrob.SE3(T).ln()
             # create an empty list of pairs of nodes (factor) connected to each node
             factors_dictionary[int(d[1])] = []
 
 #print(factors_dictionary)
+
+
+#plot_from_vertex(vertex_ini)
 
 # Initialize FG
 graph = mrob.FGraph(2200,8650)
@@ -116,7 +131,7 @@ for t in range(1,N):
         #covInv = factor_inf[nodeOrigin, t]
         covInv = np.eye(6)
         covInv[3:,3:] = np.eye(3)*100
-        #graph.add_factor_2poses_3d(obs, nodeOrigin,t,covInv)
+        graph.add_factor_2poses_3d(obs, nodeOrigin,t,covInv)
         # for end. no more loop inside the factors
         
         
@@ -129,16 +144,12 @@ for t in range(1,N):
 
 
     # plot the current problem
-    if (t+1) % 1000 == 0:
+    if (t+1) % 2200 == 0:
         print_3d_graph(graph)
         pass
 
 
 
-graph.solve_batch()
-print('chi2 = ', graph.chi2())
-graph.solve_batch()
-print('chi2 = ', graph.chi2())
 graph.print(True)
 
     
