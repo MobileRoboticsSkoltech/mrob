@@ -10,8 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 def print_3d_graph(graph):
     '''This function draws the state variables for a 3D pose graph'''
-    
-    # read graph, returns a list (vector) of state (np arrays)
+        # read graph, returns a list (vector) of state (np arrays)
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     x = graph.get_estimated_state()
@@ -45,7 +44,7 @@ factor_inf = {}
 factors_dictionary = {}
 N = 2500
 
-for i in range(N):
+for i in range(2500):
     # create an empty list of pairs of nodes (factor) connected to each node
     factors_dictionary[i] = []
 
@@ -71,8 +70,8 @@ with open('../../datasets/sphere2500_groundtruth.txt', 'r') as file:
             T[0, 3] = d[3]
             T[1, 3] = d[4]
             T[2, 3] = d[5]
-            print('ds: ', d[1], d[2], d[3],d[4],d[5],d[6],d[7],d[8])
-            print(T)
+            #print('ds: ', d[1], d[2], d[3],d[4],d[5],d[6],d[7],d[8])
+            #print(T)
             factors[int(d[1]),int(d[2])] = mrob.SE3(T).ln()
 
             #test we are transforming correctly
@@ -127,9 +126,9 @@ for t in range(1,N):
         
     # solve the problem 7s 2500nodes
     start = time.time()
-    graph.solve_batch()
+    #graph.solve_batch()
     end = time.time()
-    #print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    print('Iteration = ', t, ', nodes factors = (', graph.number_nodes(), ', ', graph.number_factors(), '), chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))
 
 
@@ -142,11 +141,22 @@ for t in range(1,N):
 
 
 
-
-#graph.solve_batch()
-#print('chi2 = ', graph.chi2())
-#graph.solve_batch()
+graph.solve_batch()
 print('chi2 = ', graph.chi2())
+print_3d_graph(graph)
+
+graph.solve_batch()
+print('chi2 = ', graph.chi2())
+print_3d_graph(graph)
+
+
+graph.solve_batch()
+print('chi2 = ', graph.chi2())
+print_3d_graph(graph)
+
+graph.solve_batch()
+print('chi2 = ', graph.chi2())
+print_3d_graph(graph)
 #graph.print(True)
 
 # testing that transformation are correctly handled by our preprocessing

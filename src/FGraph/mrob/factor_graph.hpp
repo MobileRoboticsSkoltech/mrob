@@ -82,6 +82,12 @@ public:
     std::shared_ptr<Node>& get_node(uint_t key);
 
 
+    /**
+     * FGraph information
+     */
+    uint_t number_nodes() {return nodes_.size();};
+    uint_t number_factors() {return factors_.size();};
+
     //TODO
     void save_graph() const;
     void load_graph();

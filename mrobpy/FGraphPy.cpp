@@ -99,7 +99,7 @@ public:
 /**
  * Function converting from quaternion q = [qx, qy, qz, qw](Eigen convention)
  * to a rotation matrix 3x3
- * XXX: ref eigen did not returned a valid matrix (probably lifetime was managed from cpp and this object was local to this scope)
+ * XXX: ref eigen did not return a valid matrix (probably lifetime was managed from cpp and this object was local to this scope)
  */
 Mat3 quat_to_so3(const py::EigenDRef<const Mat41> v)
 {
@@ -142,6 +142,8 @@ void init_FGraph(py::module &m)
                     "Calculated the chi2 of the problem. By default re-evaluates residuals, set to false if doesn't",
                     py::arg("evaluateResidualsFlag") = true)
             .def("get_estimated_state", &FGraphSolve::get_estimated_state)
+            .def("number_nodes", &FGraphSolve::number_nodes)
+            .def("number_factors", &FGraphSolve::number_factors)
             .def("print", &FGraph::print)
             // -----------------------------------------------------------------------------
             // Specific call to 2D
