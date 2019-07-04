@@ -46,7 +46,7 @@ void Factor1Pose3d::evaluate_residuals()
 void Factor1Pose3d::evaluate_jacobians()
 {
     // Evaluate Jacobian (see document on SE3 and small perturbations TODO)
-    // J = d/dxi ln(T X-1 exp(-xi) (R X-1)-1)= - Adj_{T X-1} = - Adj(Tr)
+    // J = d/dxi ln(T X-1 exp(-xi) (T X-1)-1)= - Adj_{T X-1} = - Adj(Tr)
     J_ = -Tr_.adj();
 }
 

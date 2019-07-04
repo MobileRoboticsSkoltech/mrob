@@ -49,8 +49,8 @@ for i in range(2500):
     factors_dictionary[i] = []
 
 # sphere2500 from gtsam, using the TORO format
-#with open('../../datasets/sphere2500.txt', 'r') as file:
-with open('../../datasets/sphere2500_groundtruth.txt', 'r') as file:
+with open('../../datasets/sphere2500.txt', 'r') as file:
+#with open('../../datasets/sphere2500_groundtruth.txt', 'r') as file:
     for line in file:
         d = line.split()
         # read edges and vertex
@@ -71,8 +71,10 @@ with open('../../datasets/sphere2500_groundtruth.txt', 'r') as file:
             T[1, 3] = d[4]
             T[2, 3] = d[5]
             #print('ds: ', d[1], d[2], d[3],d[4],d[5],d[6],d[7],d[8])
-            #print(T)
+            #print('Original T',T)
             factors[int(d[1]),int(d[2])] = mrob.SE3(T).ln()
+            #Tt = mrob.SE3(factors[int(d[1]),int(d[2])])
+            #print('transformed T', Tt.T())
 
             #test we are transforming correctly
             #Tres = mrob.SE3(factors[int(d[1]),int(d[2])])
@@ -91,6 +93,8 @@ with open('../../datasets/sphere2500_groundtruth.txt', 'r') as file:
             P[:3,3:] = np.eye(3)
             P[3:,:3] = np.eye(3)
             factor_inf[int(d[1]), int(d[2])] = P @ W @ P.transpose()
+            # in gtsam example they use directly a set diagonal cov matrix as 5*pi/180 for angles and 0.05 for displacement;
+            # factor_inf[int(d[1]), int(d[2])] = np.diag(np.array([100, 100, 100, 10, 10, 10]))
             factors_dictionary[int(d[2])].append(int(d[1]))
 
 
@@ -99,7 +103,7 @@ graph = mrob.FGraph(2500,4500)
 x = np.zeros(6)
 n = graph.add_node_pose_3d(x)
 W = np.eye(6)
-W[3:, 3:] = np.eye(3) * 100
+W[3:, 3:] = np.eye(3) * 10000
 graph.add_factor_1pose_3d(x,n,1e5*W)
 processing_time = []
 
@@ -126,38 +130,38 @@ for t in range(1,N):
         
     # solve the problem 7s 2500nodes
     start = time.time()
-    #graph.solve_batch()
+    graph.solve_batch()
     end = time.time()
     print('Iteration = ', t, ', nodes factors = (', graph.number_nodes(), ', ', graph.number_factors(), '), chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))
 
 
     # plot the current problem
-    if (t+1) % 2500 == 0:
+    if ((t+1) % 2 == 0)  & (t > 628):
         #graph.print(True)
         print_3d_graph(graph)
         pass
 
 
-
-
-graph.solve_batch()
-print('chi2 = ', graph.chi2())
 print_3d_graph(graph)
+if 0:
+    graph.solve_batch()
+    print('chi2 = ', graph.chi2())
+    print_3d_graph(graph)
 
-graph.solve_batch()
-print('chi2 = ', graph.chi2())
-print_3d_graph(graph)
+    graph.solve_batch()
+    print('chi2 = ', graph.chi2())
+    print_3d_graph(graph)
 
 
-graph.solve_batch()
-print('chi2 = ', graph.chi2())
-print_3d_graph(graph)
+    graph.solve_batch()
+    print('chi2 = ', graph.chi2())
+    print_3d_graph(graph)
 
-graph.solve_batch()
-print('chi2 = ', graph.chi2())
-print_3d_graph(graph)
-#graph.print(True)
+    graph.solve_batch()
+    print('chi2 = ', graph.chi2())
+    print_3d_graph(graph)
+    #graph.print(True)
 
 # testing that transformation are correctly handled by our preprocessing
 if 0:

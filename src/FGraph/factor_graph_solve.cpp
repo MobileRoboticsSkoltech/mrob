@@ -88,9 +88,9 @@ void FGraphSolve::solve_batch()
     for (auto t : time_profiles_)
         sum += t;
 
-    std::cout << "\nTime profile :";
+    std::cout << "\nTime profile for " << sum << " [us]: ";
     for (auto t : time_profiles_)
-        std::cout << t/sum *100 << ", ";
+        std::cout << t/sum *100 << "%, ";
     std::cout << "\n";
 }
 

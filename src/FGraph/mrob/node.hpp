@@ -82,8 +82,8 @@ class Node{
      */
     virtual bool rm_factor(std::shared_ptr<Factor> &factor);
     void clear() {neighbourFactors_.clear();};
-    std::vector<std::shared_ptr<Factor> >*
-            get_neighbour_factors(void) {return &neighbourFactors_;};
+    const std::vector<std::shared_ptr<Factor> >*
+            get_neighbour_factors(void) const {return &neighbourFactors_;};
 
   protected:
     // For highly connected nodes where removing is necessary, map should be better

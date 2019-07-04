@@ -33,7 +33,7 @@ N = 3500
 with open('../../datasets/M3500.txt', 'r') as file:
     for line in file:
         d = line.split()
-        # read edges and vertex
+        # read edges and vertex, in TORO format
         if d[0] == 'EDGE2':
             # EDGE2 id_origin   id_target   dx   dy   dth   I11   I12  I22  I33  I13  I23
             factors[int(d[1]),int(d[2])] = np.array([d[3], d[4], d[5], d[6],d[7],d[8],d[9],d[10],d[11]],dtype='float64')
@@ -89,7 +89,7 @@ for t in range(1,N):
 
     # plot the current problem
     if (t+1) % 500 == 0:
-        #print_2d_graph(graph)
+        print_2d_graph(graph)
         pass
 
 if 1:

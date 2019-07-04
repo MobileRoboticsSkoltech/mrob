@@ -103,6 +103,10 @@ void SE3::exp(const Mat4 &xi_hat)
         double c3 = (o - std::sin(o))/o/o/o;
         V += c2*w_hat + c3*w_hat*w_hat;
     }
+    else
+    {
+        std::cout << "Exp on transf small very small !!" << std::endl;
+    }
 
     // Calculate the translation component t = Vv
     Mat31 t = V*v;
@@ -132,6 +136,10 @@ Mat4 SE3::ln(void) const
         double c2 = (1 - std::cos(o))/o; // (1 - std::cos(o))/o/o
         double k1 = 1/o/o*(1 - 0.5*c1/c2);
         Vinv += -0.5*w_hat + k1* w_hat*w_hat;
+    }
+    else
+    {
+        std::cout << "Log small very small" << std::endl;
     }
 
     // v = V^-1 t

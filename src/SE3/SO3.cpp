@@ -94,6 +94,7 @@ void SO3::exp(const Mat3 &w_hat)
     if ( o < 1e-12){
         // sin(o)/0 -> 1. Others approximate this with Taylor, but we will leave it as 1
         R_ << Mat3::Identity() + w_hat;
+        std::cout << "Exp on R small very small !!" << std::endl;
         return;
     }
     double c1 = std::sin(o)/o;
@@ -119,9 +120,12 @@ Mat3 SO3::ln(double *ro) const
         //TODO augment epsilon and approximate o with Taylor
         o = 0.0;
         res << Mat3::Zero();
+
+        std::cout << "Ln on R small very small !!" << std::endl;
     }
     else
     {
+        std::cout << "Ln on R pi -pi !!" << std::endl;
         // Special case tr = -1  and theta = +- pi or multiples
         o = M_PI;
         // R = I + 0 + (2/pi^2)W^2, which makes it symmetric R = Rt and W = hat(w)

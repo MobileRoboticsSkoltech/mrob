@@ -7,7 +7,7 @@ import numpy as np
 # create graph, reserving for 10 nodes and 20 factors if indicated
 graph = mrob.FGraph()
 
-print('Solving methods in FGraph: ', mrob.solveMethod.__members__)
+print('Solving methods in FGraph: ', mrob.solve.__members__)
 
 x = np.random.randn(3)
 n1 = graph.add_node_pose_2d(x)

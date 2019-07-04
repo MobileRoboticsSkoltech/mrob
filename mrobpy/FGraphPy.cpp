@@ -144,7 +144,7 @@ void init_FGraph(py::module &m)
             .def("get_estimated_state", &FGraphSolve::get_estimated_state)
             .def("number_nodes", &FGraphSolve::number_nodes)
             .def("number_factors", &FGraphSolve::number_factors)
-            .def("print", &FGraph::print)
+            .def("print", &FGraph::print, "By default False: does not print all the information on the Fgraph", py::arg("completePrint") = false)
             // -----------------------------------------------------------------------------
             // Specific call to 2D
             .def("add_node_pose_2d", &FGraphPy::add_node_pose_2d)
