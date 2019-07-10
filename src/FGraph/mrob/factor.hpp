@@ -19,6 +19,8 @@
 
 namespace mrob{
 
+class Node;
+
 /**
  * Factor class is a base pure abstract class defining factors,
  * the second type of vertexes on factor graphs (bipartite).

@@ -17,7 +17,7 @@
 #include <assert.h>
 
 #include "mrob/matrix_base.hpp"
-
+#include "mrob/factor.hpp"
 
 namespace mrob{
 
@@ -46,6 +46,10 @@ class Node{
      * it nicely.
      */
     virtual void update(const Eigen::Ref<const MatX1> &dx) = 0;
+    /**
+     * At run time sets the new value of the estate to be x
+     */
+    virtual void set_state(const Eigen::Ref<const MatX1> &x) = 0;
     /**
      * Declared as a dynamic matrix reference to allow any size to be returned.
      * At run time returns a Reference to a fixed size matrix and provide

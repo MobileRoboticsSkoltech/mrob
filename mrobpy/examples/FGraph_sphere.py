@@ -137,14 +137,15 @@ for t in range(1,N):
 
 
     # plot the current problem
-    if ((t+1) % 2 == 0)  & (t > 628):
+    #if (t+1) % 400 == 0  :
+    if ((t + 1) % 2 == 0) & (t > 627):
         #graph.print(True)
         print_3d_graph(graph)
         pass
 
 
 print_3d_graph(graph)
-if 0:
+if 1:
     graph.solve_batch()
     print('chi2 = ', graph.chi2())
     print_3d_graph(graph)
@@ -153,6 +154,10 @@ if 0:
     print('chi2 = ', graph.chi2())
     print_3d_graph(graph)
 
+
+    graph.solve_batch()
+    print('chi2 = ', graph.chi2())
+    print_3d_graph(graph)
 
     graph.solve_batch()
     print('chi2 = ', graph.chi2())

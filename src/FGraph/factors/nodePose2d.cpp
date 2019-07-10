@@ -28,6 +28,12 @@ void NodePose2d::update(const Eigen::Ref<const MatX1> &dx)
 
 }
 
+void NodePose2d::set_state(const Eigen::Ref<const MatX1> &x)
+{
+    x_ = x;
+    x_(2) = wrap_angle(x_(2));
+}
+
 void NodePose2d::print() const
 {
     std::cout << "Printing NodePose2d: " << id_

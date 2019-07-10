@@ -105,7 +105,6 @@ void SE3::exp(const Mat4 &xi_hat)
     }
     else
     {
-        std::cout << "Exp on transf small very small !!" << std::endl;
     }
 
     // Calculate the translation component t = Vv
@@ -129,7 +128,6 @@ Mat4 SE3::ln(void) const
     // V^-1 = I - 0.5w^ + k1 (w^)^2
     // k1 = 1/o^2 * (1 - c1/(2c2) ) ,    c1 =sin(o)/o and c2 = (1 - cos(o))/o^2 from so3_exp
     Mat3 Vinv = Mat3::Identity();
-    //XXX for small numbers Taylor expansion should be used...
     if (o > 1e-12)
     {
         double c1 = std::sin(o); //sin(o)/o, we remove the o in both coeficients
@@ -137,9 +135,10 @@ Mat4 SE3::ln(void) const
         double k1 = 1/o/o*(1 - 0.5*c1/c2);
         Vinv += -0.5*w_hat + k1* w_hat*w_hat;
     }
+    //XXX for small numbers Taylor expansion should be used...
     else
     {
-        std::cout << "Log small very small" << std::endl;
+
     }
 
     // v = V^-1 t

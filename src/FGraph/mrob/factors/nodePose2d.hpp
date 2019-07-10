@@ -32,13 +32,14 @@ namespace mrob{
 
         void update(const Eigen::Ref<const MatX1> &dx);
         virtual const Eigen::Ref<const MatX1> get_state() const {return x_;};
+        virtual void set_state(const Eigen::Ref<const MatX1> &x);
         virtual const Eigen::Ref<const MatX> get_stateT() const {return Mat3::Zero();}
         virtual const Eigen::Ref<const MatX1> get_last_linearization_state() const {return linearization_x_;};
         virtual const Eigen::Ref<const MatX1> get_last_deltaX() const {return dx_;};
         void print() const;
     protected:
         Mat31 x_;
-        Mat31 linearization_x_;
+        Mat31 linearization_x_; //TODO for incremental updates
         Mat31 dx_;
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW

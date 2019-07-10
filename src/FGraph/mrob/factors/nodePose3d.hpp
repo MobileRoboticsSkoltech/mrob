@@ -37,6 +37,7 @@ class NodePose3d : public Node
      * x'=vee(ln(T'))
      */
     void update(const Eigen::Ref<const MatX1> &dx);
+    virtual void set_state(const Eigen::Ref<const MatX1> &x);
     virtual const Eigen::Ref<const MatX1> get_state() const {return x_;};
     // function returning the transformation
     virtual const Eigen::Ref<const MatX> get_stateT() const ;

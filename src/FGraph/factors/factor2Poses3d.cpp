@@ -39,14 +39,13 @@ Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &
     WT2_ = W_.llt().matrixU();
     if (updateNodeTarget)
     {
-        // dx =  T_xO * (xo frame)Tobs * Tx_t^-1
+        // Updates the child node such that it matches the odometry observation
         // NOTE: carefull on the reference frame that Tobs is expressed on the X_origin frame, hence this change:
         // T_xo * (xo reference)T_obs = (global)T_obs * T_xo.
         // We could also use the adjoint to refer the manifold coordinates obs on the xo to the global frame (identity)
         Mat4 TxOrigin = nodeOrigin->get_stateT();
-        Mat4 TxTarget = nodeTarget->get_stateT();
-        SE3 dT = SE3(TxOrigin) * Tobs_ * SE3(TxTarget).inv();
-        nodeTarget->update(dT.ln_vee());
+        SE3 T = SE3(TxOrigin) * Tobs_;//TODO how many SE3 structures are created here?
+        nodeTarget->set_state(T.ln_vee());
     }
 }
 

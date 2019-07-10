@@ -35,7 +35,7 @@ void init_SE3(py::module &m) {
         .def("update_rhs", &SE3::update_rhs)
         .def("ln", &SE3::ln_vee)
         .def("transform", &SE3::transform)
-        .def("transform_array", &SE3::transform_array)
+        .def("transform_array", &SE3::transform_array) // makes a copy of the array. TODO, pass by Ref and avoid copying, look at ownership
         .def("inv", &SE3::inv)
         .def("adj", &SE3::adj)
         .def("distance", &SE3::distance)

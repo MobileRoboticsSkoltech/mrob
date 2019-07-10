@@ -119,16 +119,16 @@ void FGraphSolve::build_adjacency()
     std::vector<uint_t> indNodesMatrix;
     indNodesMatrix.reserve(nodes->size());
 
-    uint_t N = 0;
+    N_ = 0;
     for (id_t i = 0; i < nodes->size(); ++i)
     {
         // calculate the indices to access
         uint_t dim = (*nodes)[i]->get_dim();
-        indNodesMatrix.push_back(N);
-        N += dim;
+        indNodesMatrix.push_back(N_);
+        N_ += dim;
 
     }
-    assert(N == stateDim_ && "FGraphSolve::buildAdjacency: State Dimensions are not coincident\n");
+    assert(N_ == stateDim_ && "FGraphSolve::buildAdjacency: State Dimensions are not coincident\n");
 
     // 3) Evaluate every factor given the current state and bookeeping of Factor indices
     std::vector<uint_t> reservationA;
@@ -137,7 +137,7 @@ void FGraphSolve::build_adjacency()
     reservationW.reserve( obsDim_ );
     std::vector<uint_t> indFactorsMatrix;
     indFactorsMatrix.reserve(factors->size());
-    uint_t M = 0;
+    M_ = 0;
     for (uint_t i = 0; i < factors->size(); ++i)
     {
         auto f = (*factors)[i];
@@ -152,10 +152,10 @@ void FGraphSolve::build_adjacency()
             reservationA.push_back(allDim);
             reservationW.push_back(dim-j);
         }
-        indFactorsMatrix.push_back(M);
-        M += dim;
+        indFactorsMatrix.push_back(M_);
+        M_ += dim;
     }
-    assert(M == obsDim_ && "FGraphSolve::buildAdjacency: Observation dimensions are not coincident\n");
+    assert(M_ == obsDim_ && "FGraphSolve::buildAdjacency: Observation dimensions are not coincident\n");
     A_.reserve(reservationA); //Exact allocation for elements.
     W_.reserve(reservationW); //same
 
@@ -185,7 +185,7 @@ void FGraphSolve::build_adjacency()
                     // order according to the permutation vector
                     uint_t iRow = indFactorsMatrix[i] + l;
                     uint_t iCol = indNodesMatrix[indNode] + k;
-                    // XXX This is not an ordered insertion. Is it better to order and then insert?
+                    // This is an ordered insertion
                     A_.insert(iRow,iCol) = f->get_jacobian()(l, k + totalK);
                 }
                 totalK += dimNode;
@@ -202,7 +202,7 @@ void FGraphSolve::build_adjacency()
                 uint_t iRow = indFactorsMatrix[i] + l;
                 uint_t iCol = indFactorsMatrix[i] + k;
                 W_.insert(iRow,iCol) = f->get_information_matrix()(l,k);
-                // If QR, then we needed, we dont suppoort QR anyway
+                // If QR, then we need the following, but we dont suppoort QR anyway
                 //W_.insert(iRow,iCol) = f->get_trans_sqrt_information_matrix()(l,k);
             }
         }
@@ -247,9 +247,17 @@ void FGraphSolve::build_info_direct()
 
 void FGraphSolve::solve_cholesky()
 {
-    // COLAMD is not supported on sparseCholesky
     SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
 
+
+    // LM with spherical approximation for the trust region
+    lambda_ = 1e-1;
+    for (uint_t n = 0 ; n < N_; ++n)
+        I_.coeffRef(n,n) += lambda_*I_.coeffRef(n,n); //maybe faster a sparse diagonal matrix multiplication?
+
+    // LM with ellipsoidal approximation
+
+    // compute cholesky solution
     cholesky.compute(I_);
     dx_ = cholesky.solve(b_);
 
