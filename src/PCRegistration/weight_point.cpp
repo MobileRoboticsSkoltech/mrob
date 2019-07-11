@@ -1,5 +1,5 @@
-/* $COPYRIGHT_SKOLTECH
- * $LICENSE_LGPL
+/* Copyright 2018-2019 Skolkovo Institute of Science and Technology (Skoltech)
+ * All rights reserved.
  *
  * weight_point.cpp
  *

@@ -1,5 +1,5 @@
-/* $COPYRIGHT SKOLTECH
- * $LICENSE_LGPL
+/* Copyright 2018-2019 Skolkovo Institute of Science and Technology (Skoltech)
+ * All rights reserved.
  *
  *  Created on: Jan 14, 2019
  *      Author: Konstantin Pakulev
