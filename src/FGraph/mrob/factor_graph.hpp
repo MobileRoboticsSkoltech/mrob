@@ -77,10 +77,23 @@ public:
     void print(bool complete = false) const;
 
     /**
-     * get_node returns the node given the node id key, now a position on the vector
+     * get_node returns the node given the node id key, now a position on the data structure
      */
     std::shared_ptr<Node>& get_node(uint_t key);
 
+    /**
+     * get_node returns the node given the node id key, now a position on the data structure
+     */
+    std::shared_ptr<Factor>& get_factor(uint_t key);
+    /**
+     * Returns the chi2 corresponding to a particular factor. Use this only if the valua has been updated recently
+     * Mainly the purpose of this function is for testing
+     */
+    matData_t get_factor_chi2(uint_t key);
+    /**
+     * Evaluates the residual and returns the chi2 value
+     */
+    matData_t evaluate_factor_chi2(uint_t key);
 
     /**
      * FGraph information

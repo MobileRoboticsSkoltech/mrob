@@ -62,9 +62,16 @@ public:
     /**
      * Evaluates chi2 of the current problem, with the given residuals.
      * It may be required to evaluate_residuals() to obtain the new chi2 values
-     * This function MOST likely needs to evaluate residuals first
+     * This function MOST likely needs to evaluate residuals first, but
+     * evaluate_residuals does not necessarily requires to calculate chi2, that is why
+     * there are 2 functions.
      */
     virtual void evaluate_chi2() = 0;
+    /**
+     * get chi2 returns the value in the variable chi2_. This value will be updated
+     * every time there is a caluclation of residuals.
+     */
+    matData_t get_chi2() const { return chi2_;};
     /**
      * The print utility could be re-implemented on child classes
      * if there are special needs
@@ -87,8 +94,6 @@ public:
      */
     virtual const Eigen::Ref<const MatX> get_jacobian() const = 0;
 
-    //matData_t getChi2() const { return r_.dot(W_*r_);};//TODO do we need to calculate this?
-    matData_t get_chi2() const { return chi2_;};
 
     id_t get_id() const {return id_;};
     void set_id(id_t id) {id_ = id;};

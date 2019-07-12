@@ -26,26 +26,42 @@ namespace mrob {
  * 	- TODO Information matrix (direct)
  * 	- TODO Diagonal and information for Schur complement
  *
- * Later the chosen solver should be compliant with the
- * calculated matrices.
+ * Routines provide different optiomization methods:
+ *  - optimize_gn (Gauss-Newton) using Cholesky LDLT with minimum degree ordering
+ *  - optimize_lm (Levenberg–Marquardt) TODO
  */
 class FGraphSolve: public FGraph
 {
 public:
-    enum solveMethod{CHOL_ADJ=0, CHOL, SCHUR};
+    /**
+     * This enums all matrix building methods available
+     */
+    enum matrixMethod{ADJ=0, SCHUR};
+    /**
+     * This enums optimization methods available
+     */
+    enum optimizationMethod{GAUSS_NEWTON=0, LEVENBERG_MARQUARDT};
 
-    FGraphSolve(solveMethod method = CHOL_ADJ, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
+    FGraphSolve(matrixMethod method = ADJ, optimizationMethod = GAUSS_NEWTON, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
     virtual ~FGraphSolve();
     /**
      * Solves the batch problem, by linearizing, ordering
      */
-    void solve_batch();
+    void solve_batch();// TODO deprecated
+
+
+    void solve();
     /**
-     * TODO this method is not implemented, there are some structure such as CustomCholesky
-     * Solve incremental, uses previous solution and linearization point
-     * to incrementally solve the problem
+     * Once the matrix is generated, it solve the linearized LSQ
+     * by using the Gauss-Newton algorithm
      */
-    void solve_incremental();
+    void optimize_gauss_newton();
+
+    /**
+     * Once the matrix is generated, it solve the linearized LSQ
+     * by using the Levenberg-Marquardt algorithm
+     */
+    void optimize_levenberg_marquardt();
 
     /**
      * Evaluates the current solution chi2.
@@ -58,9 +74,13 @@ public:
 
     std::vector<MatX1> get_estimated_state();
 
-    //TODO are this necessary?
-    void set_solve_method(solveMethod method) {method_ = method;};
-    solveMethod get_solve_method() { return method_;};
+    void set_matrix_method(matrixMethod method) {matrixMethod_ = method;};
+    matrixMethod get_matrix_method() { return matrixMethod_;};
+
+    /**
+     * Particular parameters for Levenberg-Marquard
+     * TODO
+     */
 
 
 protected:
@@ -75,7 +95,6 @@ protected:
      */
     void build_adjacency();
     void build_info_adjacency();
-    void build_info_direct();//TODO
 
     /**
      * Solve the systems using Cholesky LDLT decomposition with AMD ordering
@@ -93,9 +112,10 @@ protected:
      */
     void update_nodes();
 
-    // Variables for solving the FG
-    solveMethod method_;
-    double lambda_;
+    // Variables for solving the FGraph
+    matrixMethod matrixMethod_;
+    optimizationMethod optimMethod_;
+
     uint_t N_; // total number of state variables
     uint_t M_; // total number of observation variables
 
@@ -109,8 +129,11 @@ protected:
     // Correction deltas
     MatX1 dx_;
 
-    // Execution evaluation
+    // Execution evaluation TODO, do a pair of time, strings and plot things more properly
     std::vector<double> time_profiles_;//used for time profiling functions
+
+    // Particular parameters for Levenberg-Marquard
+    double lambda_;
 };
 
 

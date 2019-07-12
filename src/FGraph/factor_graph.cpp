@@ -60,6 +60,27 @@ std::shared_ptr<Node>& FGraph::get_node(uint_t key)
     return nodes_[key];// XXX test key  again
 }
 
+std::shared_ptr<Factor>& FGraph::get_factor(uint_t key)
+{
+    // TODO key on a set or map?
+    assert(key < factors_.size() && "FGraph::get_node: incorrect key");
+    return factors_[key];
+}
+
+matData_t FGraph::get_factor_chi2(uint_t key)
+{
+    auto f = this->get_factor(key);
+    return f->get_chi2();
+}
+
+matData_t FGraph::evaluate_factor_chi2(uint_t key)
+{
+    auto f = this->get_factor(key);
+    f->evaluate_residuals();
+    f->evaluate_chi2();
+    return f->get_chi2();
+}
+
 void FGraph::print(bool completePrint) const
 {
     std::cout << "Status of graph: " <<

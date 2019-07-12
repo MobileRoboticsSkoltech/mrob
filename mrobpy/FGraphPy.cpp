@@ -78,19 +78,21 @@ public:
         this->add_node(n);
         return n->get_id();
     }
-    void add_factor_1pose_3d(const py::EigenDRef<const Mat61> obs, uint_t nodeId, const py::EigenDRef<const Mat6> obsInvCov)
+    id_t add_factor_1pose_3d(const py::EigenDRef<const Mat61> obs, uint_t nodeId, const py::EigenDRef<const Mat6> obsInvCov)
     {
         auto n1 = this->get_node(nodeId);
         std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose3d(obs,n1,obsInvCov));
         this->add_factor(f);
+        return f->get_id();
     }
-    void add_factor_2poses_3d(const py::EigenDRef<const Mat61> obs, uint_t nodeOriginId, uint_t nodeTargetId,
+    id_t add_factor_2poses_3d(const py::EigenDRef<const Mat61> obs, uint_t nodeOriginId, uint_t nodeTargetId,
             const py::EigenDRef<const Mat6> obsInvCov, bool updateNodeTarget)
     {
         auto nO = this->get_node(nodeOriginId);
         auto nT = this->get_node(nodeTargetId);
         std::shared_ptr<mrob::Factor> f(new mrob::Factor2Poses3d(obs,nO,nT,obsInvCov, updateNodeTarget));
         this->add_factor(f);
+        return f->get_id();
     }
 
 };
@@ -144,6 +146,8 @@ void init_FGraph(py::module &m)
             .def("get_estimated_state", &FGraphSolve::get_estimated_state)
             .def("number_nodes", &FGraphSolve::number_nodes)
             .def("number_factors", &FGraphSolve::number_factors)
+            .def("get_factor_chi2", &FGraph::get_factor_chi2)
+            .def("evaluatet_factor_chi2", &FGraph::evaluate_factor_chi2)
             .def("print", &FGraph::print, "By default False: does not print all the information on the Fgraph", py::arg("completePrint") = false)
             // -----------------------------------------------------------------------------
             // Specific call to 2D

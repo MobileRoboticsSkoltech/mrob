@@ -27,8 +27,8 @@ using namespace std;
 using namespace Eigen;
 
 
-FGraphSolve::FGraphSolve(solveMethod method, uint_t potNumberNodes, uint_t potNumberFactors):
-	FGraph(potNumberNodes, potNumberFactors), method_(method)
+FGraphSolve::FGraphSolve(matrixMethod method, uint_t potNumberNodes, uint_t potNumberFactors):
+	FGraph(potNumberNodes, potNumberFactors), matrixMethod_(method)
 {
 
 }
@@ -39,7 +39,7 @@ FGraphSolve::~FGraphSolve() = default;
 void FGraphSolve::solve_batch()
 {
     /**
-     * 2800 nodes
+     * 2800 2D nodes on M3500
      * Time profile :13.902 % build Adjacency matrix,
      *               34.344 % build Information,
      *               48.0506 % build Cholesky,
@@ -51,16 +51,13 @@ void FGraphSolve::solve_batch()
     time_profiles_.clear();
     auto t1 = std::chrono::steady_clock::now();
 
-
+    // TODO change this, we need to specify if GaussNewton or LM or what goes well here
     // 1) Linearizes and calculates the Jacobians and required matrices
-    switch(method_)
+    switch(matrixMethod_)
     {
-      case CHOL_ADJ:
+      case ADJ:
         this->build_adjacency();
         this->build_info_adjacency();
-        break;
-      case CHOL:
-        this->build_info_direct();
         break;
       case SCHUR:
       default:
@@ -94,7 +91,12 @@ void FGraphSolve::solve_batch()
     std::cout << "\n";
 }
 
-void FGraphSolve::solve_incremental()
+void FGraphSolve::optimize_gauss_newton()
+{
+    assert(0 && "FGraphSolve::solve_batch: Programm me");
+}
+
+void FGraphSolve::optimize_levenberg_marquardt()
 {
     assert(0 && "FGraphSolve::solve_batch: Programm me");
 }
@@ -232,8 +234,10 @@ matData_t FGraphSolve::chi2(bool evaluateResidualsFlag)
     {
         auto f = factors_[i];
         if (evaluateResidualsFlag)
+        {
             f->evaluate_residuals();
-        f->evaluate_chi2();
+            f->evaluate_chi2();
+        }
         totalChi2 += f->get_chi2();
     }
     return totalChi2;
@@ -251,7 +255,7 @@ void FGraphSolve::solve_cholesky()
 
 
     // LM with spherical approximation for the trust region
-    lambda_ = 1e-1;
+    lambda_ = 0.0;
     for (uint_t n = 0 ; n < N_; ++n)
         I_.coeffRef(n,n) += lambda_*I_.coeffRef(n,n); //maybe faster a sparse diagonal matrix multiplication?
 

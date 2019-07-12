@@ -92,9 +92,9 @@ with open('../../datasets/sphere2500.txt', 'r') as file:
             P = np.zeros((6,6))
             P[:3,3:] = np.eye(3)
             P[3:,:3] = np.eye(3)
-            factor_inf[int(d[1]), int(d[2])] = P @ W @ P.transpose()
+            #factor_inf[int(d[1]), int(d[2])] = P @ W @ P.transpose()
             # in gtsam example they use directly a set diagonal cov matrix as 5*pi/180 for angles and 0.05 for displacement;
-            # factor_inf[int(d[1]), int(d[2])] = np.diag(np.array([100, 100, 100, 10, 10, 10]))
+             factor_inf[int(d[1]), int(d[2])] = np.diag(np.array([100, 100, 100, 10, 10, 10]))
             factors_dictionary[int(d[2])].append(int(d[1]))
 
 
@@ -122,7 +122,8 @@ for t in range(1,N):
         obs = factors[nodeOrigin, t]
         covInv = factor_inf[nodeOrigin, t]
         if t - nodeOrigin == 1:
-            graph.add_factor_2poses_3d(obs, nodeOrigin,t,covInv,True)
+            fator_id = graph.add_factor_2poses_3d(obs, nodeOrigin,t,covInv,True)
+            print('New odom factor ', factor_id , ' chi2 =  ', )
         else:
             graph.add_factor_2poses_3d(obs, nodeOrigin,t,covInv)
         # for end. no more loop inside the factors

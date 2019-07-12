@@ -89,24 +89,25 @@ for t in range(1,N):
 
     # plot the current problem
     if (t+1) % 500 == 0:
-        print_2d_graph(graph)
+        #print_2d_graph(graph)
         pass
 
 if 1:
+    print_2d_graph(graph)
     graph.solve_batch()
-    print('Iter 0 chi2 = ', graph.chi2(False) )
+    print('Iter 0 chi2 = ', graph.chi2() )
     graph.solve_batch()
-    print('Iter 1 chi2 = ', graph.chi2(False) )
+    print('Iter 1 chi2 = ', graph.chi2() )
     graph.solve_batch()
-    print('Iter 2 chi2 = ', graph.chi2(False) )
+    print('Iter 2 chi2 = ', graph.chi2() )
     graph.solve_batch()
-    print('Iter 3 chi2 = ', graph.chi2(False) )
+    print('Iter 3 chi2 = ', graph.chi2() )
     print_2d_graph(graph)
 
     graph.solve_batch()
-    print('Iter 4 chi2 = ', graph.chi2(False) )
+    print('Iter 4 chi2 = ', graph.chi2() )
     graph.solve_batch()
-    print('Iter 5 chi2 = ', graph.chi2(False) ) #already converges
+    print('Iter 5 chi2 = ', graph.chi2() ) #already converges
     print_2d_graph(graph)
 
 
@@ -114,7 +115,7 @@ graph.print(False)
 if 0:
     plt.figure()
     plt.plot(processing_time)
-    plt.title('Eigen simplicial LLT with Natural Ordering')
+    plt.title('Eigen simplicial LDLT with Natural Ordering')
     plt.show()
     
 
