@@ -20,7 +20,7 @@ invCov = np.identity(3)
 graph.add_factor_1pose_2d(np.zeros(3),n1,1e6*invCov)
 graph.add_factor_2poses_2d(np.ones(3),n1,n2,invCov)
 
-graph.solve_batch()
+graph.solve()
 graph.print(True)
 
 

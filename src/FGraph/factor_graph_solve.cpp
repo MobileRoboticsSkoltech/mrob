@@ -27,8 +27,8 @@ using namespace std;
 using namespace Eigen;
 
 
-FGraphSolve::FGraphSolve(matrixMethod method, uint_t potNumberNodes, uint_t potNumberFactors):
-	FGraph(potNumberNodes, potNumberFactors), matrixMethod_(method)
+FGraphSolve::FGraphSolve(matrixMethod method, optimMethod optim, uint_t potNumberNodes, uint_t potNumberFactors):
+	FGraph(potNumberNodes, potNumberFactors), matrixMethod_(method), optimMethod_(optim)
 {
 
 }
@@ -36,7 +36,7 @@ FGraphSolve::FGraphSolve(matrixMethod method, uint_t potNumberNodes, uint_t potN
 FGraphSolve::~FGraphSolve() = default;
 
 
-void FGraphSolve::solve_batch()
+void FGraphSolve::solve(optimMethod method)
 {
     /**
      * 2800 2D nodes on M3500
@@ -51,54 +51,100 @@ void FGraphSolve::solve_batch()
     time_profiles_.clear();
     auto t1 = std::chrono::steady_clock::now();
 
-    // TODO change this, we need to specify if GaussNewton or LM or what goes well here
     // 1) Linearizes and calculates the Jacobians and required matrices
+    this->build_adjacency();
+    auto t2 = std::chrono::steady_clock::now();
+    auto dif = std::chrono::duration_cast<Ttim>(t2 - t1);
+    time_profiles_.push_back( std::make_pair("Adjacency",  dif.count()) );
+
+    // 1.2) builds specifically the information
     switch(matrixMethod_)
     {
       case ADJ:
-        this->build_adjacency();
+        t1 = std::chrono::steady_clock::now();
         this->build_info_adjacency();
+        t2 = std::chrono::steady_clock::now();
+        dif = std::chrono::duration_cast<Ttim>(t2 - t1);
+        time_profiles_.push_back( std::make_pair("Info Adjacency",  dif.count()) );
         break;
       case SCHUR:
       default:
         assert(0 && "FGraphSolve: method not implemented");
     }
-    auto t2 = std::chrono::steady_clock::now();
-    auto dif = std::chrono::duration_cast<Ttim>(t2 - t1);
-    time_profiles_.push_back(dif.count());
 
-    // 2) Cholesky factorization TODO SCHUR not implemented
-    t1 = std::chrono::steady_clock::now();
-    this->solve_cholesky();
-    t2 = std::chrono::steady_clock::now();
-    dif = std::chrono::duration_cast<Ttim>(t2 - t1);
-    time_profiles_.push_back(dif.count());
+
+
+    // 2) Optimization SCHUR not implemented
+    switch(optimMethod_)
+    {
+      case GN:
+        this->optimize_gauss_newton();
+        break;
+      case LM:
+        t1 = std::chrono::steady_clock::now();
+        this->optimize_levenberg_marquardt();
+        t2 = std::chrono::steady_clock::now();
+        dif = std::chrono::duration_cast<Ttim>(t2 - t1);
+        time_profiles_.push_back( std::make_pair("LM Cholesky",  dif.count()) );
+        break;
+      default:
+        assert(0 & "FGRaphSolve:: optimization method unknown");
+    }
+
+
+
 
     // 3) Update solution (this is almost negligible on time)
     t1 = std::chrono::steady_clock::now();
     this->update_nodes();
     t2 = std::chrono::steady_clock::now();
     dif = std::chrono::duration_cast<Ttim>(t2 - t1);
-    time_profiles_.push_back(dif.count());
+    time_profiles_.push_back( std::make_pair("Update Solution",  dif.count()) );
 
-    double sum = 0;
-    for (auto t : time_profiles_)
-        sum += t;
+    if (0)
+    {
+        double sum = 0;
+        for (auto t : time_profiles_)
+            sum += t.second;
 
-    std::cout << "\nTime profile for " << sum << " [us]: ";
-    for (auto t : time_profiles_)
-        std::cout << t/sum *100 << "%, ";
-    std::cout << "\n";
+        std::cout << "\nTime profile for " << sum << " [us]: ";
+        for (auto t : time_profiles_)
+            std::cout << t.first << " = " << t.second/sum *100 << "%, ";
+        std::cout << "\n";
+    }
 }
 
 void FGraphSolve::optimize_gauss_newton()
 {
-    assert(0 && "FGraphSolve::solve_batch: Programm me");
+    SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
+    // compute cholesky solution
+    auto t1 = std::chrono::steady_clock::now();
+    cholesky.compute(I_);
+    auto t2 = std::chrono::steady_clock::now();
+    auto dif = std::chrono::duration_cast<Ttim>(t2 - t1);
+    time_profiles_.push_back( std::make_pair("Gauss Newton create Cholesky",  dif.count()) );
+    t1 = std::chrono::steady_clock::now();
+    dx_ = cholesky.solve(b_);
+    t2 = std::chrono::steady_clock::now();
+    dif = std::chrono::duration_cast<Ttim>(t2 - t1);
+    time_profiles_.push_back( std::make_pair("Gauss Newton solve Cholesky",  dif.count()) );
 }
 
 void FGraphSolve::optimize_levenberg_marquardt()
 {
-    assert(0 && "FGraphSolve::solve_batch: Programm me");
+    SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
+
+
+    // LM with spherical approximation for the trust region
+    lambda_ = 0.0;
+    for (uint_t n = 0 ; n < N_; ++n)
+        I_.coeffRef(n,n) += lambda_*I_.coeffRef(n,n); //maybe faster a sparse diagonal matrix multiplication?
+
+    // LM with ellipsoidal approximation
+
+    // compute cholesky solution
+    cholesky.compute(I_);
+    dx_ = cholesky.solve(b_);
 }
 
 void FGraphSolve::build_adjacency()
@@ -241,30 +287,6 @@ matData_t FGraphSolve::chi2(bool evaluateResidualsFlag)
         totalChi2 += f->get_chi2();
     }
     return totalChi2;
-}
-
-
-void FGraphSolve::build_info_direct()
-{
-    assert(0 && "FGraphSolve::buildProblemDirectInfo: Routine not implemented");
-}
-
-void FGraphSolve::solve_cholesky()
-{
-    SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
-
-
-    // LM with spherical approximation for the trust region
-    lambda_ = 0.0;
-    for (uint_t n = 0 ; n < N_; ++n)
-        I_.coeffRef(n,n) += lambda_*I_.coeffRef(n,n); //maybe faster a sparse diagonal matrix multiplication?
-
-    // LM with ellipsoidal approximation
-
-    // compute cholesky solution
-    cholesky.compute(I_);
-    dx_ = cholesky.solve(b_);
-
 }
 
 void FGraphSolve::update_nodes()

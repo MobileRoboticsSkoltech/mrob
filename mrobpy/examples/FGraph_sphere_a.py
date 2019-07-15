@@ -137,7 +137,7 @@ for t in range(1,N):
         
     # solve the problem 7s 2500nodes
     start = time.time()
-    #graph.solve_batch()
+    #graph.solve()
     end = time.time()
     print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))

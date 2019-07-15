@@ -79,7 +79,7 @@ for t in range(1,N):
         
     # solve the problem 7s 2500nodes
     start = time.time()
-    #graph.solve_batch()
+    graph.solve(mrob.GN)
     end = time.time()
     print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))
@@ -92,21 +92,21 @@ for t in range(1,N):
         #print_2d_graph(graph)
         pass
 
-if 1:
+if 0:
     print_2d_graph(graph)
-    graph.solve_batch()
+    graph.solve()
     print('Iter 0 chi2 = ', graph.chi2() )
-    graph.solve_batch()
+    graph.solve()
     print('Iter 1 chi2 = ', graph.chi2() )
-    graph.solve_batch()
+    graph.solve()
     print('Iter 2 chi2 = ', graph.chi2() )
-    graph.solve_batch()
+    graph.solve()
     print('Iter 3 chi2 = ', graph.chi2() )
     print_2d_graph(graph)
 
-    graph.solve_batch()
+    graph.solve()
     print('Iter 4 chi2 = ', graph.chi2() )
-    graph.solve_batch()
+    graph.solve()
     print('Iter 5 chi2 = ', graph.chi2() ) #already converges
     print_2d_graph(graph)
 

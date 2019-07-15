@@ -26,7 +26,7 @@ int main ()
 
     // create a simple graph to solve:
     //     anchor ------ X1 ------- obs ---------- X2
-    mrob::FGraphSolve graph(mrob::FGraphSolve::CHOL_ADJ,50,50);
+    mrob::FGraphSolve graph(mrob::FGraphSolve::ADJ,mrob::FGraphSolve::GN,50,50);
 
     // Initial node is defined at 0,0,0, 0,0,0 and anchor factor actually observing it at 0
     Mat61 x, obs;
@@ -59,10 +59,10 @@ int main ()
 
     // solve the Gauss Newton optimization
     graph.print(true);
-    graph.solve_batch();
-    graph.solve_batch();
-    graph.solve_batch();
-    graph.solve_batch();
+    graph.solve();
+    graph.solve();
+    graph.solve();
+    graph.solve();
 
     graph.print(true);
     std::cout << "\n\n\nSolved, chi2 = " << graph.chi2() << std::endl;

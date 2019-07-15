@@ -42,7 +42,10 @@ public:
     /**
      * Constructor for the python binding. By default uses the Cholesky adjoint solving type, and some estimated number of nodes and factors.
      */
-    FGraphPy(uint_t potNumberNodes, uint_t potNumberFactors) : FGraphSolve(FGraphSolve::solveMethod::CHOL_ADJ,potNumberNodes,potNumberFactors) {};
+    FGraphPy(uint_t potNumberNodes, uint_t potNumberFactors) :
+        FGraphSolve(FGraphSolve::matrixMethod::ADJ,
+                    FGraphSolve::optimMethod::GN,
+                    potNumberNodes,potNumberFactors) {};
     id_t add_node_pose_2d(const py::EigenDRef<const Mat31> x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodePose2d(x));
@@ -125,21 +128,20 @@ Mat3 rpy_to_so3(const py::EigenDRef<const Mat31> v)
 
 void init_FGraph(py::module &m)
 {
-    py::enum_<FGraphSolve::solveMethod>(m, "FGraph.solveMethod")
-        .value("CHOL_ADJ", FGraphSolve::solveMethod::CHOL_ADJ)
-        .value("CHOL", FGraphSolve::solveMethod::CHOL)
-        .value("SCHUR", FGraphSolve::solveMethod::SCHUR)
+    py::enum_<FGraphSolve::optimMethod>(m, "FGraph.optimMethod")
+        .value("GN", FGraphSolve::optimMethod::GN)
+        .value("LM", FGraphSolve::optimMethod::LM)
         .export_values()
         ;
     // Fgraph class adding factors and providing method to solve the inference problem.
     py::class_<FGraphPy> (m,"FGraph")
             .def(py::init<uint_t, uint_t>(),
-                    "Constructor, solveType default is CHOL_ADJ. Second parameters are an estimated number of nodes and factors",
+                    "Constructor, solveType default is ADJ and GN. Second parameters are an estimated number of nodes and factors",
                     py::arg("potNumberNodes") = 512,
                     py::arg("potNumberFactors") = 512)
-            //.def("set_solve_method", &FGraphSolve::set_solve_method)
-            .def("solve_batch", &FGraphSolve::solve_batch)
-            //.def("solve_incremental", &FGraphSolve::solve_incremental)//TODO not implemented yet
+            .def("solve", &FGraphSolve::solve,
+                    "Solves the corresponding FG",
+                    py::arg("method") =  FGraphSolve::optimMethod::GN)
             .def("chi2", &FGraphSolve::chi2,
                     "Calculated the chi2 of the problem. By default re-evaluates residuals, set to false if doesn't",
                     py::arg("evaluateResidualsFlag") = true)
@@ -147,7 +149,7 @@ void init_FGraph(py::module &m)
             .def("number_nodes", &FGraphSolve::number_nodes)
             .def("number_factors", &FGraphSolve::number_factors)
             .def("get_factor_chi2", &FGraph::get_factor_chi2)
-            .def("evaluatet_factor_chi2", &FGraph::evaluate_factor_chi2)
+            .def("evaluate_factor_chi2", &FGraph::evaluate_factor_chi2)
             .def("print", &FGraph::print, "By default False: does not print all the information on the Fgraph", py::arg("completePrint") = false)
             // -----------------------------------------------------------------------------
             // Specific call to 2D

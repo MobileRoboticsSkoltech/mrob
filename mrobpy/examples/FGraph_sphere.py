@@ -49,8 +49,8 @@ for i in range(2500):
     factors_dictionary[i] = []
 
 # sphere2500 from gtsam, using the TORO format
-with open('../../datasets/sphere2500.txt', 'r') as file:
-#with open('../../datasets/sphere2500_groundtruth.txt', 'r') as file:
+#with open('../../datasets/sphere2500.txt', 'r') as file:
+with open('../../datasets/sphere2500_groundtruth.txt', 'r') as file:
     for line in file:
         d = line.split()
         # read edges and vertex
@@ -94,7 +94,7 @@ with open('../../datasets/sphere2500.txt', 'r') as file:
             P[3:,:3] = np.eye(3)
             #factor_inf[int(d[1]), int(d[2])] = P @ W @ P.transpose()
             # in gtsam example they use directly a set diagonal cov matrix as 5*pi/180 for angles and 0.05 for displacement;
-             factor_inf[int(d[1]), int(d[2])] = np.diag(np.array([100, 100, 100, 10, 10, 10]))
+            factor_inf[int(d[1]), int(d[2])] = np.diag(np.array([100, 100, 100, 10, 10, 10]))
             factors_dictionary[int(d[2])].append(int(d[1]))
 
 
@@ -122,18 +122,19 @@ for t in range(1,N):
         obs = factors[nodeOrigin, t]
         covInv = factor_inf[nodeOrigin, t]
         if t - nodeOrigin == 1:
-            fator_id = graph.add_factor_2poses_3d(obs, nodeOrigin,t,covInv,True)
-            print('New odom factor ', factor_id , ' chi2 =  ', )
+            factor_id = graph.add_factor_2poses_3d(obs, nodeOrigin,t,covInv,True)
+            #print('New odom factor ', factor_id , ' chi2 =  ', graph.evaluate_factor_chi2(factor_id))
         else:
-            graph.add_factor_2poses_3d(obs, nodeOrigin,t,covInv)
+            factor_id = graph.add_factor_2poses_3d(obs, nodeOrigin,t,covInv)
+            print('New obs factor ', factor_id , ' chi2 =  ', graph.evaluate_factor_chi2(factor_id))
         # for end. no more loop inside the factors
         
         
     # solve the problem 7s 2500nodes
     start = time.time()
-    graph.solve_batch()
+    graph.solve(mrob.GN)
     end = time.time()
-    print('Iteration = ', t, ', nodes factors = (', graph.number_nodes(), ', ', graph.number_factors(), '), chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    #print('Iteration = ', t, ', nodes factors = (', graph.number_nodes(), ', ', graph.number_factors(), '), chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))
 
 
@@ -141,30 +142,30 @@ for t in range(1,N):
     #if (t+1) % 400 == 0  :
     if ((t + 1) % 2 == 0) & (t > 627):
         #graph.print(True)
-        print_3d_graph(graph)
+        #print_3d_graph(graph)
         pass
 
 
 print_3d_graph(graph)
-if 1:
-    graph.solve_batch()
+if 0:
+    graph.solve()
     print('chi2 = ', graph.chi2())
     print_3d_graph(graph)
 
-    graph.solve_batch()
+    graph.solve()
     print('chi2 = ', graph.chi2())
     print_3d_graph(graph)
 
 
-    graph.solve_batch()
+    graph.solve()
     print('chi2 = ', graph.chi2())
     print_3d_graph(graph)
 
-    graph.solve_batch()
+    graph.solve()
     print('chi2 = ', graph.chi2())
     print_3d_graph(graph)
 
-    graph.solve_batch()
+    graph.solve()
     print('chi2 = ', graph.chi2())
     print_3d_graph(graph)
     #graph.print(True)

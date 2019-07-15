@@ -38,31 +38,21 @@ public:
      */
     enum matrixMethod{ADJ=0, SCHUR};
     /**
-     * This enums optimization methods available
+     * This enums optimization methods available:
+     *  - Gauss Newton
+     *  - Levenberg Marquardt
      */
-    enum optimizationMethod{GAUSS_NEWTON=0, LEVENBERG_MARQUARDT};
+    enum optimMethod{GN=0, LM};
 
-    FGraphSolve(matrixMethod method = ADJ, optimizationMethod = GAUSS_NEWTON, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
+    FGraphSolve(matrixMethod method = ADJ, optimMethod = GN, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
     virtual ~FGraphSolve();
-    /**
-     * Solves the batch problem, by linearizing, ordering
-     */
-    void solve_batch();// TODO deprecated
-
-
-    void solve();
-    /**
-     * Once the matrix is generated, it solve the linearized LSQ
-     * by using the Gauss-Newton algorithm
-     */
-    void optimize_gauss_newton();
 
     /**
-     * Once the matrix is generated, it solve the linearized LSQ
-     * by using the Levenberg-Marquardt algorithm
+     * Solve call the corresponding routine on the class parameters or
+     * ultimately on the function input,
+     * by default optim method is Ggauss Newton
      */
-    void optimize_levenberg_marquardt();
-
+    void solve(optimMethod method = GN);
     /**
      * Evaluates the current solution chi2.
      *
@@ -71,9 +61,15 @@ public:
      *      - false: Uses the previous calculated residuals
      */
     matData_t chi2(bool evaluateResidualsFlag = true);
-
+    /**
+     * Rerturns a Reference to the solution vector
+     * of all variables.
+     */
     std::vector<MatX1> get_estimated_state();
 
+    /**
+     * Functions to set the matrix method building
+     */
     void set_matrix_method(matrixMethod method) {matrixMethod_ = method;};
     matrixMethod get_matrix_method() { return matrixMethod_;};
 
@@ -94,14 +90,32 @@ protected:
      *
      */
     void build_adjacency();
+    /**
+     * From the adjacency matrix it creates the information matrix as
+     *              L = A^T * W * A
+     * The residuals are also calculated as b = A^T * W *r
+     */
     void build_info_adjacency();
+    void build_schur(); // TODO
 
     /**
-     * Solve the systems using Cholesky LDLT decomposition with AMD ordering
-     * In addition, it creates the information matrix as
-     *              I = A^T * W * A
-     * The residuals are also calculated as b = A^T * W *r
+     * Once the matrix L is generated, it solves the linearized LSQ
+     * by using the Gauss-Newton algorithm
+     */
+    void optimize_gauss_newton();
+
+    /**
+     * It generates the information matrix as
+     *              L' = L +  lambda * diag(L)
      *
+     * Once the matrix L' is generated, it solves the linearized LSQ
+     * by using the Levenberg-Marquardt algorithm.
+     * Parameters are necessary to be specified in advance, o.w. it would use default values.
+     */
+    void optimize_levenberg_marquardt();
+
+    /**
+     * Solves the systems using Cholesky LDLT decomposition with AMD ordering
      * Note: LLT provides similar results
      */
     void solve_cholesky();
@@ -114,7 +128,7 @@ protected:
 
     // Variables for solving the FGraph
     matrixMethod matrixMethod_;
-    optimizationMethod optimMethod_;
+    optimMethod optimMethod_;
 
     uint_t N_; // total number of state variables
     uint_t M_; // total number of observation variables
@@ -129,8 +143,7 @@ protected:
     // Correction deltas
     MatX1 dx_;
 
-    // Execution evaluation TODO, do a pair of time, strings and plot things more properly
-    std::vector<double> time_profiles_;//used for time profiling functions
+    std::vector<std::pair<std::string, double>> time_profiles_;//used for time profiling functions
 
     // Particular parameters for Levenberg-Marquard
     double lambda_;
