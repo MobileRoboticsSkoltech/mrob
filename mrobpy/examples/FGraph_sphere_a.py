@@ -45,7 +45,10 @@ N = 2200
 
 
 # load file, .g2o format from https://github.com/RainerKuemmerle/g2o/wiki/File-Format
-with open('../../datasets/sphere_bignoise_vertex3.g2o', 'r') as file:
+#file_path = '../../datasets/sphere_bignoise_vertex3.g2o'
+file_path = '../../datasets/sphere_gt.g2o'
+#file_path = '../../datasets/sphere.g2o'
+with open(file_path, 'r') as file:
     for line in file:
         d = line.split()
         # read edges and vertex
@@ -139,20 +142,40 @@ for t in range(1,N):
     start = time.time()
     #graph.solve()
     end = time.time()
-    print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    #print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))
 
 
     # plot the current problem
-    if (t+1) % 2200 == 0:
-        print_3d_graph(graph)
+    if (t+1) % 500 == 0:
+        #print_3d_graph(graph)
         pass
 
 
 
 #graph.print(True)
+print_3d_graph(graph)
+if 1:
+    start = time.time()
+    graph.solve()
+    end = time.time()
+    print(', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    print_3d_graph(graph)
 
-    
+    start = time.time()
+    graph.solve()
+    end = time.time()
+    print(', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    print_3d_graph(graph)
+
+
+    start = time.time()
+    graph.solve()
+    end = time.time()
+    print(', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    print_3d_graph(graph)
+
+   
 
 
 

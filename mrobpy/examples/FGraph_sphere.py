@@ -147,25 +147,25 @@ for t in range(1,N):
 
 
 print_3d_graph(graph)
-if 0:
-    graph.solve()
+if 1:
+    graph.solve(mrob.LM)
     print('chi2 = ', graph.chi2())
     print_3d_graph(graph)
 
-    graph.solve()
+    graph.solve(mrob.LM)
     print('chi2 = ', graph.chi2())
     print_3d_graph(graph)
 
 
-    graph.solve()
+    graph.solve(mrob.LM)
     print('chi2 = ', graph.chi2())
     print_3d_graph(graph)
 
-    graph.solve()
+    graph.solve(mrob.LM)
     print('chi2 = ', graph.chi2())
     print_3d_graph(graph)
 
-    graph.solve()
+    graph.solve(mrob.LM)
     print('chi2 = ', graph.chi2())
     print_3d_graph(graph)
     #graph.print(True)

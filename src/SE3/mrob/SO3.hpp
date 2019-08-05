@@ -27,6 +27,9 @@
  *  Associated to the group SO3, there is the Lie algebra so3
  *  representing the same transformation in the tangent space around the identity.
  *  Particularly, w  \in Re^3 represents the rotation
+ *
+ *  In addition, we have added some utilities regarding alternative methods
+ *  to build SO(3) and connect them to the manifold representation.
  */
 namespace mrob{
 
@@ -141,6 +144,27 @@ Mat3 hat3(const Mat31 &w);
 Mat31 vee3(const Mat3 &w_hat);
 
 bool isSO3(Mat3 R);
+
+
+/**
+ * Function converting from quaternion q = [qx, qy, qz, qw](Eigen convention)
+ * to a rotation matrix 3x3
+ * XXX: ref eigen did not return a valid matrix (probably lifetime was managed from cpp and this object was local to this scope)
+ */
+Mat3 quat_to_so3(const Eigen::Ref<const Mat41> v);
+
+
+/**
+ * Function converting from a rotation matrix 3x3 to quaternion
+ * q = [qx, qy, qz, qw](Eigen convention)
+ */
+Mat41 so3_to_quat(const Eigen::Ref<const Mat3> R);
+
+/**
+ * Function converting from roll pitch yaw v = [r, p, y](Eigen convention)
+ * to a rotation matrix 3x3
+ */
+Mat3 rpy_to_so3(const Eigen::Ref<const Mat31> v);
 
 }// end namespace
 #endif /* SO3_HPP_ */

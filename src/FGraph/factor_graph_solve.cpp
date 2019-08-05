@@ -88,7 +88,7 @@ void FGraphSolve::solve(optimMethod method)
         time_profiles_.push_back( std::make_pair("LM Cholesky",  dif.count()) );
         break;
       default:
-        assert(0 & "FGRaphSolve:: optimization method unknown");
+        assert(0 && "FGRaphSolve:: optimization method unknown");
     }
 
 
@@ -101,7 +101,7 @@ void FGraphSolve::solve(optimMethod method)
     dif = std::chrono::duration_cast<Ttim>(t2 - t1);
     time_profiles_.push_back( std::make_pair("Update Solution",  dif.count()) );
 
-    if (0)
+    if (1)
     {
         double sum = 0;
         for (auto t : time_profiles_)
@@ -135,12 +135,14 @@ void FGraphSolve::optimize_levenberg_marquardt()
     SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
 
 
-    // LM with spherical approximation for the trust region
+    // LM with Ellipsoidal approximation for the trust region
     lambda_ = 0.0;
     for (uint_t n = 0 ; n < N_; ++n)
+    {
         I_.coeffRef(n,n) += lambda_*I_.coeffRef(n,n); //maybe faster a sparse diagonal matrix multiplication?
+        //I_.coeffRef(n,n) += lambda_; // Spherical approximation
+    }
 
-    // LM with ellipsoidal approximation
 
     // compute cholesky solution
     cholesky.compute(I_);

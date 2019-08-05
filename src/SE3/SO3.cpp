@@ -14,6 +14,7 @@
 #include <cmath>
 #include <iostream>
 #include <Eigen/LU> // for determinant
+#include <Eigen/Geometry> // for quaternions and rotations
 
 
 using namespace mrob;
@@ -220,4 +221,31 @@ bool mrob::isSO3(Mat3 R)
         return false;
     return true;
 
+}
+
+
+Mat3 mrob::quat_to_so3(const Eigen::Ref<const Mat41> v)
+{
+
+    Eigen::Quaternion<matData_t> q(v);
+    //std::cout << "Initial vector : " << v << ", transformed quaternion" << q.vec() << "\n and w = \n" << q.toRotationMatrix() << std::endl;
+    return q.normalized().toRotationMatrix();
+}
+
+// quaternion q = [qx, qy, qz, qw](Eigen convention)
+Mat41 so3_to_quat(const Eigen::Ref<const Mat3> R)
+{
+    Eigen::Quaternion<matData_t> q(R);
+    Mat41 res;
+    res << q.x(), q.y(), q.z(), q.w();
+    return res;
+}
+
+Mat3 mrob::rpy_to_so3(const Eigen::Ref<const Mat31> v)
+{
+    Mat3 R;
+    R = Eigen::AngleAxisd(v(0), Eigen::Vector3d::UnitX())
+          * Eigen::AngleAxisd(v(1), Eigen::Vector3d::UnitY())
+          * Eigen::AngleAxisd(v(2), Eigen::Vector3d::UnitZ());
+    return R;
 }

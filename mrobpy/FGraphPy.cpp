@@ -100,32 +100,6 @@ public:
 
 };
 
-
-/**
- * Function converting from quaternion q = [qx, qy, qz, qw](Eigen convention)
- * to a rotation matrix 3x3
- * XXX: ref eigen did not return a valid matrix (probably lifetime was managed from cpp and this object was local to this scope)
- */
-Mat3 quat_to_so3(const py::EigenDRef<const Mat41> v)
-{
-    Eigen::Quaternion<matData_t> q(v);
-    //std::cout << "Initial vector : " << v << ", transformed quaternion" << q.vec() << "\n and w = \n" << q.toRotationMatrix() << std::endl;
-    return q.normalized().toRotationMatrix();
-}
-
-/**
- * Function converting from roll pitch yaw v = [r, p, y](Eigen convention)
- * to a rotation matrix 3x3
- */
-Mat3 rpy_to_so3(const py::EigenDRef<const Mat31> v)
-{
-    Mat3 R;
-    R = Eigen::AngleAxisd(v(0), Eigen::Vector3d::UnitX())
-          * Eigen::AngleAxisd(v(1), Eigen::Vector3d::UnitY())
-          * Eigen::AngleAxisd(v(2), Eigen::Vector3d::UnitZ());
-    return R;
-}
-
 void init_FGraph(py::module &m)
 {
     py::enum_<FGraphSolve::optimMethod>(m, "FGraph.optimMethod")
@@ -178,5 +152,6 @@ void init_FGraph(py::module &m)
             ;
         // AUxiliary functions to support other conventions (TORO, g2o)
         m.def("quat_to_so3", &quat_to_so3,"Suport function from quaternion to a rotation");
+        m.def("so3_to_quat", &so3_to_quat,"Suport function from rotation matrix to quaternion");
         m.def("rpy_to_so3",  &rpy_to_so3,"Suport function from roll pitch yaw to a rotation");
 }
