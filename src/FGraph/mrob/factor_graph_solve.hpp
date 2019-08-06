@@ -26,9 +26,11 @@ namespace mrob {
  * 	- TODO Information matrix (direct)
  * 	- TODO Diagonal and information for Schur complement
  *
- * Routines provide different optiomization methods:
- *  - optimize_gn (Gauss-Newton) using Cholesky LDLT with minimum degree ordering
- *  - optimize_lm (Levenberg–Marquardt) TODO
+ * Routines provide different optimization methods:
+ *  - Gauss-Newton (GN) using Cholesky LDLT with minimum degree ordering
+ *  - Levenberg–Marquardt (LM) (Nocedal 10) using ellipsoidal approximation and trust region alg. to estimate a "good" lambda
+ *  - Dogleg (DL) (Nocedal 4.3)
+ *  - COnjugate gradient method (nocedal 7.1)
  */
 class FGraphSolve: public FGraph
 {

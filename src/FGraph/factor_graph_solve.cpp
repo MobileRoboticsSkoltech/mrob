@@ -47,7 +47,7 @@ void FGraphSolve::solve(optimMethod method)
      *               1.3959 % update values,
      *
      */
-
+    optimMethod_ = method; // updates the optimization method
     time_profiles_.clear();
     auto t1 = std::chrono::steady_clock::now();
 
@@ -74,7 +74,7 @@ void FGraphSolve::solve(optimMethod method)
 
 
 
-    // 2) Optimization SCHUR not implemented
+    // 2) Optimization
     switch(optimMethod_)
     {
       case GN:
@@ -135,8 +135,8 @@ void FGraphSolve::optimize_levenberg_marquardt()
     SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
 
 
-    // LM with Ellipsoidal approximation for the trust region
-    lambda_ = 0.0;
+    // LM with Ellipsoidal approximation for the trust region as described in Nocedal Alg.4.1 (p.69)
+    lambda_ = 1e1;
     for (uint_t n = 0 ; n < N_; ++n)
     {
         I_.coeffRef(n,n) += lambda_*I_.coeffRef(n,n); //maybe faster a sparse diagonal matrix multiplication?

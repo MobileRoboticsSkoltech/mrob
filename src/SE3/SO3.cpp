@@ -233,7 +233,7 @@ Mat3 mrob::quat_to_so3(const Eigen::Ref<const Mat41> v)
 }
 
 // quaternion q = [qx, qy, qz, qw](Eigen convention)
-Mat41 so3_to_quat(const Eigen::Ref<const Mat3> R)
+Mat41 mrob::so3_to_quat(const Eigen::Ref<const Mat3> R)
 {
     Eigen::Quaternion<matData_t> q(R);
     Mat41 res;
