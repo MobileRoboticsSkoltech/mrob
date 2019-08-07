@@ -30,8 +30,14 @@ namespace mrob{
  * We provide the node's Id to get the correspondent Jacobian
  *
  *
- * In particular, the residual of this factor is: TODO better formulate
- *   r = ln(T2) - ln(T1*Tobs) = ln(T1^-1*T2) - ln(Tobs)
+ * In particular, the relation between the transformation of poses is:
+ *   T_o * T_obs = T_t
+ *
+ * and the residual is thus:
+ *   r = Ln ( T_o * T_obs * T_t^-1 )
+ *
+ * NOTE: Transformations T=Exp(x) from global poses (x) encode the transformation:
+ *   (global)p = Exp(x) * (local x)p
  *
  * Constructor functions will be overloaded to include the pointers of the nodes,
  * The convention is from node origin, we observe node destination,

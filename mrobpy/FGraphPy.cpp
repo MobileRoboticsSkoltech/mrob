@@ -140,7 +140,7 @@ void init_FGraph(py::module &m)
             // -----------------------------------------------------------------------------
             // Specific call to 3D
             .def("add_node_pose_3d", &FGraphPy::add_node_pose_3d,
-                    "Input are SE3 matrices directly")
+                    "Input are 3D poses, as Lie Algebra of RBT around the Identity")
             .def("add_factor_1pose_3d", &FGraphPy::add_factor_1pose_3d)
             .def("add_factor_2poses_3d", &FGraphPy::add_factor_2poses_3d,
                             "Factors connecting 2 poses. If last input set to true (by default false), also updates the value of the target Node according to the new obs + origin node",
@@ -150,8 +150,8 @@ void init_FGraph(py::module &m)
                             py::arg("obsInvCov"),
                             py::arg("updateNodeTarget") = false)
             ;
-        // AUxiliary functions to support other conventions (TORO, g2o)
-        m.def("quat_to_so3", &quat_to_so3,"Suport function from quaternion to a rotation");
-        m.def("so3_to_quat", &so3_to_quat,"Suport function from rotation matrix to quaternion");
-        m.def("rpy_to_so3",  &rpy_to_so3,"Suport function from roll pitch yaw to a rotation");
+    // AUxiliary functions to support other conventions (TORO, g2o)
+    m.def("quat_to_so3", &quat_to_so3,"Suport function from quaternion to a rotation");
+    m.def("so3_to_quat", &so3_to_quat,"Suport function from rotation matrix to quaternion");
+    m.def("rpy_to_so3",  &rpy_to_so3,"Suport function from roll pitch yaw to a rotation");
 }

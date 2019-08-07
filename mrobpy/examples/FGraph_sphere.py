@@ -15,7 +15,8 @@ def print_3d_graph(graph):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     x = graph.get_estimated_state()
-    prev_p = vertex_ini[0][3:]
+    To =  mrob.SE3(vertex_ini[0]) #XXX for some reason (ownership?) can't do this is 1 line
+    prev_p =To.T()[:3,3]
     for xi in x:
         Ti = mrob.SE3(xi)
         p = Ti.T()[:3,3]
@@ -41,13 +42,13 @@ vertex_ini = {}
 factors = {}
 factor_inf = {}
 factors_dictionary = {}
-N = 2000
+N = 500 #2500
 
 
 # load file, .g2o format from https://github.com/RainerKuemmerle/g2o/wiki/File-Format
 #file_path = '../../datasets/sphere_bignoise_vertex3.g2o'
-#file_path = '../../datasets/sphere_gt.g2o'
-file_path = '../../datasets/sphere.g2o'
+file_path = '../../datasets/sphere_gt.g2o'
+#file_path = '../../datasets/sphere.g2o'
 with open(file_path, 'r') as file:
     for line in file:
         d = line.split()
@@ -109,7 +110,7 @@ with open(file_path, 'r') as file:
 #plot_from_vertex(vertex_ini)
 
 # Initialize FG
-graph = mrob.FGraph(2200,8650)
+graph = mrob.FGraph(2500,9000)
 x = vertex_ini[0]
 print(x)
 n = graph.add_node_pose_3d(x)
@@ -140,23 +141,24 @@ for t in range(1,N):
         
     # solve the problem 7s 2500nodes
     start = time.time()
-    #graph.solve()
+    graph.solve(mrob.GN)
     end = time.time()
-    #print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))
 
 
     # plot the current problem
-    if (t+1) % 500 == 0:
-        #print_3d_graph(graph)
+    if (t+1) % 100 == 0:
+        print_3d_graph(graph)
         pass
 
 
-
 #graph.print(True)
-print_3d_graph(graph)
-print('Current state of the graph: chi2 = ' , graph.chi2() )
-if 1:
+
+# SOlves the batch problem
+if 0:
+    print_3d_graph(graph)
+    print('Current state of the graph: chi2 = ' , graph.chi2() )
     start = time.time()
     graph.solve(mrob.LM)
     end = time.time()

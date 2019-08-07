@@ -40,9 +40,7 @@ Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &
     if (updateNodeTarget)
     {
         // Updates the child node such that it matches the odometry observation
-        // NOTE: carefull on the reference frame that Tobs is expressed on the X_origin frame, hence this change:
-        // T_xo * (xo reference)T_obs = (global)T_obs * T_xo.
-        // We could also use the adjoint to refer the manifold coordinates obs on the xo to the global frame (identity)
+        // carefull on the reference frame that Tobs is expressed at the X_origin frame, hence this change:
         Mat4 TxOrigin = nodeOrigin->get_stateT();
         SE3 T = SE3(TxOrigin) * Tobs_;//TODO how many SE3 structures are created here?
         nodeTarget->set_state(T.ln_vee());
@@ -55,11 +53,11 @@ Factor2Poses3d::~Factor2Poses3d()
 
 void Factor2Poses3d::evaluate_residuals()
 {
-    // r = h(x_O,x_T) - z (in general). From Origin we observe Target
-    // Tr = Txo * (xo frame)Tobs * Txt^-1
-    // NOTE: carefull on the reference frame that Tobs is expressed on the X_origin frame, hence this change:
-    // T_xo * (xo reference)T_obs = (global)T_obs * T_xo.
-    // We could also use the adjoint to refer the manifold coordinates obs on the xo to the global frame (identity)
+    // From Origin we observe Target such that: T_o * T_obs = T_t
+    // Tr = Txo * Tobs * Txt^-1
+    // NOTE: We could also use the adjoint to refer the manifold coordinates obs w.r.t xo but in this case that
+    // does not briung any advantage on the xo to the global frame (identity)
+    // (xo reference)T_obs * T_xo  = T_xo * (global)T_obs. (rhs is what we use here)
     Mat4 TxOrigin = get_neighbour_nodes()->at(0)->get_stateT();
     Mat4 TxTarget = get_neighbour_nodes()->at(1)->get_stateT();
     Tr_ = SE3(TxOrigin) * Tobs_ * SE3(TxTarget).inv();

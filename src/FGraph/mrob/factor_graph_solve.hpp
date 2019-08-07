@@ -29,8 +29,8 @@ namespace mrob {
  * Routines provide different optimization methods:
  *  - Gauss-Newton (GN) using Cholesky LDLT with minimum degree ordering
  *  - Levenberg–Marquardt (LM) (Nocedal 10) using ellipsoidal approximation and trust region alg. to estimate a "good" lambda
- *  - Dogleg (DL) (Nocedal 4.3)
- *  - COnjugate gradient method (nocedal 7.1)
+ *  - Dogleg (DL) (Nocedal 4.3) TODO
+ *  - COnjugate gradient method (nocedal 7.1) TODO
  */
 class FGraphSolve: public FGraph
 {
