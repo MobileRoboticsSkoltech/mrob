@@ -26,21 +26,32 @@ def plotT(T, ax):
     ax.plot(x[[0, 3], 0], x[[0, 3], 1], x[[0, 3], 2], 'b')  # Z axis
 
 
-# This qualitative test will
+# Qualitative test for some issues found while creating SE3 in mrob
 # 1) round pi trajectory
+if 0:
+    xi_ini = np.array([0, 0, 0, 0, 0, 0], dtype='float64')
+    # xi_fin = np.array([np.pi/3,1,0,0,0,0], dtype='float64')
+    xi_fin = np.random.rand(6) * 10
+    if np.linalg.norm(xi_fin[0:3]) > np.pi:
+        xi_fin[0:3] = xi_fin[0:3] / np.linalg.norm(xi_fin[0:3]) * (np.pi - 0.1)
+    ax = plotConfig()
+    N = 20
+    xi = np.zeros((N, 6))
+    t = np.zeros(N)
+    for i in range(6):
+        xi[:, i] = np.linspace(xi_ini[i], xi_fin[i], N, dtype='float64')
+    t = np.linspace(0, 1, N, dtype='float64')
 
-xi_ini = np.array([0, 0, 0, 0, 0, 0], dtype='float64')
-# xi_fin = np.array([np.pi/3,1,0,0,0,0], dtype='float64')
-xi_fin = np.random.rand(6) * 10
-if np.linalg.norm(xi_fin[0:3]) > np.pi:
-    xi_fin[0:3] = xi_fin[0:3] / np.linalg.norm(xi_fin[0:3]) * (np.pi - 0.1)
-ax = plotConfig()
-N = 20
-xi = np.zeros((N, 6))
-t = np.zeros(N)
-for i in range(6):
-    xi[:, i] = np.linspace(xi_ini[i], xi_fin[i], N, dtype='float64')
-t = np.linspace(0, 1, N, dtype='float64')
 
-
-# 2)
+# 2) Life of objects, some data gets corrupted when chaining functions/operators
+if 1:
+    xi = np.random.rand(6)
+    T1 = mrob.SE3(xi)
+    T2 = mrob.SE3(np.random.rand(6))
+    print(T1.T(), '\n and directly does not work, T = \n', mrob.SE3(xi).inv().T() , '\n is SE3? ', mrob.isSE3(mrob.SE3(xi).inv().T()))
+    
+    T3 = mrob.SE3(T1.T() @ T2.inv().T())
+    T3.print()
+    T4 = T1.mul(T2.inv()).mul(T3)
+    T4.print()
+    print ('is numpy muls a SE3? ', mrob.isSE3(T3.T()), '\n is mul a SE3?', mrob.isSE3(T4.T()))

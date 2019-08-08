@@ -54,6 +54,12 @@ SE3 SE3::operator*(const SE3& rhs) const
     return SE3(res);
 }
 
+
+SE3 SE3::mul(const SE3& rhs) const
+{
+    return (*this) * rhs;
+}
+
 void SE3::update_lhs(const Mat61 &dxi)
 {
     SE3 dT(dxi);

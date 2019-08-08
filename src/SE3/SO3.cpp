@@ -58,6 +58,10 @@ SO3 SO3::operator*(const SO3& rhs) const
     return SO3(res);
 }
 
+SO3 SO3::mul(const SO3& rhs) const
+{
+    return (*this) * rhs;
+}
 
 void SO3::update_lhs(const Mat31 &dw)
 {

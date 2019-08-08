@@ -66,6 +66,10 @@ public:
      * This method allows you to Multiply SE3 expressions
      */
     SE3 operator*(const SE3& rhs) const;
+    /**
+     * Multiplication function, same as above, mainly for python
+     */
+    SE3 mul(const SE3& rhs) const;
 
     /**
      * This is our *default* way to update transformations, from the Left hand side of T

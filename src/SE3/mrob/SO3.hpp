@@ -68,6 +68,12 @@ public:
      * This method allows you to Multiply SO3 expressions
      */
     SO3 operator*(const SO3& rhs) const;
+
+    /**
+     * multiplication function
+     */
+    SO3 mul(const SO3& rhs) const;
+
     /**
      * This is our *default* way to update transformations
      * Updates the current transformation with the incremental dw \in so3
