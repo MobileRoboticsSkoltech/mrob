@@ -31,6 +31,10 @@ class Factor;
  * Node class keeps track of all the neighbouring factors.
  * Destructor takes care of the neighbour factors included.
  *
+ *
+ *	Two states are kept at the same time:
+ *	- principal state: used for factors evaluations, errors and Jacobians
+ *	- auxiliary state: a book-keep state useful for partial updates
  */
 
 class Node{
@@ -38,14 +42,24 @@ class Node{
     Node(uint_t dim, uint_t potNumberFactors = 5);
     virtual ~Node();
     /**
-     * The update operation, give a block vector, it updates
-     * the value of the state x.
+     * The update from principal, given a block vector, it updates
+     * the value of the state (principal) x.
      * Since we don't know the size at compilation, we declare
      * a dynamic matrix, but on run-time we would like to use
      * a fixed block matrix, and this virtual function will handle
      * it nicely.
+     *
+     *
+     * If specified, it also updates the principal state XXX; principal should always be updated??
+     *
      */
     virtual void update(const Eigen::Ref<const MatX1> &dx) = 0;
+    //virtual void update_from_principal(const Eigen::Ref<const MatX1> &dx) = 0;
+    /**
+     * Updates *FROM* the auxiliary state the principal state.
+     * If specified, it also updates the auxiliary state
+     */
+    //virtual void update_from_auxiliary(const Eigen::Ref<const MatX1> &dx) = 0;
     /**
      * At run time sets the new value of the estate to be x
      */
@@ -63,15 +77,10 @@ class Node{
      */
     virtual const Eigen::Ref<const MatX> get_stateT() const = 0;
     /**
-     * Returns a matrix to the last linearized state. This data structure is for the incre-
-     * metal implementation.
+     * Returns a matrix to the last auxiliary state. This data structure is for the incre-
+     * metal implementation, or for error evaluation
      */
-    virtual const Eigen::Ref<const MatX1> get_last_linearization_state() const = 0;
-    /**
-     * TODO is this necessary?
-     * Return the last delta X on the update. For incremental updates
-     */
-    virtual const Eigen::Ref<const MatX1> get_last_deltaX() const = 0;
+    virtual const Eigen::Ref<const MatX1> get_auxiliary_state() const = 0;
     virtual void print() const {};
     id_t get_id() const {return id_;};
     void set_id(id_t id) {id_ = id;};

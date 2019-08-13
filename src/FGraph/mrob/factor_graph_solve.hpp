@@ -28,9 +28,12 @@ namespace mrob {
  *
  * Routines provide different optimization methods:
  *  - Gauss-Newton (GN) using Cholesky LDLT with minimum degree ordering
- *  - Levenberg–Marquardt (LM) (Nocedal 10) using ellipsoidal approximation and trust region alg. to estimate a "good" lambda
+ *  - Levenberg–Marquardt (LM) (Nocedal Ch.10) using ellipsoidal approximation and
+ *                     trust region alg. (Nocedal 4.1) to estimate a "good" lambda.
+ *                     Bertsekas p.105 proposes a similar heuristic approach for the trust
+ *                     region, which we convert to lambda estimation (we follow this notation in code).
  *  - Dogleg (DL) (Nocedal 4.3) TODO
- *  - COnjugate gradient method (nocedal 7.1) TODO
+ *  - Conjugate gradient method (nocedal 7.2) TODO
  */
 class FGraphSolve: public FGraph
 {
@@ -52,7 +55,7 @@ public:
     /**
      * Solve call the corresponding routine on the class parameters or
      * ultimately on the function input,
-     * by default optim method is Ggauss Newton
+     * by default optim method is Gauss Newton
      */
     void solve(optimMethod method = GN);
     /**
@@ -74,11 +77,6 @@ public:
      */
     void set_matrix_method(matrixMethod method) {matrixMethod_ = method;};
     matrixMethod get_matrix_method() { return matrixMethod_;};
-
-    /**
-     * Particular parameters for Levenberg-Marquard
-     * TODO
-     */
 
 
 protected:
@@ -148,7 +146,10 @@ protected:
     std::vector<std::pair<std::string, double>> time_profiles_;//used for time profiling functions
 
     // Particular parameters for Levenberg-Marquard
-    double lambda_;
+    matData_t lambda_; // current value of lambda
+    matData_t lambdaMax_, lambdaMin_;
+
+
 };
 
 

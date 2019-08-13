@@ -153,7 +153,7 @@ for t in range(1,N):
         pass
 
 
-#graph.print(True)
+graph.print(False)
 
 # SOlves the batch problem
 if 0:

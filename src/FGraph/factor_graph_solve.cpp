@@ -94,13 +94,6 @@ void FGraphSolve::solve(optimMethod method)
 
 
 
-    // 3) Update solution (this is almost negligible on time)
-    t1 = std::chrono::steady_clock::now();
-    this->update_nodes();
-    t2 = std::chrono::steady_clock::now();
-    dif = std::chrono::duration_cast<Ttim>(t2 - t1);
-    time_profiles_.push_back( std::make_pair("Update Solution",  dif.count()) );
-
     if (1)
     {
         double sum = 0;
@@ -117,6 +110,7 @@ void FGraphSolve::solve(optimMethod method)
 void FGraphSolve::optimize_gauss_newton()
 {
     SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
+
     // compute cholesky solution
     auto t1 = std::chrono::steady_clock::now();
     cholesky.compute(I_);
@@ -128,6 +122,13 @@ void FGraphSolve::optimize_gauss_newton()
     t2 = std::chrono::steady_clock::now();
     dif = std::chrono::duration_cast<Ttim>(t2 - t1);
     time_profiles_.push_back( std::make_pair("Gauss Newton solve Cholesky",  dif.count()) );
+
+    // 2) Update solution (this is almost negligible on time)
+    t1 = std::chrono::steady_clock::now();
+    this->update_nodes();
+    t2 = std::chrono::steady_clock::now();
+    dif = std::chrono::duration_cast<Ttim>(t2 - t1);
+    time_profiles_.push_back( std::make_pair("Gauss Newton Update Solution",  dif.count()) );
 }
 
 void FGraphSolve::optimize_levenberg_marquardt()
@@ -135,11 +136,15 @@ void FGraphSolve::optimize_levenberg_marquardt()
     SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
 
 
-    // LM with Ellipsoidal approximation for the trust region as described in Nocedal Alg.4.1 (p.69)
-    lambda_ = 1e1;
+    // LM with Ellipsoidal approximation for the trust region as described in Bertsekas (p.105)
+
+    // 0) parameter initialization
+    lambda_ = 1e-5;
+
+    // 1) solve subproblem
     for (uint_t n = 0 ; n < N_; ++n)
     {
-        I_.coeffRef(n,n) += lambda_*I_.coeffRef(n,n); //maybe faster a sparse diagonal matrix multiplication?
+        I_.coeffRef(n,n) += lambda_*I_.coeffRef(n,n); //may be faster a sparse diagonal matrix multiplication?
         //I_.coeffRef(n,n) += lambda_; // Spherical approximation
     }
 
@@ -293,7 +298,7 @@ matData_t FGraphSolve::chi2(bool evaluateResidualsFlag)
 
 void FGraphSolve::update_nodes()
 {
-    int acc_start = 0;
+    uint_t acc_start = 0;
     for (uint_t i = 0; i < nodes_.size(); i++)
     {
         // node update is the negative of dx just calculated.

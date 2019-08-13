@@ -38,18 +38,16 @@ class NodePose3d : public Node
      */
     void update(const Eigen::Ref<const MatX1> &dx);
     virtual void set_state(const Eigen::Ref<const MatX1> &x);
-    virtual const Eigen::Ref<const MatX1> get_state() const {return x_;};
+    virtual const Eigen::Ref<const MatX1> get_state() const {return state_;};
     // function returning the transformation
     virtual const Eigen::Ref<const MatX> get_stateT() const ;
-    virtual const Eigen::Ref<const MatX1> get_last_linearization_state() const {return linearization_x_;};
-    virtual const Eigen::Ref<const MatX1> get_last_deltaX() const {return dx_;};
+    virtual const Eigen::Ref<const MatX1> get_auxiliary_state() const {return auxiliaryState_;};
     void print() const;
 
   protected:
-    Mat61 x_;
-    SE3 Tx_;//redundant state representation, now directly in SE(3)
-    Mat61 linearization_x_;
-    Mat61 dx_;
+    Mat61 state_;
+    SE3 stateT_;//redundant state representation of principal, now directly in SE(3)
+    Mat61 auxiliaryState_; //an auxiliary vector to TODO think on this representation
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen

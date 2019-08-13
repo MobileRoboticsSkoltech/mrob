@@ -14,7 +14,7 @@
 
 using namespace mrob;
 
-NodePose2d::NodePose2d(const Mat31 &initial_x) : Node(3), x_(initial_x), linearization_x_(initial_x)
+NodePose2d::NodePose2d(const Mat31 &initial_x) : Node(3), state_(initial_x), auxiliaryState_(initial_x)
 {
     assert(initial_x.rows() == 3 && "NodePose2d:: Incorrect dimension on initial state rows");
     assert(initial_x.cols() == 1 && "NodePose2d:: Incorrect dimension on initial state cols");
@@ -23,21 +23,21 @@ NodePose2d::NodePose2d(const Mat31 &initial_x) : Node(3), x_(initial_x), lineari
 void NodePose2d::update(const Eigen::Ref<const MatX1> &dx)
 {
     // TODO for incremental updates, this should be linearization_x + dx
-    x_ += dx;
-    x_(2) = wrap_angle(x_(2));
+    state_ += dx;
+    state_(2) = wrap_angle(state_(2));
 
 }
 
 void NodePose2d::set_state(const Eigen::Ref<const MatX1> &x)
 {
-    x_ = x;
-    x_(2) = wrap_angle(x_(2));
+    state_ = x;
+    state_(2) = wrap_angle(state_(2));
 }
 
 void NodePose2d::print() const
 {
     std::cout << "Printing NodePose2d: " << id_
-              << ", state = \n" << x_
+              << ", state = \n" << state_
               <<  "\nand neighbour factors " << neighbourFactors_.size()
               << std::endl;
 }

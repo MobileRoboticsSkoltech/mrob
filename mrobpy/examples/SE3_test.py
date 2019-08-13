@@ -6,6 +6,11 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 
+# sets the default fonts on matplotlib to type2 postcript
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
+
+
 def plotConfig():
     "configfures the 3d plot structure for representing tranformations"
     fig = plt.figure()
@@ -41,6 +46,8 @@ if 0:
     for i in range(6):
         xi[:, i] = np.linspace(xi_ini[i], xi_fin[i], N, dtype='float64')
     t = np.linspace(0, 1, N, dtype='float64')
+    
+    #plt.savefig('name.pdf', bbox_inches='tight')
 
 
 # 2) Life of objects, some data gets corrupted when chaining functions/operators
