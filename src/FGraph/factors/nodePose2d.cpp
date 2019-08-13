@@ -22,16 +22,29 @@ NodePose2d::NodePose2d(const Mat31 &initial_x) : Node(3), state_(initial_x), aux
 
 void NodePose2d::update(const Eigen::Ref<const MatX1> &dx)
 {
-    // TODO for incremental updates, this should be linearization_x + dx
     state_ += dx;
     state_(2) = wrap_angle(state_(2));
 
 }
 
+void NodePose2d::update_from_auxiliary(const Eigen::Ref<const MatX1> &dx)
+{
+    state_ = auxiliaryState_ + dx;
+    state_(2) = wrap_angle(state_(2));
+
+}
+
+
 void NodePose2d::set_state(const Eigen::Ref<const MatX1> &x)
 {
     state_ = x;
     state_(2) = wrap_angle(state_(2));
+}
+
+void NodePose2d::set_auxiliary_state(const Eigen::Ref<const MatX1> &x)
+{
+    auxiliaryState_ = x;
+    auxiliaryState_(2) = wrap_angle(auxiliaryState_(2));
 }
 
 void NodePose2d::print() const

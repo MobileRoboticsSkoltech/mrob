@@ -88,7 +88,7 @@ void FGraphSolve::solve(optimMethod method)
         time_profiles_.push_back( std::make_pair("LM Cholesky",  dif.count()) );
         break;
       default:
-        assert(0 && "FGRaphSolve:: optimization method unknown");
+        assert(0 && "FGraphSolve:: optimization method unknown");
     }
 
 
@@ -100,7 +100,7 @@ void FGraphSolve::solve(optimMethod method)
         for (auto t : time_profiles_)
             sum += t.second;
 
-        std::cout << "\nTime profile for " << sum << " [us]: ";
+        std::cout << "\nTime profile for " << sum/1e3 << " [ms]: ";
         for (auto t : time_profiles_)
             std::cout << t.first << " = " << t.second/sum *100 << "%, ";
         std::cout << "\n";

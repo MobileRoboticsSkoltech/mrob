@@ -33,7 +33,7 @@ class Factor;
  *
  *
  *	Two states are kept at the same time:
- *	- principal state: used for factors evaluations, errors and Jacobians
+ *	- (principal) state: used for factors evaluations, errors and Jacobians
  *	- auxiliary state: a book-keep state useful for partial updates
  */
 
@@ -42,28 +42,27 @@ class Node{
     Node(uint_t dim, uint_t potNumberFactors = 5);
     virtual ~Node();
     /**
-     * The update from principal, given a block vector, it updates
-     * the value of the state (principal) x.
+     * The update function, given a block vector, it updates
+     * the value of the state (principal).
+     *
      * Since we don't know the size at compilation, we declare
      * a dynamic matrix, but on run-time we would like to use
      * a fixed block matrix, and this virtual function will handle
      * it nicely.
-     *
-     *
-     * If specified, it also updates the principal state XXX; principal should always be updated??
-     *
      */
     virtual void update(const Eigen::Ref<const MatX1> &dx) = 0;
-    //virtual void update_from_principal(const Eigen::Ref<const MatX1> &dx) = 0;
     /**
      * Updates *FROM* the auxiliary state the principal state.
-     * If specified, it also updates the auxiliary state
      */
-    //virtual void update_from_auxiliary(const Eigen::Ref<const MatX1> &dx) = 0;
+    virtual void update_from_auxiliary(const Eigen::Ref<const MatX1> &dx) = 0;
     /**
-     * At run time sets the new value of the estate to be x
+     * At run time sets the new value of the estate and auxiliary to be x
      */
     virtual void set_state(const Eigen::Ref<const MatX1> &x) = 0;
+    /**
+     * New auxiliary state set
+     */
+    virtual void set_auxiliary_state(const Eigen::Ref<const MatX1> &x) = 0;
     /**
      * Declared as a dynamic matrix reference to allow any size to be returned.
      * At run time returns a Reference to a fixed size matrix and provide

@@ -54,10 +54,24 @@ void NodePose3d::update(const Eigen::Ref<const MatX1> &dx)
     stateT_ = SE3(state_);//XXX is it necessary to update this every update? random? or count?
 }
 
+void NodePose3d::update_from_auxiliary(const Eigen::Ref<const MatX1> &dx)
+{
+    Mat61 dxf = dx;
+    SE3 T(auxiliaryState_);
+    T.update_lhs(dxf);
+    state_ = T.ln_vee();
+    stateT_ = T;
+}
+
 void NodePose3d::set_state(const Eigen::Ref<const MatX1> &x)
 {
     state_ = x;
     stateT_ = SE3(state_);
+}
+
+void NodePose3d::set_auxiliary_state(const Eigen::Ref<const MatX1> &x)
+{
+    auxiliaryState_ = x;
 }
 
 const Eigen::Ref<const MatX> NodePose3d::get_stateT() const
