@@ -63,14 +63,6 @@ void Factor2Poses3d::evaluate_residuals()
     Tr_ = SE3(TxOrigin) * Tobs_ * SE3(TxTarget).inv();
     r_ = Tr_.ln_vee();
 
-    // XXX debuging, when upodates are too large
-    if (0)// get_neighbour_nodes()->at(1)->get_id() == 629 )
-    {
-        std::cout << "incorrect update at factor "<< this->id_ << "residual = " << r_ << "Between nodes :" << std::endl;
-        this->print();
-        get_neighbour_nodes()->at(0)->print();
-        get_neighbour_nodes()->at(1)->print();
-    }
 }
 void Factor2Poses3d::evaluate_jacobians()
 {

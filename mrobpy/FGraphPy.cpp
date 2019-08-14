@@ -115,7 +115,8 @@ void init_FGraph(py::module &m)
                     py::arg("potNumberFactors") = 512)
             .def("solve", &FGraphSolve::solve,
                     "Solves the corresponding FG",
-                    py::arg("method") =  FGraphSolve::optimMethod::GN)
+                    py::arg("method") =  FGraphSolve::optimMethod::GN,
+                    py::arg("maxIters") = 30)
             .def("chi2", &FGraphSolve::chi2,
                     "Calculated the chi2 of the problem. By default re-evaluates residuals, set to false if doesn't",
                     py::arg("evaluateResidualsFlag") = true)

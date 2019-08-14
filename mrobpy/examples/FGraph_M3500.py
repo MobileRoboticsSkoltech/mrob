@@ -93,7 +93,11 @@ for t in range(1,N):
         pass
 
 if 1:
+    graph.solve(mrob.LM)
+    print('LM chi2 = ', graph.chi2() )
     print_2d_graph(graph)
+
+if 0:
     graph.solve(mrob.GN)
     print('Iter 0 chi2 = ', graph.chi2() )
     graph.solve(mrob.GN)
@@ -102,7 +106,7 @@ if 1:
     print('Iter 2 chi2 = ', graph.chi2() )
     graph.solve(mrob.GN)
     print('Iter 3 chi2 = ', graph.chi2() )
-    print_2d_graph(graph)
+    #print_2d_graph(graph)
 
     graph.solve(mrob.GN)
     print('Iter 4 chi2 = ', graph.chi2() )

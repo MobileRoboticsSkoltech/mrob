@@ -64,7 +64,7 @@ int main ()
 
     // solve the Gauss Newton optimization
     graph.print(true);
-    graph.solve();
+    graph.solve(mrob::FGraphSolve::LM);
 
     std::cout << "\nSolved, chi2 = " << graph.chi2() << std::endl;
 

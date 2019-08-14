@@ -28,7 +28,8 @@ using namespace Eigen;
 
 
 FGraphSolve::FGraphSolve(matrixMethod method, optimMethod optim, uint_t potNumberNodes, uint_t potNumberFactors):
-	FGraph(potNumberNodes, potNumberFactors), matrixMethod_(method), optimMethod_(optim)
+	FGraph(potNumberNodes, potNumberFactors), matrixMethod_(method), optimMethod_(optim),
+	lambda_(1e-6), solutionTolerance_(1e-2)
 {
 
 }
@@ -36,22 +37,56 @@ FGraphSolve::FGraphSolve(matrixMethod method, optimMethod optim, uint_t potNumbe
 FGraphSolve::~FGraphSolve() = default;
 
 
-void FGraphSolve::solve(optimMethod method)
+void FGraphSolve::solve(optimMethod method, uint_t maxIters)
 {
     /**
      * 2800 2D nodes on M3500
      * Time profile :13.902 % build Adjacency matrix,
      *               34.344 % build Information,
      *               48.0506 % build Cholesky,
-     *               2.3075 % solve forward and back subtitution,
+     *               2.3075 % solve forward and back substitution,
      *               1.3959 % update values,
      *
      */
     optimMethod_ = method; // updates the optimization method
     time_profiles_.clear();
+
+    // Optimization
+    switch(optimMethod_)
+    {
+      case GN:
+        this->optimize_gauss_newton();// false => lambda = 0
+        this->update_nodes();
+        break;
+      case LM:
+        this->optimize_levenberg_marquardt(maxIters);
+        break;
+      default:
+        assert(0 && "FGraphSolve:: optimization method unknown");
+    }
+
+
+
+
+    if (0)
+    {
+        double sum = 0;
+        for (auto t : time_profiles_)
+            sum += t.second;
+
+        std::cout << "\nTime profile for " << sum/1e3 << " [ms]: ";
+        for (auto t : time_profiles_)
+            std::cout << t.first << " = " << t.second/sum *100 << "%, ";
+        std::cout << "\n";
+    }
+}
+
+void FGraphSolve::build_problem(bool useLambda)
+{
     auto t1 = std::chrono::steady_clock::now();
 
-    // 1) Linearizes and calculates the Jacobians and required matrices
+    // 1) Adjacency matrix A, it has to
+    //    linearize and calculate the Jacobians and required matrices
     this->build_adjacency();
     auto t2 = std::chrono::steady_clock::now();
     auto dif = std::chrono::duration_cast<Ttim>(t2 - t1);
@@ -72,48 +107,28 @@ void FGraphSolve::solve(optimMethod method)
         assert(0 && "FGraphSolve: method not implemented");
     }
 
-
-
-    // 2) Optimization
-    switch(optimMethod_)
+    // Structure for LM and dampening GN-based methods
+    if (useLambda)
     {
-      case GN:
-        this->optimize_gauss_newton();
-        break;
-      case LM:
-        t1 = std::chrono::steady_clock::now();
-        this->optimize_levenberg_marquardt();
-        t2 = std::chrono::steady_clock::now();
-        dif = std::chrono::duration_cast<Ttim>(t2 - t1);
-        time_profiles_.push_back( std::make_pair("LM Cholesky",  dif.count()) );
-        break;
-      default:
-        assert(0 && "FGraphSolve:: optimization method unknown");
-    }
-
-
-
-
-    if (1)
-    {
-        double sum = 0;
-        for (auto t : time_profiles_)
-            sum += t.second;
-
-        std::cout << "\nTime profile for " << sum/1e3 << " [ms]: ";
-        for (auto t : time_profiles_)
-            std::cout << t.first << " = " << t.second/sum *100 << "%, ";
-        std::cout << "\n";
+        diagL_ = L_.diagonal();
     }
 }
 
-void FGraphSolve::optimize_gauss_newton()
+void FGraphSolve::optimize_gauss_newton(bool useLambda)
 {
     SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
 
+    this->build_problem(useLambda);
+
     // compute cholesky solution
     auto t1 = std::chrono::steady_clock::now();
-    cholesky.compute(I_);
+    if (useLambda)
+    {
+        for (uint_t n = 0 ; n < N_; ++n)
+            L_.coeffRef(n,n) = lambda_ + diagL_(n);//Circunference =>  diagL_(n) + lambda_
+            //L_.coeffRef(n,n) = (1.0 + lambda_)*diagL_(n);//Elipsoid, for circunference =>  diagL_(n) + lambda_. in practice worked worse
+    }
+    cholesky.compute(L_);
     auto t2 = std::chrono::steady_clock::now();
     auto dif = std::chrono::duration_cast<Ttim>(t2 - t1);
     time_profiles_.push_back( std::make_pair("Gauss Newton create Cholesky",  dif.count()) );
@@ -123,41 +138,83 @@ void FGraphSolve::optimize_gauss_newton()
     dif = std::chrono::duration_cast<Ttim>(t2 - t1);
     time_profiles_.push_back( std::make_pair("Gauss Newton solve Cholesky",  dif.count()) );
 
-    // 2) Update solution (this is almost negligible on time)
-    t1 = std::chrono::steady_clock::now();
-    this->update_nodes();
-    t2 = std::chrono::steady_clock::now();
-    dif = std::chrono::duration_cast<Ttim>(t2 - t1);
-    time_profiles_.push_back( std::make_pair("Gauss Newton Update Solution",  dif.count()) );
+
 }
 
-void FGraphSolve::optimize_levenberg_marquardt()
+uint_t FGraphSolve::optimize_levenberg_marquardt(uint_t maxIters)
 {
     SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
 
 
-    // LM with Ellipsoidal approximation for the trust region as described in Bertsekas (p.105)
+    // LM trust region as described in Bertsekas (p.105)
 
     // 0) parameter initialization
-    lambda_ = 1e-5;
+    lambda_ = 1e-2;
+    // sigma reference to the fidelity of the model at the proposed solution \in [0,1]
+    matData_t sigma1(0.25), sigma2(0.8);// 0 < sigma1 < sigma2 < 1
+    matData_t beta1(2.0), beta2(0.25); // lambda updates multiplier values, beta1 > 1 > beta2 >0
+    //matData_t lambdaMax, lambdaMin; // XXX lower bound unnecessary
 
-    // 1) solve subproblem
-    for (uint_t n = 0 ; n < N_; ++n)
-    {
-        I_.coeffRef(n,n) += lambda_*I_.coeffRef(n,n); //may be faster a sparse diagonal matrix multiplication?
-        //I_.coeffRef(n,n) += lambda_; // Spherical approximation
-    }
+    matData_t currentChi2, deltaChi2, modelFidelity;
+    uint_t iter = 0;
+
+    do{
+        iter++;
+        // 1) solve subproblem and current error
+        this->optimize_gauss_newton(true);// Test if solved anything? no nans
+        currentChi2 = this->chi2(false);// residuals don't need to be calculated again
+        this->synchronize_nodes_auxiliary_state();// book-keeps states to undo updates
+        this->update_nodes();
 
 
-    // compute cholesky solution
-    cholesky.compute(I_);
-    dx_ = cholesky.solve(b_);
+        // 1.2) Check for convergence, needs update and re-evaluaiton of errors
+        deltaChi2 = currentChi2 - this->chi2(true);
+        std::cout << "\nFGraphSolve::optimize_levenberg_marquardt: iteration "
+                  << iter << " lambda = " << lambda_ << ", error " << currentChi2
+                  << ", and delta = " << deltaChi2
+                  << std::endl;
+        if (deltaChi2 < 0)
+        {
+            // proposed dx did not improve, repeat 1) and reduce area of optimization = increase lambda
+            lambda_ *= beta1;
+            this->synchronize_nodes_state();
+            continue;
+        }
+
+        // 1.3) check for convergence
+        if (deltaChi2 < solutionTolerance_)
+            return iter;
+
+
+        // 2) Fidelity of the quadratized model vs non-linear chi2 evaluation.
+        // f = chi2(x_k) - chi2(x_k + dx)
+        //     chi2(x_k) - m_k(dx)
+        // where m_k is the quadratized model = ||r||^2 - dx'*J' r + 0.5 dx'(J'J + lambda*D2)dx
+        modelFidelity = deltaChi2 / (dx_.dot(b_) - 0.5*dx_.dot(L_* dx_)) /2.0;
+        std::cout << "model fidelity = " << modelFidelity << " and m_k = " << -dx_.dot(b_) + 0.5*dx_.dot(L_* dx_) << std::endl;
+
+        //3) update lambda
+        if (modelFidelity < sigma1)
+            lambda_ *= beta1;
+        if (modelFidelity > sigma2)
+            lambda_ *= beta2;
+
+
+    } while (iter < maxIters);
+
+    // output
+    std::cout << "FGraphSolve::optimize_levenberg_marquardt: failed to converge after "
+              << iter << " iterations and error " << currentChi2
+              << ", and delta = " << deltaChi2
+              << std::endl;
+    return 0; //
+
 }
 
 void FGraphSolve::build_adjacency()
 {
     // 0) resize properly matrices (if needed)
-    r_.resize(obsDim_,1);//dense vector
+    r_.resize(obsDim_,1);//dense vector TODO is it better to reserve and push_back??
     A_.resize(obsDim_, stateDim_);//Sparse matrix clear data
     W_.resize(obsDim_, obsDim_);//TODO should we reinitialize this all the time? an incremental should be fairly easy
 
@@ -198,6 +255,7 @@ void FGraphSolve::build_adjacency()
         auto f = (*factors)[i];
         f->evaluate_residuals();
         f->evaluate_jacobians();
+        f->evaluate_chi2();
 
         // calculate dimensions for reservation and bookeping vector
         uint_t dim = f->get_dim();
@@ -269,14 +327,14 @@ void FGraphSolve::build_adjacency()
 void FGraphSolve::build_info_adjacency()
 {
     /**
-     * I_ dx = b_ corresponds to the normal equation A'*W*A dx = A'*W*r
+     * L_ dx = b_ corresponds to the normal equation A'*W*A dx = A'*W*r
      * only store the lower part of the information matrix (symmetric)
      *
      * XXX: In terms of speed, using the selfadjointview does not improve,
      * Eigen stores a temporary object and then copy only the upper part.
      *
      */
-    I_ = (A_.transpose() * W_.selfadjointView<Eigen::Upper>() * A_);
+    L_ = (A_.transpose() * W_.selfadjointView<Eigen::Upper>() * A_);
     b_ = A_.transpose() * W_.selfadjointView<Eigen::Upper>() * r_;
 }
 
@@ -298,7 +356,7 @@ matData_t FGraphSolve::chi2(bool evaluateResidualsFlag)
 
 void FGraphSolve::update_nodes()
 {
-    uint_t acc_start = 0;
+    int acc_start = 0;
     for (uint_t i = 0; i < nodes_.size(); i++)
     {
         // node update is the negative of dx just calculated.
@@ -308,6 +366,19 @@ void FGraphSolve::update_nodes()
 
         acc_start += nodes_[i]->get_dim();
     }
+}
+
+void FGraphSolve::synchronize_nodes_auxiliary_state()
+{
+    for (auto n : nodes_)
+        n->set_auxiliary_state(n->get_state());
+}
+
+
+void FGraphSolve::synchronize_nodes_state()
+{
+    for (auto n : nodes_)
+        n->set_state(n->get_auxiliary_state());
 }
 
 // method to output (to python) or other programs the current state of the system.

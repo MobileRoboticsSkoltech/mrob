@@ -1,13 +1,12 @@
 /* Copyright 2018-2019 Skolkovo Institute of Science and Technology (Skoltech)
  * All rights reserved.
  *
- * matrix_base.hpp
+ * time_profiling.jpp
  *
- *  Created on: Feb 21, 2018
+ *  Created on: Aug 14, 2019
  *      Author: Gonzalo Ferrer
  *              g.ferrer@skoltech.ru
- *              Mobile Robotics Lab, Skoltech
- *
+ *              Mobile Robotics Lab.
  */
 
 #ifndef MATRIX_BASE_HPP_

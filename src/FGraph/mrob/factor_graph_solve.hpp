@@ -28,7 +28,7 @@ namespace mrob {
  *
  * Routines provide different optimization methods:
  *  - Gauss-Newton (GN) using Cholesky LDLT with minimum degree ordering
- *  - Levenberg–Marquardt (LM) (Nocedal Ch.10) using ellipsoidal approximation and
+ *  - Levenberg–Marquardt (LM) (Nocedal Ch.10) using spherical
  *                     trust region alg. (Nocedal 4.1) to estimate a "good" lambda.
  *                     Bertsekas p.105 proposes a similar heuristic approach for the trust
  *                     region, which we convert to lambda estimation (we follow this notation in code).
@@ -45,7 +45,7 @@ public:
     /**
      * This enums optimization methods available:
      *  - Gauss Newton
-     *  - Levenberg Marquardt
+     *  - Levenberg Marquardt (trust-region)
      */
     enum optimMethod{GN=0, LM};
 
@@ -57,7 +57,7 @@ public:
      * ultimately on the function input,
      * by default optim method is Gauss Newton
      */
-    void solve(optimMethod method = GN);
+    void solve(optimMethod method = GN, uint_t maxIters = 20);
     /**
      * Evaluates the current solution chi2.
      *
@@ -75,18 +75,25 @@ public:
     /**
      * Functions to set the matrix method building
      */
-    void set_matrix_method(matrixMethod method) {matrixMethod_ = method;};
-    matrixMethod get_matrix_method() { return matrixMethod_;};
+    void set_build_matrix_method(matrixMethod method) {matrixMethod_ = method;};
+    matrixMethod get_build_matrix_method() { return matrixMethod_;};
 
 
 protected:
     /**
+     * build problem creates an information matrix L, W and a vector b
+     *
+     * It chooses from building the information from the adjacency matrix,
+     * directly building info or schur (TODO)
+     *
+     * If bool useLambda is true, it also stores a vector D2 containing the diagonal
+     * of the information matrix L
+     */
+    void build_problem(bool useLambda = false);
+    /**
      * This protected method creates an Adjacency matrix, iterating over
      * all factors in the FG and creates a block diagonal matrix W with each factors information.
-     *
-     * During build adjacency also we keep track of the number of factors for each
-     * node and order them according to the minimum order degree. The permutation vector
-     * is stored on the class variable permutation_
+     * As a result, residuals, Jacobians and chi2 values are up to date
      *
      */
     void build_adjacency();
@@ -101,30 +108,50 @@ protected:
     /**
      * Once the matrix L is generated, it solves the linearized LSQ
      * by using the Gauss-Newton algorithm
+     *
+     * Input useLambda (default false) builds the GN problem with lambda factor on the diagonal
+     *    L = A'*A + lambda * I
      */
-    void optimize_gauss_newton();
+    void optimize_gauss_newton(bool useLambda = false);
 
     /**
      * It generates the information matrix as
-     *              L' = L +  lambda * diag(L)
+     *              L' = L +  lambda * I
      *
-     * Once the matrix L' is generated, it solves the linearized LSQ
-     * by using the Levenberg-Marquardt algorithm.
+     * TODO, the preconditioning could be adapted to expected values, such as w < pi and v < avg
+     *               L' = L +  lambda * D2
+     *
+     * Iteratively updates the solution given the right estimation of lambda
      * Parameters are necessary to be specified in advance, o.w. it would use default values.
+     *
+     * input maxIters, before returning a result
+     *
+     * output: number of iterations it took to converge.
+     *    0 when incorrect solution
      */
-    void optimize_levenberg_marquardt();
+    uint_t optimize_levenberg_marquardt(uint_t maxIters);
 
     /**
-     * Solves the systems using Cholesky LDLT decomposition with AMD ordering
-     * Note: LLT provides similar results
-     */
-    void solve_cholesky();
-
-    /**
-     * Auxiliary function that updates all nodes with the current solution,
+     * Function that updates all nodes with the current solution,
      * this must be called after solving the problem
      */
     void update_nodes();
+
+    /**
+     * Synchronize state variable in all nodes
+     * exactly value the current state.
+     *
+     * Usually this function un-does an incorrect update of the state.
+     */
+    void synchronize_nodes_state();
+
+    /**
+     * Synchronize auxiliary state variables in all nodes
+     * exactly value the current state.
+     * This function is used when we will update a solution
+     * but it needs verification, so we book-keep at auxiliary.
+     */
+    void synchronize_nodes_auxiliary_state();
 
     // Variables for solving the FGraph
     matrixMethod matrixMethod_;
@@ -137,7 +164,7 @@ protected:
     SMatRow W_; //A block diagonal information matrix. For types Adjacency it calculates its block transposed squared root
     MatX1 r_; // Residuals as given by the factors
 
-    SMatCol I_; //Information matrix
+    SMatCol L_; //Information matrix
     MatX1 b_; // Post-processed residuals, A'*W*r
 
     // Correction deltas
@@ -147,7 +174,8 @@ protected:
 
     // Particular parameters for Levenberg-Marquard
     matData_t lambda_; // current value of lambda
-    matData_t lambdaMax_, lambdaMin_;
+    matData_t solutionTolerance_;
+    MatX1 diagL_; //diagonal matrix (vector) of L to update it efficiently
 
 
 };
