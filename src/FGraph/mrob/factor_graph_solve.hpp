@@ -31,9 +31,9 @@ namespace mrob {
  *  - Levenberg–Marquardt (LM) (Nocedal Ch.10) using spherical
  *                     trust region alg. (Nocedal 4.1) to estimate a "good" lambda.
  *                     Bertsekas p.105 proposes a similar heuristic approach for the trust
- *                     region, which we convert to lambda estimation (we follow this notation in code).
+ *                     region, which we convert to lambda estimation (we follow Bertsekas' notation in code).
  *  - Dogleg (DL) (Nocedal 4.3) TODO
- *  - Conjugate gradient method (nocedal 7.2) TODO
+ *  - Conjugate gradient method (Nocedal 7.2) TODO
  */
 class FGraphSolve: public FGraph
 {

@@ -19,10 +19,18 @@ namespace mrob{
 
     /**
      * Factor2Poses2d if a factor relating a 2 2dimensional poses
-     *  through a direct observation such that:
-     *  observation = h(nodeOrigin,nodeTarget) = x_dest - x_origin
-     *  or
-     *  residual =  x_origin + observation - x_destination
+     * through a direct observation such that:
+     * observation = h(nodeOrigin,nodeTarget) = x_target - x_origin
+     * or
+     * residual =  x_origin + observation - x_target
+     *
+     * With this arrangement, the linearized factor substracts the residual (r)
+     * to the first order term of the nonlinear observation function:
+     * || J dx - r ||
+     *
+     * This convention will be followed by all factors in this library, otherwise the optimization
+     * will not work properly.
+     *
      *
      * It is possible to update the target node if it has not been initialized.
      * By default is set to FALSE, so we must specify it to true in case we want

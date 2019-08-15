@@ -126,7 +126,7 @@ void FGraphSolve::optimize_gauss_newton(bool useLambda)
     {
         for (uint_t n = 0 ; n < N_; ++n)
             L_.coeffRef(n,n) = lambda_ + diagL_(n);//Circunference =>  diagL_(n) + lambda_
-            //L_.coeffRef(n,n) = (1.0 + lambda_)*diagL_(n);//Elipsoid, for circunference =>  diagL_(n) + lambda_. in practice worked worse
+            //L_.coeffRef(n,n) = (1.0 + lambda_)*diagL_(n);//Elipsoid, for circunference =>  diagL_(n) + lambda. WORSE In practice
     }
     cholesky.compute(L_);
     auto t2 = std::chrono::steady_clock::now();
@@ -149,7 +149,7 @@ uint_t FGraphSolve::optimize_levenberg_marquardt(uint_t maxIters)
     // LM trust region as described in Bertsekas (p.105)
 
     // 0) parameter initialization
-    lambda_ = 1e-2;
+    lambda_ = 1e-5;
     // sigma reference to the fidelity of the model at the proposed solution \in [0,1]
     matData_t sigma1(0.25), sigma2(0.8);// 0 < sigma1 < sigma2 < 1
     matData_t beta1(2.0), beta2(0.25); // lambda updates multiplier values, beta1 > 1 > beta2 >0
@@ -360,7 +360,8 @@ void FGraphSolve::update_nodes()
     for (uint_t i = 0; i < nodes_.size(); i++)
     {
         // node update is the negative of dx just calculated.
-        //x = x - alhpa * H^(-1) * Grad = x - dx    \ alpha = 1 since we are close to the solution
+        // x = x - alpha * H^(-1) * Grad = x - dx
+        // Depending on the optimization, it is already taking care of the step alpha, so we assume alpha = 1
         auto node_update = -dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
         nodes_[i]->update(node_update);
 

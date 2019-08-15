@@ -33,11 +33,15 @@ namespace mrob{
  * In particular, the relation between the transformation of poses is:
  *   T_o * T_obs = T_t
  *
+ * T_o is the transformation encoded by the 3D pose 'origin'. Also note that the
+ * transformation from a pose (Exp(x_o) transforms point in the local 'origin' frame to the world reference.
+ * T_t target transformation from pose x_t
+ * T_obs observation transformation from pose obs (observed from origin)
+ *
  * and the residual is thus:
  *   r = Ln ( T_o * T_obs * T_t^-1 )
  *
- * NOTE: Transformations T=Exp(x) from global poses (x) encode the transformation:
- *   (global)p = Exp(x) * (local x)p
+ * (equivalent to x_origin + observation - x_target)
  *
  * Constructor functions will be overloaded to include the pointers of the nodes,
  * The convention is from node origin, we observe node destination,

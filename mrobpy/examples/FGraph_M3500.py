@@ -93,7 +93,8 @@ for t in range(1,N):
         pass
 
 if 1:
-    graph.solve(mrob.LM)
+    print('current initial chi2 = ', graph.chi2() )
+    graph.solve(mrob.LM, 50)
     print('LM chi2 = ', graph.chi2() )
     print_2d_graph(graph)
 

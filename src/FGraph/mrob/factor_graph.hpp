@@ -32,10 +32,10 @@ namespace mrob{
  *
  * We require two abstract classes,
  *  - Class Node
- *  - Class Factor
+ *  - Class Factor. here see factor.hpp for the conventions on residuals, observations, etc.
  *
- * XXX, actually key as addresses won't work in python interface. Better use uint
- * Both data containers are stored in vectors (XXX prev unordered sets) whose keys are their adresses. By doing this, we can
+ * XXX, actually key as addresses won't work in python interface. Better use id_t (uint)
+ * Both data containers are stored in vectors (XXX prev unordered sets) whose keys are their addresses. By doing this, we can
  * iterate and quickly find elements in both data containers.
  *
  * Each problem instantaition should implement methods for solving the graph and storing the
