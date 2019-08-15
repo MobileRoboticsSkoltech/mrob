@@ -166,7 +166,7 @@ if 1:
     start = time.time()
     graph.solve(mrob.LM,500)
     end = time.time()
-    print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e6*(end - start))
+    print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     print_3d_graph(graph)
 
    

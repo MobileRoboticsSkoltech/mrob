@@ -190,8 +190,8 @@ uint_t FGraphSolve::optimize_levenberg_marquardt(uint_t maxIters)
         // f = chi2(x_k) - chi2(x_k + dx)
         //     chi2(x_k) - m_k(dx)
         // where m_k is the quadratized model = ||r||^2 - dx'*J' r + 0.5 dx'(J'J + lambda*D2)dx
-        modelFidelity = deltaChi2 / (dx_.dot(b_) - 0.5*dx_.dot(L_* dx_)) /2.0;
-        std::cout << "model fidelity = " << modelFidelity << " and m_k = " << -dx_.dot(b_) + 0.5*dx_.dot(L_* dx_) << std::endl;
+        modelFidelity = deltaChi2 / (dx_.dot(b_) - 0.5*dx_.dot(L_* dx_));
+        std::cout << "model fidelity = " << modelFidelity << " and m_k = " << dx_.dot(b_) << std::endl;
 
         //3) update lambda
         if (modelFidelity < sigma1)

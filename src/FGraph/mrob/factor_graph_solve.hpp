@@ -32,8 +32,9 @@ namespace mrob {
  *                     trust region alg. (Nocedal 4.1) to estimate a "good" lambda.
  *                     Bertsekas p.105 proposes a similar heuristic approach for the trust
  *                     region, which we convert to lambda estimation (we follow Bertsekas' notation in code).
- *  - Dogleg (DL) (Nocedal 4.3) TODO
- *  - Conjugate gradient method (Nocedal 7.2) TODO
+ *  - TODO Gradient 1st order based with preconditioning
+ *  - TODO Dogleg (DL) (Nocedal 4.3)
+ *  - TODO Conjugate gradient method (Nocedal 7.2)
  */
 class FGraphSolve: public FGraph
 {
@@ -45,7 +46,7 @@ public:
     /**
      * This enums optimization methods available:
      *  - Gauss Newton
-     *  - Levenberg Marquardt (trust-region)
+     *  - Levenberg Marquardt (trust-region-like for lambda adjustment)
      */
     enum optimMethod{GN=0, LM};
 
