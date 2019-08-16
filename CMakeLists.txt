@@ -58,6 +58,10 @@ ADD_SUBDIRECTORY(./src/FGraph)
 INCLUDE_DIRECTORIES(./src/PCRegistration)
 ADD_SUBDIRECTORY(./src/PCRegistration)
 
+
+INCLUDE_DIRECTORIES(./src/EigenFactors)
+ADD_SUBDIRECTORY(./src/EigenFactors)
+
 # New modules should be included here
 
 # MROB python bingins, defined here:
