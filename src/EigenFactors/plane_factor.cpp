@@ -10,5 +10,7 @@
  */
 
 
+#include "mrob/plane_factor.hpp"
+
 
 
