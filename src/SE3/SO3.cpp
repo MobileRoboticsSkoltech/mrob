@@ -16,6 +16,8 @@
 #include <Eigen/LU> // for determinant
 #include <Eigen/Geometry> // for quaternions and rotations
 
+// TODO remove
+#include <iomanip>
 
 using namespace mrob;
 
@@ -96,13 +98,22 @@ void SO3::exp(const Mat3 &w_hat)
 {
     Mat31 w = vee3(w_hat);
     double o = w.norm();
-    if ( o < 1e-12){
-        // sin(o)/0 -> 1. Approximate this with Taylor, but we will leave it as 1
-        R_ << Mat3::Identity() + w_hat;
-        return;
+    double c1,c2;
+    // TODO justify this threshold
+    if ( o < 1e-5){
+        // sin(o)/0 -> 1. Approximate this with Taylor
+        //R_ << Mat3::Identity() + w_hat;
+        // sin(o)/o = 1 - x^2/3! + x^4/5! + O(x^6)
+        c1 =  1 - o*o/6.0;
+        // (1-cos(o))/o^2 = 0.5 + x^2/12 + ...
+        c2 = 0.5 - o*o/12.0;
+        //std::cout << "here\n";
     }
-    double c1 = std::sin(o)/o;
-    double c2 = (1 - std::cos(o))/o/o;
+    else
+    {
+        c1 = std::sin(o)/o;
+        c2 = (1 - std::cos(o))/o/o;
+    }
     R_ << Mat3::Identity() + c1 * w_hat + c2 * w_hat *w_hat;
 }
 
@@ -111,25 +122,56 @@ Mat3 SO3::ln(double *ro) const
     // Logarithmic mapping of the rotations
     Mat3 res;
     double tr = (R_.trace()-1)*0.5;
-    double o;
-    if (tr  < 1.0 - 1e-9 && tr > -1.0 + 1e-9 )
+    double o = std::acos(tr); //[0,pi]
+    double lnTol = 1e-9;
+    if (tr  < 1.0 - lnTol && tr > -1.0 + lnTol )
     {
         // Usual case, tr \in (-1,1) and theta \in (-pi,pi)
-        o = std::fabs(std::acos(tr));
         res << 0.5 * o / std::sin(o) * ( R_ - R_.transpose());
     }
-    else if (tr >= 1.0 - 1e-9 )
+    else if (tr >= 1.0 - lnTol )
     {
-        // Special case tr =1  and theta = 0
-        //TODO augment epsilon and approximate o with Taylor
-        o = 0.0;
-        res << Mat3::Zero();
+        // Special case tr =1  and theta -> 0
+        // We will evaluate 3 cases: 1) incorrect o 2) incorrect x.sin 3) normal
+        double d1;
+        if (o != o) // is Nan
+        {
+            d1 = 0.0;
+        }
+        else if( o < lnTol)
+        {
+            // o can be exactly 0 (=acos) which is why we need this statement, although it might be redundant
+            // and a Taylor expansion for such a small o, if not, Nans TODO is taylor correct?
+            d1 = 0.5 + o*o/12;
+        }
+        else
+        {
+            d1 = 0.5 * o / std::sin(o);
+        }
+        res << d1 * ( R_ - R_.transpose());
     }
     else
     {
         // Special case tr = -1  and theta = +- pi or multiples
-        o = M_PI;
+        //std::cout << "pi pi o = " << o << std::endl;
+        if ( o != o)
+        {
+            o = M_PI;// exact case for theta
+            std::cout << "here starts the error\n";
+        }
+        else
+        {
+            // Taylor around the cos
+            std::cout << o << std::endl;
+            o = M_PI;
+        }
+        // First order Taylor to approximate acos at pi
+        //o = M_PI - 1.0/std::sqrt(1.0-tr*tr) * (1 - std::fabs(tr));
+
+        // As we approach pi, the Taylor expansion becomes:
         // R = I + 0 + (2/pi^2)W^2, which makes it symmetric R = Rt and W = hat(w)
+        // so we can consider the first order term negligible.
+        //
         // From here, we know that W^2 = ww^t - theta^2I, (you can span W^2 to see this)
         // which leaves R = I + 2/pi2 (wwt - pi2 I)
         // R+I = 2/pi2 wwt
@@ -160,7 +202,7 @@ Mat3 SO3::ln(double *ro) const
         double length = w.norm();
         if (length > 0.0)
         {
-            w *= M_PI / length;
+            w *= o / length;
         }
         else
         {

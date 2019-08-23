@@ -11,47 +11,106 @@ plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['ps.fonttype'] = 42
 
 
-def plotConfig():
-    "configfures the 3d plot structure for representing tranformations"
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    return ax
+# Overall error for differente segments of theta (angle)
+if 1:
+    print('Overall evaluation of SO(3) ranging from theta [0,pi]')
+    N, M = 200, 10
+    error = np.zeros((N,M))
+    rmse = np.zeros(N)
+    eps = 1e-9 #1e-3 #to avoid the explicit case 0,pi, but closer is more problematic
+    X = np.linspace(0+eps,np.pi-eps,N);
+    # sweep de theta = [0, pi]
+    for n in range(N):
+        x = X[n]
+        rmse_n = []
+        for i in range(M):
+            xi = np.random.randn(3)
+            xi = xi / np.linalg.norm(xi) * x
+            e = mrob.SO3(xi).ln() - xi
+            e2 = e.dot(e)
+            # handle negatives TODO signs of should be solved in mrob
+            if e2 > np.pi :
+                e = mrob.SO3(xi).ln() + xi
+                e2 = e.dot(e)
+                print('error = ', e, ', ln = ', mrob.SO3(xi).ln() , 'xi = ' , xi)
+            rmse_n.append( e2 )
+            error[n,i] = np.sqrt(e2)
+        rmse[n] = np.sqrt( sum(rmse_n)/M )
+        print('Evaluation at theta (angle) = ', x, ' error = ', rmse[n] )
+    # calculate RMSE and some statistical perceptinles
+    plt.figure(figsize=(8,5))
+    plt.plot(X,np.log10(rmse))
+    plt.title('RMSE in SO(3)')
+    plt.xlabel('angle theta of rotations')
+    plt.show()
+    plt.figure()
 
+# Exp/ln chain SO(3)
+# ======================================================
+# 1) round pi,0 trajectory
+if 0:
+    N, M = 40, 10
+    
+    eps = np.zeros(N)
+    eps[0] = 1e-2
+    for n in range (1,N):
+        eps[n] = eps[n-1]*0.7
+    rmse = np.zeros(N)
+    
+    for n in range(N):
+        error = []
+        for i in range(M):
+            xi = np.random.randn(3) 
+            xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (eps[n]) #around 0
+            #xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (np.pi - eps[n]) #around pi
+            e = mrob.SO3(xi).ln() - xi
+            error.append( e.dot(e) )
+        #eps[] *= 0.5
+        rmse[n] = np.sqrt( sum(error)/M )
+        print('Iteration n = ', n , ', eps = ', eps[n], ', current error = ', rmse[n])
+    plt.plot(rmse)
+    #plt.xticks(range(int(N/10)), eps[np.arange(0,N,10)])
+    #plt.locator_params(axis='x', nbins=N/10)
+    #plt.title('RMSE of SO(3) transfomration $\epsilon$ close to 0')
+    plt.title('RMSE of SO(3) transfomration $\epsilon$ close to $\pi$')
+    #plt.savefig('error_SO3.pdf', bbox_inches='tight')
+    plt.show()
 
-def plotT(T, ax):
-    "Plots a 3 axis frame in the origin given the mrob SE3 transformation, right-hand convention"
-    # transform 3 axis to the coordinate system
-    x = np.zeros((4, 3))
-    x[0, :] = T.transform(np.array([0, 0, 0], dtype='float64'))
-    x[1, :] = T.transform(np.array([1, 0, 0], dtype='float64'))
-    ax.plot(x[[0, 1], 0], x[[0, 1], 1], x[[0, 1], 2], 'r')  # X axis
-    x[2, :] = T.transform(np.array([0, 1, 0], dtype='float64'))
-    ax.plot(x[[0, 2], 0], x[[0, 2], 1], x[[0, 2], 2], 'g')  # Y axis
-    x[3, :] = T.transform(np.array([0, 0, 1], dtype='float64'))
-    ax.plot(x[[0, 3], 0], x[[0, 3], 1], x[[0, 3], 2], 'b')  # Z axis
-
-
+# Exp-Ln SE(3)
+# ======================================================
 # Qualitative test for some issues found while creating SE3 in mrob
 # 1) round pi trajectory
 if 0:
-    xi_ini = np.array([0, 0, 0, 0, 0, 0], dtype='float64')
-    # xi_fin = np.array([np.pi/3,1,0,0,0,0], dtype='float64')
-    xi_fin = np.random.rand(6) * 10
-    if np.linalg.norm(xi_fin[0:3]) > np.pi:
-        xi_fin[0:3] = xi_fin[0:3] / np.linalg.norm(xi_fin[0:3]) * (np.pi - 0.1)
-    ax = plotConfig()
-    N = 20
-    xi = np.zeros((N, 6))
-    t = np.zeros(N)
-    for i in range(6):
-        xi[:, i] = np.linspace(xi_ini[i], xi_fin[i], N, dtype='float64')
-    t = np.linspace(0, 1, N, dtype='float64')
+    N, M = 30, 100
     
-    #plt.savefig('name.pdf', bbox_inches='tight')
+    eps = np.zeros(N)
+    eps[0] = 1e-2
+    for n in range (1,N):
+        eps[n] = eps[n-1]*0.7
+    rmse = np.zeros(N)
+    
+    for n in range(N):
+        error = []
+        for i in range(M):
+            xi = np.random.randn(6) * 100 # 30000 similar value to kais dataset tranlations.
+            #xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (eps[n]) #around 0
+            xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (np.pi - eps[n]) #around pi
+            e = mrob.SE3(xi).ln() - xi
+            error.append( e.dot(e) )
+        #eps[] *= 0.5
+        rmse[n] = np.sqrt( sum(error)/M )
+        print('Iteration n = ', n , ', eps = ', eps[n], ', current error = ', rmse[n])
+    plt.plot(rmse)
+    plt.xticks(range(N), eps)
+    plt.locator_params(axis='x', nbins=4)
+    plt.title('RMSE of SE(3) transfomration $\epsilon$ close to $\pi$')
+    #plt.savefig('error_hard.pdf', bbox_inches='tight')
+    plt.show()
 
 
-# 2) Life of objects, some data gets corrupted when chaining functions/operators
-if 1:
+# 2) Life of objects, some data gets corrupted when chaining functions/operators.
+# XXX: WORKING WELL
+if 0:
     xi = np.random.rand(6)
     T1 = mrob.SE3(xi)
     T2 = mrob.SE3(np.random.rand(6))

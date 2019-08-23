@@ -57,6 +57,7 @@ void init_SE3(py::module &m) {
         .def("ln", &SO3::ln_vee, py::return_value_policy::copy)
         .def("inv", &SO3::inv, py::return_value_policy::copy)
         .def("adj", &SO3::adj, py::return_value_policy::copy)
+        .def("distance", &SO3::distance)
         .def("print", &SO3::print)
         ;
 }
