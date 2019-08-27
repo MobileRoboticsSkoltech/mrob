@@ -104,14 +104,19 @@ void SE3::exp(const Mat4 &xi_hat)
     Mat3 V = Mat3::Identity();
     double o = w.norm();
     // If rotation is not zero
-    if ( o > 1e-12){
-        double c2 = (1 - std::cos(o))/o/o;
-        double c3 = (o - std::sin(o))/o/o/o;
-        V += c2*w_hat + c3*w_hat*w_hat;
+    matData_t c2, c3;
+    if ( o > 1e-3){ // c2 and c3 become numerically imprecise for o < 1-5, so we choose a conservative threshold 1e-3
+        c2 = (1 - std::cos(o))/o/o;
+        c3 = (o - std::sin(o))/o/o/o;
     }
     else
     {
+        // second order Taylor (first order is zero since this is an even function)
+        c2 = 0.5 - o*o/24;
+        // Second order Taylor
+        c3 = 1.0/6.0 - o*o/120;
     }
+    V += c2*w_hat + c3*w_hat*w_hat;
 
     // Calculate the translation component t = Vv
     Mat31 t = V*v;
@@ -134,18 +139,22 @@ Mat4 SE3::ln(void) const
     // V^-1 = I - 0.5w^ + k1 (w^)^2
     // k1 = 1/o^2 * (1 - c1/(2c2) ) ,    c1 =sin(o)/o and c2 = (1 - cos(o))/o^2 from so3_exp
     Mat3 Vinv = Mat3::Identity();
-    if (o > 1e-12)
+    double k1;
+    // 5e-3 bound provided on numerical_test.cpp, smaller than this k1 becomes degradated
+    if (o > 5e-3)
     {
         double c1 = std::sin(o); //sin(o)/o, we remove the o in both coeficients
         double c2 = (1 - std::cos(o))/o; // (1 - std::cos(o))/o/o
-        double k1 = 1/o/o*(1 - 0.5*c1/c2);
-        Vinv += -0.5*w_hat + k1* w_hat*w_hat;
+        k1 = 1/o/o*(1 - 0.5*c1/c2);
     }
-    //XXX for small numbers Taylor expansion should be used...
+    //Taylor expansion for small o.
     else
     {
-
+        // f(o) = 1/12 + 1/2*f''*o^2
+        // f'' = 1/360
+        k1 = 1.0/12 + o*o/720;
     }
+    Vinv += -0.5*w_hat + k1* w_hat*w_hat;
 
     // v = V^-1 t
     Mat31 v = Vinv * T_.topRightCorner<3,1>();

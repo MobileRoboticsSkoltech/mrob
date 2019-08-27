@@ -18,3 +18,4 @@ bin/
 *.idea
 *.png
 *.pdf
+*.pkl

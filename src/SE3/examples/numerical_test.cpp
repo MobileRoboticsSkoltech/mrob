@@ -41,8 +41,8 @@ int main()
             double res = std::sin(x)/x;
             double xx = x*x;
             double resTaylor = 1 - xx/6;// + xx*xx/120.0;
-            //std::cout << "sinc (" << x << ") = " << std::setprecision(40) << res << std::endl;
-            //std::cout << "tayl (" << x << ") = " << std::setprecision(40) << resTaylor << std::endl;
+            std::cout << "sinc (" << x << ") = " << std::setprecision(40) << res << std::endl;
+            std::cout << "tayl (" << x << ") = " << std::setprecision(40) << resTaylor << std::endl;
             std::cout << "diff (" << x << ") = " << std::setprecision(20) << res - resTaylor << std::endl;
         }
     }
@@ -65,10 +65,24 @@ int main()
         {
             double xx = x*x;
             double res = (1.0-std::cos(x))/xx;
-            double resTaylor = 0.5 - x*x/12;
+            double resTaylor = 0.5 - x*x/24; // number obtained below *1/2
             //std::cout << "cosc (" << x << ") = " << std::setprecision(40) << res << std::endl;
             //std::cout << "tayl (" << x << ") = " << std::setprecision(40) << resTaylor << std::endl;
             std::cout << "diff (" << x << ") = " << std::setprecision(20) << res - resTaylor << std::endl;
+        }
+    }
+    // Testing Taylor approximation for (1-cos)/x2.
+    // - First derivative  = 0 (even function)
+    // - Second derivative.  Lets approximate this value from the right
+    // RESULT -> -1/12 (0.08333)
+    if (0)
+    {
+        for ( auto x : X)
+        {
+            double c = std::cos(x), s = std::sin(x), xx = x*x;
+            double res = (c*xx - s*x - 3*s*x + 6 - 6*c)/(xx*xx);
+            std::cout << "Second derivative of (1-cos)/theta^2 approximated by the right= ("
+                      << x << ") = " << std::setprecision(40) << res << std::endl;
         }
     }
 
@@ -88,7 +102,7 @@ int main()
             double xp = M_PI - x;
             double res = xp / std::sin(xp);
             double xx = xp*xp;
-            double resTaylor = 1 + 6*xx;// + xx*xx*120.0;
+            double resTaylor = 1 + 12*xx;// + xx*xx*120.0;
             std::cout << "x/sin (" << x << ") = " << std::setprecision(40) << res << std::endl;
             //std::cout << "tayl (" << x << ") = " << std::setprecision(40) << resTaylor << std::endl;
             //std::cout << "diff (" << x << ") = " << std::setprecision(20) << res - resTaylor << std::endl;
@@ -96,39 +110,54 @@ int main()
     }
 
 
-    // plot acos
+    // plot (x - sin(x))/x^3
     // --------------------------------------------------------------------------
-    // Results: Stable function but if input is not in [-1,1] outputs nan => prepare this case in Ln
-    //    if not, this function is (of course, this is cmath) very stable.
-    if (1)
-    {
-        for ( auto x : X)
-        {
-            double epsPi = -1.0+x;
-            double res = std::acos(epsPi);
-            double resTaylor = M_PI - 1.0/std::sqrt(1.0-epsPi*epsPi) * (x);
-            if (res != res)
-                std::cout << "nana here\n";
-            std::cout << "acos (" << 1.0-x << ") = " << std::setprecision(40) << res << std::endl;
-            //std::cout << "tayl (" << x << ") = " << std::setprecision(40) << resTaylor << std::endl;
-            //std::cout << "diff (" << epsPi << ") = " << std::setprecision(40) << res - resTaylor << std::endl;
-        }
-    }
-
-
-    // plot 0.5 *x / sin
-    // --------------------------------------------------------------------------
-    // Results
+    // Results: checked, converges to 1/6, numerical results inconsistent x < 1e-6
+    // Taylor approximation x < 1e-3 already works well (error < 1e-8)
     if (0)
     {
         for ( auto x : X)
         {
-            double res = 0.5 * x / std::sin(x);
             double xx = x*x;
-            double resTaylor = 0.5 + xx/12;// + xx*xx*120.0;
-            //std::cout << "x/sin (" << x << ") = " << std::setprecision(40) << res << std::endl;
+            double res = (x - std::sin(x))/xx/x;
+            double resTaylor = 1/6.0 - xx/120;
+            //std::cout << "(x-sin)/x^3 (" << x << ") = " << std::setprecision(40) << res << std::endl;
             //std::cout << "tayl (" << x << ") = " << std::setprecision(40) << resTaylor << std::endl;
             std::cout << "diff (" << x << ") = " << std::setprecision(20) << res - resTaylor << std::endl;
         }
     }
+
+    // Result -> -0.0166 (-1/60) for x < e-3 already starts degradating
+    if (0)
+    {
+        for ( auto x : X)
+        {
+            double c = std::cos(x), s = std::sin(x), xx = x*x;
+            double res = (6*x + s*xx + 6*c*x - 12*s )/(xx*xx*x);
+            std::cout << "2nd Derivative of (0-sin)/theta^3 approximated by the right= ("
+                      << x << ") = " << std::setprecision(40) << res << std::endl;
+        }
+    }
+
+    // plot 1/x^2(1 - s/(2(1-c)))
+    // --------------------------------------------------------------------------
+    // Results: checked, converges to 1/12, numerical results inconsistent x < 1e-4. Simplified version (res2) is equally poor
+    // Taylor approximation x < 1e-3 already works well (error < 1e-8)
+    if (0)
+    {
+        for ( auto x : X)
+        {
+            double c = std::cos(x), s = std::sin(x), xx = x*x;
+            double res = (1-0.5*s*x/(1-c))/xx;
+            double res2 = (1 - c - 0.5*s*x)/xx/(1-c);
+            double resTaylor = 1/12.0 + xx/720;
+            //std::cout << "f (" << x << ") = " << std::setprecision(40) << res << std::endl;
+            //std::cout << "f2(" << x << ") = " << std::setprecision(40) << res2 << std::endl;
+            //std::cout << "tayl (" << x << ") = " << std::setprecision(40) << resTaylor << std::endl;
+            std::cout << "diff (" << x << ") = " << std::setprecision(20) << res - resTaylor << std::endl;
+        }
+    }
+
+    // Limit of the derivative. First order 0 (even function)
+    //           second derivative -> 1/360
 }

@@ -16,8 +16,6 @@
 #include <Eigen/LU> // for determinant
 #include <Eigen/Geometry> // for quaternions and rotations
 
-// TODO remove
-#include <iomanip>
 
 using namespace mrob;
 
@@ -103,8 +101,8 @@ void SO3::exp(const Mat3 &w_hat)
     if ( o < 1e-5){
         // sin(o)/o = 1 - x^2/3! + x^4/5! + O(x^6)
         c1 =  1 - o*o/6.0;
-        // (1-cos(o))/o^2 = 0.5 + x^2/12 + ...
-        c2 = 0.5 - o*o/12.0;
+        // (1-cos(o))/o^2 = 0.5 + 1/2*f''*x^2/ + ... , where f'' = 1/12
+        c2 = 0.5 - o*o/24.0;
     }
     else
     {
@@ -136,7 +134,7 @@ Mat3 SO3::ln(double *ro) const
         // We choose this value since Taylor improves over the numerical result of the program (see numericap_test.cpp)
         else if( o < 1e-5)
         {
-            // Taylor expansion around 0 TODO is taylor correct?
+            // Taylor expansion around 0
             d1 = 0.5 + o*o/12;
         }
         // 3) normal case
@@ -158,8 +156,8 @@ Mat3 SO3::ln(double *ro) const
         // on the expansion that allow to solve the problem this way.
         else
         {
+            // The result of acos is good enought
             //std::cout << std::setprecision(20) << M_PI - o << std::endl;
-            //o = M_PI;
         }
         // As we approach pi, the exponent(theta) becomes:
         // R = I + 0 + (1-cos)/o^2)W^2, which evaluated at +pi = 2/pi^2
@@ -173,27 +171,27 @@ Mat3 SO3::ln(double *ro) const
         // so we find the maximum row and apply that formula
         // knowing that norm(w) = pi (theta)
         Mat31 w;
-        double d = -std::cos(o);
+        double d = std::cos(o);
 
 
         if( R_(0,0) > R_(1,1) && R_(0,0) > R_(2,2) )
         {
             // For stability, we average the two elements since it is almost symetric
-            w << R_(0,0) + d,
+            w << R_(0,0) - d,
                  0.5 * ( R_(0,1) + R_(1,0)),
                  0.5 * ( R_(0,2) + R_(2,0));
         }
         else if( R_(1,1) > R_(0,0) && R_(1,1) > R_(2,2) )
         {
             w << 0.5 * ( R_(1,0) + R_(0,1)),
-                 R_(1,1) + d,
+                 R_(1,1) - d,
                  0.5 * ( R_(1,2) + R_(2,1));
         }
         else
         {
             w << 0.5 * ( R_(2,0) + R_(0,2)),
                  0.5 * ( R_(2,1) + R_(1,2)),
-                 R_(2,2) + d;
+                 R_(2,2) - d;
         }
         // normalize the vector w, such that norm(w) = theta
         double length = w.norm();
@@ -207,13 +205,13 @@ Mat3 SO3::ln(double *ro) const
         }
         res = hat3(w);
 
-        // TODO this does not work for very very small theta, which is fine since at pi the axis is undefined
+        // NOTE: this does not work for very very small theta, which is expectedsince at pi the axis is undefined
         // The problem of this approach is that we loose the sign of rotation, so we try to estimate it
         // by comparing R with the 1st order of Exp(w) and Exp(-w).
         if( (Mat3::Identity() + res - R_ ).norm() >  (Mat3::Identity() - res - R_).norm() )
         {
-            //std::cout << "inverse detected\n" << R_ << "\n" << Mat3::Identity() + res -R_ <<  std::endl;
             res *= -1.0;
+            o *=-1.0;
         }
     }
     if (ro != nullptr) *ro = o;
