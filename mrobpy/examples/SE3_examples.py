@@ -24,11 +24,12 @@ def plotT(T, ax):
     ax.plot(x[[0,3],0],x[[0,3],1],x[[0,3],2],'b') # Z axis
     
 
+#TODO show simpler examples
 xi_ini = np.array([0,0,0,0,0,0], dtype='float64')
 #xi_fin = np.array([np.pi/3,1,0,0,0,0], dtype='float64')
 xi_fin = np.random.rand(6)*10
 if np.linalg.norm ( xi_fin[0:3] ) > np.pi:
-    xi_fin[0:3] = xi_fin[0:3] / np.linalg.norm ( xi_fin[0:3] ) * (np.pi - 0.1)
+    xi_fin[0:3] = xi_fin[0:3] / np.linalg.norm ( xi_fin[0:3] ) * (np.pi-1e-5)
 ax = plotConfig()
 N = 20
 xi = np.zeros((N,6))
@@ -52,7 +53,7 @@ for i in range(N):
     plotT(Ti,ax)
     #print(Ti.T())
     
-    Ts = mrob.SE3( mrob.SE3(t[i]*dxi).T() @ T_0.T() )
+    Ts = mrob.SE3(t[i]*dxi).mul(T_0)
     #print(Ts.T())
     plotT(Ts,ax)
     
@@ -75,7 +76,7 @@ if 0:
         
     print(np.max(e), np.min(e))
     
-if 1:
+if 0:
     w = np.random.rand(3)
     R = mrob.SO3(w)
     print('SO3 matrix: \n', R.R() )

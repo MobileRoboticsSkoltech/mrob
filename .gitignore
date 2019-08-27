@@ -16,3 +16,6 @@ lib/
 bin/
 *.so
 *.idea
+*.png
+*.pdf
+*.pkl
