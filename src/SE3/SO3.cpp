@@ -129,6 +129,7 @@ Mat3 SO3::ln(double *ro) const
         if ( std::isnan(o) )
         {
             d1 = 0.0;
+            o = 0.0;
         }
         // 2) incorrect x/sin when approaching 0. The other problematic point o = pi is handled below
         // We choose this value since Taylor improves over the numerical result of the program (see numericap_test.cpp)
@@ -146,9 +147,11 @@ Mat3 SO3::ln(double *ro) const
     }
     else
     {
-        // Special case tr = -1  so theta = +- pi or multiples
+        // Special case tr = -1  so theta = + pi or multiples
         // Again, we handle nan's assuming they express exact +-pi plus a numerical error
-        if ( std::isnan(o) )
+        // The second condition stand for the error in acos. Very close to pi it is better (in error) to assume
+        // a rotation of exactly pi
+        if ( std::isnan(o) || M_PI - o < 6e-8 )
         {
             o = M_PI;// exact case for theta
         }
@@ -156,7 +159,7 @@ Mat3 SO3::ln(double *ro) const
         // on the expansion that allow to solve the problem this way.
         else
         {
-            // The result of acos is good enought
+            // The result of acos is good enough
             //std::cout << std::setprecision(20) << M_PI - o << std::endl;
         }
         // As we approach pi, the exponent(theta) becomes:
@@ -172,7 +175,6 @@ Mat3 SO3::ln(double *ro) const
         // knowing that norm(w) = pi (theta)
         Mat31 w;
         double d = std::cos(o);
-
 
         if( R_(0,0) > R_(1,1) && R_(0,0) > R_(2,2) )
         {

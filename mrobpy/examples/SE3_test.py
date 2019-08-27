@@ -3,7 +3,6 @@
 import mrob
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 import pickle
 
@@ -19,8 +18,7 @@ if 1:
     N, M = 200, 100
     error = np.zeros((N,M))
     rmse = np.zeros(N)
-    eps = 1e-5 #to avoid the explicit case 0,pi which gives an exact solution, but closer is more problematic
-    X = np.linspace(0+eps,np.pi-eps,N);
+    X = np.linspace(0,np.pi,N);
     # sweep de theta = [0, pi]
     for n in range(N):
         x = X[n]
@@ -61,7 +59,7 @@ if 1:
 # ======================================================
 # 1) round pi,0 trajectory
 if 1:
-    N, M = 120, 100
+    N, M = 120, 50
     
     eps = np.zeros(N)
     eps[0] = 1e0
@@ -78,12 +76,12 @@ if 1:
             error.append( e.dot(e) )
         rmse[n] = np.sqrt( sum(error)/M )
         print('Iteration n = ', n , ', eps = ', eps[n], ', current error = ', rmse[n])
-    plt.plot(np.log10(rmse))
+    plt.plot(np.log10(eps),np.log10(rmse))
     plt.title('RMSE of SO(3) transformation $\epsilon$ to 0')
     #plt.savefig('error_SO3.pdf', bbox_inches='tight')
     # saving data for comparison
     output = open('SO3_zero.pkl', 'wb')
-    pickle.dump((rmse, X), output)
+    pickle.dump((rmse, eps), output)
     output.close()
     plt.show()
 
@@ -91,7 +89,7 @@ if 1:
 # ======================================================
 # 1) round pi trajectory
 if 1:
-    N, M = 120, 100
+    N, M = 180, 50
     
     eps = np.zeros(N)
     eps[0] = 1e0
@@ -103,20 +101,19 @@ if 1:
         error = []
         for i in range(M):
             xi = np.random.randn(3) 
-            xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (eps[n]) #around 0
-            #xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (np.pi - eps[n]) #around pi
+            xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (np.pi - eps[n]) #around pi
             e = mrob.SO3(xi).ln() - xi
-            #if e.dot(e) > np.pi :
-            #    e = mrob.SO3(xi).ln() + xi
+            if e.dot(e) > np.pi :
+                e = mrob.SO3(xi).ln() + xi
             error.append( e.dot(e) )
         #eps[] *= 0.5
         rmse[n] = np.sqrt( sum(error)/M )
         print('Iteration n = ', n , ', eps = ', eps[n], ', current error = ', rmse[n])
-    plt.plot(np.log10(rmse))
+    plt.plot(np.log10(eps), np.log10(rmse))
     plt.title('RMSE of SO(3) transformation $\epsilon$ to $\pi$')
     # saving data for comparison
     output = open('SO3_pi.pkl', 'wb')
-    pickle.dump((rmse, X), output)
+    pickle.dump((rmse, eps), output)
     output.close()
     plt.show()
 
@@ -130,8 +127,7 @@ if 1:
     N, M = 200, 100
     error = np.zeros((N,M))
     rmse = np.zeros(N)
-    eps = 1e-4 #1e-3 #to avoid the explicit case 0,pi, but closer is more problematic
-    X = np.linspace(0+eps,np.pi-eps,N);
+    X = np.linspace(0,np.pi,N);
     # sweep de theta = [0, pi]
     for n in range(N):
         x = X[n]
@@ -184,20 +180,19 @@ if 1:
         #eps[] *= 0.5
         rmse[n] = np.sqrt( sum(error)/M )
         print('Iteration n = ', n , ', eps = ', eps[n], ', current error = ', rmse[n])
-    plt.plot(np.log10(rmse))
-    plt.title('RMSE of SE(3) transfomration $\epsilon$ close to 0')
-    #plt.savefig('error_hard.pdf', bbox_inches='tight')
+    plt.plot(np.log10(eps),np.log10(rmse))
+    plt.title('RMSE of SE(3) transformation $\epsilon$ close to 0')
     plt.show()
     # saving data for comparison
     output = open('SE3_zero.pkl', 'wb')
-    pickle.dump((rmse, X), output)
+    pickle.dump((rmse, eps), output)
     output.close()
 
 
 # Qualitative test for some issues found while creating SE3 in mrob
 # 3) round pi trajectory
 if 1:
-    N, M = 120, 100
+    N, M = 180, 100
     
     eps = np.zeros(N)
     eps[0] = 1e0
@@ -208,7 +203,7 @@ if 1:
     for n in range(N):
         error = []
         for i in range(M):
-            xi = np.random.rand(6) * 10 # 30000 similar value to kais dataset tranlations.
+            xi = np.random.rand(6) * 100 # 30000 similar value to kais dataset tranlations.
             xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (np.pi - eps[n]) #around pi
             e = mrob.SE3(xi).ln() - xi
             # To be sure that close to pi we are in our convention, we will provide positive angles by
@@ -222,13 +217,13 @@ if 1:
             error.append( e2 )
         rmse[n] = np.sqrt( sum(error)/M )
         print('Iteration n = ', n , ', eps = ', eps[n], ', current error = ', rmse[n])
-    plt.plot(np.log10(rmse))
-    plt.title('RMSE of SE(3) transfomration $\epsilon$ close to $\pi$')
+    plt.plot(np.log10(eps),np.log10(rmse))
+    plt.title('RMSE of SE(3) transformation $\epsilon$ close to $\pi$')
     #plt.savefig('error_hard.pdf', bbox_inches='tight')
     plt.show()
     # saving data for comparison
     output = open('SE3_pi.pkl', 'wb')
-    pickle.dump((rmse, X), output)
+    pickle.dump((rmse, eps), output)
     output.close()
 
 # 2) Life of objects, some data gets corrupted when chaining functions/operators.
