@@ -21,7 +21,7 @@
 int main()
 {
     // Test the numerical stability of the sinc(x) function and it's power series.
-    uint_t N = 50;
+    uint_t N = 180;
     std::vector<double> X(N);
     X[0] = 1; // initial seed
 
@@ -95,7 +95,7 @@ int main()
     //   * around pi :
     //   * arnd  -pi :
 
-     if (0)
+    if (0)
     {
         for ( auto x : X)
         {
@@ -108,6 +108,25 @@ int main()
             //std::cout << "diff (" << x << ") = " << std::setprecision(20) << res - resTaylor << std::endl;
         }
     }
+
+
+    // plot acos around -1
+    // --------------------------------------------------------------------------
+    // Results:
+    // * around 1 ->converges to 0, x < 10-17 is zero and min value = 1.4e-8
+    // * around -1, same as above
+
+     if (1)
+     {
+         for ( auto x : X)
+         {
+             double xp = -1.0 + x;
+             double res = std::acos(xp);
+             //double xx = xp*xp;
+             std::cout << "acos (" << x << ") = " << std::setprecision(40) << res << std::endl;
+             //std::cout << "acos (" << x << ") = " << std::setprecision(40) << M_PI - res << std::endl;
+         }
+     }
 
 
     // plot (x - sin(x))/x^3
