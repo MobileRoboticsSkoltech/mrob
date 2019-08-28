@@ -115,7 +115,8 @@ int main()
     // Results:
     // * around 1 ->converges to 0, x < 10-17 is zero and min value = 1.4e-8
     // * around -1, same as above
-
+    // The "rough" Taylor expansion doesn't work well. There is still some error (substract over PI?)
+    // that persist so it is not a good idea. In this case it is better to clip the o value to o = pi
      if (1)
      {
          for ( auto x : X)
@@ -123,8 +124,11 @@ int main()
              double xp = -1.0 + x;
              double res = std::acos(xp);
              //double xx = xp*xp;
-             std::cout << "acos (" << x << ") = " << std::setprecision(40) << res << std::endl;
-             //std::cout << "acos (" << x << ") = " << std::setprecision(40) << M_PI - res << std::endl;
+             double resTaylor = std::fma(-5e7,x,M_PI);
+             //std::cout << "acos (" << x << ") = " << std::setprecision(40) << res << std::endl;
+             std::cout << "acos (" << x << ") = " << std::setprecision(40) << M_PI - res << std::endl;
+             std::cout << "tayl (" << x << ") = " << std::setprecision(40) << M_PI - resTaylor << std::endl;
+             //std::cout << "diff (" << x << ") = " << std::setprecision(20) << res - resTaylor << std::endl;
          }
      }
 
