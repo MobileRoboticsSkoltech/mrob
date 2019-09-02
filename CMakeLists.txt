@@ -47,7 +47,7 @@ ADD_SUBDIRECTORY(./pybind11)
 
 # MROB modules. Remove those that are not necessary, by default all are active
 INCLUDE_DIRECTORIES(./src/common)
-#ADD_SUBDIRECTORY(./src/common) #only headers here
+ADD_SUBDIRECTORY(./src/common)
 
 INCLUDE_DIRECTORIES(./src/SE3)
 ADD_SUBDIRECTORY(./src/SE3)

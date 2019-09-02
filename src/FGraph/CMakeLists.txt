@@ -35,7 +35,7 @@ SET(factors_sources
 
 # create the shared library
 ADD_LIBRARY(FGraph SHARED  ${sources} ${factors_sources})
-TARGET_LINK_LIBRARIES(FGraph SE3)
+TARGET_LINK_LIBRARIES(FGraph SE3 common)
 
 
 #install 
