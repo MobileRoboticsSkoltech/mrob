@@ -62,6 +62,16 @@ void Factor2Poses3d::evaluate_residuals()
     Mat4 TxTarget = get_neighbour_nodes()->at(1)->get_stateT();
     Tr_ = SE3(TxOrigin) * Tobs_ * SE3(TxTarget).inv();
     r_ = Tr_.ln_vee();
+    // TODO for debugging in KAIST DS
+    if (r_.norm() > 1.0)
+    {
+        this->evaluate_jacobians();
+        this->evaluate_chi2();
+        this->print();
+        Tr_.print();
+        std::cout << "T origin " << get_neighbour_nodes()->at(0)->get_id() << " = \n" << TxOrigin <<
+                     "\n and Targe " << get_neighbour_nodes()->at(1)->get_id() << " = \n" << TxTarget << std::endl;
+    }
 
 }
 void Factor2Poses3d::evaluate_jacobians()

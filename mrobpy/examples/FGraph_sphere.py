@@ -47,8 +47,8 @@ N = 2500
 
 # load file, .g2o format from https://github.com/RainerKuemmerle/g2o/wiki/File-Format
 #file_path = '../../datasets/sphere_bignoise_vertex3.g2o'
-#file_path = '../../datasets/sphere_gt.g2o'
-file_path = '../../datasets/sphere.g2o'
+file_path = '../../datasets/sphere_gt.g2o'
+#file_path = '../../datasets/sphere.g2o'
 with open(file_path, 'r') as file:
     for line in file:
         d = line.split()
@@ -164,7 +164,8 @@ if 1:
     print('Current state of the graph: chi2 = ' , graph.chi2() )
     print_3d_graph(graph)
     start = time.time()
-    graph.solve(mrob.LM,500)
+    #graph.solve(mrob.LM,500)
+    graph.solve(mrob.GN)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     print_3d_graph(graph)

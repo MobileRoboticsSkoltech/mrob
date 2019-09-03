@@ -132,7 +132,7 @@ Mat4 SE3::ln(void) const
 {
     SO3 rotation(this->R());
     // Logarithmic mapping of the rotations
-    double o;
+    double o; // This is absolute value of angle
     Mat3 w_hat = rotation.ln(&o);
 
     // calculate v = V^1 t

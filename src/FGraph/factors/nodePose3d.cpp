@@ -32,22 +32,6 @@ void NodePose3d::update(const Eigen::Ref<const MatX1> &dx)
 {
     Mat61 dxf = dx;
 
-    // XXX debuging, when upodates are too large, clip them to PI/4
-    double dw = dxf.head(3).norm();
-    if (dw > M_PI/4 && 0)
-    {
-        std::cout << "incorrect update at node "<< this->id_ << "update = " << dxf <<  std::endl;
-        //dxf *= M_PI/4.0/dw;
-
-
-        this->print();
-        auto list = this->get_neighbour_factors();
-        for ( auto f : *list )
-        {
-            f->print(); //->print();
-        }
-
-    }
     // Tx and x are always sync, i.e., Tx = exp(x^)
     stateT_.update_lhs(dxf);
     state_ = stateT_.ln_vee();//this will cast to
