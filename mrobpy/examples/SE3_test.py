@@ -13,7 +13,7 @@ plt.rcParams['ps.fonttype'] = 42
 
 
 # Overall error for differente segments of theta (angle)
-if 1:
+if 0:
     print('Overall evaluation of SO(3) ranging from theta [0,pi]')
     N, M = 200, 100
     error = np.zeros((N,M))
@@ -58,7 +58,7 @@ if 1:
 # Exp/ln chain SO(3)
 # ======================================================
 # 1) round pi,0 trajectory
-if 1:
+if 0:
     N, M = 120, 50
     
     eps = np.zeros(N)
@@ -88,7 +88,7 @@ if 1:
 # Exp/ln chain SO(3)
 # ======================================================
 # 1) round pi trajectory
-if 1:
+if 0:
     N, M = 180, 50
     
     eps = np.zeros(N)
@@ -133,7 +133,7 @@ if 1:
         x = X[n]
         rmse_n = []
         for i in range(M):
-            xi = np.random.rand(6) * 10000 # 30000 similar value to kais dataset tranlations.
+            xi = np.random.randn(6) * 10000 # 30000 similar value to kais dataset tranlations.
             xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * x
             e = mrob.SE3(xi).ln() - xi
             e2 = e.dot(e)
@@ -172,7 +172,7 @@ if 1:
     for n in range(N):
         error = []
         for i in range(M):
-            xi = np.random.rand(6) * 10 # 30000 similar value to kais dataset tranlations.
+            xi = np.random.randn(6) * 10 # 30000 similar value to kais dataset tranlations.
             xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (eps[n]) #around 0
             e = mrob.SE3(xi).ln() - xi
             e2 = e.dot(e)
@@ -203,7 +203,7 @@ if 1:
     for n in range(N):
         error = []
         for i in range(M):
-            xi = np.random.rand(6) * 100 # 30000 similar value to kais dataset tranlations.
+            xi = np.random.rand(6) * 10000 # 30000 similar value to kais dataset tranlations.
             xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (np.pi - eps[n]) #around pi
             e = mrob.SE3(xi).ln() - xi
             # To be sure that close to pi we are in our convention, we will provide positive angles by
@@ -211,7 +211,6 @@ if 1:
             # this error is due to a flip on sign, which does not affect the transformation, only the manifolf parameters
             # we correct this by 
             if e2 > np.pi:
-                print('flip sign')
                 e = mrob.SE3(xi).mul(mrob.SE3(-xi)).ln()
                 e2 = e.dot(e)
             error.append( e2 )

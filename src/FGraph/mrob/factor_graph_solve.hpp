@@ -14,7 +14,7 @@
 
 
 #include "mrob/factor_graph.hpp"
-
+#include "mrob/time_profiling.hpp"
 
 namespace mrob {
 
@@ -171,14 +171,13 @@ protected:
     // Correction deltas
     MatX1 dx_;
 
-    std::vector<std::pair<std::string, double>> time_profiles_;//used for time profiling functions
-
     // Particular parameters for Levenberg-Marquard
     matData_t lambda_; // current value of lambda
     matData_t solutionTolerance_;
     MatX1 diagL_; //diagonal matrix (vector) of L to update it efficiently
 
-
+    // time profiling
+    TimeProfiling time_profiles_;
 };
 
 

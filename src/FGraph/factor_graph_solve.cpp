@@ -19,9 +19,6 @@
 #include <Eigen/SparseCholesky>
 #include <Eigen/SparseQR>
 
-#include <chrono>
-typedef std::chrono::microseconds Ttim;
-
 using namespace mrob;
 using namespace std;
 using namespace Eigen;
@@ -49,7 +46,7 @@ void FGraphSolve::solve(optimMethod method, uint_t maxIters)
      *
      */
     optimMethod_ = method; // updates the optimization method
-    time_profiles_.clear();
+    time_profiles_.reset();
 
     // Optimization
     switch(optimMethod_)
@@ -69,38 +66,25 @@ void FGraphSolve::solve(optimMethod method, uint_t maxIters)
 
 
     if (0)
-    {
-        double sum = 0;
-        for (auto t : time_profiles_)
-            sum += t.second;
-
-        std::cout << "\nTime profile for " << sum/1e3 << " [ms]: ";
-        for (auto t : time_profiles_)
-            std::cout << t.first << " = " << t.second/sum *100 << "%, ";
-        std::cout << "\n";
-    }
+        time_profiles_.print();
 }
 
 void FGraphSolve::build_problem(bool useLambda)
 {
-    auto t1 = std::chrono::steady_clock::now();
 
     // 1) Adjacency matrix A, it has to
     //    linearize and calculate the Jacobians and required matrices
+    time_profiles_.start();
     this->build_adjacency();
-    auto t2 = std::chrono::steady_clock::now();
-    auto dif = std::chrono::duration_cast<Ttim>(t2 - t1);
-    time_profiles_.push_back( std::make_pair("Adjacency",  dif.count()) );
+    time_profiles_.stop("Adjacency");
 
     // 1.2) builds specifically the information
     switch(matrixMethod_)
     {
       case ADJ:
-        t1 = std::chrono::steady_clock::now();
+        time_profiles_.start();
         this->build_info_adjacency();
-        t2 = std::chrono::steady_clock::now();
-        dif = std::chrono::duration_cast<Ttim>(t2 - t1);
-        time_profiles_.push_back( std::make_pair("Info Adjacency",  dif.count()) );
+        time_profiles_.stop("Info Adjacency");
         break;
       case SCHUR:
       default:
@@ -121,7 +105,7 @@ void FGraphSolve::optimize_gauss_newton(bool useLambda)
     this->build_problem(useLambda);
 
     // compute cholesky solution
-    auto t1 = std::chrono::steady_clock::now();
+    time_profiles_.start();
     if (useLambda)
     {
         for (uint_t n = 0 ; n < N_; ++n)
@@ -129,15 +113,10 @@ void FGraphSolve::optimize_gauss_newton(bool useLambda)
             //L_.coeffRef(n,n) = (1.0 + lambda_)*diagL_(n);//Elipsoid, for circunference =>  diagL_(n) + lambda. WORSE In practice
     }
     cholesky.compute(L_);
-    auto t2 = std::chrono::steady_clock::now();
-    auto dif = std::chrono::duration_cast<Ttim>(t2 - t1);
-    time_profiles_.push_back( std::make_pair("Gauss Newton create Cholesky",  dif.count()) );
-    t1 = std::chrono::steady_clock::now();
+    time_profiles_.stop("Gauss Newton create Cholesky");
+    time_profiles_.start();
     dx_ = cholesky.solve(b_);
-    t2 = std::chrono::steady_clock::now();
-    dif = std::chrono::duration_cast<Ttim>(t2 - t1);
-    time_profiles_.push_back( std::make_pair("Gauss Newton solve Cholesky",  dif.count()) );
-
+    time_profiles_.stop("Gauss Newton solve Cholesky");
 
 }
 

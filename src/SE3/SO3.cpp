@@ -213,7 +213,7 @@ Mat3 SO3::ln(double *ro) const
         if( (Mat3::Identity() + res - R_ ).norm() >  (Mat3::Identity() - res - R_).norm() )
         {
             res *= -1.0;
-            o *=-1.0;
+            // Note that o is the absolute value of the angle of rotation (don't flip)
         }
     }
     if (ro != nullptr) *ro = o;

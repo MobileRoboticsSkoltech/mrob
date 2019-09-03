@@ -7,11 +7,16 @@
  *      Author: Gonzalo Ferrer
  */
 
-#ifndef SRC_TIME_PROFILING_HPP_
-#define SRC_TIME_PROFILING_HPP_
+#ifndef TIME_PROFILING_HPP_
+#define TIME_PROFILING_HPP_
+
+#include <chrono>
+#include <vector>
+#include <string>
 
 
 namespace mrob {
+typedef std::chrono::microseconds Ttim;
 
 
 /**
@@ -22,10 +27,39 @@ namespace mrob {
 
 class TimeProfiling
 {
+public:
+    /**
+     * Constructor, no parameters reqauired
+     */
+    TimeProfiling();
+    /**
+     * Destructor, nothing to free
+     */
+    ~TimeProfiling();
+    /**
+     * Reset method
+     */
+    void reset();
+    /**
+     * start
+     * TODO add here the key?
+     */
+    void start();
+    /**
+     * stop() records given the string the time spent since last start() call
+     */
+    void stop(const std::string &key);
+    /**
+     * print: displays the information gathered so far
+     */
+    void print();
 
+protected:
+    std::chrono::steady_clock::time_point t1_;
+    std::vector<std::pair<std::string, double>> time_profiles_;
 };
 
 }
 
 
-#endif /* SRC_COMMON_MROB_TIME_PROFILING_HPP_ */
+#endif /* TIME_PROFILING_HPP_ */
