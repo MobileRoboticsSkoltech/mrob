@@ -119,8 +119,9 @@ public:
      */
     SE3 inv(void) const;
     /**
-     * Adjoint: Adj_xi = [R , t^R]
-     *                   [0    R]
+     * Adjoint: T Exp(x) = Exp ( Adj_T x) T
+     *          Adj_T = [R ,   0]
+     *                  [t^R,  R]
      */
     Mat6 adj() const;
     /**

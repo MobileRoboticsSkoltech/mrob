@@ -47,6 +47,7 @@ class NodePose3d : public Node
     void print() const;
 
   protected:
+    // TODO remove vector states and work only with SE3. ALso change base class
     Mat61 state_;
     SE3 stateT_;//redundant state representation of principal, now directly in SE(3)
     Mat61 auxiliaryState_; //an auxiliary vector to TODO think on this representation

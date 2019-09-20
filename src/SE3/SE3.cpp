@@ -205,7 +205,7 @@ Mat6 SE3::adj() const
     Mat3 tx = hat3( this->t() );
     res.topLeftCorner<3,3>() << R();
     res.bottomRightCorner<3,3>() << R();
-    res.topRightCorner<3,3>() << tx*R();
+    res.bottomLeftCorner<3,3>() << tx*R();
     return res;
 }
 

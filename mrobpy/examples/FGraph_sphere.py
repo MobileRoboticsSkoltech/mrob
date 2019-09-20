@@ -47,8 +47,8 @@ N = 2500
 
 # load file, .g2o format from https://github.com/RainerKuemmerle/g2o/wiki/File-Format
 #file_path = '../../datasets/sphere_bignoise_vertex3.g2o'
-file_path = '../../datasets/sphere_gt.g2o'
-#file_path = '../../datasets/sphere.g2o'
+#file_path = '../../datasets/sphere_gt.g2o'
+file_path = '../../datasets/sphere.g2o'
 with open(file_path, 'r') as file:
     for line in file:
         d = line.split()
@@ -115,7 +115,6 @@ x = vertex_ini[0]
 print(x)
 n = graph.add_node_pose_3d(x)
 W = np.eye(6)
-W[3:, 3:] = np.eye(3) * 100
 graph.add_factor_1pose_3d(x,n,1e5*W)
 processing_time = []
 
@@ -134,7 +133,7 @@ for t in range(1,N):
         obs = factors[nodeOrigin, t]
         #covInv = factor_inf[nodeOrigin, t]
         covInv = np.eye(6)
-        covInv[3:,3:] = np.eye(3)*100
+        #covInv[3:,3:] = np.eye(3)*100
         graph.add_factor_2poses_3d(obs, nodeOrigin,t,covInv)
         # for end. no more loop inside the factors
         
@@ -143,7 +142,7 @@ for t in range(1,N):
     start = time.time()
     #graph.solve(mrob.LM, 70)
     end = time.time()
-    print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    #print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))
 
 
@@ -164,8 +163,8 @@ if 1:
     print('Current state of the graph: chi2 = ' , graph.chi2() )
     print_3d_graph(graph)
     start = time.time()
-    #graph.solve(mrob.LM,500)
-    graph.solve(mrob.GN)
+    graph.solve(mrob.LM,100)
+    #graph.solve(mrob.GN)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     print_3d_graph(graph)

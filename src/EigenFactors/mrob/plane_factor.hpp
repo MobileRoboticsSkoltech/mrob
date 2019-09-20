@@ -26,8 +26,8 @@ namespace mrob{
  * It is not required an explicit parametrization of the plane, so the resultant topology
  * is N nodes connecting to the plane factor.
  *
- * In order to build the problem it would follow the interface especifications by FGraph
- * but we need extra methods and variables to keep track of the
+ * In order to build the problem we would follow the interface specifications by FGraph
+ * but we need extra methods and variables to keep track of the neighbours
  */
 class PlaneFactor : public Factor{
 public:
@@ -60,13 +60,16 @@ public:
     const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
 
 
-    // NEW functions added to the base class factor.hhp
+    // NEW functions added to the base class factor.hpp
+    Mat41 get_plane(void) {return planeEstimation_;};
 
 
 protected:
     MatX1 J_;//Jacobian
-    MatX H_; // Hessian matrix
+    MatX H_; // Hessian matrix, dense sinve it connects all poses from where plane was observed
     std::vector<Mat4> S_;  // According to our notation S = sum p*p'
+
+    Mat41 planeEstimation_;
 };
 
 }
