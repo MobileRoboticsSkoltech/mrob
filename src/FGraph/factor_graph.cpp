@@ -34,7 +34,7 @@ FGraph::~FGraph()
 
 bool FGraph::add_factor(std::shared_ptr<Factor> &factor)
 {
-	factor->set_id(factors_.size());//XXX Test this works well again
+	factor->set_id(factors_.size());
 	factors_.push_back(factor);
     auto list = factor->get_neighbour_nodes();
     for( auto n: *list)
@@ -47,7 +47,7 @@ bool FGraph::add_factor(std::shared_ptr<Factor> &factor)
 
 bool FGraph::add_node(std::shared_ptr<Node> &node)
 {
-	node->set_id(nodes_.size());//XXX test this again
+	node->set_id(nodes_.size());
 	nodes_.push_back(node);
 	stateDim_ += node->get_dim();
 	return true;

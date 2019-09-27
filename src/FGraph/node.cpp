@@ -45,6 +45,7 @@ bool Node::rm_factor(std::shared_ptr<Factor> &factor)
     return true;
 }
 
+// support function for 2D poses
 double mrob::wrap_angle(double angle)
 {
     double pi2 = 2 * M_PI;

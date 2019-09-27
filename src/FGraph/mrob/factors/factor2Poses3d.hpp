@@ -86,7 +86,7 @@ class Factor2Poses3d : public Factor
     Mat6 WT2_;//transpose and squared root of W.
     Mat<6,12> J_;//Joint Jacobian
 
-    // TODO remove vector states and work only with SE3. ALso change base class
+    // TODO remove vector states and work only with SE3. ALso change base class to return Ref<Matx>
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen

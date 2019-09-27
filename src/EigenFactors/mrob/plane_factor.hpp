@@ -14,6 +14,7 @@
 
 
 #include "mrob/factor.hpp"
+#include <map> // used for storing matrices S, paired by node Ids (or might be pointers)
 
 
 namespace mrob{
@@ -22,7 +23,7 @@ namespace mrob{
  * Plane factor is a vertex that complies with the Fgraph standards
  * and inherits from base factor.hpp
  *
- * The PLane factor connects different poses that have observed the same geometric entity.
+ * The Plane factor connects different poses that have observed the same geometric entity.
  * It is not required an explicit parametrization of the plane, so the resultant topology
  * is N nodes connecting to the plane factor.
  *
@@ -34,7 +35,7 @@ public:
     /**
      * Creates a plane. The minimum requirements are 1 pose.
      */
-    PlaneFactor(const Mat4 &observation, std::shared_ptr<Node> &nodeOrigin);
+    PlaneFactor(const Mat4 &S, std::shared_ptr<Node> &nodeOrigin);
     ~PlaneFactor();
     /**
      * Jacobians are not evaluated, just the residuals
@@ -61,13 +62,20 @@ public:
 
 
     // NEW functions added to the base class factor.hpp
+    /**
+     * get plane returns the current planeEstimation
+     */
     Mat41 get_plane(void) {return planeEstimation_;};
+    /**
+     * Add observation adds the S matrix and the time
+     */
+    void add_observation(const Mat4& S, std::shared_ptr<Node> &newNode);
 
 
 protected:
     MatX1 J_;//Jacobian
-    MatX H_; // Hessian matrix, dense sinve it connects all poses from where plane was observed
-    std::vector<Mat4> S_;  // According to our notation S = sum p*p'
+    MatX H_; // Hessian matrix, dense since it connects all poses from where plane was observed
+    std::map<uint_t, Mat4> S_;  // According to our notation S = sum p*p'
 
     Mat41 planeEstimation_;
 };

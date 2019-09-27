@@ -86,7 +86,7 @@ public:
      */
     std::shared_ptr<Factor>& get_factor(uint_t key);
     /**
-     * Returns the chi2 corresponding to a particular factor. Use this only if the valua has been updated recently
+     * Returns the chi2 corresponding to a particular factor. Use this only if the value has been updated recently
      * Mainly the purpose of this function is for testing
      */
     matData_t get_factor_chi2(uint_t key);
@@ -112,7 +112,7 @@ protected:
 	 *  We are also interested on having indices on nodes and factors.
 	 *  Set iterates ok O(1) and can remove elements nicely O(1).
 	 *
-	 *  For now we will use vectors, but we will mantain abstraction in case we need to change
+	 *  For now we will use vectors, but we will maintain abstraction in case we need to change
      *
      */
     //std::unordered_set<std::shared_ptr<Node> >   nodes_;
