@@ -81,6 +81,7 @@ double Plane::estimate_plane()
 
     // sum( v * p_i )
     Eigen::JacobiSVD<Mat4> svd(accumulatedQ_, Eigen::ComputeFullU );
+    // XXX actually SelfAdjointEigenSolver is faster (https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html)
     planeEstimation_ = svd.matrixU().col(3);
     //std::cout << svd.matrixU() << "\n and solution \n" << planeEstimation_ <<  std::endl;
     //std::cout << "plane estimation error: " << svd.singularValues() <<  std::endl;

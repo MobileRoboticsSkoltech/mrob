@@ -29,6 +29,9 @@ namespace mrob{
  *
  * In order to build the problem we would follow the interface specifications by FGraph
  * but we need extra methods and variables to keep track of the neighbours
+ *
+ * This class assumes that matrices S = sum p*p' are calculated before since they are directly inputs
+ * XXX should we store all points?
  */
 class PlaneFactor : public Factor{
 public:
@@ -70,6 +73,44 @@ public:
      * Add observation adds the S matrix and the time
      */
     void add_observation(const Mat4& S, std::shared_ptr<Node> &newNode);
+    /**
+     * Estimates the plane parameters: v = [n', d]'_{4x1}, where v is unit, (due to the Eigen solution)
+     * although for standard plane estimation we could enforce unit on the normal vector n.
+     */
+    double estimate_plane();
+    /**
+     * Estimates Incremetally the plane parameters: v = [n', d]'_{4x1}, where v is unitary, (due to the SVD solution)
+     * although for standard plane estimation we could enforce unitary on the normal vector n.
+     *
+     * The difference with the previous estimate_plane() is that we update the matrix Q for the give time
+     * stamp and recalculate the solution, on constant time O(1)
+     */
+    double estimate_plane_incrementally(uint_t t);
+    /**
+     * get error: returns the error as the min eigenvalue
+     */
+    double get_error() const {return planeError_;};
+    /**
+     * get error incremental: returns the error as the min eigenvalue only updating the
+     * value of Q_t, at time step t. Nothing inside gets updated
+     */
+    double get_error_incremental(uint_t t) const;
+    /**
+     *  calculates the matrix Qi = 1^T_i * Si * (1^T_i)^transp
+     *  for all planes. Since this is an iterative process on T's,
+     *  we separate the calculation of the S matrix,
+     *  and the Q matrix which rotates S
+     */
+    void calculate_all_matrices_Q();
+    /**
+     * get mean point calculates the mean of the pointcloud observed at time t,
+     * given that S = sum p * p' =  sum ([x2 xy xz x
+     *                                    yx y2 yz y
+     *                                    zx zy z2 z
+     *                                    x   y  z 1]
+     * ser we just calcualte S and return
+     */
+    //Mat31 get_mean_point(uint_t t); // XXX is this necessary?
 
 
 protected:
@@ -78,6 +119,9 @@ protected:
     std::map<uint_t, Mat4> S_;  // According to our notation S = sum p*p'
 
     Mat41 planeEstimation_;
+    double planeError_;
+    std::vector<Mat4> matrixQ_;
+    Mat4 accumulatedQ_;//Q matrix of accumulated values for the incremental update of the error.
 };
 
 }

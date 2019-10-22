@@ -24,11 +24,22 @@
 
 namespace mrob {
 
-class EfFGraphSolve: public FGraphSolve
+class EFSolve: public FGraphSolve
 {
 public:
-    EfFGraphSolve();
-    ~EfFGraphSolve;
+    EFSolve();
+    ~EFSolve();
+
+    /**
+     * Solve the alignment problem for a stream of observations
+     * from pose x_origin = I to x_f
+     * w.r.t the final pose
+     */
+    void solve_1_pose();
+    /**
+     * Solve the full problem involving multiple poses
+     */
+    void solve_planes();
 };
 
 }//end namespace
