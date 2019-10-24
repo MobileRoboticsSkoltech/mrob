@@ -14,7 +14,7 @@
 
 
 #include "mrob/factor.hpp"
-#include <map> // used for storing matrices S, paired by node Ids (or might be pointers)
+#include <unordered_map> // used for storing matrices S, paired by node Ids (or might be pointers)
 
 
 namespace mrob{
@@ -73,6 +73,7 @@ public:
      * Add observation adds the S matrix and the time
      */
     void add_observation(const Mat4& S, std::shared_ptr<Node> &newNode);
+    //void add_observation(const Mat4& S, time ts, SE3 initialPose); // TODO variables for these non-optimized nodes
     /**
      * Estimates the plane parameters: v = [n', d]'_{4x1}, where v is unit, (due to the Eigen solution)
      * although for standard plane estimation we could enforce unit on the normal vector n.
@@ -111,17 +112,53 @@ public:
      * ser we just calcualte S and return
      */
     //Mat31 get_mean_point(uint_t t); // XXX is this necessary?
+    /**
+     * calculate Jacobian at node nodeId, returns the Jacobian over the Eigendecomposition of Q  = V D V'
+     * as d lamda = v' * dQ * v
+     */
+    Mat61 calculate_jacobian(uint_t nodeId);
+    /**
+     * Calculate Hessian at time
+     */
 
 
 protected:
-    MatX1 J_;//Jacobian
-    MatX H_; // Hessian matrix, dense since it connects all poses from where plane was observed
-    std::map<uint_t, Mat4> S_;  // According to our notation S = sum p*p'
+    /**
+     * On the base class it is declared vector<std::shared_ptr<Node> > neighbourNodes_;
+     * This is a sorted list, so the add_node function makes sure to keep the order.
+     *
+     * For planes nodes we need to keep a sorted list of nodes. While
+     * other factors connect to 1 node, 2 usually, plane factor is not bounded,
+     * so we will store a sorted container for nodes that have observed the same
+     * plane. Nodes on this list will not be optimized, but they should be related to its 2 closes nodes.
+     *
+     * For optimizaing we will use the neighbourNodes_ from the base class, and here we must preserve
+     * the order.
+     */
+    std::vector<std::shared_ptr<Node> > planeNodes_;
+    /**
+     * The Jacobian of the plane error, the poses involved are in XXX order
+     */
+    MatX1 J_;
+    /**
+     * Hessian matrix, dense since it connects all poses from where plane was observed TODO order?
+     */
+    MatX H_;
+    /**
+     * According to our notation S = sum p*p'
+     * We choose unordered map here since this is a subset of neighbours (small) and we will iterate over them
+     * Iterations may be not in strict order, but we don't care much for now (will we?)
+     *
+     * Q = T *S *T'
+     */
+    std::unordered_map<uint_t, Mat4> S_, Q_;
+    Mat4 accumulatedQ_;//Q matrix of accumulated values for the incremental update of the error.
 
     Mat41 planeEstimation_;
     double planeError_;
-    std::vector<Mat4> matrixQ_;
-    Mat4 accumulatedQ_;//Q matrix of accumulated values for the incremental update of the error.
+
+public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen
 };
 
 }

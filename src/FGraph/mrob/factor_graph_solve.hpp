@@ -50,7 +50,7 @@ public:
      */
     enum optimMethod{GN=0, LM};
 
-    FGraphSolve(matrixMethod method = ADJ, optimMethod = GN, uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
+    FGraphSolve(matrixMethod method = ADJ, optimMethod optim = GN);
     virtual ~FGraphSolve();
 
     /**

@@ -16,12 +16,9 @@
 using namespace mrob;
 
 
-FGraph::FGraph(uint_t potNumberNodes, uint_t potNumberFactors) :
+FGraph::FGraph() :
         stateDim_(0),obsDim_(0)
 {
-    //For Sets:: max_load is 1, so it rehashes and augment the #bucklets in the same amount
-    factors_.reserve(potNumberFactors);
-    nodes_.reserve(potNumberNodes);
 }
 FGraph::~FGraph()
 {

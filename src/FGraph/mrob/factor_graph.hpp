@@ -12,9 +12,8 @@
 #ifndef FACTOR_GRAPH_HPP_
 #define FACTOR_GRAPH_HPP_
 
-//#include <unordered_set>
-//#include <deque>//TODO change for long allocations
-#include <vector>
+//#include <unordered_map>
+#include <deque>//TODO change for long allocations
 
 #include "mrob/factor.hpp"
 #include "mrob/node.hpp"
@@ -46,7 +45,7 @@ namespace mrob{
 
 class FGraph{
 public:
-    FGraph(uint_t potNumberNodes = 512, uint_t potNumberFactors = 512);
+    FGraph();
     virtual ~FGraph();
     /**
      * Adds a factor, if it is not already on the set.
@@ -116,10 +115,10 @@ protected:
      *
      */
     //std::unordered_set<std::shared_ptr<Node> >   nodes_;
-    std::vector<std::shared_ptr<Node> >   nodes_;
+    std::deque<std::shared_ptr<Node> >   nodes_; // no specific oder needed
 
     //std::unordered_set<std::shared_ptr<Factor> > factors_;
-    std::vector<std::shared_ptr<Factor> > factors_;
+    std::deque<std::shared_ptr<Factor> > factors_; // no specific order needed
 
     /**
      * Total accumulated dimensions on both the state (nodes)

@@ -24,8 +24,8 @@ using namespace std;
 using namespace Eigen;
 
 
-FGraphSolve::FGraphSolve(matrixMethod method, optimMethod optim, uint_t potNumberNodes, uint_t potNumberFactors):
-	FGraph(potNumberNodes, potNumberFactors), matrixMethod_(method), optimMethod_(optim),
+FGraphSolve::FGraphSolve(matrixMethod method, optimMethod optim):
+	FGraph(), matrixMethod_(method), optimMethod_(optim), N_(0), M_(0),
 	lambda_(1e-6), solutionTolerance_(1e-2)
 {
 
@@ -110,7 +110,7 @@ void FGraphSolve::optimize_gauss_newton(bool useLambda)
     {
         for (uint_t n = 0 ; n < N_; ++n)
             L_.coeffRef(n,n) = lambda_ + diagL_(n);//Circunference =>  diagL_(n) + lambda_
-            //L_.coeffRef(n,n) = (1.0 + lambda_)*diagL_(n);//Elipsoid, for circunference =>  diagL_(n) + lambda. WORSE In practice
+            //L_.coeffRef(n,n) = (1.0 + lambda_)*diagL_(n);//Elipsoid, for circunference =>  diagL_(n) + lambda.
     }
     cholesky.compute(L_);
     time_profiles_.stop("Gauss Newton create Cholesky");
@@ -122,7 +122,7 @@ void FGraphSolve::optimize_gauss_newton(bool useLambda)
 
 uint_t FGraphSolve::optimize_levenberg_marquardt(uint_t maxIters)
 {
-    SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
+    //SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
 
 
     // LM trust region as described in Bertsekas (p.105)
@@ -198,8 +198,8 @@ void FGraphSolve::build_adjacency()
     W_.resize(obsDim_, obsDim_);//TODO should we reinitialize this all the time? an incremental should be fairly easy
 
     // 1) create the vector's structures
-    std::vector<std::shared_ptr<Factor> >* factors;
-    std::vector<std::shared_ptr<Node> >* nodes;
+    std::deque<std::shared_ptr<Factor> >* factors;
+    std::deque<std::shared_ptr<Node> >* nodes;
     // TODO: optimizing subgraph is not an option now, but we maintain generality
     factors = &factors_;
     nodes = &nodes_;

@@ -70,7 +70,7 @@ int main()
     // calculate numerical second order derivatives
     if (1)
     {
-        std::cout << "\n\n Second order derivatives around a random element \n" << std::endl;
+        std::cout << "\n\n Second order derivatives around a the identity\n" << std::endl;
         //x = Mat61::Random() * 0.1;
         x = Mat61::Zero();
         T = SE3(x);

@@ -98,7 +98,7 @@ class Node{
             get_neighbour_factors(void) const {return &neighbourFactors_;};
 
   protected:
-    // For highly connected nodes where removing is necessary, map should be better
+    // no oder needed here
     std::vector<std::shared_ptr<Factor> > neighbourFactors_;
     id_t id_;
     uint_t dim_;

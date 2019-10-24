@@ -110,7 +110,7 @@ with open(file_path, 'r') as file:
 #plot_from_vertex(vertex_ini)
 
 # Initialize FG
-graph = mrob.FGraph(2500,9000)
+graph = mrob.FGraph()
 x = vertex_ini[0]
 print(x)
 n = graph.add_node_pose_3d(x)
@@ -140,18 +140,15 @@ for t in range(1,N):
         
     # solve the problem 7s 2500nodes
     start = time.time()
-    #graph.solve(mrob.LM, 70)
+    #graph.solve(mrob.GN)
     end = time.time()
     #print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))
 
 
     # plot the current problem
-    if (t+1) % 5 == 0:
+    if (t+1) % 10 == 0:
         #print_3d_graph(graph)
-        if (t+1) == 50: #first intersting case of big big error
-            #print_3d_graph_edges() #TODO plot this things
-            t
         pass
         
 
@@ -159,17 +156,52 @@ for t in range(1,N):
 graph.print(False)
 
 # SOlves the batch problem
-if 1:
+if 0:
     print('Current state of the graph: chi2 = ' , graph.chi2() )
     print_3d_graph(graph)
     start = time.time()
-    graph.solve(mrob.LM,100)
-    #graph.solve(mrob.GN)
+    graph.solve(mrob.LM,20)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     print_3d_graph(graph)
 
-   
+if 1:
+    print('Current state of the graph: chi2 = ' , graph.chi2() )
+    print_3d_graph(graph)
+    start = time.time()
+    graph.solve(mrob.GN)
+    end = time.time()
+    print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
+    start = time.time()
+    graph.solve(mrob.GN)
+    end = time.time()
+    print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
+    start = time.time()
+    graph.solve(mrob.GN)
+    end = time.time()
+    print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
+    start = time.time()
+    graph.solve(mrob.GN)
+    end = time.time()
+    print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
+    start = time.time()
+    graph.solve(mrob.GN)
+    end = time.time()
+    print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
+    start = time.time()
+    graph.solve(mrob.GN)
+    end = time.time()
+    print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
+    start = time.time()
+    graph.solve(mrob.GN)
+    end = time.time()
+    print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
+    start = time.time()
+    graph.solve(mrob.GN)
+    end = time.time()
+    print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
+    
+    print_3d_graph(graph)
 
 
 

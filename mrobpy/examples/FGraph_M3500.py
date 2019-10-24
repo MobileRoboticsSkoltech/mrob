@@ -48,7 +48,7 @@ with open('../../datasets/M3500.txt', 'r') as file:
 #print(factors_dictionary)
 
 # Initialize FG
-graph = mrob.FGraph(3500,5500)
+graph = mrob.FGraph()
 x = np.zeros(3)
 n = graph.add_node_pose_2d(x)
 print('node 0 id = ', n) # id starts at 1
@@ -92,13 +92,13 @@ for t in range(1,N):
         #print_2d_graph(graph)
         pass
 
-if 1:
+if 0:
     print('current initial chi2 = ', graph.chi2() )
     graph.solve(mrob.LM, 50)
     print('LM chi2 = ', graph.chi2() )
     print_2d_graph(graph)
 
-if 0:
+if 1:
     graph.solve(mrob.GN)
     print('Iter 0 chi2 = ', graph.chi2() )
     graph.solve(mrob.GN)
@@ -120,7 +120,7 @@ graph.print(False)
 if 0:
     plt.figure()
     plt.plot(processing_time)
-    plt.title('Eigen simplicial LDLT with Natural Ordering')
+    plt.title('Eigen simplicial LDLT with AMD Ordering')
     plt.show()
     
 

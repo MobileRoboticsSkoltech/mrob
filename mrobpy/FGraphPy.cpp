@@ -42,10 +42,9 @@ public:
     /**
      * Constructor for the python binding. By default uses the Cholesky adjoint solving type, and some estimated number of nodes and factors.
      */
-    FGraphPy(uint_t potNumberNodes, uint_t potNumberFactors) :
+    FGraphPy() :
         FGraphSolve(FGraphSolve::matrixMethod::ADJ,
-                    FGraphSolve::optimMethod::GN,
-                    potNumberNodes,potNumberFactors) {};
+                    FGraphSolve::optimMethod::GN) {};
     id_t add_node_pose_2d(const py::EigenDRef<const Mat31> x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodePose2d(x));
@@ -109,10 +108,8 @@ void init_FGraph(py::module &m)
         ;
     // Fgraph class adding factors and providing method to solve the inference problem.
     py::class_<FGraphPy> (m,"FGraph")
-            .def(py::init<uint_t, uint_t>(),
-                    "Constructor, solveType default is ADJ and GN. Second parameters are an estimated number of nodes and factors",
-                    py::arg("potNumberNodes") = 512,
-                    py::arg("potNumberFactors") = 512)
+            .def(py::init<>(),
+                    "Constructor, solveType default is ADJ and GN.")
             .def("solve", &FGraphSolve::solve,
                     "Solves the corresponding FG",
                     py::arg("method") =  FGraphSolve::optimMethod::GN,
