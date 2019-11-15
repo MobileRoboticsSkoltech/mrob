@@ -47,8 +47,8 @@ N = 2500
 
 # load file, .g2o format from https://github.com/RainerKuemmerle/g2o/wiki/File-Format
 #file_path = '../../datasets/sphere_bignoise_vertex3.g2o'
-#file_path = '../../datasets/sphere_gt.g2o'
-file_path = '../../datasets/sphere.g2o'
+file_path = '../../datasets/sphere_gt.g2o'
+#file_path = '../../datasets/sphere.g2o'
 with open(file_path, 'r') as file:
     for line in file:
         d = line.split()
@@ -141,14 +141,15 @@ for t in range(1,N):
     # solve the problem 7s 2500nodes
     start = time.time()
     #graph.solve(mrob.GN)
+    #graph.solve(mrob.LM, 5)
     end = time.time()
-    #print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))
 
 
     # plot the current problem
     if (t+1) % 10 == 0:
-        #print_3d_graph(graph)
+        print_3d_graph(graph)
         pass
         
 
@@ -156,7 +157,7 @@ for t in range(1,N):
 graph.print(False)
 
 # SOlves the batch problem
-if 0:
+if 1:
     print('Current state of the graph: chi2 = ' , graph.chi2() )
     print_3d_graph(graph)
     start = time.time()
@@ -165,7 +166,7 @@ if 0:
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     print_3d_graph(graph)
 
-if 1:
+if 0:
     print('Current state of the graph: chi2 = ' , graph.chi2() )
     print_3d_graph(graph)
     start = time.time()
