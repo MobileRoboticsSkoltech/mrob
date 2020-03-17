@@ -13,7 +13,7 @@
 #define FACTOR_GRAPH_HPP_
 
 //#include <unordered_map>
-#include <deque>//TODO change for long allocations
+#include <deque>// for long allocations
 
 #include "mrob/factor.hpp"
 #include "mrob/node.hpp"
@@ -106,16 +106,17 @@ public:
 
 protected:
     /**
-	 *  XXX is set better than vector for what we are using them?
+	 *  XXX is set better than vector(deque) for what we are using them?
 	 *  Vector is much faster for direct access [], but needs allocation.
 	 *  We are also interested on having indices on nodes and factors.
 	 *  Set iterates ok O(1) and can remove elements nicely O(1).
 	 *
-	 *  For now we will use vectors, but we will maintain abstraction in case we need to change
+	 *  For now we will use deque, but we will maintain abstraction in case we need to change
+	 since it has fast access and does no require memory allocation
      *
      */
     //std::unordered_set<std::shared_ptr<Node> >   nodes_;
-    std::deque<std::shared_ptr<Node> >   nodes_; // no specific oder needed
+    std::deque<std::shared_ptr<Node> >   nodes_; // added as they appear. Removing them is not an efficient option for now
 
     //std::unordered_set<std::shared_ptr<Factor> > factors_;
     std::deque<std::shared_ptr<Factor> > factors_; // no specific order needed
