@@ -1,7 +1,7 @@
 /* Copyright 2018-2020 Skolkovo Institute of Science and Technology (Skoltech)
  * All rights reserved.
  *
- * nodePoint3d.hpp
+ * nodeLandmark3d.hpp
  *
  *  Created on: March 17, 2020
  *      Author: Gonzalo Ferrer
@@ -9,8 +9,8 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#ifndef NODEPOINT3D_HPP_
-#define NODEPOINT3D_HPP_
+#ifndef NODELANDMARK3D_HPP_
+#define NODELANDMARK_HPP_
 
 #include "mrob/matrix_base.hpp"
 #include "mrob/SE3.hpp" //requires including and linking SE3 library
@@ -18,15 +18,15 @@
 
 namespace mrob{
 
-class NodePoint3d : public Node
+class NodeLandmark3d : public Node
 {
   public:
     /**
      * For initialization, requires an initial estimation of the state.
      */
-    NodePoint3d(const Mat31 &initial_x);
+    NodeLandmark3d(const Mat31 &initial_x);
     //NodePose3d(const SE3 &initial_T);
-    virtual ~NodePoint3d();
+    virtual ~NodeLandmark3d();
 
     virtual void update(const Eigen::Ref<const MatX1> &dx);
     virtual void update_from_auxiliary(const Eigen::Ref<const MatX1> &dx);

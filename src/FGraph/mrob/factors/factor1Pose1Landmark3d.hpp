@@ -1,7 +1,7 @@
 /* Copyright 2018-2020 Skolkovo Institute of Science and Technology (Skoltech)
  * All rights reserved.
  *
- * factor1Pose1Point3d.hpp
+ * factor1Pose1Landmark3d.hpp
  *
  *  Created on: March 17, 2020
  *      Author: Gonzalo Ferrer
@@ -9,8 +9,8 @@
  *              Mobile Robotics Lab, Skoltech 
  */
 
-#ifndef FACTOR1POSE1POINT3D_HPP_
-#define FACTOR1POSE1POINT3D_HPP_
+#ifndef FACTOR1POSE1LANDMARK3D_HPP_
+#define FACTOR1POSE1LANDMARK3D_HPP_
 
 
 #include "mrob/matrix_base.hpp"
@@ -20,14 +20,14 @@
 namespace mrob{
 
 /**
- * The factor1Pose1Point3d is a vertex representing the distribution between
+ * The factor1Pose1Landmark3d is a vertex representing the distribution between
  * a Rigid Body Transformation encoding a 3D pose and a Landmark, a 3D point
  *
  * The observation is a 3D point, in the local frame of the current 3D pose.
  * The two Nodes that the factor is connecting, which are provided by their
  * shared_ptr's, are:
  *  - 1 Pose3d
- *  - 1 Point3d
+ *  - 1 Landmark3d
  * We provide the node's Id to get the correspondent Jacobian
  *
  *
@@ -36,26 +36,26 @@ namespace mrob{
  *
  * z is a 3d point with the observations in the local frame T
  * T is the transformation encoded by the 3D pose, the local frame.
- * p is a 3d point encoding the landmark position
+ * l is a 3d point encoding the landmark position
  *
  * and the residual is thus:
- *   r = T^{-1}p - z
+ *   r = T^{-1}l - z
  *
  *
  * Constructor functions will be overloaded to include the pointers of the nodes,
  * The convention is 3d pose, we observe node destination,
- * such that: Factor1Pose1Point3d(nodePose, nodePoint, ...
+ * such that: Factor1Pose1Landmark3d(nodePose, nodeLandmark, ...
  *
  * The observations relate a pair of nodes. The order matters, since this will
  * affect the order on the Jacobian block matrix
  */
 
-class Factor1Pose1Point3d : public Factor
+class Factor1Pose1Landmark3d : public Factor
 {
   public:
-    Factor1Pose1Point3d(const Mat31 &observation, std::shared_ptr<Node> &nodePose,
-            std::shared_ptr<Node> &nodePoint, const Mat3 &obsInf);
-    ~Factor1Pose1Point3d();
+    Factor1Pose1Landmark3d(const Mat31 &observation, std::shared_ptr<Node> &nodePose,
+            std::shared_ptr<Node> &nodeLandmark, const Mat3 &obsInf, bool initializeLandmark=false);
+    ~Factor1Pose1Landmark3d();
     /**
      * Jacobians are not evaluated, just the residuals
      */
@@ -93,4 +93,4 @@ class Factor1Pose1Point3d : public Factor
 
 
 
-#endif /* Factor1Pose1Point3d_HPP_ */
+#endif /* Factor1Pose1Landmark3d_HPP_ */

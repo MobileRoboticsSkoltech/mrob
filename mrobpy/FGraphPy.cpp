@@ -21,8 +21,8 @@
 #include "mrob/factors/nodePose3d.hpp"
 #include "mrob/factors/factor1Pose3d.hpp"
 #include "mrob/factors/factor2Poses3d.hpp"
-#include "mrob/factors/nodePoint3d.hpp"
-#include "mrob/factors/factor1Pose1Point3d.hpp"
+#include "mrob/factors/nodeLandmark3d.hpp"
+#include "mrob/factors/factor1Pose1Landmark3d.hpp"
 
 #include <Eigen/Geometry>
 
@@ -75,6 +75,7 @@ public:
     }
 
     // 3D factor graph
+    // ------------------------------------------------------------------------------------
     id_t add_node_pose_3d(const py::EigenDRef<const Mat61> x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodePose3d(x));
@@ -98,18 +99,20 @@ public:
         return f->get_id();
     }
     
-    // 3D Ladmarks (points)
-    id_t add_node_point_3d(const py::EigenDRef<const Mat31> x)
+    // 3D Ladmarks (Landmarks)
+    // ------------------------------------------------------------------------------------
+    id_t add_node_landmark_3d(const py::EigenDRef<const Mat31> x)
     {
-        std::shared_ptr<mrob::Node> n(new mrob::NodePoint3d(x));
+        std::shared_ptr<mrob::Node> n(new mrob::NodeLandmark3d(x));
         this->add_node(n);
         return n->get_id();
     }
-    id_t add_factor_1pose_1point_3d(const py::EigenDRef<const Mat31> obs, uint_t nodePoseId, uint_t nodePointId, const py::EigenDRef<const Mat3> obsInvCov)
+    id_t add_factor_1pose_1landmark_3d(const py::EigenDRef<const Mat31> obs, uint_t nodePoseId,
+                uint_t nodeLandmarkId, const py::EigenDRef<const Mat3> obsInvCov, bool initializeLandmark)
     {
         auto n1 = this->get_node(nodePoseId);
-        auto n2 = this->get_node(nodePointId);
-        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Point3d(obs,n1,n2,obsInvCov));
+        auto n2 = this->get_node(nodeLandmarkId);
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Landmark3d(obs,n1,n2,obsInvCov,initializeLandmark));
         this->add_factor(f);
         return f->get_id();
     }
@@ -164,6 +167,17 @@ void init_FGraph(py::module &m)
                             py::arg("nodeTargetId"),
                             py::arg("obsInvCov"),
                             py::arg("updateNodeTarget") = false)
+                            // -----------------------------------------------------------------------------
+            // SLandmark or Point 3D
+            .def("add_node_landmark_3d", &FGraphPy::add_node_landmark_3d,
+                    "Ladmarks are 3D points, in [x,y,z]")
+            .def("add_factor_1pose_1landmark_3d", &FGraphPy::add_factor_1pose_1landmark_3d,
+                            "Factor connecting 1 pose and 1 point (landmark).",
+                            py::arg("obs"),
+                            py::arg("nodePoseId"),
+                            py::arg("nodeLandmarkId"),
+                            py::arg("obsInvCov"),
+                            py::arg("initializeLandmark") = false)
             ;
     // AUxiliary functions to support other conventions (TORO, g2o)
     m.def("quat_to_so3", &quat_to_so3,"Suport function from quaternion to a rotation");
