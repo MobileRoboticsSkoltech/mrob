@@ -21,7 +21,8 @@
 #include "mrob/factors/nodePose3d.hpp"
 #include "mrob/factors/factor1Pose3d.hpp"
 #include "mrob/factors/factor2Poses3d.hpp"
-
+#include "mrob/factors/nodePoint3d.hpp"
+#include "mrob/factors/factor1Pose1Point3d.hpp"
 
 #include <Eigen/Geometry>
 
@@ -93,6 +94,22 @@ public:
         auto nO = this->get_node(nodeOriginId);
         auto nT = this->get_node(nodeTargetId);
         std::shared_ptr<mrob::Factor> f(new mrob::Factor2Poses3d(obs,nO,nT,obsInvCov, updateNodeTarget));
+        this->add_factor(f);
+        return f->get_id();
+    }
+    
+    // 3D Ladmarks (points)
+    id_t add_node_point_3d(const py::EigenDRef<const Mat31> x)
+    {
+        std::shared_ptr<mrob::Node> n(new mrob::NodePoint3d(x));
+        this->add_node(n);
+        return n->get_id();
+    }
+    id_t add_factor_1pose_1point_3d(const py::EigenDRef<const Mat31> obs, uint_t nodePoseId, uint_t nodePointId, const py::EigenDRef<const Mat3> obsInvCov)
+    {
+        auto n1 = this->get_node(nodePoseId);
+        auto n2 = this->get_node(nodePointId);
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Point3d(obs,n1,n2,obsInvCov));
         this->add_factor(f);
         return f->get_id();
     }
