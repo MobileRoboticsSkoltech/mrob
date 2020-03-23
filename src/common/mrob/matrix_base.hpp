@@ -46,6 +46,14 @@ typedef Eigen::Matrix<matData_t, 5,1> Mat51;
 typedef Eigen::Matrix<matData_t, 6,1> Mat61;
 typedef Eigen::Matrix<matData_t, Eigen::Dynamic,1> MatX1;
 
+// Definition of row matrices (vectors)
+typedef Eigen::Matrix<matData_t, 1,2> Mat12;
+typedef Eigen::Matrix<matData_t, 1,3> Mat13;
+typedef Eigen::Matrix<matData_t, 1,4> Mat14;
+typedef Eigen::Matrix<matData_t, 1,5> Mat15;
+typedef Eigen::Matrix<matData_t, 1,6> Mat16;
+typedef Eigen::Matrix<matData_t, 1,Eigen::Dynamic> Mat1X;
+
 
 // Definition of templated-based fixed matrices using c'11 aliases
 template<int D>

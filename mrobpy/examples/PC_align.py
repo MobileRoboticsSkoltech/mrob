@@ -6,7 +6,7 @@ import numpy as np
 # example equal to ./PC_alignment/examples/example_align.cpp
 # generate random data
 N = 5
-X =  np.random.rand(3,N)
+X =  np.random.rand(N,3)
 T = mrob.SE3(np.random.rand(6))
 Y = T.transform_array(X)
 

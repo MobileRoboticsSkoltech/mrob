@@ -177,13 +177,14 @@ Mat31 SE3::transform(const Mat31 & p) const
     return R()*p + t();
 }
 
+
 MatX SE3::transform_array(const MatX &P) const
 {
-    assert(P.rows() == 3 && "SE3::transformArray: incorrect data structure");
-    uint_t N = P.cols();
-    MatX res(3,N);
+    assert(P.cols() == 3 && "SE3::transformArray: incorrect data structure, it is required an Nx3 input");
+    uint_t N = P.rows();
+    MatX res(N,3);
     for (uint_t i = 0; i < N; ++i)
-        res.col(i) << this->transform(P.col(i));
+        res.row(i) << this->transform(P.row(i)).transpose();
     return res;
 }
 

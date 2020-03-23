@@ -1,4 +1,4 @@
-/* Copyright 2018-2019 Skolkovo Institute of Science and Technology (Skoltech)
+/* Copyright 2018-2020 Skolkovo Institute of Science and Technology (Skoltech)
  * All rights reserved.
  *
  * SE3py.cpp
@@ -37,7 +37,8 @@ void init_SE3(py::module &m) {
         .def("update_rhs", &SE3::update_rhs)
         .def("ln", &SE3::ln_vee, py::return_value_policy::copy)
         .def("transform", &SE3::transform, py::return_value_policy::copy)
-        .def("transform_array", &SE3::transform_array, py::return_value_policy::copy) // makes a copy of the array. TODO, pass by Ref and avoid copying, look at ownership
+        .def("transform_array", &SE3::transform_array, py::return_value_policy::copy,
+              "Input is a an array Nx3 and output is Nx3") // makes a copy of the array. TODO, pass by Ref and avoid copying, look at ownership
         .def("inv", &SE3::inv, py::return_value_policy::copy)
         .def("adj", &SE3::adj, py::return_value_policy::copy)
         .def("distance", &SE3::distance)
@@ -60,5 +61,7 @@ void init_SE3(py::module &m) {
         .def("distance", &SO3::distance)
         .def("print", &SO3::print)
         ;
+    m.def("hat3", &mrob::hat3, "Returns a skew symetric matrix 3x3 from a 3-vector", py::return_value_policy::copy);
+    m.def("hat6", &mrob::hat6, "Returns a Lie algebra matrix 4x4 from a 6-vector", py::return_value_policy::copy);
 }
 

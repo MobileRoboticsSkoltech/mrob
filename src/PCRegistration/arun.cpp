@@ -21,10 +21,10 @@ using namespace Eigen;
 
 int PCRegistration::arun(const Ref<const MatX> X, const Ref<const MatX> Y, SE3 &T)
 {
-    assert(X.rows() == 3  && "PCRegistration::Arun: Incorrect sizing, we expect 3xN");
-    assert(X.cols() >= 3  && "PCRegistration::Arun: Incorrect sizing, we expect at least 3 correspondences (not aligned)");
-    assert(Y.cols() == X.cols()  && "PCRegistration::Arun: Same number of correspondences");
-    uint_t N = X.cols();
+    assert(X.cols() == 3  && "PCRegistration::Arun: Incorrect sizing, we expect Nx3");
+    assert(X.rows() >= 3  && "PCRegistration::Arun: Incorrect sizing, we expect at least 3 correspondences (not aligned)");
+    assert(Y.rows() == X.rows()  && "PCRegistration::Arun: Same number of correspondences");
+    uint_t N = X.rows();
     /** Algorithm:
      *  1) calculate centroids cx = sum x_i. cy = sum y_i
      *  2) calculate dispersion from centroids qx = x_i - cx
@@ -41,18 +41,18 @@ int PCRegistration::arun(const Ref<const MatX> X, const Ref<const MatX> Y, SE3 &
     //std::cout << "X: \n" << X << "\nY:\n" << Y << std::endl;
     // 1) calculate centroids cx = E{x_i}. cy = E{y_i}
     //More efficient than creating a matrix of ones when on Release mode (not is Debug mode)
-    Mat31 cxm = X.rowwise().sum();
+    Mat13 cxm = X.colwise().sum();
     cxm /= (double)N;
-    Mat31 cym = Y.rowwise().sum();
+    Mat13 cym = Y.rowwise().sum();
     cym /= (double)N;
 
     // 2)  calculate dispersion from centroids qx = x_i - cx
-    MatX qx = X.colwise() - cxm;
-    MatX qy = Y.colwise() - cym;
+    MatX qx = X.rowwise() - cxm;
+    MatX qy = Y.rowwise() - cym;
 
 
-    // 3) calculate matrix H = sum qx_i * qy_i^T
-    Mat3 H = qx * qy.transpose();
+    // 3) calculate matrix H = sum qx_i * qy_i^T (noting that we are obtaingin row vectors)
+    Mat3 H = qx.transpose() * qy;
 
     // 4) svd decomposition: H = U*D*V'
     JacobiSVD<Matrix3d> SVD(H, ComputeFullU | ComputeFullV);//Full matrices indicate Square matrices
@@ -92,7 +92,7 @@ int PCRegistration::arun(const Ref<const MatX> X, const Ref<const MatX> Y, SE3 &
     }
 
     // 6) calculate translation as: t = cy - R * cx
-    Mat31 t = cym - R*cxm;
+    Mat31 t = cym.transpose() - R*cxm.transpose();
     //std::cout << "t = " << t << std::endl;
 
     // 7) return result

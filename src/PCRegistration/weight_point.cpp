@@ -21,10 +21,10 @@ using namespace mrob;
 int PCRegistration::weighted_point(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
            const Eigen::Ref<const MatX1> weight,  SE3 &T, double tol)
 {
-    assert(X.rows() == 3  && "PCRegistration::Weighted_point: Incorrect sizing, we expect 3xN");
-    assert(X.cols() >= 3  && "PCRegistration::Weighted_point: Incorrect sizing, we expect at least 3 correspondences (not aligned)");
-    assert(Y.cols() == X.cols()  && "PCRegistration::Weighted_point: Same number of correspondences");
-    uint_t N = X.cols();
+    assert(X.cols() == 3  && "PCRegistration::Gicp: Incorrect sizing, we expect Nx3");
+    assert(X.rows() >= 3  && "PCRegistration::Gicp: Incorrect sizing, we expect at least 3 correspondences (not aligned)");
+    assert(Y.rows() == X.rows()  && "PCRegistration::Gicp: Same number of correspondences");
+    uint_t N = X.rows();
     // TODO precalculation of T by reduced Arun
 
     // Initialize Jacobian and Hessian
@@ -40,8 +40,8 @@ int PCRegistration::weighted_point(const Eigen::Ref<const MatX> X, const Eigen::
         for ( uint_t i = 0; i < N ; ++i)
         {
             // 1) Calculate residual r = y - Tx and the inverse of joint covariance
-            Mat31 Txi = T.transform(X.col(i));
-            Mat31 r = Y.col(i) - Txi;
+            Mat31 Txi = T.transform(X.row(i));
+            Mat31 r = Y.row(i).transpose() - Txi;
 
             // 2) Calculate Jacobian for residual Jf = df/d xi = w * r' Jr, where Jr = [(Tx)^ ; -I])
             Mat<3,6> Jr;

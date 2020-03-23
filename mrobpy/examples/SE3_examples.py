@@ -98,7 +98,8 @@ if 0:
     T_1.print()
     print('direct T1\n',T_1.T())
     mrob.SE3(T_1.T()).print()
-    dxi = mrob.SE3( (T_1.T() @ T_0_inv.T()) ).ln()
+    #dxi = mrob.SE3( (T_1.T() @ T_0_inv.T()) ).ln()
+    dxi = T_1.mul(T_0_inv).ln()
     for i in range(N):
         Ti = mrob.SE3(xi[i,:])
         plotT(Ti,ax)
