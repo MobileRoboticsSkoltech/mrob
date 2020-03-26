@@ -68,17 +68,15 @@ class Factor1Pose1Landmark3d : public Factor
 
     void print() const;
 
-    const Eigen::Ref<const MatX1> get_obs() const {return obs_;};
+    const Eigen::Ref<const MatX> get_obs() const {return obs_;};
     const Eigen::Ref<const MatX1> get_residual() const {return r_;};
     const Eigen::Ref<const MatX> get_information_matrix() const {return W_;};
-    const Eigen::Ref<const MatX> get_trans_sqrt_information_matrix() const{return WT2_;};
     const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
 
   protected:
     Mat31 obs_, r_, landmark_;
     SE3 Tinv_;
     Mat3 W_;//inverse of observation covariance (information matrix)
-    Mat3 WT2_;//transpose and squared root of W.
     Mat<3,9> J_;//Joint Jacobian
     bool reversedNodeOrder_;//flag to keep order when building the adjacency matrix. This should be transparent for the user
 

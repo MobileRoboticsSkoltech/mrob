@@ -13,11 +13,11 @@
 
 
 
-#include "mrob/factor_graph_solve.hpp"
 #include "mrob/factors/nodePose3d.hpp"
 #include "mrob/factors/nodeLandmark3d.hpp"
 #include "mrob/factors/factor1Pose3d.hpp"
 #include "mrob/factors/factor1Pose1Landmark3d.hpp"
+#include "mrob/factor_graph_solve.hpp"
 
 
 #include <iostream>
@@ -31,12 +31,13 @@ int main ()
 
     // Initial node is defined at 0,0,0, 0,0,0 and anchor factor actually observing it at 0
     Mat61 x, obs;
-    Mat6 obsInformation= Mat6::Identity();
     x = Mat61::Random()*0.05;
-    obs = Mat61::Zero();
-    std::shared_ptr<mrob::Node> n0(new mrob::NodePose3d(x));
+    mrob::SE3 Tx(x);
+    std::shared_ptr<mrob::Node> n0(new mrob::NodePose3d(Tx));
     graph.add_node(n0);
-    std::shared_ptr<mrob::Factor> f0(new mrob::Factor1Pose3d(obs,n0,obsInformation*1e6));
+    Mat4 Tobs = Mat4::Identity();
+    Mat6 obsInformation = Mat6::Identity();
+    std::shared_ptr<mrob::Factor> f0(new mrob::Factor1Pose3d(Tobs,n0,obsInformation*1e6));
     graph.add_factor(f0);
 
     // Add Ladmarks: uninitialized
@@ -65,7 +66,6 @@ int main ()
 
     // solve the Gauss Newton optimization
     graph.print(true);
-    //graph.solve();
     graph.solve(mrob::FGraphSolve::LM);
 
     std::cout << "\n\n\nSolved, chi2 = " << graph.chi2() << std::endl;

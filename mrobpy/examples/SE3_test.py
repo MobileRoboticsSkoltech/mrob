@@ -26,13 +26,13 @@ if 0:
         for i in range(M):
             xi = np.random.randn(3)
             xi = xi / np.linalg.norm(xi) * x
-            e = mrob.SO3(xi).ln() - xi
+            e = mrob.SO3(xi).Ln() - xi
             e2 = e.dot(e)
             # handle negatives, since the convention in MROB is positive angles to disambiguate
             if e2 > np.pi :
-                e = mrob.SO3(xi).ln() + xi
+                e = mrob.SO3(xi).Ln() + xi
                 e2 = e.dot(e)
-                #print('error = ', e, ', ln = ', mrob.SO3(xi).ln() , 'xi = ' , xi)
+                #print('error = ', e, ', Ln = ', mrob.SO3(xi).Ln() , 'xi = ' , xi)
             rmse_n.append( e2 )
             error[n,i] = np.sqrt(e2)
         rmse[n] = np.sqrt( sum(rmse_n)/M )
@@ -55,7 +55,7 @@ if 0:
     #rmse, X = pickle.load(pkl_file)
     #pkl_file.close()
 
-# Exp/ln chain SO(3)
+# Exp/Ln chain SO(3)
 # ======================================================
 # 1) round pi,0 trajectory
 if 0:
@@ -72,7 +72,7 @@ if 0:
         for i in range(M):
             xi = np.random.randn(3) 
             xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (eps[n]) #around 0
-            e = mrob.SO3(xi).ln() - xi
+            e = mrob.SO3(xi).Ln() - xi
             error.append( e.dot(e) )
         rmse[n] = np.sqrt( sum(error)/M )
         print('Iteration n = ', n , ', eps = ', eps[n], ', current error = ', rmse[n])
@@ -85,7 +85,7 @@ if 0:
     output.close()
     plt.show()
 
-# Exp/ln chain SO(3)
+# Exp/Ln chain SO(3)
 # ======================================================
 # 1) round pi trajectory
 if 0:
@@ -102,9 +102,9 @@ if 0:
         for i in range(M):
             xi = np.random.randn(3) 
             xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (np.pi - eps[n]) #around pi
-            e = mrob.SO3(xi).ln() - xi
+            e = mrob.SO3(xi).Ln() - xi
             if e.dot(e) > np.pi :
-                e = mrob.SO3(xi).ln() + xi
+                e = mrob.SO3(xi).Ln() + xi
             error.append( e.dot(e) )
         #eps[] *= 0.5
         rmse[n] = np.sqrt( sum(error)/M )
@@ -135,11 +135,11 @@ if 1:
         for i in range(M):
             xi = np.random.randn(6) * 10000 # 30000 similar value to kais dataset tranlations.
             xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * x
-            e = mrob.SE3(xi).ln() - xi
+            e = mrob.SE3(xi).Ln() - xi
             e2 = e.dot(e)
             if e2 > np.pi:
                 print('flip sign')
-                e = mrob.SE3(xi).mul(mrob.SE3(-xi)).ln()
+                e = mrob.SE3(xi).mul(mrob.SE3(-xi)).Ln()
                 e2 = e.dot(e)
             rmse_n.append( e2 )
             error[n,i] = np.sqrt(e2)
@@ -174,7 +174,7 @@ if 1:
         for i in range(M):
             xi = np.random.randn(6) * 10 # 30000 similar value to kais dataset tranlations.
             xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (eps[n]) #around 0
-            e = mrob.SE3(xi).ln() - xi
+            e = mrob.SE3(xi).Ln() - xi
             e2 = e.dot(e)
             error.append( e2 )
         #eps[] *= 0.5
@@ -205,13 +205,13 @@ if 1:
         for i in range(M):
             xi = np.random.rand(6) * 10000 # 30000 similar value to kais dataset tranlations.
             xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (np.pi - eps[n]) #around pi
-            e = mrob.SE3(xi).ln() - xi
+            e = mrob.SE3(xi).Ln() - xi
             # To be sure that close to pi we are in our convention, we will provide positive angles by
             e2 = e.dot(e)
             # this error is due to a flip on sign, which does not affect the transformation, only the manifolf parameters
             # we correct this by 
             if e2 > np.pi:
-                e = mrob.SE3(xi).mul(mrob.SE3(-xi)).ln()
+                e = mrob.SE3(xi).mul(mrob.SE3(-xi)).Ln()
                 e2 = e.dot(e)
             error.append( e2 )
         rmse[n] = np.sqrt( sum(error)/M )

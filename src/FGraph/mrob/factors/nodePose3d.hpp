@@ -23,13 +23,15 @@ class NodePose3d : public Node
   public:
     /**
      * For initialization, requires an initial estimation of the state.
+     * For 3D poses we use a transformation matrix 4x4
+     * 
+     * Note that the dimensionality of this node is 6, that is the DOF
      */
-    NodePose3d(const Mat61 &initial_x);
+    NodePose3d(const Mat4 &initial_x);
     /**
-     * Initialization directly on SE3
-     * XXX to be replaced, just to keep consistency with factors, that can't accept transformations
+     * Initialization directly on SE3 a matrix
      */
-    //NodePose3d(const SE3 &initial_T);
+    NodePose3d(const SE3 &initial_x);
     virtual ~NodePose3d();
     /**
      * Left update operation corresponds to
@@ -38,22 +40,18 @@ class NodePose3d : public Node
      */
     virtual void update(const Eigen::Ref<const MatX1> &dx);
     virtual void update_from_auxiliary(const Eigen::Ref<const MatX1> &dx);
-    virtual void set_state(const Eigen::Ref<const MatX1> &x);
-    virtual void set_auxiliary_state(const Eigen::Ref<const MatX1> &x);
-    virtual const Eigen::Ref<const MatX1> get_state() const {return state_;};
-    // function returning the transformation
-    virtual const Eigen::Ref<const MatX> get_stateT() const ;
-    virtual const Eigen::Ref<const MatX1> get_auxiliary_state() const {return auxiliaryState_;};
+    virtual void set_state(const Eigen::Ref<const MatX> &x);
+    virtual void set_auxiliary_state(const Eigen::Ref<const MatX> &x);
+    virtual const Eigen::Ref<const MatX> get_state() const {return state_.T();};
+    virtual const Eigen::Ref<const MatX> get_auxiliary_state() const {return auxiliaryState_.T();};
     void print() const;
 
   protected:
-    // TODO remove vector states and work only with SE3. ALso change base class
-    Mat61 state_;
-    SE3 stateT_;//redundant state representation of principal, now directly in SE(3)
-    Mat61 auxiliaryState_; //an auxiliary vector to TODO think on this representation
+    SE3 state_;
+    SE3 auxiliaryState_; //an auxiliary vector for undoing updates
 
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen
+    //EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen
 
 
 };

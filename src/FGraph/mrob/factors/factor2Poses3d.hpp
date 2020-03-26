@@ -54,7 +54,9 @@ namespace mrob{
 class Factor2Poses3d : public Factor
 {
   public:
-    Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &nodeOrigin,
+    Factor2Poses3d(const Mat4 &observation, std::shared_ptr<Node> &nodeOrigin,
+            std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf, bool updateNodeTarget=false);
+    Factor2Poses3d(const SE3 &observation, std::shared_ptr<Node> &nodeOrigin,
             std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf, bool updateNodeTarget=false);
     ~Factor2Poses3d();
     /**
@@ -69,24 +71,20 @@ class Factor2Poses3d : public Factor
 
     void print() const;
 
-    const Eigen::Ref<const MatX1> get_obs() const {return obs_;};
+    const Eigen::Ref<const MatX> get_obs() const {return Tobs_.T();};
     const Eigen::Ref<const MatX1> get_residual() const {return r_;};
     const Eigen::Ref<const MatX> get_information_matrix() const {return W_;};
-    const Eigen::Ref<const MatX> get_trans_sqrt_information_matrix() const{return WT2_;};
     const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
 
   protected:
     // The Jacobians' correspondant nodes are ordered on the vector<Node>
     // being [0]->J_origin and [1]->J_target
     // declared here but initialized on child classes
-    Mat61 obs_, r_; //and residuals
     SE3 Tobs_; // Transformation from observation. NOTE: In Xorigin frame
+    Mat61 r_; //and residuals
     SE3 Tr_; // Residual Transformation
     Mat6 W_;//inverse of observation covariance (information matrix)
-    Mat6 WT2_;//transpose and squared root of W.
     Mat<6,12> J_;//Joint Jacobian
-
-    // TODO remove vector states and work only with SE3. ALso change base class to return Ref<Matx>
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen

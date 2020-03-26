@@ -12,7 +12,7 @@ plt.rcParams['pdf.fonttype'] = 42
 plt.rcParams['ps.fonttype'] = 42
 
 
-# Exp/ln chain SO(3)
+# Exp/Ln chain SO(3)
 # ======================================================
 # 1) round 0 trajectory. Consistent with manifold error
 if 0:
@@ -31,7 +31,7 @@ if 0:
             xi = np.random.randn(3) 
             xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (eps[n]) #around 0
             R = mrob.SO3(xi)
-            e = np.linalg.norm(R.R() - mrob.SO3(R.ln()).R())
+            e = np.linalg.norm(R.R() - mrob.SO3(R.Ln()).R())
             error.append( e )
         mae[n] = sum(error)/M
         print('Iteration n = ', n , ', eps = ', eps[n], ', current error = ', mae[n])
@@ -44,7 +44,7 @@ if 0:
     output.close()
     plt.show()
 
-# Exp/ln chain SO(3)
+# Exp/Ln chain SO(3)
 # ======================================================
 # 1) round pi trajectory
 if 0:
@@ -64,7 +64,7 @@ if 0:
             xi = np.random.randn(3) 
             xi[0:3] = xi[0:3] / np.linalg.norm(xi[0:3]) * (np.pi - eps[n]) #around pi
             R = mrob.SO3(xi)
-            e = np.linalg.norm(R.R() - mrob.SO3(R.ln()).R())
+            e = np.linalg.norm(R.R() - mrob.SO3(R.Ln()).R())
             error.append( e )
         mae[n] = sum(error)/M
         print('Iteration n = ', n , ', eps = ', eps[n], ', current error = ', mae[n])
@@ -78,7 +78,7 @@ if 0:
     plt.show()
 
 
-# Exp/ln chain SE(3)
+# Exp/Ln chain SE(3)
 # ======================================================
 # 1) round pi trajectory
 if 1:
@@ -101,7 +101,7 @@ if 1:
             T[:3,:3] = mrob.SO3(xi).R()
             T[:3,3] = np.random.randn(3)*100;
             print(T)
-            T2 = mrob.SE3(mrob.SE3(T).ln())
+            T2 = mrob.SE3(mrob.SE3(T).Ln())
             e = np.linalg.norm(T - T2.T())
             print('Diff = \n', T - T2.T())
             error.append( e )

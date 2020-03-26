@@ -32,7 +32,9 @@ namespace mrob{
 class Factor1Pose3d : public Factor
 {
   public:
-    Factor1Pose3d(const Mat61 &observation, std::shared_ptr<Node> &n1,
+    Factor1Pose3d(const Mat4 &observation, std::shared_ptr<Node> &n1,
+             const Mat6 &obsInf);
+    Factor1Pose3d(const SE3 &observation, std::shared_ptr<Node> &n1,
              const Mat6 &obsInf);
     ~Factor1Pose3d();
     /**
@@ -44,18 +46,16 @@ class Factor1Pose3d : public Factor
 
     void print() const;
 
-    const Eigen::Ref<const MatX1> get_obs() const {return obs_;};
+    const Eigen::Ref<const MatX> get_obs() const {return Tobs_.T();};
     const Eigen::Ref<const MatX1> get_residual() const {return r_;};
     const Eigen::Ref<const MatX> get_information_matrix() const {return W_;};
-    const Eigen::Ref<const MatX> get_trans_sqrt_information_matrix() const{return WT2_;};
     const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
 
 
   protected:
-    Mat61 obs_, r_; //and residuals
+    Mat61 r_; //and residuals
     SE3 Tobs_, Tr_;//Transformation for the observation and the residual
     Mat6 W_;//inverse of observation covariance (information matrix)
-    Mat6 WT2_;//transpose and squared root of W. We could delete this variable...
     Mat6 J_;//Jacobian
 
 

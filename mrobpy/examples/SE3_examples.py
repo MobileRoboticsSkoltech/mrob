@@ -75,7 +75,7 @@ if 1:
 
 # Interpolation TODO: clean code
 # --------------------------------------------------------
-if 0:
+if 1:
     xi_ini = np.array([0,0,0,0,0,0], dtype='float64')
     #xi_fin = np.array([np.pi/3,1,0,0,0,0], dtype='float64')
     xi_fin = np.random.rand(6)*10
@@ -98,8 +98,8 @@ if 0:
     T_1.print()
     print('direct T1\n',T_1.T())
     mrob.SE3(T_1.T()).print()
-    #dxi = mrob.SE3( (T_1.T() @ T_0_inv.T()) ).ln()
-    dxi = T_1.mul(T_0_inv).ln()
+    #dxi = mrob.SE3( (T_1.T() @ T_0_inv.T()) ).Ln()
+    dxi = T_1.mul(T_0_inv).Ln()
     for i in range(N):
         Ti = mrob.SE3(xi[i,:])
         plotT(Ti,ax)
@@ -111,7 +111,7 @@ if 0:
         
         # ploting and visualizing error
         #print(Ts.T())
-        print(np.linalg.norm(Ti.ln() - Ts.ln()))
+        print(np.linalg.norm(Ti.Ln() - Ts.Ln()))
         #T.transform(np.array([0,0,0], dtype='float64'))
     plt.show()
 
@@ -132,5 +132,5 @@ if 0:
     w = np.random.rand(3)
     R = mrob.SO3(w)
     print('SO3 matrix: \n', R.R() )
-    print('SO3 in the manifold: \n', R.ln())
+    print('SO3 in the manifold: \n', R.Ln())
     

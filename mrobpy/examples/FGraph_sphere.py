@@ -47,8 +47,8 @@ N = 2500
 
 # load file, .g2o format from https://github.com/RainerKuemmerle/g2o/wiki/File-Format
 #file_path = '../../datasets/sphere_bignoise_vertex3.g2o'
-file_path = '../../datasets/sphere_gt.g2o'
-#file_path = '../../datasets/sphere.g2o'
+#file_path = '../../datasets/sphere_gt.g2o'
+file_path = '../../datasets/sphere.g2o'
 with open(file_path, 'r') as file:
     for line in file:
         d = line.split()
@@ -69,7 +69,7 @@ with open(file_path, 'r') as file:
             T[0, 3] = d[3]
             T[1, 3] = d[4]
             T[2, 3] = d[5]
-            factors[int(d[1]),int(d[2])] = mrob.SE3(T).ln()
+            factors[int(d[1]),int(d[2])] = mrob.SE3(T)
 
             # matrix information. g2o convention
             W = np.array(
@@ -100,7 +100,7 @@ with open(file_path, 'r') as file:
             T[2, 3] = d[4]
             #print('ds: ', d[1], d[2], d[3],d[4],d[5],d[6],d[7],d[8])
             #print(T)
-            vertex_ini[int(d[1])] = mrob.SE3(T).ln()
+            vertex_ini[int(d[1])] = mrob.SE3(T)
             # create an empty list of pairs of nodes (factor) connected to each node
             factors_dictionary[int(d[1])] = []
 
@@ -112,7 +112,7 @@ with open(file_path, 'r') as file:
 # Initialize FG
 graph = mrob.FGraph()
 x = vertex_ini[0]
-print(x)
+print(x.T())
 n = graph.add_node_pose_3d(x)
 W = np.eye(6)
 graph.add_factor_1pose_3d(x,n,1e5*W)
@@ -143,13 +143,13 @@ for t in range(1,N):
     #graph.solve(mrob.GN)
     #graph.solve(mrob.LM, 5)
     end = time.time()
-    print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    #print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))
 
 
     # plot the current problem
-    if (t+1) % 10 == 0:
-        print_3d_graph(graph)
+    if (t+1) % 15 == 0:
+        #print_3d_graph(graph) #TODO this does not work
         pass
         
 

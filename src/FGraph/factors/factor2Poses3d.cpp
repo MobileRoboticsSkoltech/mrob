@@ -13,14 +13,13 @@
 #include "mrob/factors/factor2Poses3d.hpp"
 
 #include <iostream>
-#include <Eigen/Cholesky>
 
 using namespace mrob;
 
 
-Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &nodeOrigin,
+Factor2Poses3d::Factor2Poses3d(const Mat4 &observation, std::shared_ptr<Node> &nodeOrigin,
         std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf, bool updateNodeTarget):
-        Factor(6,12), obs_(observation), Tobs_(observation), W_(obsInf)
+        Factor(6,12), Tobs_(observation), W_(obsInf)
 {
     if (nodeOrigin->get_id() < nodeTarget->get_id())
     {
@@ -33,17 +32,40 @@ Factor2Poses3d::Factor2Poses3d(const Mat61 &observation, std::shared_ptr<Node> &
         neighbourNodes_.push_back(nodeOrigin);
 
         // inverse observations to correctly modify this
-        obs_ = -observation;
-        Tobs_ = SE3(obs_);
+        Tobs_.inv();
     }
-    WT2_ = W_.llt().matrixU();
     if (updateNodeTarget)
     {
         // Updates the child node such that it matches the odometry observation
         // carefull on the reference frame that Tobs is expressed at the X_origin frame, hence this change:
-        Mat4 TxOrigin = nodeOrigin->get_stateT();
-        SE3 T = SE3(TxOrigin) * Tobs_;//TODO how many SE3 structures are created here?
-        nodeTarget->set_state(T.ln_vee());
+        Mat4 TxOrigin = nodeOrigin->get_state();
+        nodeTarget->set_state( TxOrigin * Tobs_.T() );
+    }
+}
+
+Factor2Poses3d::Factor2Poses3d(const SE3 &observation, std::shared_ptr<Node> &nodeOrigin,
+        std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf, bool updateNodeTarget):
+        Factor(6,12), Tobs_(observation), W_(obsInf)
+{
+    if (nodeOrigin->get_id() < nodeTarget->get_id())
+    {
+        neighbourNodes_.push_back(nodeOrigin);
+        neighbourNodes_.push_back(nodeTarget);
+    }
+    else
+    {
+        neighbourNodes_.push_back(nodeTarget);
+        neighbourNodes_.push_back(nodeOrigin);
+
+        // inverse observations to correctly modify this
+        Tobs_.inv();
+    }
+    if (updateNodeTarget)
+    {
+        // Updates the child node such that it matches the odometry observation
+        // carefull on the reference frame that Tobs is expressed at the X_origin frame, hence this change:
+        Mat4 TxOrigin = nodeOrigin->get_state();
+        nodeTarget->set_state( TxOrigin * Tobs_.T() );
     }
 }
 
@@ -58,8 +80,8 @@ void Factor2Poses3d::evaluate_residuals()
     // NOTE: We could also use the adjoint to refer the manifold coordinates obs w.r.t xo but in this case that
     // does not briung any advantage on the xo to the global frame (identity)
     // (xo reference)T_obs * T_xo  = T_xo * (global)T_obs. (rhs is what we use here)
-    Mat4 TxOrigin = get_neighbour_nodes()->at(0)->get_stateT();
-    Mat4 TxTarget = get_neighbour_nodes()->at(1)->get_stateT();
+    Mat4 TxOrigin = get_neighbour_nodes()->at(0)->get_state();
+    Mat4 TxTarget = get_neighbour_nodes()->at(1)->get_state();
     Tr_ = SE3(TxOrigin) * Tobs_ * SE3(TxTarget).inv();
     r_ = Tr_.ln_vee();
 
@@ -77,7 +99,7 @@ void Factor2Poses3d::evaluate_chi2()
 }
 void Factor2Poses3d::print() const
 {
-    std::cout << "Printing Factor: " << id_ << ", obs= \n" << obs_
+    std::cout << "Printing Factor: " << id_ << ", obs= \n" << Tobs_.T()
               << "\n Residuals= \n" << r_
               << " \nand Information matrix\n" << W_
               << "\n Calculated Jacobian = \n" << J_

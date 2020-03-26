@@ -147,6 +147,11 @@ public:
      * of the ln(T * T_rhs^{-1})
      */
     double distance(const SE3 &rhs) const;
+    /**
+     * Regenerate, does the following operation:
+     * T = Exp ( Ln(T) )
+     */
+    void regenerate();
 
 
     void print(void) const;

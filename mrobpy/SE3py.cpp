@@ -25,8 +25,13 @@ using namespace mrob;
 
 void init_SE3(py::module &m) {
     py::class_<SE3>(m, "SE3")
+		.def(py::init<>(),
+				"Default contructor, creates the identity transformation",
+				py::return_value_policy::copy)
+        .def(py::init<const Mat4 &>(),
+        		"Matrix contructor, requires a 4x4 RBT matrix",
+				py::return_value_policy::copy)
         .def(py::init<const Mat61 &>(), py::return_value_policy::copy)
-        .def(py::init<const Mat4 &>(), py::return_value_policy::copy)
         .def(py::init<const SE3 &>(), py::return_value_policy::copy)
         .def("T", &SE3::T, py::return_value_policy::copy) // makes a copy of the 4x4 Transformation
         .def("R", &SE3::R, py::return_value_policy::copy)
@@ -35,7 +40,7 @@ void init_SE3(py::module &m) {
         .def("update", &SE3::update_lhs)
         .def("update_lhs", &SE3::update_lhs)
         .def("update_rhs", &SE3::update_rhs)
-        .def("ln", &SE3::ln_vee, py::return_value_policy::copy)
+        .def("Ln", &SE3::ln_vee, "Logarithm + vee operator, returns 6 coordinates in the manifold", py::return_value_policy::copy)
         .def("transform", &SE3::transform, py::return_value_policy::copy)
         .def("transform_array", &SE3::transform_array, py::return_value_policy::copy,
               "Input is a an array Nx3 and output is Nx3") // makes a copy of the array. TODO, pass by Ref and avoid copying, look at ownership
@@ -47,7 +52,8 @@ void init_SE3(py::module &m) {
     m.def("isSE3", &mrob::isSE3, "Returns True is the matrix is a valid transformation and False if not");
 
     py::class_<SO3>(m, "SO3")
-        .def(py::init<const Mat31 &>(), py::return_value_policy::copy)
+		.def(py::init<>(), py::return_value_policy::copy)
+		.def(py::init<const Mat31 &>(), py::return_value_policy::copy)
         .def(py::init<const Mat3 &>(), py::return_value_policy::copy)
         .def(py::init<const SO3 &>(), py::return_value_policy::copy)
         .def("R", &SO3::R, py::return_value_policy::copy)
@@ -55,7 +61,7 @@ void init_SE3(py::module &m) {
         .def("update", &SO3::update_lhs )
         .def("update_lhs", &SO3::update_lhs )
         .def("update_rhs", &SO3::update_rhs )
-        .def("ln", &SO3::ln_vee, py::return_value_policy::copy)
+        .def("Ln", &SO3::ln_vee, py::return_value_policy::copy)
         .def("inv", &SO3::inv, py::return_value_policy::copy)
         .def("adj", &SO3::adj, py::return_value_policy::copy)
         .def("distance", &SO3::distance)

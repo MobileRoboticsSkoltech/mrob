@@ -10,7 +10,6 @@
  */
 
 #include <iostream>
-#include <Eigen/Cholesky>
 #include <mrob/factors/factor2Poses2d.hpp>
 
 
@@ -35,7 +34,6 @@ Factor2Poses2d::Factor2Poses2d(const Mat31 &observation, std::shared_ptr<Node> &
         // reverse observations to account for this
         obs_ = -observation;
     }
-    WT2_ = W_.llt().matrixU();
     if (updateNodeTarget)
     {
         Mat31 dx = nodeOrigin->get_state() +  obs_ - nodeTarget->get_state();
@@ -121,7 +119,7 @@ void Factor2Poses2dOdom::evaluate_residuals()
 void Factor2Poses2dOdom::evaluate_jacobians()
 {
     // Get the position of node we are traversing from
-    auto node1 = get_neighbour_nodes()->at(0).get()->get_state();
+    Mat31 node1 = get_neighbour_nodes()->at(0).get()->get_state();
 
     auto s = -obs_[1] * sin(node1[2]), c = obs_[1] * sin(node1[2]);
 

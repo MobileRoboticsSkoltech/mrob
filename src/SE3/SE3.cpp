@@ -248,6 +248,12 @@ void SE3::print_lie(void) const
     std::cout << this->ln_vee() << std::endl;
 }
 
+void SE3::regenerate()
+{
+    Mat4 xi_hat = this->ln();
+    this->exp(xi_hat);
+}
+
 bool mrob::isSE3(Mat4 T)
 {
     if (!isSO3(T.topLeftCorner<3,3>()) )

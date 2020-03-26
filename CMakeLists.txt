@@ -59,8 +59,8 @@ INCLUDE_DIRECTORIES(./src/PCRegistration)
 ADD_SUBDIRECTORY(./src/PCRegistration)
 
 
-INCLUDE_DIRECTORIES(./src/EigenFactors)
-ADD_SUBDIRECTORY(./src/EigenFactors)
+#INCLUDE_DIRECTORIES(./src/EigenFactors)
+#ADD_SUBDIRECTORY(./src/EigenFactors)
 
 # New modules should be included here
 
