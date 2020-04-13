@@ -43,7 +43,7 @@ int PCRegistration::arun(const Ref<const MatX> X, const Ref<const MatX> Y, SE3 &
     //More efficient than creating a matrix of ones when on Release mode (not is Debug mode)
     Mat13 cxm = X.colwise().sum();
     cxm /= (double)N;
-    Mat13 cym = Y.rowwise().sum();
+    Mat13 cym = Y.colwise().sum();
     cym /= (double)N;
 
     // 2)  calculate dispersion from centroids qx = x_i - cx
