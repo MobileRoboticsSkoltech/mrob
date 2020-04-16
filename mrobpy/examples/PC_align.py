@@ -40,7 +40,7 @@ def vis_her(X, Y, T = []):
 
 def vis_arr(X):
 	pcd = open3d.PointCloud()
-	pcd.points =open3d.Vector3dVector(X)
+	pcd.points =open3d.utility.Vector3dVector(X)
 	pcd.paint_uniform_color(np.random.rand(3,).astype(np.float64))
 	open3d.visualization.draw_geometries([pcd])
 
