@@ -21,6 +21,9 @@ def plot_segments(segments, color, T = []):
 		pcds.append(pcd)
 	return pcds
 
+
+# 1) Preprecess/Generate points each of them labeled with plane ID
+# -----------------------------------------------------------------------------------
 points = 1500
 planes = 3
 poses = 5
@@ -31,14 +34,15 @@ pcds_updated = []
 for i in range(poses-1):
 	labels = f_tr.get_point_plane_ids(i)
 	points = np.array(f_tr.get_point_cloud(i))
-	#points = f_tr.get_point_cloud(i)
-	#print(type(points))
-	points_next = np.array(f_tr.get_point_cloud(i+1))
 	s = i/poses
 	pcds.extend(plot_segments(create_planes(labels, points), color=[1-s,0,s]))
-	T_arun = mrob.align_arun(points,points_next)
-	labels = f_tr.get_point_plane_ids(i+1)
-	pcds_updated.extend(plot_segments(create_planes(labels, points_next), color=[1-s,0,s], T = T_arun.T()))
 
 open3d.visualization.draw_geometries(pcds)
-open3d.visualization.draw_geometries(pcds_updated)
+
+# 2) Generate structure
+# -----------------------------------------------------------------------------------
+
+
+# 3) Solve Plane aligment
+# -----------------------------------------------------------------------------------
+

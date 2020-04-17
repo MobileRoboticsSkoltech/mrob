@@ -18,6 +18,7 @@ namespace py = pybind11;
 void init_SE3(py::module &m);
 void init_FGraph(py::module &m);
 void init_PCRegistration(py::module &m);
+void init_PCPlanes(py::module &m);
 
 
 
@@ -27,6 +28,7 @@ PYBIND11_MODULE(mrob, m) {
     init_SE3(m);
     init_FGraph(m);
     init_PCRegistration(m);
+    init_PCPlanes(m);
 }
 
 
