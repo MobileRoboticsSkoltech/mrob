@@ -35,7 +35,7 @@ class PlaneRegistration{
 
   public:
     PlaneRegistration();
-    PlaneRegistration(uint_t numberPlanes , uint_t numberPoses);
+    //PlaneRegistration(uint_t numberPlanes , uint_t numberPoses);
     ~PlaneRegistration();
 
     void set_number_planes_and_poses(uint_t numPlanes, uint_t numPoses);

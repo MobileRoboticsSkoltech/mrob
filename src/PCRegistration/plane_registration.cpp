@@ -26,7 +26,7 @@ PlaneRegistration::PlaneRegistration():
 {
 }
 // XX is this constructor really necessary?
-PlaneRegistration::PlaneRegistration(uint_t numberPlanes, uint_t numberPoses):
+/*PlaneRegistration::PlaneRegistration(uint_t numberPlanes, uint_t numberPoses):
         numberPlanes_(numberPlanes), numberPoses_(numberPoses),isSolved_(0),
         trajMode_(TrajectoryMode::SEQUENCE), trajectory_(new std::vector<SE3>(numberPoses, SE3())),
         solveMode_(SolveMode::GRADIENT_DESCENT_NAIVE),
@@ -36,7 +36,7 @@ PlaneRegistration::PlaneRegistration(uint_t numberPlanes, uint_t numberPoses):
     inverseHessian_.resize(numberPoses, 1e-3 * Mat6::Identity());
     previousJacobian_.resize(numberPoses, Mat61::Zero());
     previousState_.resize(numberPoses, Mat61::Zero());
-}
+}*/
 
 PlaneRegistration::~PlaneRegistration()
 {
