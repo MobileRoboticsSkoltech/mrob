@@ -13,7 +13,6 @@
 #include "mrob/factors/factor1Pose1Landmark3d.hpp"
 
 #include <iostream>
-#include <Eigen/Cholesky>
 
 using namespace mrob;
 
@@ -38,9 +37,8 @@ Factor1Pose1Landmark3d::Factor1Pose1Landmark3d(const Mat31 &observation, std::sh
 
     if (initializeLandmark)
     {
-        // Initialize landmark value to whatever observation we see from current pose
+        // TODO Initialize landmark value to whatever observation we see from current pose
     }
-    WT2_ = W_.llt().matrixU();
 }
 
 Factor1Pose1Landmark3d::~Factor1Pose1Landmark3d()
@@ -57,7 +55,7 @@ void Factor1Pose1Landmark3d::evaluate_residuals()
         landmarkIndex = 0;
         poseIndex = 1; 
     }
-    Mat4 Tx = get_neighbour_nodes()->at(poseIndex)->get_stateT();
+    Mat4 Tx = get_neighbour_nodes()->at(poseIndex)->get_state();
     Tinv_ = SE3(Tx).inv();
     landmark_ = get_neighbour_nodes()->at(landmarkIndex)->get_state();
     r_ = Tinv_.transform(landmark_) - obs_;

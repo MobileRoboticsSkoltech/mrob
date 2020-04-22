@@ -48,7 +48,7 @@ with open('../../datasets/M3500.txt', 'r') as file:
 #print(factors_dictionary)
 
 # Initialize FG
-graph = mrob.FGraph()
+graph = mrob.fgraph.FGraph()
 x = np.zeros(3)
 n = graph.add_node_pose_2d(x)
 print('node 0 id = ', n) # id starts at 1
@@ -94,24 +94,24 @@ for t in range(1,N):
 
 if 0:
     print('current initial chi2 = ', graph.chi2() )
-    graph.solve(mrob.LM, 50)
+    graph.solve(mrob.fgraph.LM, 50)
     print('LM chi2 = ', graph.chi2() )
     print_2d_graph(graph)
 
 if 1:
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     print('Iter 0 chi2 = ', graph.chi2() )
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     print('Iter 1 chi2 = ', graph.chi2() )
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     print('Iter 2 chi2 = ', graph.chi2() )
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     print('Iter 3 chi2 = ', graph.chi2() )
     #print_2d_graph(graph)
 
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     print('Iter 4 chi2 = ', graph.chi2() )
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     print('Iter 5 chi2 = ', graph.chi2() ) #already converges
     print_2d_graph(graph)
 

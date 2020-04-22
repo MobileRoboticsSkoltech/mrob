@@ -35,13 +35,13 @@ void NodePose2d::update_from_auxiliary(const Eigen::Ref<const MatX1> &dx)
 }
 
 
-void NodePose2d::set_state(const Eigen::Ref<const MatX1> &x)
+void NodePose2d::set_state(const Eigen::Ref<const MatX> &x)
 {
     state_ = x;
     state_(2) = wrap_angle(state_(2));
 }
 
-void NodePose2d::set_auxiliary_state(const Eigen::Ref<const MatX1> &x)
+void NodePose2d::set_auxiliary_state(const Eigen::Ref<const MatX> &x)
 {
     auxiliaryState_ = x;
     auxiliaryState_(2) = wrap_angle(auxiliaryState_(2));

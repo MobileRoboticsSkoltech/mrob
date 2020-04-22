@@ -30,11 +30,10 @@ class NodeLandmark3d : public Node
 
     virtual void update(const Eigen::Ref<const MatX1> &dx);
     virtual void update_from_auxiliary(const Eigen::Ref<const MatX1> &dx);
-    virtual void set_state(const Eigen::Ref<const MatX1> &x);
-    virtual void set_auxiliary_state(const Eigen::Ref<const MatX1> &x);
-    virtual const Eigen::Ref<const MatX1> get_state() const {return state_;};
-    virtual const Eigen::Ref<const MatX> get_stateT() const;
-    virtual const Eigen::Ref<const MatX1> get_auxiliary_state() const {return auxiliaryState_;};
+    virtual void set_state(const Eigen::Ref<const MatX> &x);
+    virtual void set_auxiliary_state(const Eigen::Ref<const MatX> &x);
+    virtual const Eigen::Ref<const MatX> get_state() const {return state_;};
+    virtual const Eigen::Ref<const MatX> get_auxiliary_state() const {return auxiliaryState_;};
     void print() const;
 
   protected:

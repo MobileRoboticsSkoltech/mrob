@@ -48,10 +48,9 @@ namespace mrob{
         void evaluate_jacobians() override;
         void evaluate_chi2() override;
 
-        const Eigen::Ref<const MatX1> get_obs() const override {return obs_;};
+        const Eigen::Ref<const MatX> get_obs() const override {return obs_;};
         const Eigen::Ref<const MatX1> get_residual() const override {return r_;};
         const Eigen::Ref<const MatX> get_information_matrix() const override {return W_;};
-        const Eigen::Ref<const MatX> get_trans_sqrt_information_matrix() const override {return WT2_;};
         const Eigen::Ref<const MatX> get_jacobian() const override {return J_;};
         void print() const override;
 
@@ -61,7 +60,6 @@ namespace mrob{
         // declared here but initialized on child classes
         Mat31 obs_, r_; //and residuals
         Mat3 W_;//inverse of observation covariance (information matrix)
-        Mat3 WT2_;//transpose and squared root of W = RT R = W1/2 * WT/2.
         Mat<3,6> J_;//Joint Jacobian
 
     public:

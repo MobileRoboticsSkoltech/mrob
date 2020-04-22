@@ -21,10 +21,10 @@ using namespace mrob;
 int PCRegistration::gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
            const Eigen::Ref<const MatX> covX, const Eigen::Ref<const MatX> covY, SE3 &T, double tol)
 {
-    assert(X.rows() == 3  && "PCRegistration::Gicp: Incorrect sizing, we expect 3xN");
-    assert(X.cols() >= 3  && "PCRegistration::Gicp: Incorrect sizing, we expect at least 3 correspondences (not aligned)");
-    assert(Y.cols() == X.cols()  && "PCRegistration::Gicp: Same number of correspondences");
-    uint_t N = X.cols();
+    assert(X.cols() == 3  && "PCRegistration::Gicp: Incorrect sizing, we expect Nx3");
+    assert(X.rows() >= 3  && "PCRegistration::Gicp: Incorrect sizing, we expect at least 3 correspondences (not aligned)");
+    assert(Y.rows() == X.rows()  && "PCRegistration::Gicp: Same number of correspondences");
+    uint_t N = X.rows();
     // TODO precalculation of T by reduced Arun
     // TODO different number of iterations and convergence criterion
 
@@ -41,9 +41,9 @@ int PCRegistration::gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const 
         for ( uint_t i = 0; i < N ; ++i)
         {
             // 1) Calculate residual r = y - Tx and the inverse of joint covariance
-            Mat31 Txi = T.transform(X.col(i));
-            Mat31 r = Y.col(i) - Txi;
-            Mat3 Li = (covY.block<3,3>(0,3*i) + T.R() * covX.block<3,3>(0,3*i) * T.R().transpose()).inverse();
+            Mat31 Txi = T.transform(X.row(i));
+            Mat31 r = Y.row(i).transpose() - Txi;
+            Mat3 Li = (covY.block<3,3>(3*i,0) + T.R() * covX.block<3,3>(3*i,0) * T.R().transpose()).inverse();
 
             // 2) Calculate Jacobian for residual Jf = df1/d xi = r1' Li * Jr, where Jr = [(Tx)^ ; -I])
             Mat<3,6> Jr;

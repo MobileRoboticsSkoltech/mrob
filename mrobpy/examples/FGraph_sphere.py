@@ -15,10 +15,10 @@ def print_3d_graph(graph):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     x = graph.get_estimated_state()
-    To =  mrob.SE3(vertex_ini[0]) #XXX for some reason (ownership?) can't do this is 1 line
+    To =  mrob.geometry.SE3(vertex_ini[0]) #XXX for some reason (ownership?) can't do this is 1 line
     prev_p =To.T()[:3,3]
     for xi in x:
-        Ti = mrob.SE3(xi)
+        Ti = mrob.geometry.SE3(xi)
         p = Ti.T()[:3,3]
         ax.plot((prev_p[0],p[0]),(prev_p[1],p[1]),(prev_p[2],p[2]) , '-b')
         prev_p = np.copy(p)
@@ -30,8 +30,8 @@ def plot_from_vertex(vertex):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     for i in range(1,N):
-        p = mrob.SE3(vertex[i]).T()[:3,3]
-        prev_p = mrob.SE3(vertex[i-1]).T()[:3,3]
+        p = mrob.geometry.SE3(vertex[i]).T()[:3,3]
+        prev_p = mrob.geometry.SE3(vertex[i-1]).T()[:3,3]
         #ax.scatter(p[0],p[1],p[2],color='green')
         ax.plot((prev_p[0],p[0]),(prev_p[1],p[1]),(prev_p[2],p[2]) , '-b')
         #prev_p = np.copy(p)
@@ -47,8 +47,8 @@ N = 2500
 
 # load file, .g2o format from https://github.com/RainerKuemmerle/g2o/wiki/File-Format
 #file_path = '../../datasets/sphere_bignoise_vertex3.g2o'
-file_path = '../../datasets/sphere_gt.g2o'
-#file_path = '../../datasets/sphere.g2o'
+#file_path = '../../datasets/sphere_gt.g2o'
+file_path = '../../datasets/sphere.g2o'
 with open(file_path, 'r') as file:
     for line in file:
         d = line.split()
@@ -65,11 +65,11 @@ with open(file_path, 'r') as file:
             # transforming quaterntion to SE3
             quat = np.array([d[6],d[7],d[8],d[9]],dtype='float64')
             T = np.eye(4,dtype='float64')
-            T[:3,:3] =  mrob.quat_to_so3(quat)
+            T[:3,:3] =  mrob.geometry.quat_to_so3(quat)
             T[0, 3] = d[3]
             T[1, 3] = d[4]
             T[2, 3] = d[5]
-            factors[int(d[1]),int(d[2])] = mrob.SE3(T).ln()
+            factors[int(d[1]),int(d[2])] = mrob.geometry.SE3(T)
 
             # matrix information. g2o convention
             W = np.array(
@@ -94,13 +94,13 @@ with open(file_path, 'r') as file:
             # transforming quaterntion to SE3
             quat = np.array([d[5],d[6],d[7],d[8]],dtype='float64')
             T = np.eye(4,dtype='float64')
-            T[:3,:3] =  mrob.quat_to_so3(quat)
+            T[:3,:3] =  mrob.geometry.quat_to_so3(quat)
             T[0, 3] = d[2]
             T[1, 3] = d[3]
             T[2, 3] = d[4]
             #print('ds: ', d[1], d[2], d[3],d[4],d[5],d[6],d[7],d[8])
             #print(T)
-            vertex_ini[int(d[1])] = mrob.SE3(T).ln()
+            vertex_ini[int(d[1])] = mrob.geometry.SE3(T)
             # create an empty list of pairs of nodes (factor) connected to each node
             factors_dictionary[int(d[1])] = []
 
@@ -110,9 +110,9 @@ with open(file_path, 'r') as file:
 #plot_from_vertex(vertex_ini)
 
 # Initialize FG
-graph = mrob.FGraph()
+graph = mrob.fgraph.FGraph()
 x = vertex_ini[0]
-print(x)
+print(x.T())
 n = graph.add_node_pose_3d(x)
 W = np.eye(6)
 graph.add_factor_1pose_3d(x,n,1e5*W)
@@ -143,13 +143,13 @@ for t in range(1,N):
     #graph.solve(mrob.GN)
     #graph.solve(mrob.LM, 5)
     end = time.time()
-    print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
+    #print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
     processing_time.append(1e3*(end - start))
 
 
     # plot the current problem
-    if (t+1) % 10 == 0:
-        print_3d_graph(graph)
+    if (t+1) % 15 == 0:
+        #print_3d_graph(graph) #TODO this does not work
         pass
         
 
@@ -161,7 +161,7 @@ if 1:
     print('Current state of the graph: chi2 = ' , graph.chi2() )
     print_3d_graph(graph)
     start = time.time()
-    graph.solve(mrob.LM,20)
+    graph.solve(mrob.fgraph.LM,20)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     print_3d_graph(graph)
@@ -170,35 +170,35 @@ if 0:
     print('Current state of the graph: chi2 = ' , graph.chi2() )
     print_3d_graph(graph)
     start = time.time()
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     start = time.time()
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     start = time.time()
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     start = time.time()
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     start = time.time()
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     start = time.time()
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     start = time.time()
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     start = time.time()
-    graph.solve(mrob.GN)
+    graph.solve(mrob.fgraph.GN)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     

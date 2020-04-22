@@ -16,11 +16,19 @@
 
 using namespace mrob;
 
-NodePose3d::NodePose3d(const Mat61 &initial_x) :
-        Node(6), state_(initial_x),stateT_(initial_x), auxiliaryState_(initial_x)
+NodePose3d::NodePose3d(const Mat4 &initial_x) :
+        Node(6), state_(initial_x), auxiliaryState_(initial_x)
 {
-    assert(initial_x.rows() == 6 && "NodePose3d:: Incorrect dimension on initial state rows" );
-    assert(initial_x.cols() == 1 && "NodePose3d:: Incorrect dimension on initial state cols" );
+    // TODO remove me
+    //assert(initial_x.rows() == 6 && "NodePose3d:: Incorrect dimension on initial state rows" );
+    //assert(initial_x.cols() == 1 && "NodePose3d:: Incorrect dimension on initial state cols" );
+    assert(isSE3(initial_x) && "NodePose3d:: Incorrect initial state, not an element of SE3" );
+}
+
+NodePose3d::NodePose3d(const SE3 &initial_x) :
+		 Node(6), state_(initial_x), auxiliaryState_(initial_x)
+{
+	assert(isSE3(initial_x.T()) && "NodePose3d:: Incorrect initial state, not an element of SE3" );
 }
 
 NodePose3d::~NodePose3d()
@@ -33,41 +41,37 @@ void NodePose3d::update(const Eigen::Ref<const MatX1> &dx)
     Mat61 dxf = dx;
 
     // Tx and x are always sync, i.e., Tx = exp(x^)
-    stateT_.update_lhs(dxf);
-    state_ = stateT_.ln_vee();//this will cast to
-    stateT_ = SE3(state_);//XXX is it necessary to update this every update? random? or count?
+    state_.update_lhs(dxf);
+    // XXX regeneration of state is required, for now we do it every time. random? count?
+    // XXX is it necessary?
+    state_.regenerate();
 }
 
 void NodePose3d::update_from_auxiliary(const Eigen::Ref<const MatX1> &dx)
 {
     Mat61 dxf = dx;
-    SE3 T(auxiliaryState_);
-    T.update_lhs(dxf);
-    state_ = T.ln_vee();
-    stateT_ = T;
+    state_ = auxiliaryState_;//we update from the auxiliary state
+    state_.update_lhs(dxf);
 }
 
-void NodePose3d::set_state(const Eigen::Ref<const MatX1> &x)
+void NodePose3d::set_state(const Eigen::Ref<const MatX> &x)
 {
-    state_ = x;
-    stateT_ = SE3(state_);
+	// casting is necessary for SE3 constructor, it does not handle a ref TODO
+	Mat4 newState = x;
+    state_ = SE3(newState);
 }
 
-void NodePose3d::set_auxiliary_state(const Eigen::Ref<const MatX1> &x)
+void NodePose3d::set_auxiliary_state(const Eigen::Ref<const MatX> &x)
 {
-    auxiliaryState_ = x;
-}
-
-const Eigen::Ref<const MatX> NodePose3d::get_stateT() const
-{
-    return stateT_.T();
+	Mat4 newState = x;
+    auxiliaryState_ = SE3(newState);
 }
 
 void NodePose3d::print() const
 {
     std::cout << "Printing NodePose3d: " << id_
-        << ", state = \n" << state_ << ",\n SE3 matrix: \n";
-    stateT_.print();
+        << ", state = \n" << state_.ln_vee() << ",\n SE3 matrix: \n";
+    state_.print();
     std::cout  <<  "\nand neighbour factors " << neighbourFactors_.size()
         << std::endl;
 }

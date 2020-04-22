@@ -40,26 +40,21 @@ void NodeLandmark3d::update_from_auxiliary(const Eigen::Ref<const MatX1> &dx)
     state_ = auxiliaryState_ + dxf;
 }
 
-void NodeLandmark3d::set_state(const Eigen::Ref<const MatX1> &x)
+void NodeLandmark3d::set_state(const Eigen::Ref<const MatX> &x)
 {
+	// cast is done by Eigen
     state_ = x;
 }
 
-void NodeLandmark3d::set_auxiliary_state(const Eigen::Ref<const MatX1> &x)
+void NodeLandmark3d::set_auxiliary_state(const Eigen::Ref<const MatX> &x)
 {
     auxiliaryState_ = x;
-}
-
-const Eigen::Ref<const MatX> NodeLandmark3d::get_stateT() const
-{
-    assert(0 && "NodeLandmark3d::get_stateT(): this method should not be called.");
-    return Mat3::Zero();
 }
 
 void NodeLandmark3d::print() const
 {
     std::cout << "Printing NodeLandmark3d: " << id_
-        << ", state = \n" << state_ << ",\n SE3 matrix: \n";
+        << ", state = \n" << state_;
     std::cout  <<  "\nand neighbour factors " << neighbourFactors_.size()
         << std::endl;
 }

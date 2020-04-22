@@ -362,15 +362,15 @@ void FGraphSolve::synchronize_nodes_state()
 }
 
 // method to output (to python) or other programs the current state of the system.
-std::vector<MatX1> FGraphSolve::get_estimated_state()
+std::vector<MatX> FGraphSolve::get_estimated_state()
 {
-    vector<MatX1> results;
+    vector<MatX> results;
     results.reserve(nodes_.size());
 
     for (uint_t i = 0; i < nodes_.size(); i++)
     {
         //nodes_[i]->print();
-        MatX1 updated_pos = nodes_[i]->get_state();
+        MatX updated_pos = nodes_[i]->get_state();
         results.emplace_back(updated_pos);
     }
 

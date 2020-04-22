@@ -68,10 +68,10 @@ public:
      */
     matData_t chi2(bool evaluateResidualsFlag = true);
     /**
-     * Rerturns a Reference to the solution vector
-     * of all variables.
+     * Returns a Reference to the solution vector
+     * of all variables, vectors, matrices, etc.
      */
-    std::vector<MatX1> get_estimated_state();
+    std::vector<MatX> get_estimated_state();
 
     /**
      * Functions to set the matrix method building

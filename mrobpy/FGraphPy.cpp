@@ -1,4 +1,4 @@
-/* Copyright 2018-2019 Skolkovo Institute of Science and Technology (Skoltech)
+/* Copyright 2018-2020 Skolkovo Institute of Science and Technology (Skoltech)
  * All rights reserved.
  *
  * FGraphPy.cpp
@@ -76,20 +76,26 @@ public:
 
     // 3D factor graph
     // ------------------------------------------------------------------------------------
-    id_t add_node_pose_3d(const py::EigenDRef<const Mat61> x)
+    /*id_t add_node_pose_3d(const py::EigenDRef<const Mat4> x)
+    {
+        std::shared_ptr<mrob::Node> n(new mrob::NodePose3d(x));
+        this->add_node(n);
+        return n->get_id();
+    }*/
+    id_t add_node_pose_3d(const SE3 &x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodePose3d(x));
         this->add_node(n);
         return n->get_id();
     }
-    id_t add_factor_1pose_3d(const py::EigenDRef<const Mat61> obs, uint_t nodeId, const py::EigenDRef<const Mat6> obsInvCov)
+    id_t add_factor_1pose_3d(const SE3 &obs, uint_t nodeId, const py::EigenDRef<const Mat6> obsInvCov)
     {
         auto n1 = this->get_node(nodeId);
         std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose3d(obs,n1,obsInvCov));
         this->add_factor(f);
         return f->get_id();
     }
-    id_t add_factor_2poses_3d(const py::EigenDRef<const Mat61> obs, uint_t nodeOriginId, uint_t nodeTargetId,
+    id_t add_factor_2poses_3d(const SE3 &obs, uint_t nodeOriginId, uint_t nodeTargetId,
             const py::EigenDRef<const Mat6> obsInvCov, bool updateNodeTarget)
     {
         auto nO = this->get_node(nodeOriginId);
@@ -179,8 +185,5 @@ void init_FGraph(py::module &m)
                             py::arg("obsInvCov"),
                             py::arg("initializeLandmark") = false)
             ;
-    // AUxiliary functions to support other conventions (TORO, g2o)
-    m.def("quat_to_so3", &quat_to_so3,"Suport function from quaternion to a rotation");
-    m.def("so3_to_quat", &so3_to_quat,"Suport function from rotation matrix to quaternion");
-    m.def("rpy_to_so3",  &rpy_to_so3,"Suport function from roll pitch yaw to a rotation");
+
 }

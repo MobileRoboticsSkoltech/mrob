@@ -27,13 +27,13 @@ class Node;
  * Factors keep track of all their neighbour nodes they are connected to.
  *
  * In general, the residuals are formulated as follows:
- * observation = h(nodeOrigin,nodeTarget) = x_target - x_origin
+ * z (observation) = h(nodeOrigin,nodeTarget)
  * or
- * residual =  x_origin + observation - x_target
+ * residual =  z - h(x0)
  *
  * With this arrangement, the linearized factor substracts the residual (r)
  * to the first order term of the nonlinear observation function:
- * || J dx - r ||
+ * || h(x) - z  || = || h(x0) + J dx - z || = || J dx - r ||
  *
  * This convention will be followed by all factors in this library, otherwise the optimization
  * will not work properly.
@@ -93,12 +93,14 @@ public:
      * Return a Ref to a dynamic matrix, while the child matrix should declare
      * all these variables as fixed size matrices, and ref takes care of
      * doing the conversion with minimal temporary artifacts
+     * Observation can be a 3d point, a 3d pose (transfromation 4x4), etc.
      */
-    virtual const Eigen::Ref<const MatX1> get_obs() const = 0;
+    virtual const Eigen::Ref<const MatX> get_obs() const = 0;
+    /**
+     * Residual will always be a block vector
+     */
     virtual const Eigen::Ref<const MatX1> get_residual() const = 0;
     virtual const Eigen::Ref<const MatX> get_information_matrix() const = 0;
-    //XXX since we dont use QR this may be deprecated, isnt it?
-    virtual const Eigen::Ref<const MatX> get_trans_sqrt_information_matrix() const = 0;
     /**
      * get_jacobian returns a block matrices stacking all the Jacobians on the factor.
      * The convention is that Jacobians corresponding to
@@ -127,9 +129,8 @@ protected:
 
     // variables to declare on child Factor, for instance of dim 6
     //Mat61 obs_, r_; //and residuals
-    //Mat6 J1_,J2_;//Jacobians
+    //Mat<Z,N> J_;//Jacobians
     //Mat6 W_;//inverse of observation covariance (information matrix)
-    //Mat6 WT2_;//transpose and squared root of W.
 
 };
 
