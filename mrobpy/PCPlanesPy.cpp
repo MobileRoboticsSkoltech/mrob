@@ -35,15 +35,17 @@ using namespace mrob;
 
 void init_PCPlanes(py::module &m)
 {
+	// This class creates a synthetic testing
     py::class_<CreatePoints>(m,"CreatePoints")
             .def(py::init<uint_t, uint_t, uint_t, double>())
             .def("get_point_cloud", &CreatePoints::get_point_cloud,
-            		"Input time index and outpus all points at that instant in time")
+            		"Input time index and outputs all points at that instant in time")
             .def("get_point_plane_ids", &CreatePoints::get_point_plane_ids,
             		"Input time index and outputs the plane IDs of each point, in the exact same order")
             .def("create_plane_registration", &CreatePoints::create_plane_registration,
-            		"This fills in the structure for the class plane registration, ready to optimized with the synthtically created points. TODO this is a reference, not a deep copy!")
+            		"This fills in the structure for the class plane registration, ready to optimized with the synthetically created points. TODO this is a reference, not a deep copy!")
             ;
+    // This class is a data structure, containing all points and calculating plane registration
     py::class_<PlaneRegistration>(m,"PlaneRegistration")
             .def(py::init<>(),
             		"Constructor, by default empty structure")

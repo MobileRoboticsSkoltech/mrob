@@ -185,8 +185,5 @@ void init_FGraph(py::module &m)
                             py::arg("obsInvCov"),
                             py::arg("initializeLandmark") = false)
             ;
-    // AUxiliary functions to support other conventions (TORO, g2o)
-    m.def("quat_to_so3", &quat_to_so3,"Suport function from quaternion to a rotation");
-    m.def("so3_to_quat", &so3_to_quat,"Suport function from rotation matrix to quaternion");
-    m.def("rpy_to_so3",  &rpy_to_so3,"Suport function from roll pitch yaw to a rotation");
+
 }

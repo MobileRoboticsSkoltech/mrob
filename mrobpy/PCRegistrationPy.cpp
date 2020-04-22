@@ -54,9 +54,9 @@ SE3 weighted_solve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const 
 
 void init_PCRegistration(py::module &m)
 {
-    m.def("align_arun", &arun_solve);
-    m.def("align_gicp", &gicp_solve);
-    m.def("align_weighted", &weighted_solve);
+    m.def("arun", &arun_solve);
+    m.def("gicp", &gicp_solve);
+    m.def("weighted", &weighted_solve);
 }
 
 

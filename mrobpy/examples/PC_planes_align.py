@@ -42,7 +42,7 @@ for i in range(poses-1):
 
 open3d.visualization.draw_geometries(pcds)
 
-# 2) Generate structure
+# 2) Generate structure: inputs should be PC with labels and we should get
 # -----------------------------------------------------------------------------------
 problem = mrob.PlaneRegistration() #empty creator
 # fills in all data from synthetic points into problem for optimiation

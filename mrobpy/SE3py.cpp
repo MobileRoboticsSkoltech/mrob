@@ -23,7 +23,7 @@ namespace py = pybind11;
 using namespace mrob;
 
 
-void init_SE3(py::module &m) {
+void init_geometry(py::module &m) {
     py::class_<SE3>(m, "SE3")
 		.def(py::init<>(),
 				"Default contructor, creates the identity transformation",
@@ -69,5 +69,10 @@ void init_SE3(py::module &m) {
         ;
     m.def("hat3", &mrob::hat3, "Returns a skew symetric matrix 3x3 from a 3-vector", py::return_value_policy::copy);
     m.def("hat6", &mrob::hat6, "Returns a Lie algebra matrix 4x4 from a 6-vector", py::return_value_policy::copy);
+
+    // AUxiliary functions to support other conventions (TORO, g2o)
+    m.def("quat_to_so3", &quat_to_so3,"Suport function from quaternion to a rotation");
+    m.def("so3_to_quat", &so3_to_quat,"Suport function from rotation matrix to quaternion");
+    m.def("rpy_to_so3",  &rpy_to_so3,"Suport function from roll pitch yaw to a rotation");
 }
 

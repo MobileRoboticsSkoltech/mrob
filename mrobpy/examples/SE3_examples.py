@@ -37,12 +37,12 @@ def plotT(T, ax):
 if 1:
     print('Printing orientations')
     w = np.zeros(3)
-    R = mrob.SO3(w)
+    R = mrob.geometry.SO3(w)
     R.print()
     ax = plotConfig()
     T = np.eye(4)
     T[:3,:3] = R.R()
-    plotT(mrob.SE3(T),ax)# we use this function, but it is equivalent since the translation is set to zero
+    plotT(mrob.geometry.SE3(T),ax)# we use this function, but it is equivalent since the translation is set to zero
     plt.title('Rotation Identity')
     plt.savefig('SO3_1.pdf', bbox_inches='tight')  
     plt.show()
@@ -50,11 +50,11 @@ if 1:
     
     # Rotation on z axis
     w[2] = -np.pi/4
-    R = mrob.SO3(w)
+    R = mrob.geometry.SO3(w)
     R.print()
     T[:3,:3] = R.R()
     ax = plotConfig()
-    plotT(mrob.SE3(T),ax)
+    plotT(mrob.geometry.SE3(T),ax)
     plt.title('Rotation over the z axis')
     plt.savefig('SO3_2.pdf', bbox_inches='tight')  
     plt.show()
@@ -63,11 +63,11 @@ if 1:
         
     # Rotation on z axis
     w = np.random.randn(3)
-    R = mrob.SO3(w)
+    R = mrob.geometry.SO3(w)
     R.print()
     T[:3,:3] = R.R()
     ax = plotConfig()
-    plotT(mrob.SE3(T),ax)
+    plotT(mrob.geometry.SE3(T),ax)
     plt.title('Rotation')
     plt.savefig('SO3_3.pdf', bbox_inches='tight')  
     plt.show()
@@ -92,20 +92,20 @@ if 1:
 
     # interpolation in the manifold of se(3)^vee
     # and proper interpolation in SE(3)
-    T_0 = mrob.SE3(xi_ini)
+    T_0 = mrob.geometry.SE3(xi_ini)
     T_0_inv = T_0.inv()
-    T_1 = mrob.SE3(xi_fin)
+    T_1 = mrob.geometry.SE3(xi_fin)
     T_1.print()
     print('direct T1\n',T_1.T())
-    mrob.SE3(T_1.T()).print()
-    #dxi = mrob.SE3( (T_1.T() @ T_0_inv.T()) ).Ln()
+    mrob.geometry.SE3(T_1.T()).print()
+    #dxi = mrob.geometry.SE3( (T_1.T() @ T_0_inv.T()) ).Ln()
     dxi = T_1.mul(T_0_inv).Ln()
     for i in range(N):
-        Ti = mrob.SE3(xi[i,:])
+        Ti = mrob.geometry.SE3(xi[i,:])
         plotT(Ti,ax)
         #print(Ti.T())
         
-        Ts = mrob.SE3(t[i]*dxi).mul(T_0)
+        Ts = mrob.geometry.SE3(t[i]*dxi).mul(T_0)
         #print(Ts.T())
         plotT(Ts,ax)
         
@@ -120,9 +120,9 @@ if 0:
     e = np.zeros(1000)
     for i in range(1000):
         xi = np.random.rand(6)*3
-        Tr = mrob.SE3(xi)
+        Tr = mrob.geometry.SE3(xi)
         T = Tr.inv()
-        Ti = mrob.SE3(-xi)
+        Ti = mrob.geometry.SE3(-xi)
         e[i] = np.linalg.norm(T.T()- Ti.T())
         #print( np.linalg.norm(T.T()- Ti.T()))
         
@@ -130,7 +130,7 @@ if 0:
     
 if 0:
     w = np.random.rand(3)
-    R = mrob.SO3(w)
+    R = mrob.geometry.SO3(w)
     print('SO3 matrix: \n', R.R() )
     print('SO3 in the manifold: \n', R.Ln())
     
