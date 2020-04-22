@@ -31,7 +31,7 @@ points = 1500
 planes = 3
 poses = 5
 
-synthetic_points = mrob.CreatePoints(points,planes,poses, 0.001)
+synthetic_points = mrob.registration.CreatePoints(points,planes,poses, 0.001)
 pcds = []
 pcds_updated = []
 for i in range(poses-1):
@@ -44,7 +44,7 @@ open3d.visualization.draw_geometries(pcds)
 
 # 2) Generate structure: inputs should be PC with labels and we should get
 # -----------------------------------------------------------------------------------
-problem = mrob.PlaneRegistration() #empty creator
+problem = mrob.registration.PlaneRegistration() #empty creator
 # fills in all data from synthetic points into problem for optimiation
 synthetic_points.create_plane_registration(problem)
 problem.print()
