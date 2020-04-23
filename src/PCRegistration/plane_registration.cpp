@@ -402,6 +402,27 @@ double PlaneRegistration::calculate_poses_rmse(std::vector<SE3> & groundTruth) c
     return std::sqrt(rmse);
 }
 
+//XXX this can be a reference, who does this interface with pybinds?
+std::vector<Mat31> PlaneRegistration::get_point_cloud(uint_t time)
+{
+	std::vector<Mat31> aggregated_pc;
+	for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
+    {
+        std::vector<Mat31>& plane_pc = it->second->get_points(time);
+        // aggregating elements
+        aggregated_pc.insert(aggregated_pc.end(), plane_pc.begin(), plane_pc.end());
+	}
+	return aggregated_pc;
+}
+
+Mat4 PlaneRegistration::get_trajectory(uint_t time)
+{
+    assert(time < numberPoses_ && "CreatePoints::getPointCloud: temporal index larger than number of calculated poses\n");
+    if (time < numberPoses_ )
+        return trajectory_->at(time).T();
+    return Mat4::Identity();
+}
+
 void PlaneRegistration::print(bool plotPlanes) const
 {
     std::cout << "Printing plane registration data :"<< std::endl;

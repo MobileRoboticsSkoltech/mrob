@@ -93,11 +93,16 @@ class Plane{
      */
     void calculate_all_matrices_Q();
     /**
-     * calculate Jacobian at time t, returns the Jacobian over the SVD od Q  = U D V'
+     * calculate Jacobian at time t, returns the Jacobian over the EF from SVD of Q  = U D V'
      * as d lamda = v' * dQ * v
      *
      */
     Mat61 calculate_jacobian(uint_t t);
+
+    /**
+     * calculates the Hessian of the eigen factor, as described in the paper
+     */
+    Mat6 calculate_hessian(uint_t t);
 
 
     void reset();

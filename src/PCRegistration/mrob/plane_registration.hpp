@@ -61,11 +61,12 @@ class PlaneRegistration{
     uint_t solve_initialize();
     double get_current_error();
     /**
-     * Get transformation returns a smart pointer to the vector of transformations,
+     * Get trajectory returns a smart pointer to the vector of transformations,
      * which is already shared by all Plane objects.
      * It serves for checking the solution and for modyfying the initial conditions for optimization (if any).
      */
-    std::shared_ptr<std::vector<SE3>>& get_transformations() {return trajectory_;};//if solved
+    //std::shared_ptr<std::vector<SE3>>& get_trajectory() {return trajectory_;};//if solved
+    Mat4 get_trajectory(uint_t time);
 
     /**
      * add_plane adds a plane structure already initialized and filled with data
@@ -82,6 +83,17 @@ class PlaneRegistration{
 
     void print(bool plotPlanes = true) const;
 
+    /**
+     * add point_cloud requires a complete set of points observed at a given time
+     * stamp (XXX now only an integer) and fills in the registration structure.
+     */
+    void add_point_cloud_planes(uint_t time, std::vector<Mat31>& points, std::vector<uint_t>& point_ids);
+    /**
+     * get_point_cloud gets all raw point, according to the current time index
+     * from trajectory. It does not distinguish between planes.
+     */
+    std::vector<Mat31> get_point_cloud(uint_t time);
+    std::vector<Mat31> get_point_plane_ids(uint_t time);
 
   protected:
     // flag for detecting when is has been solved

@@ -85,7 +85,7 @@ void SamplePlanarSurface::sampleBias()
     yBias_ = bias_(generator_);
 }
 
-Mat31 SamplePlanarSurface::samplePoint(double length)
+Mat31 SamplePlanarSurface::samplePoint()
 {
     return Mat31(x_(generator_) + xBias_, y_(generator_) + yBias_, z_(generator_) );
 }
@@ -136,7 +136,7 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
     // 2) generate initial and final pose, TODO We could add more intermediate points
     initialPose_ = SE3(); // the initial pose is a relative pose for the following poses
     SE3 initialPoseInv = initialPose_.inv();
-    Mat61 xi; xi << 0.3,1,-0.1,1,0,0;
+    //Mat61 xi; xi << 0.3,1,-0.1,1,0,0;
     finalPose_ = samplePoses_.samplePose();
     SE3 dx =  finalPose_ * initialPoseInv;
     Mat61 dxi = dx.ln_vee();
@@ -163,11 +163,9 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         {
             // parameter is the legnth of the observed plane
             uint_t planeId = std::floor((float)i * (float)numberPlanes_/ (float)numberPoints_);
-            Mat31 point = planePoses_[planeId].transform( samplePoints_.samplePoint( 0.5 ) );
+            Mat31 point = planePoses_[planeId].transform( samplePoints_.samplePoint() );
             point = transInvPose.transform(point);
-            // TODO some problem here on python
-            //std::cout << "\n point being pushed back            " << point;
-            X_[t].push_back( point );
+            X_[t].push_back( point );//XXX this should go away, only PC on planes
             pointId_[t].push_back(planeId);
             // add information to plane structure
             planes_[planeId].second->push_back_point(point,t);

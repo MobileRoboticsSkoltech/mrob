@@ -54,9 +54,9 @@ class SamplePlanarSurface{
     SamplePlanarSurface(double zStd, double bias = 0.0);
     ~SamplePlanarSurface();
     /**
-     * samples a point with noise on a square of given length
+     * samples a point with noise and biases as specified in class
      */
-    Mat31 samplePoint(double length);
+    Mat31 samplePoint();
     void sampleBias();
 
   protected:
@@ -78,8 +78,8 @@ public:
     ~CreatePoints();
 
     /**
-     * Fill the Planeregistration class with planes calcualted here (reset)
-     * and a new initial traejctory set to I's
+     * Fill the PlaneRegistration class with planes calculated here (reset)
+     * and a new initial trajectory set to I's
      */
     void create_plane_registration(PlaneRegistration& planeReg);
 

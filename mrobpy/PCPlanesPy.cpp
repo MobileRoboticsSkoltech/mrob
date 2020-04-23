@@ -48,11 +48,15 @@ void init_PCPlanes(py::module &m)
     // This class is a data structure, containing all points and calculating plane registration
     py::class_<PlaneRegistration>(m,"PlaneRegistration")
             .def(py::init<>(),
-            		"Constructor, by default empty structure")
+                    "Constructor, by default empty structure")
             .def("solve", &PlaneRegistration::solve_interpolate,
-            		py::arg("singleIteration") = false)
+                    py::arg("singleIteration") = false)
             .def("print", &PlaneRegistration::print,
-            		py::arg("plotPlanes") =  false)
+                    py::arg("plotPlanes") =  false)
 			// TODO add methods to fill in the data structure more properly, now it is a reference pass by sharing the smart pointer
+            .def("get_point_cloud", &PlaneRegistration::get_point_cloud,
+                    "Gets the point cloud at input time index")
+            .def("get_number_poses", &PlaneRegistration::get_number_poses)
+            .def("get_trajectory", &PlaneRegistration::get_trajectory)
             ;
 }
