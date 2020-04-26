@@ -221,6 +221,13 @@ Mat61 Plane::calculate_jacobian(uint_t t)
     return jacobian;
 }
 
+Mat6 Plane::calculate_hessian(uint_t t)
+{
+    Mat6 hessian = Mat6::Zero();
+    assert(0 && "program me!!");
+    return hessian;
+}
+
 void Plane::print() const
 {
     for (uint_t t = 0; t <  timeLength_; ++t)

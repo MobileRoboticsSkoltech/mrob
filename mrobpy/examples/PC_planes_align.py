@@ -33,7 +33,7 @@ def draw_planes_pc(problem):
 
 # 1) Preprecess/Generate points each of them labeled with plane ID
 # -----------------------------------------------------------------------------------
-points = 1500
+points = 500
 planes = 3
 poses = 4
 

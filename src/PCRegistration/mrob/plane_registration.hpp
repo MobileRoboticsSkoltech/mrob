@@ -55,6 +55,12 @@ class PlaneRegistration{
      */
     uint_t solve_interpolate(bool singleIteration = false);
     /**
+     * solve_interpolate_hessian() calculates the poses on trajectory such that the minimization objective
+     * is met: J = sum (lamda_min_plane), and the trajectory is described as an interpolation from I to T_f
+     * using second order methods with Hessian. Very similar to solve_interpolate
+     */
+    uint_t solve_interpolate_hessian(bool singleIteration = false);
+    /**
      * Initialization_solve give a first guess on all poses by using classical point-point
      * methods SVD-based to calculate an initial condition closer to the true solution
      */
@@ -63,7 +69,7 @@ class PlaneRegistration{
     /**
      * Get trajectory returns a smart pointer to the vector of transformations,
      * which is already shared by all Plane objects.
-     * It serves for checking the solution and for modyfying the initial conditions for optimization (if any).
+     * It serves for checking the solution and for modifying the initial conditions for optimization (if any).
      */
     //std::shared_ptr<std::vector<SE3>>& get_trajectory() {return trajectory_;};//if solved
     Mat4 get_trajectory(uint_t time);

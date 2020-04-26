@@ -12,7 +12,9 @@
 
 #include "mrob/pc_registration.hpp"
 #include "mrob/plane_registration.hpp"
+#include <Eigen/LU> // for inverse and determinant
 #include <iostream>
+
 
 #include <chrono>
 
@@ -332,6 +334,58 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
             trajectory_->at(t) = SE3(dxi);
         }
         ++solveIters;
+    }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters < 1e4);
+    return solveIters;
+}
+
+uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
+{
+    // iterative process, on convergence basis | error_k - error_k-1| < tol
+    // For now, only 1 iteration
+    uint_t solveIters = 0;
+    double previousError = 1e20, diffError = 10;
+
+    do
+    {
+
+        // 1) calculate plane estimation given the current trajectory. Same as solve_interpolate
+        double  initialError = 0.0;
+        for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
+        {
+            initialError += it->second->estimate_plane();
+        }
+        diffError = previousError - initialError;
+        previousError = initialError;
+
+        // 2) calculate Gradient and Hessian
+        Mat61 jacobian = Mat61::Zero(), accumulatedJacobian = Mat61::Zero();
+        Mat6 hessian = Mat6::Zero(), accumulatedHessian = Mat6::Zero();
+        double  tau = 1.0 / (double)(numberPoses_-1);
+        for (uint_t t = 1 ; t < numberPoses_; ++t)
+        {
+            jacobian.setZero();
+            for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
+            {
+                jacobian += it->second->calculate_jacobian(t);
+                hessian += it->second->calculate_hessian(t);
+            }
+            // TODO this should be changed to time stamps later
+            accumulatedJacobian +=  (tau *  t)  * jacobian;
+            accumulatedHessian += (tau *  t) * hessian;
+        }
+        // 3) calculate update Tf = exp(-dxi) * Tf (our convention, we expanded from the left)
+        Mat61 dxi = - accumulatedHessian.inverse() * jacobian;
+        trajectory_->back().update_lhs(dxi);
+
+
+        // 4) update full trajectory. Here we assume a full rank matrix TODO check for degenerate cases
+        Mat61 xiFinal = trajectory_->back().ln_vee();
+        for (uint_t t = 1 ; t < numberPoses_-1; ++t)
+        {
+            dxi = tau * t * xiFinal;// SE3 does not like all derived classes TODO
+            trajectory_->at(t) = SE3(dxi);
+        }
+        solveIters++;
     }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters < 1e4);
     return solveIters;
 }
