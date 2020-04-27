@@ -100,7 +100,8 @@ class Plane{
     Mat61 calculate_jacobian(uint_t t);
 
     /**
-     * calculates the Hessian of the eigen factor, as described in the paper
+     * calculates the Hessian of the eigen factor, as described in the paper.
+     * It requires to FIRST calculate gradient. TODO assert this?
      */
     Mat6 calculate_hessian(uint_t t);
 
@@ -130,6 +131,9 @@ class Plane{
     // gradient calculation Q
     std::vector<Mat4> matrixS_, matrixQ_;
     Mat4 accumulatedQ_;//Q matrix of accumulated values for the incremental update of the error.
+
+    // Store last gradients calculated (for Hessian)
+    std::vector<Mat4> gradQ_, lieGenerativeMatrices_;
 
   public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

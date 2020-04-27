@@ -32,6 +32,18 @@ Plane::Plane(uint_t timeLength):
     }
     matrixS_.reserve(timeLength_);
     matrixQ_.reserve(timeLength_);
+
+    //Initialize matrices for calculating Hessian
+    gradQ_.reserve(6);// one matrix for each dimension
+    lieGenerativeMatrices_.reserve(6);
+
+    //TODO create all generative matrices
+    Mat4 G;
+    G << 0, 0, -1, 0,
+         0, 0, 0, 0,
+         -1, 0, 0, 0,
+         0, 0, 0, 0;
+    lieGenerativeMatrices_.push_back(G);
 }
 
 Plane::~Plane()
@@ -157,6 +169,8 @@ void Plane::calculate_all_matrices_Q()
 Mat61 Plane::calculate_jacobian(uint_t t)
 {
     Mat61 jacobian;
+    gradQ_.clear();//used for Hessian, we bookeep all calculated gradients
+
     // calculate dQ/dxi for the submatrix S
     Mat4 dQ, &Q = matrixQ_[t];
 
@@ -168,6 +182,7 @@ Mat61 Plane::calculate_jacobian(uint_t t)
     dQ.row(1) << -Q.row(2);
     dQ.row(2) <<  Q.row(1);
     dQ += dQ.transpose().eval();
+    gradQ_.push_back(dQ);
     jacobian(0) = planeEstimation_.dot(dQ*planeEstimation_);
 
     // dQ / d xi(1) = [q3
@@ -178,6 +193,7 @@ Mat61 Plane::calculate_jacobian(uint_t t)
     dQ.row(0) <<  Q.row(2);
     dQ.row(2) << -Q.row(0);
     dQ += dQ.transpose().eval();
+    gradQ_.push_back(dQ);
     jacobian(1) = planeEstimation_.dot(dQ*planeEstimation_);
 
     // dQ / d xi(2) = [-q2
@@ -188,6 +204,7 @@ Mat61 Plane::calculate_jacobian(uint_t t)
     dQ.row(0) << -Q.row(1);
     dQ.row(1) <<  Q.row(0);
     dQ += dQ.transpose().eval();
+    gradQ_.push_back(dQ);
     jacobian(2) = planeEstimation_.dot(dQ*planeEstimation_);
 
     // dQ / d xi(3) = [q4
@@ -197,6 +214,7 @@ Mat61 Plane::calculate_jacobian(uint_t t)
     dQ.setZero();
     dQ.row(0) << Q.row(3);
     dQ += dQ.transpose().eval();
+    gradQ_.push_back(dQ);
     jacobian(3) = planeEstimation_.dot(dQ*planeEstimation_);
 
     // dQ / d xi(4) = [0
@@ -206,6 +224,7 @@ Mat61 Plane::calculate_jacobian(uint_t t)
     dQ.setZero();
     dQ.row(1) << Q.row(3);
     dQ += dQ.transpose().eval();
+    gradQ_.push_back(dQ);
     jacobian(4) = planeEstimation_.dot(dQ*planeEstimation_);
 
     // dQ / d xi(5) = [0
@@ -215,6 +234,7 @@ Mat61 Plane::calculate_jacobian(uint_t t)
     dQ.setZero();
     dQ.row(2) << Q.row(3);
     dQ += dQ.transpose().eval();
+    gradQ_.push_back(dQ);
     jacobian(5) = planeEstimation_.dot(dQ*planeEstimation_);
 
 
@@ -224,7 +244,18 @@ Mat61 Plane::calculate_jacobian(uint_t t)
 Mat6 Plane::calculate_hessian(uint_t t)
 {
     Mat6 hessian = Mat6::Zero();
-    assert(0 && "program me!!");
+    Mat4 ddQ, &Q = matrixQ_[t];
+    for (uint_t i =0 ; i< 6 ; ++i)
+    {
+        for (uint_t j = i ; j< 6 ; ++j)
+        {
+            ddQ.setZero();
+            ddQ = lieGenerativeMatrices_[i]*lieGenerativeMatrices_[j] + lieGenerativeMatrices_[j]*lieGenerativeMatrices_[i];
+            ddQ *= 0.5 * Q;
+            ddQ += lieGenerativeMatrices_[i] * gradQ_[j];
+            hessian(i,j) = planeEstimation_.dot(ddQ*planeEstimation_);
+        }
+    }
     return hessian;
 }
 

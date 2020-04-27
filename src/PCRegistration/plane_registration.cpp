@@ -374,6 +374,7 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
             accumulatedHessian += (tau *  t) * hessian;
         }
         // 3) calculate update Tf = exp(-dxi) * Tf (our convention, we expanded from the left)
+        // TODO this is an upper triangular matrix self adjoint matrix, inversion should take care of it
         Mat61 dxi = - accumulatedHessian.inverse() * jacobian;
         trajectory_->back().update_lhs(dxi);
 
