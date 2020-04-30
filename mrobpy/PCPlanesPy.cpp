@@ -49,7 +49,10 @@ void init_PCPlanes(py::module &m)
     py::class_<PlaneRegistration>(m,"PlaneRegistration")
             .def(py::init<>(),
                     "Constructor, by default empty structure")
+            .def("solve_initialize", &PlaneRegistration::solve_initialize) //Add all solvers into 1 function
             .def("solve", &PlaneRegistration::solve_interpolate,
+                    py::arg("singleIteration") = false)
+            .def("solve_hessian", &PlaneRegistration::solve_interpolate_hessian,
                     py::arg("singleIteration") = false)
             .def("print", &PlaneRegistration::print,
                     py::arg("plotPlanes") =  false)

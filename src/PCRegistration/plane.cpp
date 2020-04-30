@@ -39,9 +39,34 @@ Plane::Plane(uint_t timeLength):
 
     //TODO create all generative matrices
     Mat4 G;
-    G << 0, 0, -1, 0,
+    G << 0, 0, 0, 0,
+         0, 0, -1, 0,
+         0, 1, 0, 0,
+         0, 0, 0, 0;
+    lieGenerativeMatrices_.push_back(G);
+    G << 0, 0, 1, 0,
          0, 0, 0, 0,
          -1, 0, 0, 0,
+         0, 0, 0, 0;
+    lieGenerativeMatrices_.push_back(G);
+    G << 0, -1, 0, 0,
+         1, 0, 0, 0,
+         0, 0, 0, 0,
+         0, 0, 0, 0;
+    lieGenerativeMatrices_.push_back(G);
+    G << 0, 0, 0, 1,
+         0, 0, 0, 0,
+         0, 0, 0, 0,
+         0, 0, 0, 0;
+    lieGenerativeMatrices_.push_back(G);
+    G << 0, 0, 0, 0,
+         0, 0, 0, 1,
+         0, 0, 0, 0,
+         0, 0, 0, 0;
+    lieGenerativeMatrices_.push_back(G);
+    G << 0, 0, 0, 0,
+         0, 0, 0, 0,
+         0, 0, 0, 1,
          0, 0, 0, 0;
     lieGenerativeMatrices_.push_back(G);
 }
@@ -245,6 +270,9 @@ Mat6 Plane::calculate_hessian(uint_t t)
 {
     Mat6 hessian = Mat6::Zero();
     Mat4 ddQ, &Q = matrixQ_[t];
+
+    // H = pi' * dd Q * pi, where dd Q = Bij + Bij' and
+    // Bij = (Gi*Gj + Gj*Gi)Q*0.5 + Gi * dQ (previous gradient)
     for (uint_t i =0 ; i< 6 ; ++i)
     {
         for (uint_t j = i ; j< 6 ; ++j)
@@ -253,6 +281,7 @@ Mat6 Plane::calculate_hessian(uint_t t)
             ddQ = lieGenerativeMatrices_[i]*lieGenerativeMatrices_[j] + lieGenerativeMatrices_[j]*lieGenerativeMatrices_[i];
             ddQ *= 0.5 * Q;
             ddQ += lieGenerativeMatrices_[i] * gradQ_[j];
+            ddQ = ddQ + ddQ.transpose();
             hessian(i,j) = planeEstimation_.dot(ddQ*planeEstimation_);
         }
     }

@@ -34,7 +34,7 @@ def draw_planes_pc(problem):
 # 1) Preprecess/Generate points each of them labeled with plane ID
 # -----------------------------------------------------------------------------------
 points = 500
-planes = 3
+planes = 4
 poses = 4
 
 synthetic_points = mrob.registration.CreatePoints(points,planes,poses, 0.001)
@@ -57,6 +57,17 @@ draw_planes_pc(problem)
 
 # 3) Solve Plane aligment
 # -----------------------------------------------------------------------------------
+problem.solve_initialize()
+#draw_planes_pc(problem)
+
+
+
 problem.solve()
-problem.print()
+#problem.solve_hessian()
+#problem.print()
 draw_planes_pc(problem)
+    
+if 0:
+    for i in range(10):
+        problem.solve_hessian(True)
+        draw_planes_pc(problem)

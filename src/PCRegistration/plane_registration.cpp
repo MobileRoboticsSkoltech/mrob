@@ -287,6 +287,8 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
         diffError = previousError - initialError;
         previousError = initialError;
 
+        std::cout << "current error iteration " << solveIters << " = "<< initialError << std::endl;
+
         // 2) calculate Gradient = Jacobian^T. We maintain the nomenclature Jacobian for coherence on the project,
         //    but actually this Jacobian should be transposed.
         Mat61 jacobian = Mat61::Zero(), accumulatedJacobian = Mat61::Zero();
@@ -357,6 +359,8 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
         diffError = previousError - initialError;
         previousError = initialError;
 
+        std::cout << "current error iteration " << solveIters << " = "<< initialError << std::endl;
+
         // 2) calculate Gradient and Hessian
         Mat61 jacobian = Mat61::Zero(), accumulatedJacobian = Mat61::Zero();
         Mat6 hessian = Mat6::Zero(), accumulatedHessian = Mat6::Zero();
@@ -371,7 +375,7 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
             }
             // TODO this should be changed to time stamps later
             accumulatedJacobian +=  (tau *  t)  * jacobian;
-            accumulatedHessian += (tau *  t) * hessian;
+            accumulatedHessian += (tau *  t) * hessian.selfadjointView<Eigen::Upper>();
         }
         // 3) calculate update Tf = exp(-dxi) * Tf (our convention, we expanded from the left)
         // TODO this is an upper triangular matrix self adjoint matrix, inversion should take care of it
@@ -383,7 +387,7 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
         Mat61 xiFinal = trajectory_->back().ln_vee();
         for (uint_t t = 1 ; t < numberPoses_-1; ++t)
         {
-            dxi = tau * t * xiFinal;// SE3 does not like all derived classes TODO
+            dxi = tau * t * xiFinal;
             trajectory_->at(t) = SE3(dxi);
         }
         solveIters++;
@@ -395,14 +399,14 @@ uint_t PlaneRegistration::solve_initialize()
 {
     // TODO Maybe solve this as a plane-to-point alignment wrt T0
     // Initialize matrices of points
-    MatX X(3,numberPlanes_), Y(3,numberPlanes_);
+    MatX X(numberPlanes_,3), Y(numberPlanes_,3);
 
     // create points Y (from frame t =0), minimum 3 planes per pose
     uint_t t = 0;
     for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
     {
         it->second->calculate_all_matrices_S();
-        Y.col(t) = it->second->get_mean_point(0);
+        Y.row(t) = it->second->get_mean_point(0);
         ++t;
     }
 
@@ -413,7 +417,7 @@ uint_t PlaneRegistration::solve_initialize()
         X.setZero();
         for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
         {
-            X.col(cont) = it->second->get_mean_point(t);
+            X.row(cont) = it->second->get_mean_point(t);
             ++cont;
         }
         // Arun solver

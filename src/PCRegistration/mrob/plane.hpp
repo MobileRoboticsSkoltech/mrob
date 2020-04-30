@@ -101,7 +101,8 @@ class Plane{
 
     /**
      * calculates the Hessian of the eigen factor, as described in the paper.
-     * It requires to FIRST calculate gradient. TODO assert this?
+     * It requires to FIRST calculate gradient.
+     * Output is an upper traingular view of the symetric hessian matrix
      */
     Mat6 calculate_hessian(uint_t t);
 
