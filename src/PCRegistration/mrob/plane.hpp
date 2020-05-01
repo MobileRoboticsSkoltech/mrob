@@ -134,7 +134,7 @@ class Plane{
     Mat4 accumulatedQ_;//Q matrix of accumulated values for the incremental update of the error.
 
     // Store last gradients calculated (for Hessian)
-    std::vector<Mat4> gradQ_, lieGenerativeMatrices_;
+    std::vector<Mat4> gradQ_, lieGenerativeMatrices_;//TODO move this to a common library utility, replicating this every time is terrible.
 
   public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW

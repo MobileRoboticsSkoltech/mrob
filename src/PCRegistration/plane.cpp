@@ -14,6 +14,7 @@
 #include "mrob/plane.hpp"
 #include <iostream>
 #include <Eigen/SVD>
+#include <Eigen/LU>
 
 
 
@@ -281,7 +282,7 @@ Mat6 Plane::calculate_hessian(uint_t t)
             ddQ = lieGenerativeMatrices_[i]*lieGenerativeMatrices_[j] + lieGenerativeMatrices_[j]*lieGenerativeMatrices_[i];
             ddQ *= 0.5 * Q;
             ddQ += lieGenerativeMatrices_[i] * gradQ_[j];
-            ddQ = ddQ + ddQ.transpose();
+            ddQ += ddQ.transpose().eval();
             hessian(i,j) = planeEstimation_.dot(ddQ*planeEstimation_);
         }
     }

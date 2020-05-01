@@ -65,6 +65,11 @@ class PlaneRegistration{
      * methods SVD-based to calculate an initial condition closer to the true solution
      */
     uint_t solve_initialize();
+    /**
+     * reset_solution, resets the current calculated solution while maintainting all data (planes)
+     * This function is intended for comparing different solvers without replicating data
+     */
+    void reset_solution();
     double get_current_error();
     /**
      * Get trajectory returns a smart pointer to the vector of transformations,
@@ -110,10 +115,9 @@ class PlaneRegistration{
     std::unordered_map<uint_t, std::shared_ptr<Plane>> planes_;
     std::shared_ptr<std::vector<SE3>> trajectory_;
 
-    // Quasi Newton methods if used
+    // 1st order parameters methods if used
     PlaneRegistration::SolveMode solveMode_;
-    std::vector<Mat6> inverseHessian_;
-    std::vector<Mat61> previousJacobian_, previousState_;
+    std::vector<Mat61> previousState_;
     double c1_, c2_;    //parameters for the Wolfe conditions DEPRECATED?
     double alpha_, beta_;
 

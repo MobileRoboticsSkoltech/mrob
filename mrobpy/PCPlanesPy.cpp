@@ -54,6 +54,7 @@ void init_PCPlanes(py::module &m)
                     py::arg("singleIteration") = false)
             .def("solve_hessian", &PlaneRegistration::solve_interpolate_hessian,
                     py::arg("singleIteration") = false)
+            .def("reset_solution", &PlaneRegistration::reset_solution, "resets the current solution and maintains the data from planes (PC)")
             .def("print", &PlaneRegistration::print,
                     py::arg("plotPlanes") =  false)
 			// TODO add methods to fill in the data structure more properly, now it is a reference pass by sharing the smart pointer

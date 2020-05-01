@@ -55,28 +55,24 @@ void PlaneRegistration::set_number_planes_and_poses(uint_t numberPlanes, uint_t 
     numberPlanes_ = numberPlanes;
     numberPoses_ = numberPoses;
 
-    inverseHessian_.clear();
-    inverseHessian_.resize(numberPoses, 1e-3 * Mat6::Identity());
-    previousJacobian_.clear();
-    previousJacobian_.resize(numberPoses, Mat61::Zero());
     previousState_.clear();
     previousState_.resize(numberPoses, Mat61::Zero());
 }
 
+
+void PlaneRegistration::reset_solution()
+{
+    // trajectory is reset
+    trajectory_->clear();
+    trajectory_->resize(numberPoses_, SE3());
+    previousState_.clear();
+    previousState_.resize(numberPoses_, Mat61::Zero());
+}
+
+
 uint_t PlaneRegistration::solve(bool singleIteration)
 {
     // Initializitaion
-    //inverseHessian_.clear();
-    //inverseHessian_.resize(numberPoses, Mat6::Identity());
-    //Mat61 previousJacobian = Mat61::Zero();
-
-
-    // for benchmarking. This should go away later
-    typedef std::chrono::microseconds Ttim;
-    auto t1 = std::chrono::steady_clock::now();
-    auto t2 = std::chrono::steady_clock::now();
-    auto dif = std::chrono::duration_cast<Ttim>(t2 - t1);
-
 
     // iterative process, on convergence basis | error_k - error_k-1| < tol
     uint_t solveIters = 0;
@@ -235,26 +231,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
                 //std::cout << "update error = " << updateError << ", initial error = " << initialError << ", and alpha = " << alpha << ", iter = "<< iters << std::endl;
             }
 
-            // 3.X) NOT WORKING: BFGS, a first approach for alpha = 1 (no line search) or checking of Wolfe conditions.
-            //         We assume the problem to be behave as a quadratic function, which is accurate on the manifold of SE3 but not for a sequence of
-            //         poses. That makes the update state too agressive and the solution diverges
-            if (solveMode_ == SolveMode::BFGS)
-            {
-                // dxi = - D * grad f  | for alpha = 1
-                Mat61 dxi = - alpha_ * inverseHessian_[t]*jacobian ;
-                trajectory_->at(t).update_lhs(dxi);
-                // TODO Line search for updating alpha by satisfying Wolfe conditions
-                // update inverseHessian Dk
-                Mat61 y = jacobian/numberPoints - previousJacobian_[t];
-                double rho = y.dot(dxi);
-                //std::cout << "inverse hessian = " << inverseHessian_[t] << "\n gradient: "
-                //          <<  jacobian << std::endl;
-                inverseHessian_[t] = (Mat6::Identity() - dxi*y.transpose()/rho)*inverseHessian_[t]*(Mat6::Identity() - y*dxi.transpose()/rho) + dxi*dxi.transpose()/rho;
-                previousJacobian_[t] = jacobian/numberPoints;
-            }
 
-            // 3.X) SR1
-            // ------------------------------------------------------------------------------------------------------
         }
         solveIters++;
     }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters < 1e4);
