@@ -102,7 +102,7 @@ uint_t PlaneRegistration::solve(bool singleIteration)
             numberPoints = 0.0;
             for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
             {
-                jacobian += it->second->calculate_jacobian(t);
+                jacobian += it->second->calculate_gradient(t);
                 numberPoints += it->second->get_number_points(t);
                 //std::cout << "Plane " << it->first << ", error = " << it->second->estimate_plane() << ", Jacobian = " << it->second->calculate_jacobian(t).transpose() << std::endl;
             }
@@ -276,7 +276,7 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
             jacobian.setZero();
             for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
             {
-                jacobian += it->second->calculate_jacobian(t);
+                jacobian += it->second->calculate_gradient(t);
                 numberPoints += it->second->get_number_points(t);
             }
             // XXX this could be changed to time stamps later
@@ -339,24 +339,26 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
         std::cout << "current error iteration " << solveIters << " = "<< initialError << std::endl;
 
         // 2) calculate Gradient and Hessian
-        Mat61 jacobian = Mat61::Zero(), accumulatedJacobian = Mat61::Zero();
-        Mat6 hessian = Mat6::Zero(), accumulatedHessian = Mat6::Zero();
+        Mat61 gradient = Mat61::Zero();
+        Mat6 hessian = Mat6::Zero();
+        gradient_.setZero();
+        hessian_.setZero();
         double  tau = 1.0 / (double)(numberPoses_-1);
         for (uint_t t = 1 ; t < numberPoses_; ++t)
         {
-            jacobian.setZero();
+            gradient.setZero();
             for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
             {
-                jacobian += it->second->calculate_jacobian(t);
+                gradient += it->second->calculate_gradient(t);
                 hessian += it->second->calculate_hessian(t);
             }
             // TODO this should be changed to time stamps later
-            accumulatedJacobian +=  (tau *  t)  * jacobian;
-            accumulatedHessian += (tau *  t) * hessian.selfadjointView<Eigen::Upper>();
+            gradient_ +=  (tau *  t)  * gradient;
+            hessian_ += (tau *  t) * hessian.selfadjointView<Eigen::Upper>();
         }
         // 3) calculate update Tf = exp(-dxi) * Tf (our convention, we expanded from the left)
         // TODO this is an upper triangular matrix self adjoint matrix, inversion should take care of it
-        Mat61 dxi = - accumulatedHessian.inverse() * jacobian;
+        Mat61 dxi = - hessian_.inverse() * gradient;
         trajectory_->back().update_lhs(dxi);
 
 
@@ -369,6 +371,15 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
         }
         solveIters++;
     }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters < 1e4);
+    return solveIters;
+}
+
+
+uint_t PlaneRegistration::solve_quaternion_plane()
+{
+    uint_t solveIters = 0;
+    //double previousError = 1e20, diffError = 10;
+
     return solveIters;
 }
 
@@ -469,4 +480,23 @@ void PlaneRegistration::print(bool plotPlanes) const
         for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
             it->second->print();
     }
+}
+
+#include <Eigen/Eigenvalues>
+
+void PlaneRegistration::print_evaluate() const
+{
+    // Normals on planes
+    //for (auto it = planes_.cbegin();  it != planes_.cend(); ++it) //using iterators vs using range loop
+    for (auto plane : planes_)
+    {
+        Mat41 pi = plane.second->get_plane();
+        std::cout << "plane : \n" << pi << std::endl;
+        // TODO aggreate a matrix of norm. planes and a matrix of normals, check for rank.
+    }
+    // Hessian rank and eigen, look for negative vaps. Lasta hessina calculateds
+    Eigen::EigenSolver<MatX> eigs(hessian_);
+    std::cout << "eigen values are: \n" << eigs.eigenvalues() << std::endl;
+    // Determinant of stacked normals
+    std::cout << "det(Hessian) = \n" << hessian_.determinant() << std::endl;
 }

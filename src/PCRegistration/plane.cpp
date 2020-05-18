@@ -192,7 +192,7 @@ void Plane::calculate_all_matrices_Q()
     }
 }
 
-Mat61 Plane::calculate_jacobian(uint_t t)
+Mat61 Plane::calculate_gradient(uint_t t)
 {
     Mat61 jacobian;
     gradQ_.clear();//used for Hessian, we bookeep all calculated gradients

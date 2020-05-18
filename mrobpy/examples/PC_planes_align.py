@@ -68,7 +68,14 @@ problem.reset_solution()
 problem.solve_initialize()
 problem.solve_hessian()
 draw_planes_pc(problem)
-#problem.print()
+problem.print_evaluate()
+
+
+# printing for hessian at initial steps
+problem.reset_solution()
+problem.solve_initialize()
+problem.solve_hessian(True)
+problem.print_evaluate()
 
     
 if 0:

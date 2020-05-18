@@ -66,6 +66,11 @@ class PlaneRegistration{
      */
     uint_t solve_initialize();
     /**
+     * Solve quaternion plane uses a paramteric representation for each plane, a quaternion,
+     * and optimizes both the plane parameters and the trajectory variables
+     */
+    uint_t solve_quaternion_plane();
+    /**
      * reset_solution, resets the current calculated solution while maintainting all data (planes)
      * This function is intended for comparing different solvers without replicating data
      */
@@ -95,6 +100,13 @@ class PlaneRegistration{
     void print(bool plotPlanes = true) const;
 
     /**
+     * pront evaluate looks for degenerate cases, such as planes normal vectors,
+     * Hessian rank, det of all normals, etc. Basically this function tries to answer
+     * if the problem is ill-conditioned
+     */
+    void print_evaluate() const;
+
+    /**
      * add point_cloud requires a complete set of points observed at a given time
      * stamp (XXX now only an integer) and fills in the registration structure.
      */
@@ -120,6 +132,10 @@ class PlaneRegistration{
     std::vector<Mat61> previousState_;
     double c1_, c2_;    //parameters for the Wolfe conditions DEPRECATED?
     double alpha_, beta_;
+
+    //2nd order data (if used)
+    Mat61 gradient_;
+    Mat6 hessian_;
 
 };
 
