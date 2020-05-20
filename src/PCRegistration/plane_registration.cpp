@@ -486,14 +486,26 @@ void PlaneRegistration::print(bool plotPlanes) const
 
 void PlaneRegistration::print_evaluate() const
 {
-    // Normals on planes
-    //for (auto it = planes_.cbegin();  it != planes_.cend(); ++it) //using iterators vs using range loop
+    MatX allPlanes(numberPlanes_,4);
+    MatX allNormals(numberPlanes_,3);
+    uint_t i = 0;
+    // Normals on planes, check for rank
     for (auto plane : planes_)
     {
         Mat41 pi = plane.second->get_plane();
-        std::cout << "plane : \n" << pi << std::endl;
-        // TODO aggreate a matrix of norm. planes and a matrix of normals, check for rank.
+        //std::cout << "plane : \n" << pi << std::endl;
+        allPlanes.row(i) = pi;
+        allNormals.row(i) = pi.head(3)/(pi.head(3).norm());
+        ++i;
     }
+    // Orthogonality between planes (4 dim)
+    std::cout << "Orthogonality between planes: \n" << allPlanes * allPlanes.transpose() <<
+                  "\n and det  = \n" << allPlanes.determinant() << std::endl;
+
+    // Orthogonality between normals
+    std::cout << "Orthogonality between normals: \n" << allNormals * allNormals.transpose() <<
+                 "\n and det = \n" << allNormals.determinant() << std::endl;
+
     // Hessian rank and eigen, look for negative vaps. Lasta hessina calculateds
     Eigen::EigenSolver<MatX> eigs(hessian_);
     std::cout << "eigen values are: \n" << eigs.eigenvalues() << std::endl;

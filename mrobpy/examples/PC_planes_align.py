@@ -35,7 +35,7 @@ def draw_planes_pc(problem):
 # -----------------------------------------------------------------------------------
 points = 500
 planes = 3
-poses = 4
+poses = 3
 
 synthetic_points = mrob.registration.CreatePoints(points,planes,poses, 0.001)
 pcds = []
