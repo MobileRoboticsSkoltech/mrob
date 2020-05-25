@@ -274,6 +274,7 @@ Mat6 Plane::calculate_hessian(uint_t t)
 
     // H = pi' * dd Q * pi, where dd Q = Bij + Bij' and
     // Bij = (Gi*Gj + Gj*Gi)Q*0.5 + Gi * dQ (previous gradient)
+    // Upper triangular matrix
     for (uint_t i =0 ; i< 6 ; ++i)
     {
         for (uint_t j = i ; j< 6 ; ++j)

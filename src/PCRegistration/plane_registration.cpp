@@ -499,7 +499,8 @@ void PlaneRegistration::print_evaluate() const
         ++i;
     }
     // Orthogonality between planes (4 dim)
-    std::cout << "Orthogonality between planes: \n" << allPlanes * allPlanes.transpose() <<
+    std::cout << "current gradient \n" << gradient_ << std::endl;
+    std::cout << "solution\n" << allPlanes << "\nOrthogonality between planes: \n" << allPlanes * allPlanes.transpose() <<
                   "\n and det  = \n" << allPlanes.determinant() << std::endl;
 
     // Orthogonality between normals
@@ -511,4 +512,9 @@ void PlaneRegistration::print_evaluate() const
     std::cout << "eigen values are: \n" << eigs.eigenvalues() << std::endl;
     // Determinant of stacked normals
     std::cout << "det(Hessian) = \n" << hessian_.determinant() << std::endl;
+    // Hessian conditioning number
+    Eigen::JacobiSVD<Mat6> svd(hessian_, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    std::cout << "SVD decomposition : \n" << svd.singularValues() <<
+                  "\n vectors :\n" << svd.matrixU() <<
+                 "\n and conditioning number = " << svd.singularValues()(0)/svd.singularValues()(5) << std::endl;
 }
