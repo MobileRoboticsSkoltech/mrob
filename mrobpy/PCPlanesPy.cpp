@@ -49,16 +49,13 @@ void init_PCPlanes(py::module &m)
     py::class_<PlaneRegistration>(m,"PlaneRegistration")
             .def(py::init<>(),
                     "Constructor, by default empty structure")
-            .def("solve_initialize", &PlaneRegistration::solve_initialize) //Add all solvers into 1 function
-            .def("solve", &PlaneRegistration::solve_interpolate,
+            .def("solve", &PlaneRegistration::solve,
                     py::arg("singleIteration") = false)
-            .def("solve_hessian", &PlaneRegistration::solve_interpolate_hessian,
-                    py::arg("singleIteration") = false)
-            .def("solve_quaternion", &PlaneRegistration::solve_quaternion_plane)
             .def("reset_solution", &PlaneRegistration::reset_solution, "resets the current solution and maintains the data from planes (PC)")
             .def("print", &PlaneRegistration::print,
                     py::arg("plotPlanes") =  false)
-            .def("print_evaluate", &PlaneRegistration::print_evaluate)
+            .def("print_evaluate", &PlaneRegistration::print_evaluate,
+                    "returns: current error,1) number of iters, 2) determinant 3) number of negative eigenvalues 4) conditioning number")
 			// TODO add methods to fill in the data structure more properly, now it is a reference pass by sharing the smart pointer
             .def("get_point_cloud", &PlaneRegistration::get_point_cloud,
                     "Gets the point cloud at input time index")

@@ -28,7 +28,7 @@ int main()
 
 
     // 3) evaluate alignment
-    contPlanes.solve();
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
     contPlanes.print(false);
     contPlanes.solve();
     contPlanes.print(false);

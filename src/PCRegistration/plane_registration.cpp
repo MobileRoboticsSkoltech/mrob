@@ -23,7 +23,7 @@ using namespace mrob;
 
 PlaneRegistration::PlaneRegistration():
         numberPlanes_(0), numberPoses_(0),isSolved_(0), trajectory_(new std::vector<SE3>(8,SE3())),
-        solveMode_(SolveMode::GRADIENT_DESCENT_NAIVE),
+        solveMode_(SolveMode::GRADIENT),
         c1_(1e-4), c2_(0.9), alpha_(0.75), beta_(0.1)
 {
 }
@@ -70,188 +70,31 @@ void PlaneRegistration::reset_solution()
 }
 
 
-uint_t PlaneRegistration::solve(bool singleIteration)
+uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
 {
-    // Initializitaion
-
-    // iterative process, on convergence basis | error_k - error_k-1| < tol
-    uint_t solveIters = 0;
-    double previousError = 1e20, diffError = 10;
-    do
+    // just in case some methods, such as gradient, has several modes
+    solveMode_ = mode;
+    switch(mode)
     {
-
-        // 1) calculate plane estimation given the current trajectory
-        double  initialError = 0.0;
-        for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
-        {
-            initialError += it->second->estimate_plane();
-        }
-        diffError = previousError - initialError;
-        previousError = initialError;
-
-        // 2) calculate Gradient = Jacobian^T. We maintain the nomenclature Jacobian for coherence on the project,
-        //    but actually this Jacobian should be transposed.
-        Mat61 jacobian;
-        double  numberPoints;
-        // it should start at t = 1 because t = 0 is the fixed reference frame T0 = I
-        // Convergence greatly improves if we include the first pose as well.
-        // We update it and then transform all the sequence according to T0^-1 to maintain T0 = I
-        for (uint_t t = 0 ; t < trajectory_->size(); ++t)
-        {
-            jacobian.setZero();
-            numberPoints = 0.0;
-            for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
-            {
-                jacobian += it->second->calculate_gradient(t);
-                numberPoints += it->second->get_number_points(t);
-                //std::cout << "Plane " << it->first << ", error = " << it->second->estimate_plane() << ", Jacobian = " << it->second->calculate_jacobian(t).transpose() << std::endl;
-            }
-
-            // 3) update results Ti = exp(-dxi) * Ti (our convention, we expanded from the left)
-            // 3.1) gradient decent with fixed step upgrade alpha = 0.75/N
-            if (solveMode_ == SolveMode::GRADIENT_DESCENT_NAIVE)
-            {
-                // after some tuning, best values for alpha = 0.3
-                double alpha = alpha_/numberPoints;
-                Mat61 dxi = -alpha * jacobian;// dxi = alpha * p_k = alpha *(-Grad f)
-                //std::cout << "\njacobian : = " << jacobian.transpose() << ", at time step " << t <<  std::endl;
-                trajectory_->at(t).update_lhs(dxi);
-
-            }
-            // 3.1-A) Incremental update after each pose
-            // Results: does not improve much for a hug increase on the overhead
-            if (solveMode_ == SolveMode::GRADIENT_DESCENT_INCR)
-            {
-                double alpha = alpha_/numberPoints;
-                Mat61 dxi = -alpha * jacobian;// dxi = alpha * p_k = alpha *(-Grad f)
-                //std::cout << "jacobian : = " << jacobian.norm() << std::endl;
-                trajectory_->at(t).update_lhs(dxi);
-                for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
-                    //XXX we also return current new error lambda, it could be used
-                    it->second->estimate_plane_incrementally(t);// this updates the current solution v. XXX: SLOW
-            }
-
-            // 3.1-B) Steepest gradient decent with fixed step upgrade alpha = 1/N
-            // results: incredibly slow, useless
-            if (solveMode_ == SolveMode::STEEPEST)
-            {
-                double alpha = 1e-2;
-                Mat61 dxi = - alpha/jacobian.norm() * jacobian; //dxi = alpha * p_k = alpha *(-Grad f)/norm(Grad)
-                trajectory_->at(t).update_lhs(dxi);
-            }
-
-            // 3.2) Heavy Ball (Poliak'64): Gradient decent with averaging: x_k+1 = x_k - alpha Grad + beta (xk - x_k-1)
-            // Results: does not really improve much
-            if (solveMode_ == SolveMode::HEAVYBALL)
-            {
-                double alpha = 1.0/numberPoints;
-                Mat61 currentState = trajectory_->at(t).ln_vee();
-                std::cout << "diff in state : "<< (currentState - previousState_[t]).norm() <<  ", alpha gradient : = " << (alpha * jacobian).norm() << std::endl;
-                Mat61 dxi = -alpha * jacobian + 0.1 * (currentState - previousState_[t]);
-                previousState_[t] = currentState;
-                trajectory_->at(t).update_lhs(dxi);
-            }
-
-            // 3.3) Momentum (Hinton84?):
-            //      Gradient decent where Dx_k = beta * Dx_k - alpha Grad
-            //                                    and x_k+1 = x_k + D x_k
-            // Results: works great
-            if (solveMode_ == SolveMode::MOMENTUM)
-            {
-                double alpha = alpha_/numberPoints; // raw alpha = 1
-                //double beta = 0.1;
-                Mat61 dxi = -alpha * jacobian + beta_ * previousState_[t];
-                previousState_[t] = dxi;
-                std::cout << "diff in state : "<< dxi.norm() <<  ", alpha gradient : = " << (alpha * jacobian).norm() << std::endl;
-                trajectory_->at(t).update_lhs(dxi);
-            }
-
-            // 3.3-B) Momentum with a given sequence of params: Gradient decent where D x_k = beta * D x_k - alpha Grad
-            //                                    and x_k+1 = x_k + D x_k
-            // Results: not implemented
-            if (solveMode_ == SolveMode::MOMENTUM_SEQ)
-            {
-                // select a sequence of parameters
-                double alpha = 1.0/numberPoints;
-                double beta = 0.1; // adaptive depending on the gradient, sequence: 0.1, 0.5,0.9,0.99
-                Mat61 dxi = -alpha * jacobian + beta * previousState_[t];
-                previousState_[t] = dxi;
-                std::cout << "diff in state : "<< dxi.norm() <<  ", alpha gradient : = " << (alpha * jacobian).norm() << std::endl;
-                trajectory_->at(t).update_lhs(dxi);
-            }
-
-            // 3.4) Nesterov's Accelerated Gradient (NAG, by Nesterov): it can be understood as a momentum algorithm as well (see Sutskever'2013)
-            // Results: we did not implement this due to
-            //
-            // 3.4-B) Bengio's NAG: a modification to NAG as proposed in Bengio-2013. Fixed parameters
-            //          1) momentum or velocity  v_k = beta_k-1 v _k-1 - alpha_k-1 Grad f (x_k-1)
-            //          2) x_k+1 = x_k + beta_k+1 beta_k * v_k - (1 + beta_k+1)*alpha_k * Grad f(x_k)
-            // Restuls, works great, the default optimizer
-            if (solveMode_ == SolveMode::BENGIOS_NAG)
-            {
-                double alpha = alpha_/numberPoints; //raw alpha 1.0
-                //beta_ = 0.05;
-                // x update
-                Mat61 dxi = beta_ * beta_ * previousState_[t] - (1 + beta_) * alpha * jacobian;
-                trajectory_->at(t).update_lhs(dxi);
-
-                // momentum
-                previousState_[t] = beta_ * previousState_[t] - alpha * jacobian;
-
-            }
-
-            // ------------------------------------------------------------------------------------------------------
-            // 3.X) NOT WORKING gradient decent with line search using the Backtracking algorithm (Nocedal p.37)
-            // line search to satisfy t`he Wolfe conditions
-            // (I)  f(x_k + a_k p_k) - f(x_k) <= c1 a_k Grad f_k p_k
-            // (II) Grad f(x_k + a_k dx_k)'p_k >= c2 Grad f_k' dx_k
-            if (solveMode_ == SolveMode::GRADIENT_DESCENT_BACKTRACKING)
-            {
-                double alpha = 0.05; // alpha \in (0,1)
-                double updateError;
-                Mat61 p_k = -jacobian, dxiOld = Mat61::Zero();
-                bool backtrackingFlag;
-                uint_t iters = 0;
-                do
-                {
-                    Mat61 dxi = alpha * p_k;
-                    trajectory_->at(t).update_lhs(-dxiOld);//XXX a little ugly...
-                    trajectory_->at(t).update_lhs(dxi);
-                    dxiOld = dxi;
-                    // (I) calculate error at plane estimation for the current pose at time t
-                    updateError = 0.0;
-                    for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
-                    {
-                        updateError += it->second->get_error_incremental(t);
-                    }
-                    backtrackingFlag = (updateError <= initialError + c1_ * alpha * jacobian.dot(p_k));
-                    alpha *= 0.7;
-                    iters++;
-                }while(!backtrackingFlag && iters < 20);
-                //std::cout << "update error = " << updateError << ", initial error = " << initialError << ", and alpha = " << alpha << ", iter = "<< iters << std::endl;
-            }
-
-
-        }
-        solveIters++;
-    }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters < 1e4);
-    //}while(!singleIteration && solveIters < 200);
-
-    // correct for the first pose
-    // The first pose should be T0 = I, but optimizition slighly perturns it, so we correct it here
-    SE3 invFirstPose = trajectory_->at(0).inv();
-    for (SE3 &pose: *trajectory_)
-    {
-        pose = invFirstPose * pose;
+        case SolveMode::INITIALIZE:
+            return solve_initialize();
+        case SolveMode::GRADIENT:
+        case SolveMode::GRADIENT_BENGIOS_NAG:
+            return solve_interpolate_gradient(singleIteration);
+        case SolveMode::GN_HESSIAN:
+            return solve_interpolate_hessian(singleIteration);
+        case SolveMode::GN_CLAMPED_HESSIAN:
+        case SolveMode::LM_HESSIAN:
+        case SolveMode::LM_CLAMPED_HESSIAN:
+        default:
+            return 0;
     }
-
-    return solveIters;
 }
 
-uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
+uint_t PlaneRegistration::solve_interpolate_gradient(bool singleIteration)
 {
     // iterative process, on convergence basis | error_k - error_k-1| < tol
-    uint_t solveIters = 0;
+    solveIters_ = 0;
     double previousError = 1e20, diffError = 10;
     do
     {
@@ -264,7 +107,7 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
         diffError = previousError - initialError;
         previousError = initialError;
 
-        std::cout << "current error iteration " << solveIters << " = "<< initialError << std::endl;
+        std::cout << "current error iteration " << solveIters_ << " = "<< initialError << std::endl;
 
         // 2) calculate Gradient = Jacobian^T. We maintain the nomenclature Jacobian for coherence on the project,
         //    but actually this Jacobian should be transposed.
@@ -286,7 +129,7 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
         // 3) update results Tf = exp(-dxi) * Tf (our convention, we expanded from the left)
         // 3-1)
         Mat61 dxi, xiFinal;
-        if (solveMode_ == SolveMode::GRADIENT_DESCENT_NAIVE)
+        if (solveMode_ == SolveMode::GRADIENT)
         {
             double alpha = alpha_;
             dxi = -alpha * accumulatedJacobian;
@@ -295,7 +138,7 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
         // 3.4-B) Bengio's NAG: a modification to NAG as proposed in Bengio-2013. Fixed parameters
         //          1) momentum or velocity  v_k = beta_k-1 v _k-1 - alpha_k-1 Grad f (x_k-1)
         //          2) x_k+1 = x_k + beta_k+1 beta_k * v_k - (1 + beta_k+1)*alpha_k * Grad f(x_k)
-        if (solveMode_ == SolveMode::BENGIOS_NAG)
+        if (solveMode_ == SolveMode::GRADIENT_BENGIOS_NAG)
         {
             double alpha = alpha_;
             double beta = beta_;
@@ -312,16 +155,16 @@ uint_t PlaneRegistration::solve_interpolate(bool singleIteration)
             dxi = tau * t * xiFinal;// SE3 does not like all derived classes TODO
             trajectory_->at(t) = SE3(dxi);
         }
-        ++solveIters;
-    }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters < 1e4);
-    return solveIters;
+        ++solveIters_;
+    }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters_ < 1e4);
+    return solveIters_;
 }
 
 uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
 {
     // iterative process, on convergence basis | error_k - error_k-1| < tol
     // For now, only 1 iteration
-    uint_t solveIters = 0;
+    solveIters_ = 0;
     double previousError = 1e20, diffError = 10;
 
     do
@@ -336,7 +179,7 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
         diffError = previousError - initialError;
         previousError = initialError;
 
-        std::cout << "current error iteration " << solveIters << " = "<< initialError << std::endl;
+        std::cout << "current error iteration " << solveIters_ << " = "<< initialError << std::endl;
 
         // 2) calculate Gradient and Hessian
         Mat61 gradient = Mat61::Zero();
@@ -369,18 +212,18 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
             dxi = tau * t * xiFinal;
             trajectory_->at(t) = SE3(dxi);
         }
-        solveIters++;
-    }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters < 1e4);
-    return solveIters;
+        solveIters_++;
+    }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters_ < 1e4);
+    return solveIters_;
 }
 
 
 uint_t PlaneRegistration::solve_quaternion_plane()
 {
-    uint_t solveIters = 0;
+    solveIters_ = 0;
     //double previousError = 1e20, diffError = 10;
 
-    return solveIters;
+    return solveIters_;
 }
 
 uint_t PlaneRegistration::solve_initialize()
@@ -420,7 +263,7 @@ uint_t PlaneRegistration::solve_initialize()
     return 1;
 }
 
-double PlaneRegistration::get_current_error()
+double PlaneRegistration::get_current_error() const
 {
     double  currentError = 0.0;
     for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
@@ -484,8 +327,14 @@ void PlaneRegistration::print(bool plotPlanes) const
 
 #include <Eigen/Eigenvalues>
 
-void PlaneRegistration::print_evaluate() const
+// resturns: [0]error, [1]iters, hessdet[2], conditioningNumber[3]
+std::vector<double> PlaneRegistration::print_evaluate() const
 {
+    std::vector<double> result(6,0.0);
+
+    result[0] = get_current_error();
+    result[1] = solveIters_;
+
     MatX allPlanes(numberPlanes_,4);
     MatX allNormals(numberPlanes_,3);
     uint_t i = 0;
@@ -500,21 +349,28 @@ void PlaneRegistration::print_evaluate() const
     }
     // Orthogonality between planes (4 dim)
     std::cout << "current gradient \n" << gradient_ << std::endl;
-    std::cout << "solution\n" << allPlanes << "\nOrthogonality between planes: \n" << allPlanes * allPlanes.transpose() <<
-                  "\n and det  = \n" << allPlanes.determinant() << std::endl;
+    // XXX : NO, Orthogonolaity was not an issue
+    //std::cout << "solution\n" << allPlanes << "\nOrthogonality between planes: \n" << allPlanes * allPlanes.transpose() <<
+    //              "\n and det  = \n" << allPlanes.determinant() << std::endl;
 
-    // Orthogonality between normals
-    std::cout << "Orthogonality between normals: \n" << allNormals * allNormals.transpose() <<
-                 "\n and det = \n" << allNormals.determinant() << std::endl;
+    // XXX No, Orthogonality between normals
+    //std::cout << "Orthogonality between normals: \n" << allNormals * allNormals.transpose() <<
+    //             "\n and det = \n" << allNormals.determinant() << std::endl;
 
     // Hessian rank and eigen, look for negative vaps. Lasta hessina calculateds
     Eigen::EigenSolver<MatX> eigs(hessian_);
     std::cout << "eigen values are: \n" << eigs.eigenvalues() << std::endl;
     // Determinant of stacked normals
-    std::cout << "det(Hessian) = \n" << hessian_.determinant() << std::endl;
+    std::cout << "det(Hessian) = \n" << hessian_ << std::endl;
     // Hessian conditioning number
     Eigen::JacobiSVD<Mat6> svd(hessian_, Eigen::ComputeThinU | Eigen::ComputeThinV);
     std::cout << "SVD decomposition : \n" << svd.singularValues() <<
                   "\n vectors :\n" << svd.matrixU() <<
                  "\n and conditioning number = " << svd.singularValues()(0)/svd.singularValues()(5) << std::endl;
+
+    result[2] = hessian_.determinant();
+    //TODO count this and optimze
+    result[3] = svd.singularValues()(0)/svd.singularValues()(5);
+
+    return result;
 }

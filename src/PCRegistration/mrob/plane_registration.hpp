@@ -30,8 +30,17 @@ namespace mrob{
 class PlaneRegistration{
 
   public:
+    // XXX is this mode used anymore? deprecated?
     enum TrajectoryMode{SEQUENCE=0, INTERPOLATION};
-    enum SolveMode{GRADIENT_DESCENT_NAIVE=0, GRADIENT_DESCENT_INCR, STEEPEST, HEAVYBALL, MOMENTUM, MOMENTUM_SEQ, BENGIOS_NAG, GRADIENT_DESCENT_BACKTRACKING, BFGS};
+    // XXX Solve method is almost deprecated
+    //enum SolveModeGrad{GRADIENT_DESCENT_NAIVE=0, GRADIENT_DESCENT_INCR, STEEPEST, HEAVYBALL, MOMENTUM, MOMENTUM_SEQ, BENGIOS_NAG, GRADIENT_DESCENT_BACKTRACKING, BFGS};
+    enum SolveMode{INITIALIZE=0,
+                   GRADIENT,
+                   GRADIENT_BENGIOS_NAG,
+                   GN_HESSIAN,
+                   LM_HESSIAN,
+                   GN_CLAMPED_HESSIAN,
+                   LM_CLAMPED_HESSIAN};
 
   public:
     PlaneRegistration();
@@ -42,18 +51,16 @@ class PlaneRegistration{
     uint_t get_number_planes() const {return numberPlanes_;};
     uint_t get_number_poses() const {return numberPoses_;};
 
-    void set_solving_method(SolveMode mode) {solveMode_ = mode;};
-
     /**
      * solve() calculates the poses on trajectory such that the minimization objective
      * is met: J = sum (lamda_min_plane)
      */
-    uint_t solve(bool singleIteration = false);
+    uint_t solve(SolveMode mode, bool singleIteration = false);
     /**
      * solve_interpolate() calculates the poses on trajectory such that the minimization objective
      * is met: J = sum (lamda_min_plane), and the trajectory is described as an interpolation from I to T_f
      */
-    uint_t solve_interpolate(bool singleIteration = false);
+    uint_t solve_interpolate_gradient(bool singleIteration = false);
     /**
      * solve_interpolate_hessian() calculates the poses on trajectory such that the minimization objective
      * is met: J = sum (lamda_min_plane), and the trajectory is described as an interpolation from I to T_f
@@ -75,7 +82,7 @@ class PlaneRegistration{
      * This function is intended for comparing different solvers without replicating data
      */
     void reset_solution();
-    double get_current_error();
+    double get_current_error() const;
     /**
      * Get trajectory returns a smart pointer to the vector of transformations,
      * which is already shared by all Plane objects.
@@ -100,11 +107,17 @@ class PlaneRegistration{
     void print(bool plotPlanes = true) const;
 
     /**
-     * pront evaluate looks for degenerate cases, such as planes normal vectors,
+     * print evaluate looks for degenerate cases, such as planes normal vectors,
      * Hessian rank, det of all normals, etc. Basically this function tries to answer
      * if the problem is ill-conditioned
+     *
+     * Returns: 0) current error
+     *          1) number of iters,
+     *          2) determinant
+     *          3) number of negative eigenvalues
+     *          4) conditioning number
      */
-    void print_evaluate() const;
+    std::vector<double> print_evaluate() const;
 
     /**
      * add point_cloud requires a complete set of points observed at a given time
@@ -126,6 +139,7 @@ class PlaneRegistration{
     uint_t time_;
     std::unordered_map<uint_t, std::shared_ptr<Plane>> planes_;
     std::shared_ptr<std::vector<SE3>> trajectory_;
+    uint_t solveIters_;
 
     // 1st order parameters methods if used
     PlaneRegistration::SolveMode solveMode_;

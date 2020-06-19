@@ -35,7 +35,7 @@ def draw_planes_pc(problem):
 # -----------------------------------------------------------------------------------
 points = 500
 planes = 3
-poses = 2
+poses = 3
 
 synthetic_points = mrob.registration.CreatePoints(points,planes,poses, 0.001)
 pcds = []
@@ -57,7 +57,7 @@ synthetic_points.create_plane_registration(problem)
 
 # 3) Solve Plane aligment linear case
 # -----------------------------------------------------------------------------------
-problem.solve_initialize()
+#problem.solve_initialize()
 problem.solve()
 draw_planes_pc(problem)
 
@@ -65,17 +65,18 @@ draw_planes_pc(problem)
 
 # 4) Solve Hessian optimization
 problem.reset_solution()
-problem.solve_initialize()
+#problem.solve_initialize()
 problem.solve_hessian()
 draw_planes_pc(problem)
-problem.print_evaluate()
-
+r= problem.print_evaluate()
+print('overall results([0]error, [1]iters, hessdet[2], conditioningNumber[3]):\n',r)
 
 # printing for hessian at initial steps
 problem.reset_solution()
-problem.solve_initialize()
+#problem.solve_initialize()
 problem.solve_hessian(True)
-problem.print_evaluate()
+r = problem.print_evaluate()
+print('overall results ([0]error, [1]iters, hessdet[2], conditioningNumber[3]):\n',r)
 
     
 if 0:
