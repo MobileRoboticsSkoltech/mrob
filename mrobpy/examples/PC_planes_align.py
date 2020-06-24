@@ -29,7 +29,8 @@ def draw_planes_pc(problem):
         pc.paint_uniform_color([0.5,1-s, (1-s)/2])
         pc.transform(problem.get_trajectory(i))
         pcds.append(pc)
-    open3d.visualization.draw_geometries(pcds)
+    if 0:
+        open3d.visualization.draw_geometries(pcds)
 
 # 1) Preprecess/Generate points each of them labeled with plane ID
 # -----------------------------------------------------------------------------------

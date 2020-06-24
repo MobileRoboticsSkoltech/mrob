@@ -44,4 +44,5 @@ def vis_arr(X):
 	pcd.paint_uniform_color(np.random.rand(3,).astype(np.float64))
 	open3d.visualization.draw_geometries([pcd])
 
-vis_her(X,Y,np.asarray(T_arun.T()))
+if 0:
+    vis_her(X,Y,np.asarray(T_arun.T()))
