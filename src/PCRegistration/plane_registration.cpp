@@ -13,6 +13,7 @@
 #include "mrob/pc_registration.hpp"
 #include "mrob/plane_registration.hpp"
 #include <Eigen/LU> // for inverse and determinant
+#include <Eigen/Eigenvalues>
 #include <iostream>
 
 
@@ -82,8 +83,8 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
         case SolveMode::GRADIENT_BENGIOS_NAG:
             return solve_interpolate_gradient(singleIteration);
         case SolveMode::GN_HESSIAN:
-            return solve_interpolate_hessian(singleIteration);
         case SolveMode::GN_CLAMPED_HESSIAN:
+            return solve_interpolate_hessian(singleIteration);
         case SolveMode::LM_HESSIAN:
         case SolveMode::LM_CLAMPED_HESSIAN:
         default:
@@ -200,8 +201,23 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
             hessian_ += (tau *  t) * hessian.selfadjointView<Eigen::Upper>();
         }
         // 3) calculate update Tf = exp(-dxi) * Tf (our convention, we expanded from the left)
-        // TODO this is an upper triangular matrix self adjoint matrix, inversion should take care of it
-        Mat61 dxi = - hessian_.inverse() * gradient;
+        Mat61 dxi;
+        if (solveMode_ == SolveMode::GN_CLAMPED_HESSIAN)
+        {
+            // we clamp the vector spaces corresponding to negative eigenvals
+            Mat6 pseudoInv = Mat6::Zero();
+            Eigen::SelfAdjointEigenSolver<Mat6> eigs(hessian_);
+            for (uint_t i = 0; i < 6 ; ++i)
+            {
+                if(eigs.eigenvalues()[i] > 1e-4) //TODO set tolerance
+                {
+                    pseudoInv += (1.0/eigs.eigenvalues()(i)) * eigs.eigenvectors().col(i) * eigs.eigenvectors().col(i).transpose();//TODO
+                }
+            }
+            dxi = - pseudoInv * gradient;
+        }
+        else
+            dxi = - hessian_.inverse() * gradient;
         trajectory_->back().update_lhs(dxi);
 
 
@@ -221,7 +237,13 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
 uint_t PlaneRegistration::solve_quaternion_plane()
 {
     solveIters_ = 0;
-    //double previousError = 1e20, diffError = 10;
+    double previousError = 1e20, diffError = 10;
+
+    do
+    {
+        // calculate Jacobian
+    }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters_ < 1e4);
+
 
     return solveIters_;
 }
@@ -325,7 +347,6 @@ void PlaneRegistration::print(bool plotPlanes) const
     }
 }
 
-#include <Eigen/Eigenvalues>
 
 // resturns: [0]error, [1]iters, hessdet[2], conditioningNumber[3]
 std::vector<double> PlaneRegistration::print_evaluate() const

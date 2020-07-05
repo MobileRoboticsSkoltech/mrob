@@ -15,6 +15,8 @@
 #include <iostream>
 
 
+using namespace mrob;
+
 int main()
 {
     uint_t numPlanes = 4, numPoses = 2;
@@ -30,26 +32,25 @@ int main()
     // 3) evaluate alignment
     contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
     contPlanes.print(false);
-    contPlanes.solve();
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
     contPlanes.print(false);
-    contPlanes.solve();
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
     contPlanes.print(false);
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
-    contPlanes.solve();
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
+    contPlanes.solve(PlaneRegistration::SolveMode::GRADIENT);
     contPlanes.print(false);
 
 

@@ -57,7 +57,7 @@ synthetic_points.create_plane_registration(problem)
 
 # 3) Solve Plane aligment linear case
 # -----------------------------------------------------------------------------------
-#problem.solve_initialize()
+#problem.solve(SolveMode::INITIALIZE)
 problem.solve()
 draw_planes_pc(problem)
 
@@ -66,7 +66,7 @@ draw_planes_pc(problem)
 # 4) Solve Hessian optimization
 problem.reset_solution()
 #problem.solve_initialize()
-problem.solve_hessian()
+problem.solve()
 draw_planes_pc(problem)
 r= problem.print_evaluate()
 print('overall results([0]error, [1]iters, hessdet[2], conditioningNumber[3]):\n',r)
@@ -74,7 +74,7 @@ print('overall results([0]error, [1]iters, hessdet[2], conditioningNumber[3]):\n
 # printing for hessian at initial steps
 problem.reset_solution()
 #problem.solve_initialize()
-problem.solve_hessian(True)
+problem.solve(HESSIAN)
 r = problem.print_evaluate()
 print('overall results ([0]error, [1]iters, hessdet[2], conditioningNumber[3]):\n',r)
 
