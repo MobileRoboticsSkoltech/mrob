@@ -209,9 +209,13 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
             Eigen::SelfAdjointEigenSolver<Mat6> eigs(hessian_);
             for (uint_t i = 0; i < 6 ; ++i)
             {
+                std::cout << "POSITIVE cos distance to grad = " << eigs.eigenvectors().col(i).dot(gradient)/gradient.norm()
+                          << ", eigs = " << eigs.eigenvalues()[i] << std::endl;
                 if(eigs.eigenvalues()[i] > 1e-4) //TODO set tolerance
                 {
-                    pseudoInv += (1.0/eigs.eigenvalues()(i)) * eigs.eigenvectors().col(i) * eigs.eigenvectors().col(i).transpose();//TODO
+                    std::cout << "NEGATIVE cos distance to grad = " << eigs.eigenvectors().col(i).dot(gradient)/gradient.norm() << std::endl;
+                    pseudoInv += (1.0/eigs.eigenvalues()(i)) * eigs.eigenvectors().col(i) * eigs.eigenvectors().col(i).transpose();
+                    // XXX why is this function not monotonically decreasing? this is annoying, but makes clamping a bad idea: LM!
                 }
             }
             dxi = - pseudoInv * gradient;
@@ -239,10 +243,7 @@ uint_t PlaneRegistration::solve_quaternion_plane()
     solveIters_ = 0;
     double previousError = 1e20, diffError = 10;
 
-    do
-    {
-        // calculate Jacobian
-    }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters_ < 1e4);
+    // TODO create factor graph or call dense solver?
 
 
     return solveIters_;
@@ -385,9 +386,10 @@ std::vector<double> PlaneRegistration::print_evaluate() const
     std::cout << "det(Hessian) = \n" << hessian_ << std::endl;
     // Hessian conditioning number
     Eigen::JacobiSVD<Mat6> svd(hessian_, Eigen::ComputeThinU | Eigen::ComputeThinV);
-    std::cout << "SVD decomposition : \n" << svd.singularValues() <<
-                  "\n vectors :\n" << svd.matrixU() <<
-                 "\n and conditioning number = " << svd.singularValues()(0)/svd.singularValues()(5) << std::endl;
+    // TODO remove
+    //std::cout << "SVD decomposition : \n" << svd.singularValues() <<
+    //              "\n vectors :\n" << svd.matrixU() <<
+    //             "\n and conditioning number = " << svd.singularValues()(0)/svd.singularValues()(5) << std::endl;
 
     result[2] = hessian_.determinant();
     //TODO count this and optimze

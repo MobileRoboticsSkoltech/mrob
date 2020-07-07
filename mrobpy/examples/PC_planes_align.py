@@ -57,29 +57,30 @@ synthetic_points.create_plane_registration(problem)
 
 # 3) Solve Plane aligment linear case
 # -----------------------------------------------------------------------------------
-#problem.solve(SolveMode::INITIALIZE)
-problem.solve()
+#problem.solve(mrob.registration.INITIALIZE)
+#problem.solve(mrob.registration.GRADIENT)
+problem.solve(mrob.registration.GN_HESSIAN)
 draw_planes_pc(problem)
 
 
 
 # 4) Solve Hessian optimization
 problem.reset_solution()
-#problem.solve_initialize()
-problem.solve()
+#problem.solve(mrob.registration.INITIALIZE)
+problem.solve(mrob.registration.GN_CLAMPED_HESSIAN)
 draw_planes_pc(problem)
 r= problem.print_evaluate()
 print('overall results([0]error, [1]iters, hessdet[2], conditioningNumber[3]):\n',r)
 
 # printing for hessian at initial steps
-problem.reset_solution()
-#problem.solve_initialize()
-problem.solve(HESSIAN)
-r = problem.print_evaluate()
-print('overall results ([0]error, [1]iters, hessdet[2], conditioningNumber[3]):\n',r)
+#problem.reset_solution()
+#problem.solve(mrob.registration.INITIALIZE)
+#problem.solve(mrob.registration.GN_CLAMPED_HESSIAN, True)
+#r = problem.print_evaluate()
+#print('overall results ([0]error, [1]iters, hessdet[2], conditioningNumber[3]):\n',r)
 
     
 if 0:
     for i in range(10):
-        problem.solve_hessian(True)
+        problem.solve(mrob.registration.GN_HESSIAN, True)
         draw_planes_pc(problem)

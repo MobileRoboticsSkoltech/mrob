@@ -32,7 +32,7 @@ namespace mrob{
  *
  *
  * In particular, the relation between the transformation of poses is:
- *   z = T^{-1}p
+ *   z = T^{-1}*l
  *
  * z is a 3d point with the observations in the local frame T
  * T is the transformation encoded by the 3D pose, the local frame.
