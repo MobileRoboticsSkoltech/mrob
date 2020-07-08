@@ -26,7 +26,7 @@ namespace mrob{
  *  - Newton-Raphson (NR), this is a second order method of the form:
  *         x' = x - (Hessian)^-1 * Gradient
  *
- *         Note that Gauss-Newtow is an instance of this, but approximating the
+ *         Note that Gauss-Newton is an instance of this, but approximating the
  *         Hessian by J'*J
  *  - Levenberg-Marquard: Spherical approximation
  *         x' = x - (H + lambda * I)^-1 * gradient
@@ -48,39 +48,74 @@ public:
 	 *  - LM_E: Levenberg Marquardt: Eliptical
 	 */
 	enum optimMethod{NR=0, LM_S, LM_E};
-    Optimizer();
+    Optimizer(matData_t solutionTolerance = 1e-2, matData_t lambda = 1e-6);
     virtual ~Optimizer();
 
     /**
-     * Once the gradient and Hessian are generated, it optimizes according to
-     * the Newton-Raphson algorithm (second order method).
+     * Optimization call.
+     * Input: optmization method from {NR=0, LM_S, LM_E}
+     * output: number of iterations
+     */
+    uint_t optimize(optimMethod method);
+
+    /**
+     * General abstract functions to implement:
+     * Calculate error calculates the current error function
+     */
+    virtual matData_t calculate_error() = 0;
+    /**
+     * Gradient calculates the gradient
+     * This function will be called always after a calculate
+     * error, so the method using optimizer can keep some information
+     * and no need to re-calculated everything
+     */
+    virtual MatX1 calculate_gradient() = 0;
+    /**
+     * Calculates Hessian, as a dynamic dense matrix.
+     * Same as for gradient, it will be called right after gradient,
+     * so inherited class can use that information.
+     */
+    virtual MatX calculate_hessian() = 0;
+    /**
+     * Updates the current solution
+     */
+    virtual void update(MatX1 &dx) = 0;
+    /**
+     * For Levenberg-Marquard
+     * This function bookeeps the current state values
+     * This is in case the optimization step does not improve
+     */
+    virtual void bookeep_states() = 0;
+    /**
+     * For Levenberg-Marquard
+     * Undoes an incorrect update
+     */
+    virtual void update_bookeeps_states() = 0;
+
+protected:
+
+    /**
+     * Optimizes according to the Newton-Raphson algorithm
+     * (second order method).
      *
      *
      * Input useLambda (default false) builds the NR problem with lambda factor on the diagonal
      *    H' = H + lambda * D. where D depends on which LM has been selected (TODO better)
      */
-    void optimize_gauss_newton(bool useLambda = false);
+    uint_t optimize_newton_raphson(bool useLambda = false);
 
     /**
-     * General abstract functions to implement
+     * Levenberg-Marquard method, inside will distinguish between elliptic and spherical
+     *
+     * Input useLambda (default false) builds the NR problem with lambda factor on the diagonal
+     *    H' = H + lambda * D. where D depends on which LM has been selected (TODO better)
      */
-    virtual void calculate_error() = 0;
-    virtual void calculate_gradient() = 0;
-    virtual void calculate_hessian() = 0;
-    virtual void update() = 0;
+    uint_t optimize_levenber_marquard();
 
-    /**
-     * Specific methods for Levenberg-Marquard
-     */
 
-protected:
-    optimMethod optimMethod_;
-    MatX hessian_;
-    MatX1 gradient_, dx_;
     matData_t solutionTolerance_;
 
-    // Necessary for LM
-    MatX1 diag_hessian_;
+    // Necessary for LM, Other LM parameters are set to default (see .cpp)
     matData_t lambda_;
 
 };
