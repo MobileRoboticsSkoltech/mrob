@@ -28,9 +28,9 @@ namespace mrob{
  *
  *         Note that Gauss-Newton is an instance of this, but approximating the
  *         Hessian by J'*J
- *  - Levenberg-Marquard: Spherical approximation
+ *  - Levenberg-Marquardt: Spherical approximation
  *         x' = x - (H + lambda * I)^-1 * gradient
- *  - Levenberg-Marquard: Elliptical approximation
+ *  - Levenberg-Marquardt: Elliptical approximation
  *         x' = x - (H + lambda * D)^-1 * gradient, where D = diag(H)
  *
  *  given the following requirements:
@@ -69,17 +69,17 @@ public:
      * error, so the method using optimizer can keep some information
      * and no need to re-calculated everything
      */
-    virtual MatX1 calculate_gradient() = 0;
+    virtual MatX1& calculate_gradient() = 0;
     /**
      * Calculates Hessian, as a dynamic dense matrix.
      * Same as for gradient, it will be called right after gradient,
      * so inherited class can use that information.
      */
-    virtual MatX calculate_hessian() = 0;
+    virtual MatX& calculate_hessian() = 0;
     /**
      * Updates the current solution
      */
-    virtual void update(MatX1 &dx) = 0;
+    virtual void update_state(const MatX1 &dx) = 0;
     /**
      * For Levenberg-Marquard
      * This function bookeeps the current state values
@@ -90,7 +90,7 @@ public:
      * For Levenberg-Marquard
      * Undoes an incorrect update
      */
-    virtual void update_bookeeps_states() = 0;
+    virtual void update_bookept_states() = 0;
 
 protected:
 
@@ -102,18 +102,26 @@ protected:
      * Input useLambda (default false) builds the NR problem with lambda factor on the diagonal
      *    H' = H + lambda * D. where D depends on which LM has been selected (TODO better)
      */
-    uint_t optimize_newton_raphson(bool useLambda = false);
+    uint_t optimize_newton_raphson();
 
     /**
-     * Levenberg-Marquard method, inside will distinguish between elliptic and spherical
+     * One iteration of the RN method
+     */
+    uint_t optimize_newton_raphson_one_iteration(bool useLambda = false);
+
+    /**
+     * Levenberg-Marquardt method, inside will distinguish between elliptic and spherical
      *
      * Input useLambda (default false) builds the NR problem with lambda factor on the diagonal
      *    H' = H + lambda * D. where D depends on which LM has been selected (TODO better)
      */
-    uint_t optimize_levenber_marquard();
+    uint_t optimize_levenberg_marquardt();
 
 
+    optimMethod optimization_method_;
     matData_t solutionTolerance_;
+    MatX1 gradient_, dx_;
+    MatX hessian_;
 
     // Necessary for LM, Other LM parameters are set to default (see .cpp)
     matData_t lambda_;
