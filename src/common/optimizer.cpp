@@ -10,6 +10,7 @@
  */
 
 #include "mrob/optimizer.hpp"
+#include <Eigen/LU> // for inverse and determinant
 #include <iostream>
 
 using namespace mrob;
@@ -44,14 +45,19 @@ Optimizer::~Optimizer()
 uint_t Optimizer::optimize_newton_raphson_one_iteration(bool useLambda)
 {
     // 1) build problem: Gradient and Hessian
-    gradient_ = calculate_gradient();
-    hessian_ = calculate_hessian();
+    calculate_gradient_hessian();
     if (useLambda)
     {
         if (optimization_method_ == LM_S)
-            hessian_.diagonal() += lambda_;
+        {
+            for (uint_t i = 0; i < hessian_.diagonalSize() ; ++i)
+                hessian_(i,i) += lambda_;
+        }
         if (optimization_method_ == LM_E)
-            hessian_.diagonal() *= 1.0 + lambda_;//TODO check this
+        {
+            for (uint_t i = 0; i < hessian_.diagonalSize() ; ++i)
+                hessian_(i,i) *= 1.0 + lambda_;
+        }
     }
 
     // 2) dx = - h^-1 * grad XXX test for singularities?

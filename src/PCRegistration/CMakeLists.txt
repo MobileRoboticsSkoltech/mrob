@@ -21,7 +21,7 @@ SET(headers
 
 # create the shared library
 ADD_LIBRARY(PCRegistration SHARED  ${sources} )
-TARGET_LINK_LIBRARIES(PCRegistration SE3 )
+TARGET_LINK_LIBRARIES(PCRegistration SE3 common)
 
 
 #install 

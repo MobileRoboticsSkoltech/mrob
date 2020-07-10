@@ -185,8 +185,8 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
         // 2) calculate Gradient and Hessian
         Mat61 gradient = Mat61::Zero();
         Mat6 hessian = Mat6::Zero();
-        gradient_.setZero();
-        hessian_.setZero();
+        gradient__.setZero();
+        hessian__.setZero();
         double  tau = 1.0 / (double)(numberPoses_-1);
         for (uint_t t = 1 ; t < numberPoses_; ++t)
         {
@@ -197,8 +197,8 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
                 hessian += it->second->calculate_hessian(t);
             }
             // TODO this should be changed to time stamps later
-            gradient_ +=  (tau *  t)  * gradient;
-            hessian_ += (tau *  t) * hessian.selfadjointView<Eigen::Upper>();
+            gradient__ +=  (tau *  t)  * gradient;
+            hessian__ += (tau *  t) * hessian.selfadjointView<Eigen::Upper>();
         }
         // 3) calculate update Tf = exp(-dxi) * Tf (our convention, we expanded from the left)
         Mat61 dxi;
@@ -206,7 +206,7 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
         {
             // we clamp the vector spaces corresponding to negative eigenvals
             Mat6 pseudoInv = Mat6::Zero();
-            Eigen::SelfAdjointEigenSolver<Mat6> eigs(hessian_);
+            Eigen::SelfAdjointEigenSolver<Mat6> eigs(hessian__);
             for (uint_t i = 0; i < 6 ; ++i)
             {
                 std::cout << "POSITIVE cos distance to grad = " << eigs.eigenvectors().col(i).dot(gradient)/gradient.norm()
@@ -221,7 +221,7 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
             dxi = - pseudoInv * gradient;
         }
         else
-            dxi = - hessian_.inverse() * gradient;
+            dxi = - hessian__.inverse() * gradient;
         trajectory_->back().update_lhs(dxi);
 
 
@@ -370,7 +370,7 @@ std::vector<double> PlaneRegistration::print_evaluate() const
         ++i;
     }
     // Orthogonality between planes (4 dim)
-    std::cout << "current gradient \n" << gradient_ << std::endl;
+    std::cout << "current gradient \n" << gradient__ << std::endl;
     // XXX : NO, Orthogonolaity was not an issue
     //std::cout << "solution\n" << allPlanes << "\nOrthogonality between planes: \n" << allPlanes * allPlanes.transpose() <<
     //              "\n and det  = \n" << allPlanes.determinant() << std::endl;
@@ -380,20 +380,72 @@ std::vector<double> PlaneRegistration::print_evaluate() const
     //             "\n and det = \n" << allNormals.determinant() << std::endl;
 
     // Hessian rank and eigen, look for negative vaps. Lasta hessina calculateds
-    Eigen::EigenSolver<MatX> eigs(hessian_);
+    Eigen::EigenSolver<MatX> eigs(hessian__);
     std::cout << "eigen values are: \n" << eigs.eigenvalues() << std::endl;
     // Determinant of stacked normals
-    std::cout << "det(Hessian) = \n" << hessian_ << std::endl;
+    std::cout << "det(Hessian) = \n" << hessian__ << std::endl;
     // Hessian conditioning number
-    Eigen::JacobiSVD<Mat6> svd(hessian_, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    Eigen::JacobiSVD<Mat6> svd(hessian__, Eigen::ComputeThinU | Eigen::ComputeThinV);
     // TODO remove
     //std::cout << "SVD decomposition : \n" << svd.singularValues() <<
     //              "\n vectors :\n" << svd.matrixU() <<
     //             "\n and conditioning number = " << svd.singularValues()(0)/svd.singularValues()(5) << std::endl;
 
-    result[2] = hessian_.determinant();
+    result[2] = hessian__.determinant();
     //TODO count this and optimze
     result[3] = svd.singularValues()(0)/svd.singularValues()(5);
 
     return result;
 }
+
+// From parent class Optmizer:
+// TOOD for now replicated, later we will substitude
+matData_t PlaneRegistration::calculate_error()
+{
+    return get_current_error();
+}
+
+void PlaneRegistration::calculate_gradient_hessian()
+{
+    MatX1 gradient = Mat61::Zero();
+    MatX hessian = Mat6::Zero();
+    gradient_.setZero();
+    hessian_.setZero();
+    double  tau = 1.0 / (double)(numberPoses_-1);
+    for (uint_t t = 1 ; t < numberPoses_; ++t)
+    {
+        gradient.setZero();
+        for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
+        {
+             gradient += it->second->calculate_gradient(t);
+             hessian += it->second->calculate_hessian(t);
+        }
+        // TODO this should be changed to time stamps later
+        gradient_ +=  (tau *  t)  * gradient;
+        hessian_ += (tau *  t) * hessian.selfadjointView<Eigen::Upper>();
+    }
+}
+
+void PlaneRegistration::update_state(const MatX1 &dx)
+{
+    trajectory_->back().update_lhs(dx);
+    Mat61 xiFinal = trajectory_->back().ln_vee();
+    double  tau = 1.0 / (double)(numberPoses_-1);
+    Mat61 dxi;
+    for (uint_t t = 1 ; t < numberPoses_-1; ++t)
+    {
+        dxi = tau * t * xiFinal;
+        trajectory_->at(t) = SE3(dxi);
+    }
+}
+
+void PlaneRegistration::bookeep_states()
+{
+    trajectory_->back();
+}
+
+void PlaneRegistration::update_bookept_states()
+{
+
+}
+

@@ -64,18 +64,12 @@ public:
      */
     virtual matData_t calculate_error() = 0;
     /**
-     * Gradient calculates the gradient
+     * Gradient calculates the gradient and Hessian
      * This function will be called always after a calculate
      * error, so the method using optimizer can keep some information
      * and no need to re-calculated everything
      */
-    virtual MatX1& calculate_gradient() = 0;
-    /**
-     * Calculates Hessian, as a dynamic dense matrix.
-     * Same as for gradient, it will be called right after gradient,
-     * so inherited class can use that information.
-     */
-    virtual MatX& calculate_hessian() = 0;
+    virtual void calculate_gradient_hessian() = 0;
     /**
      * Updates the current solution
      */

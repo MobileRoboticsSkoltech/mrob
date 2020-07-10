@@ -16,6 +16,7 @@
 #include "mrob/SE3.hpp"
 #include <Eigen/StdVector>
 #include "mrob/plane.hpp"
+#include "mrob/optimizer.hpp"
 
 #include <unordered_map>
 #include <memory>
@@ -27,7 +28,7 @@ namespace mrob{
  * class PlaneRegistration introduced a class for the alignment of
  * planes.
  */
-class PlaneRegistration{
+class PlaneRegistration: public Optimizer{
 
   public:
     // XXX is this mode used anymore? deprecated?
@@ -47,6 +48,15 @@ class PlaneRegistration{
     //PlaneRegistration(uint_t numberPlanes , uint_t numberPoses);
     ~PlaneRegistration();
 
+    // Function from the parent class Optimizer
+    virtual matData_t calculate_error();
+    virtual void calculate_gradient_hessian();
+    virtual void update_state(const MatX1 &dx);
+    virtual void bookeep_states();
+    virtual void update_bookept_states();
+
+
+    // Specific methods
     void set_number_planes_and_poses(uint_t numPlanes, uint_t numPoses);
     uint_t get_number_planes() const {return numberPlanes_;};
     uint_t get_number_poses() const {return numberPoses_;};
@@ -139,6 +149,8 @@ class PlaneRegistration{
     uint_t time_;
     std::unordered_map<uint_t, std::shared_ptr<Plane>> planes_;
     std::shared_ptr<std::vector<SE3>> trajectory_;
+    SE3 bookept_trajectory_;//last pose is stored/bookept
+    double tau_;//variable for weighting the number of poses in traj
     uint_t solveIters_;
 
     // 1st order parameters methods if used
@@ -147,9 +159,10 @@ class PlaneRegistration{
     double c1_, c2_;    //parameters for the Wolfe conditions DEPRECATED?
     double alpha_, beta_;
 
-    //2nd order data (if used)
-    Mat61 gradient_;
-    Mat6 hessian_;
+
+    //2nd order data (if used) TODO remove since they are defined in parent class
+    Mat61 gradient__;
+    Mat6 hessian__;
 
 };
 
