@@ -23,6 +23,8 @@
 #include "mrob/factors/factor2Poses3d.hpp"
 #include "mrob/factors/nodeLandmark3d.hpp"
 #include "mrob/factors/factor1Pose1Landmark3d.hpp"
+#include "mrob/factors/nodeLandmark2d.hpp"
+#include "mrob/factors/factor1Pose1Landmark2d.hpp"
 
 #include <Eigen/Geometry>
 
@@ -105,7 +107,7 @@ public:
         return f->get_id();
     }
     
-    // 3D Ladmarks (Landmarks)
+    // 3D Landmarks
     // ------------------------------------------------------------------------------------
     id_t add_node_landmark_3d(const py::EigenDRef<const Mat31> x)
     {
@@ -119,6 +121,25 @@ public:
         auto n1 = this->get_node(nodePoseId);
         auto n2 = this->get_node(nodeLandmarkId);
         std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Landmark3d(obs,n1,n2,obsInvCov,initializeLandmark));
+        this->add_factor(f);
+        return f->get_id();
+    }
+
+
+    // 2D Landmarks
+    // ------------------------------------------------------------------------------------
+    id_t add_node_landmark_2d(const py::EigenDRef<const Mat21> x)
+    {
+        std::shared_ptr<mrob::Node> n(new mrob::NodeLandmark2d(x));
+        this->add_node(n);
+        return n->get_id();
+    }
+    id_t add_factor_1pose_1landmark_2d(const py::EigenDRef<const Mat21> obs, uint_t nodePoseId,
+                uint_t nodeLandmarkId, const py::EigenDRef<const Mat2> obsInvCov, bool initializeLandmark)
+    {
+        auto n1 = this->get_node(nodePoseId);
+        auto n2 = this->get_node(nodeLandmarkId);
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Landmark2d(obs,n1,n2,obsInvCov,initializeLandmark));
         this->add_factor(f);
         return f->get_id();
     }
@@ -161,6 +182,16 @@ void init_FGraph(py::module &m)
                     py::arg("obsInvCov"),
                     py::arg("updateNodeTarget") = false)
             .def("add_factor_2poses_2d_odom", &FGraphPy::add_factor_2poses_2d_odom)
+            // 2d Landmkarks
+            .def("add_node_landmark_2d", &FGraphPy::add_node_landmark_2d,
+                    "Ladmarks are 2D points, in [x,y]")
+            .def("add_factor_1pose_1landmark_2d", &FGraphPy::add_factor_1pose_1landmark_2d,
+                            "Factor connecting 1 pose and 1 point (landmark).",
+                            py::arg("obs"),
+                            py::arg("nodePoseId"),
+                            py::arg("nodeLandmarkId"),
+                            py::arg("obsInvCov"),
+                            py::arg("initializeLandmark") = false)
             // -----------------------------------------------------------------------------
             // Specific call to 3D
             .def("add_node_pose_3d", &FGraphPy::add_node_pose_3d,
