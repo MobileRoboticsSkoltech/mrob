@@ -24,7 +24,9 @@ SET(factors_headers
     mrob/factors/nodePose2d.hpp
     mrob/factors/factor1Pose2d.hpp
     mrob/factors/factor2Poses2d.hpp
+    mrob/factors/nodeLandmark2d.hpp
     mrob/factors/nodeLandmark3d.hpp
+    mrob/factors/factor1Pose1Landmark2d.hpp
     mrob/factors/factor1Pose1Landmark3d.hpp)
 
 SET(factors_sources
@@ -34,7 +36,9 @@ SET(factors_sources
     factors/nodePose2d.cpp
     factors/factor1Pose2d.cpp
     factors/factor2Poses2d.cpp
+    factors/nodeLandmark2d.cpp
     factors/nodeLandmark3d.cpp
+    factors/factor1Pose1Landmark2d.cpp
     factors/factor1Pose1Landmark3d.cpp)
 
 # create the shared library
