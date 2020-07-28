@@ -20,7 +20,9 @@ using namespace mrob;
 
 Factor1Pose1Landmark2d::Factor1Pose1Landmark2d(const Mat21 &observation, std::shared_ptr<Node> &nodePose,
         std::shared_ptr<Node> &nodeLandmark, const Mat2 &obsInf, bool initializeLandmark):
-        Factor(2,5), obs_(observation), W_(obsInf), reversedNodeOrder_(false)
+        Factor(2,5), obs_(observation), r_(Mat21::Zero()),landmark_(Mat21::Zero()),
+        state_(Mat31::Zero()),dx_(0.0), dy_(0.0), q_(0.0),
+        W_(obsInf), reversedNodeOrder_(false)
 {
     // chek for order, we need to ensure id_0 < id_1
     if (nodePose->get_id() < nodeLandmark->get_id())
@@ -65,7 +67,7 @@ void Factor1Pose1Landmark2d::evaluate_residuals()
     r_ << std::sqrt(q_),
          std::atan2(dy_,dx_) - state_(2);
     r_ -= obs_;
-    // TODO check for angles be a valid [-pi,pi]
+    r_(2) = wrap_angle(r_(2));
 
 }
 void Factor1Pose1Landmark2d::evaluate_jacobians()
@@ -74,10 +76,10 @@ void Factor1Pose1Landmark2d::evaluate_jacobians()
     Mat<2,3> Jx = Mat<2,3>::Zero();
     matData_t sqrt_q = std::sqrt(q_);
     Jx << -dx_/sqrt_q, -dy_/sqrt_q, 0,
-           dy_/q_,     dx_/q_,     -1;
+           dy_/q_,    -dx_/q_,     -1;
     Mat<2,2> Jl = Mat<2,2>::Zero();
-    Jx << dx_/sqrt_q, dy_/sqrt_q,
-          -dy_/q_,   -dx_/q_;
+    Jl << dx_/sqrt_q, dy_/sqrt_q,
+          -dy_/q_,    dx_/q_;
     if (!reversedNodeOrder_)
     {
         J_.topLeftCorner<2,3>() = Jx;

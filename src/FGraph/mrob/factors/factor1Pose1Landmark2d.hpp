@@ -77,7 +77,7 @@ class Factor1Pose1Landmark2d : public Factor
     Mat31 state_;
     matData_t dx_, dy_, q_; // increments from pose to landmark (x,y) and q squared L2 distance
     Mat2 W_;//inverse of observation covariance (information matrix)
-    Mat<2,5> J_;//Joint Jacobian
+    Mat<2,5> J_;//Joint Jacobian, Block will depend on order
     bool reversedNodeOrder_;//flag to keep order when building the adjacency matrix. This should be transparent for the user
 
   public:
