@@ -12,6 +12,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 #include <pybind11/stl.h>
+#include <pybind11/iostream.h>
 
 
 #include "mrob/factor_graph_solve.hpp"
@@ -160,7 +161,8 @@ void init_FGraph(py::module &m)
             .def("solve", &FGraphSolve::solve,
                     "Solves the corresponding FG",
                     py::arg("method") =  FGraphSolve::optimMethod::GN,
-                    py::arg("maxIters") = 30)
+                    py::arg("maxIters") = 30,
+                    py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>())
             .def("chi2", &FGraphSolve::chi2,
                     "Calculated the chi2 of the problem. By default re-evaluates residuals, set to false if doesn't",
                     py::arg("evaluateResidualsFlag") = true)
@@ -169,7 +171,9 @@ void init_FGraph(py::module &m)
             .def("number_factors", &FGraphSolve::number_factors)
             .def("get_factor_chi2", &FGraph::get_factor_chi2)
             .def("evaluate_factor_chi2", &FGraph::evaluate_factor_chi2)
-            .def("print", &FGraph::print, "By default False: does not print all the information on the Fgraph", py::arg("completePrint") = false)
+            .def("print", &FGraph::print, "By default False: does not print all the information on the Fgraph",
+                    py::arg("completePrint") = false,
+                    py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>())
             // -----------------------------------------------------------------------------
             // Specific call to 2D
             .def("add_node_pose_2d", &FGraphPy::add_node_pose_2d)
