@@ -28,18 +28,7 @@ PlaneRegistration::PlaneRegistration():
         c1_(1e-4), c2_(0.9), alpha_(0.75), beta_(0.1)
 {
 }
-// XX is this constructor really necessary?
-/*PlaneRegistration::PlaneRegistration(uint_t numberPlanes, uint_t numberPoses):
-        numberPlanes_(numberPlanes), numberPoses_(numberPoses),isSolved_(0),
-        trajMode_(TrajectoryMode::SEQUENCE), trajectory_(new std::vector<SE3>(numberPoses, SE3())),
-        solveMode_(SolveMode::GRADIENT_DESCENT_NAIVE),
-        c1_(1e-4), c2_(0.9), alpha_(0.75), beta_(0.1)
-{
-    planes_.reserve(numberPlanes);
-    inverseHessian_.resize(numberPoses, 1e-3 * Mat6::Identity());
-    previousJacobian_.resize(numberPoses, Mat61::Zero());
-    previousState_.resize(numberPoses, Mat61::Zero());
-}*/
+
 
 PlaneRegistration::~PlaneRegistration()
 {
@@ -87,6 +76,7 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
             return solve_interpolate_hessian(singleIteration);
         case SolveMode::LM_HESSIAN:
         case SolveMode::LM_CLAMPED_HESSIAN:
+            return optimize(NR);//XXX thisd does not work and gets stuck!!
         default:
             return 0;
     }
@@ -94,6 +84,7 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
 
 uint_t PlaneRegistration::solve_interpolate_gradient(bool singleIteration)
 {
+    // This function is from the first implementation, is just kept for comparisons (but should not be used to solve the problem)
     // iterative process, on convergence basis | error_k - error_k-1| < tol
     solveIters_ = 0;
     double previousError = 1e20, diffError = 10;
@@ -398,8 +389,8 @@ std::vector<double> PlaneRegistration::print_evaluate() const
     return result;
 }
 
-// From parent class Optmizer:
-// TOOD for now replicated, later we will substitude
+// From parent class Optimizer:
+// TOOD for now replicated, later we will substitute
 matData_t PlaneRegistration::calculate_error()
 {
     return get_current_error();

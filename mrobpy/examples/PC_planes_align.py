@@ -22,7 +22,7 @@ def plot_segments(segments, color, T = []):
 
 def draw_planes_pc(problem):
     pcds = []
-    for i in range(problem.get_number_poses()-1):
+    for i in range(problem.get_number_poses()):
         pc = open3d.geometry.PointCloud()
         pc.points = open3d.utility.Vector3dVector(np.array(problem.get_point_cloud(i)))
         s = i/poses
@@ -39,7 +39,7 @@ poses = 3
 
 synthetic_points = mrob.registration.CreatePoints(points,planes,poses, 0.001)
 pcds = []
-for i in range(poses-1):
+for i in range(poses):
 	labels = synthetic_points.get_point_plane_ids(i)
 	points = np.array(synthetic_points.get_point_cloud(i))
 	s = i/poses
@@ -57,7 +57,7 @@ synthetic_points.create_plane_registration(problem)
 
 # 3) Solve Plane aligment linear case
 # -----------------------------------------------------------------------------------
-#problem.solve(mrob.registration.INITIALIZE)
+problem.solve(mrob.registration.INITIALIZE)
 #problem.solve(mrob.registration.GRADIENT)
 problem.solve(mrob.registration.GN_HESSIAN)
 draw_planes_pc(problem)
@@ -66,8 +66,8 @@ draw_planes_pc(problem)
 
 # 4) Solve Hessian optimization
 problem.reset_solution()
-#problem.solve(mrob.registration.INITIALIZE)
-problem.solve(mrob.registration.GN_CLAMPED_HESSIAN)
+problem.solve(mrob.registration.INITIALIZE)
+problem.solve(mrob.registration.LM_HESSIAN)
 draw_planes_pc(problem)
 r= problem.print_evaluate()
 print('overall results([0]error, [1]iters, hessdet[2], conditioningNumber[3]):\n',r)

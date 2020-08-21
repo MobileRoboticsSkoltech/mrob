@@ -77,7 +77,9 @@ uint_t Optimizer::optimize_newton_raphson()
         this->optimize_newton_raphson_one_iteration(false);
         matData_t current_error = this->calculate_error();
         diffError = previousError - current_error;
-    }while(fabs(diffError) > solutionTolerance_ && iters < 1e3);
+        std::cout << "iter " << gradient_ << std::endl;
+        iters++;
+    }while(fabs(diffError) > solutionTolerance_ && iters < 1);
 
 
     return iters;
@@ -90,7 +92,7 @@ uint_t Optimizer::optimize_levenberg_marquardt()
     matData_t sigma1(0.25), sigma2(0.8);// 0 < sigma1 < sigma2 < 1
     matData_t beta1(2.0), beta2(0.25); // lambda updates multiplier values, beta1 > 1 > beta2 >0
     uint_t iters = 0;
-    matData_t previous_error = 1e20, diff_error = 10, current_error;
+    matData_t previous_error = calculate_error(), diff_error, current_error;
     do
     {
         // 1) solve the current subproblem by NR

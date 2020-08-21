@@ -23,7 +23,7 @@ namespace mrob{
  * min C(x)
  *
  * The current methods implemented are:
- *  - Newton-Raphson (NR), this is a second order method of the form:
+ *  - Newton-Raphson (NR), this is a second order method:
  *         x' = x - (Hessian)^-1 * Gradient
  *
  *         Note that Gauss-Newton is an instance of this, but approximating the
