@@ -236,6 +236,15 @@ double SE3::distance(const SE3 &rhs) const
     return (*this * rhs.inv()).ln_vee().norm();
 }
 
+double SE3::distance_rotation(const SE3 &rhs) const
+{
+    return SO3(this->R() * rhs.R().transpose()).ln_vee().norm();
+}
+
+double SE3::distance_trans(const SE3 &rhs) const
+{
+    return (this->t() - rhs.t()).norm();
+}
 void SE3::print(void) const
 {
     std::cout << T_ << std::endl;

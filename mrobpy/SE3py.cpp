@@ -47,6 +47,8 @@ void init_geometry(py::module &m) {
         .def("inv", &SE3::inv, py::return_value_policy::copy)
         .def("adj", &SE3::adj, py::return_value_policy::copy)
         .def("distance", &SE3::distance)
+        .def("distance_rotation", &SE3::distance_rotation)
+        .def("distance_trans", &SE3::distance_trans)
         .def("print", &SE3::print)
         ;
     m.def("isSE3", &mrob::isSE3, "Returns True is the matrix is a valid transformation and False if not");

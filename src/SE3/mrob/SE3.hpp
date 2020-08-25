@@ -148,6 +148,16 @@ public:
      */
     double distance(const SE3 &rhs) const;
     /**
+     * Provide the distance on the rotation in the tangent space
+     * of the ln(R * R_rhs^{-1})
+     */
+    double distance_rotation(const SE3 &rhs) const;
+    /**
+     * Provide the distance of the translation part
+     * ||t - t'||
+     */
+    double distance_trans(const SE3 &rhs) const;
+    /**
      * Regenerate, does the following operation:
      * T = Exp ( Ln(T) )
      */
