@@ -57,15 +57,15 @@ synthetic_points.create_plane_registration(problem)
 
 # 3) Solve Plane aligment linear case
 # -----------------------------------------------------------------------------------
-problem.solve(mrob.registration.INITIALIZE)
+#problem.solve(mrob.registration.INITIALIZE)
 #problem.solve(mrob.registration.GRADIENT)
-problem.solve(mrob.registration.GN_HESSIAN)
+#problem.solve(mrob.registration.GN_HESSIAN)
 draw_planes_pc(problem)
 
 
 
 # 4) Solve Hessian optimization
-problem.reset_solution()
+problem.reset_solution() #TODO there is aproblem here, reset before any solution breaks number of poses.
 problem.solve(mrob.registration.INITIALIZE)
 problem.solve(mrob.registration.LM_HESSIAN)
 draw_planes_pc(problem)

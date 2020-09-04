@@ -33,6 +33,7 @@ void init_geometry(py::module &m) {
 				py::return_value_policy::copy)
         .def(py::init<const Mat61 &>(), py::return_value_policy::copy)
         .def(py::init<const SE3 &>(), py::return_value_policy::copy)
+        .def(py::init<const SO3 &, const Mat31>(), py::return_value_policy::copy)
         .def("T", &SE3::T, py::return_value_policy::copy) // makes a copy of the 4x4 Transformation
         .def("R", &SE3::R, py::return_value_policy::copy)
         .def("t", &SE3::t, py::return_value_policy::copy)

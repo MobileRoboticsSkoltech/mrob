@@ -27,6 +27,9 @@ PlaneRegistration::PlaneRegistration():
         solveMode_(SolveMode::GRADIENT),
         c1_(1e-4), c2_(0.9), alpha_(0.75), beta_(0.1)
 {
+    // Optmizer does not establish the size for this matrices
+    gradient_.resize(6);
+    hessian_.resize(6,6);
 }
 
 
@@ -53,10 +56,12 @@ void PlaneRegistration::set_number_planes_and_poses(uint_t numberPlanes, uint_t 
 void PlaneRegistration::reset_solution()
 {
     // trajectory is reset
+    print();
     trajectory_->clear();
     trajectory_->resize(numberPoses_, SE3());
     previousState_.clear();
     previousState_.resize(numberPoses_, Mat61::Zero());
+    print();
 }
 
 
@@ -398,8 +403,8 @@ matData_t PlaneRegistration::calculate_error()
 
 void PlaneRegistration::calculate_gradient_hessian()
 {
-    MatX1 gradient = Mat61::Zero();
-    MatX hessian = Mat6::Zero();
+    Mat61 gradient = Mat61::Zero();
+    Mat6 hessian = Mat6::Zero();
     gradient_.setZero();
     hessian_.setZero();
     double  tau = 1.0 / (double)(numberPoses_-1);
@@ -408,8 +413,8 @@ void PlaneRegistration::calculate_gradient_hessian()
         gradient.setZero();
         for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
         {
-             gradient += it->second->calculate_gradient(t);
-             hessian += it->second->calculate_hessian(t);
+            gradient = it->second->calculate_gradient(t);
+            hessian += it->second->calculate_hessian(t);
         }
         // TODO this should be changed to time stamps later
         gradient_ +=  (tau *  t)  * gradient;

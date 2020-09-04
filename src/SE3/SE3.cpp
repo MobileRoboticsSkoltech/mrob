@@ -31,7 +31,17 @@ SE3::SE3(const Mat61 &xi) : T_(Mat4::Identity())
 SE3::SE3(const SE3 &T): T_(T.T())
 {
 }
+SE3::SE3(const SO3 &R, const Mat31 t)
+{
+    T_  << R.R(), t,
+           0,0,0,1;
+}
 
+SE3::SE3(const Mat3 &R, const Mat31 t)
+{
+    T_  << R, t,
+           0,0,0,1;
+}
 template<typename OtherDerived>
 SE3::SE3(const Eigen::MatrixBase<OtherDerived>& rhs)  :
     T_(rhs)
