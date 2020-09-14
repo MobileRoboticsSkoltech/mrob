@@ -27,7 +27,7 @@ PlaneRegistration::PlaneRegistration():
         solveMode_(SolveMode::GRADIENT),
         c1_(1e-4), c2_(0.9), alpha_(0.75), beta_(0.1)
 {
-    // Optmizer does not establish the size for this matrices
+    // Optmizer does not establish the size for this matrices and thus it is required
     gradient_.resize(6);
     hessian_.resize(6,6);
 }
@@ -56,12 +56,10 @@ void PlaneRegistration::set_number_planes_and_poses(uint_t numberPlanes, uint_t 
 void PlaneRegistration::reset_solution()
 {
     // trajectory is reset
-    print();
     trajectory_->clear();
     trajectory_->resize(numberPoses_, SE3());
     previousState_.clear();
     previousState_.resize(numberPoses_, Mat61::Zero());
-    print();
 }
 
 
@@ -81,7 +79,7 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
             return solve_interpolate_hessian(singleIteration);
         case SolveMode::LM_HESSIAN:
         case SolveMode::LM_CLAMPED_HESSIAN:
-            return optimize(NR);//XXX thisd does not work and gets stuck!!
+            return optimize(NEWTON_RAPHSON);
         default:
             return 0;
     }
@@ -187,6 +185,7 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
         for (uint_t t = 1 ; t < numberPoses_; ++t)
         {
             gradient.setZero();
+            hessian.setZero();
             for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
             {
                 gradient += it->second->calculate_gradient(t);
@@ -214,10 +213,10 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
                     // XXX why is this function not monotonically decreasing? this is annoying, but makes clamping a bad idea: LM!
                 }
             }
-            dxi = - pseudoInv * gradient;
+            dxi = - pseudoInv * gradient__;
         }
         else
-            dxi = - hessian__.inverse() * gradient;
+            dxi = - hessian__.inverse() * gradient__;
         trajectory_->back().update_lhs(dxi);
 
 
@@ -411,9 +410,10 @@ void PlaneRegistration::calculate_gradient_hessian()
     for (uint_t t = 1 ; t < numberPoses_; ++t)
     {
         gradient.setZero();
+        hessian.setZero();
         for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
         {
-            gradient = it->second->calculate_gradient(t);
+            gradient += it->second->calculate_gradient(t);
             hessian += it->second->calculate_hessian(t);
         }
         // TODO this should be changed to time stamps later

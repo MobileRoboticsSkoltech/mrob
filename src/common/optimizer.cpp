@@ -32,10 +32,10 @@ Optimizer::~Optimizer()
     optimization_method_ = method;
     switch(method)
     {
-      case NR:
+      case NEWTON_RAPHSON:
           return optimize_newton_raphson();
-      case LM_S:
-      case LM_E:
+      case LEVENBERG_MARQUARDT_S:
+      case LEVENBERG_MARQUARDT_E:
           return optimize_levenberg_marquardt();
     }
     return 0;
@@ -48,12 +48,12 @@ uint_t Optimizer::optimize_newton_raphson_one_iteration(bool useLambda)
     calculate_gradient_hessian();
     if (useLambda)
     {
-        if (optimization_method_ == LM_S)
+        if (optimization_method_ == LEVENBERG_MARQUARDT_S)
         {
             for (uint_t i = 0; i < hessian_.diagonalSize() ; ++i)
                 hessian_(i,i) += lambda_;
         }
-        if (optimization_method_ == LM_E)
+        if (optimization_method_ == LEVENBERG_MARQUARDT_E)
         {
             for (uint_t i = 0; i < hessian_.diagonalSize() ; ++i)
                 hessian_(i,i) *= 1.0 + lambda_;
@@ -71,15 +71,16 @@ uint_t Optimizer::optimize_newton_raphson_one_iteration(bool useLambda)
 uint_t Optimizer::optimize_newton_raphson()
 {
     uint_t iters = 0;
-    matData_t previousError = 1e20, diffError = 10;
+    matData_t previous_error = 1e20, diff_error = 10;
     do
     {
         this->optimize_newton_raphson_one_iteration(false);
         matData_t current_error = this->calculate_error();
-        diffError = previousError - current_error;
-        std::cout << "iter " << iters << std::endl;
+        diff_error = previous_error - current_error;
+        previous_error = current_error;
+        std::cout << "iter " << iters << ", error = " << current_error <<std::endl;
         iters++;
-    }while(fabs(diffError) > solutionTolerance_ && iters < 1);
+    }while(fabs(diff_error) > solutionTolerance_ && iters < 1e2);
 
 
     return iters;

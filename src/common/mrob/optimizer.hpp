@@ -47,8 +47,8 @@ public:
 	 *  - LM_S: Levenberg Marquardt: Spherical
 	 *  - LM_E: Levenberg Marquardt: Eliptical
 	 */
-	enum optimMethod{NR=0, LM_S, LM_E};
-    Optimizer(matData_t solutionTolerance = 1e-2, matData_t lambda = 1e-6);
+	enum optimMethod{NEWTON_RAPHSON=0, LEVENBERG_MARQUARDT_S, LEVENBERG_MARQUARDT_E};
+    Optimizer(matData_t solutionTolerance = 1e-4, matData_t lambda = 1e-6);
     virtual ~Optimizer();
 
     /**
