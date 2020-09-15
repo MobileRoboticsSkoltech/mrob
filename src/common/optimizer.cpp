@@ -71,14 +71,15 @@ uint_t Optimizer::optimize_newton_raphson_one_iteration(bool useLambda)
 uint_t Optimizer::optimize_newton_raphson()
 {
     uint_t iters = 0;
-    matData_t previous_error = 1e20, diff_error = 10;
+    // Calculate error also estimates planes, which are necessary for gradients. XXX this can cause bugs on the first iteration
+    matData_t previous_error = this->calculate_error(), diff_error;
     do
     {
         this->optimize_newton_raphson_one_iteration(false);
         matData_t current_error = this->calculate_error();
+        std::cout << "iter " << iters << ", error = " << current_error <<std::endl;
         diff_error = previous_error - current_error;
         previous_error = current_error;
-        std::cout << "iter " << iters << ", error = " << current_error <<std::endl;
         iters++;
     }while(fabs(diff_error) > solutionTolerance_ && iters < 1e2);
 
@@ -96,7 +97,7 @@ uint_t Optimizer::optimize_levenberg_marquardt()
     matData_t previous_error = calculate_error(), diff_error, current_error;
     do
     {
-        // 1) solve the current subproblem by NR
+        // 1) solve the current subproblem by Newton Raphson
         this->bookeep_states();
         optimize_newton_raphson_one_iteration(true);
         current_error = calculate_error();

@@ -166,11 +166,8 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
     {
 
         // 1) calculate plane estimation given the current trajectory. Same as solve_interpolate
-        double  initialError = 0.0;
-        for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
-        {
-            initialError += it->second->estimate_plane();
-        }
+        double  initialError = get_current_error();
+
         diffError = previousError - initialError;
         previousError = initialError;
 
@@ -204,13 +201,17 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
             Eigen::SelfAdjointEigenSolver<Mat6> eigs(hessian__);
             for (uint_t i = 0; i < 6 ; ++i)
             {
-                std::cout << "POSITIVE cos distance to grad = " << eigs.eigenvectors().col(i).dot(gradient)/gradient.norm()
-                          << ", eigs = " << eigs.eigenvalues()[i] << std::endl;
-                if(eigs.eigenvalues()[i] > 1e-4) //TODO set tolerance
+                if(eigs.eigenvalues()[i] > 1e-4 ) //TODO set tolerance
                 {
-                    std::cout << "NEGATIVE cos distance to grad = " << eigs.eigenvectors().col(i).dot(gradient)/gradient.norm() << std::endl;
+                    std::cout << "POSITIVE. cos distance to grad = " << eigs.eigenvectors().col(i).dot(gradient)/gradient.norm() << std::endl;
                     pseudoInv += (1.0/eigs.eigenvalues()(i)) * eigs.eigenvectors().col(i) * eigs.eigenvectors().col(i).transpose();
                     // XXX why is this function not monotonically decreasing? this is annoying, but makes clamping a bad idea: LM!
+                }
+                else
+                {
+                    std::cout << "NEGATIVE. cos distance to grad = " << eigs.eigenvectors().col(i).dot(gradient)/gradient.norm()
+                          << ", eigs = " << eigs.eigenvalues()[i] << std::endl;
+
                 }
             }
             dxi = - pseudoInv * gradient__;
@@ -437,11 +438,12 @@ void PlaneRegistration::update_state(const MatX1 &dx)
 
 void PlaneRegistration::bookeep_states()
 {
+    //TODO
     trajectory_->back();
 }
 
 void PlaneRegistration::update_bookept_states()
 {
-
+    //TODO
 }
 
