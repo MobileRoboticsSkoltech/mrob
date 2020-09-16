@@ -75,11 +75,12 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
         case SolveMode::GRADIENT_BENGIOS_NAG:
             return solve_interpolate_gradient(singleIteration);
         case SolveMode::GN_HESSIAN:
+            return optimize(NEWTON_RAPHSON);
         case SolveMode::GN_CLAMPED_HESSIAN:
             return solve_interpolate_hessian(singleIteration);
         case SolveMode::LM_HESSIAN:
+            return optimize(LEVENBERG_MARQUARDT_S);
         case SolveMode::LM_CLAMPED_HESSIAN:
-            return optimize(NEWTON_RAPHSON);
         default:
             return 0;
     }
@@ -201,16 +202,17 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
             Eigen::SelfAdjointEigenSolver<Mat6> eigs(hessian__);
             for (uint_t i = 0; i < 6 ; ++i)
             {
-                if(eigs.eigenvalues()[i] > 1e-4 ) //TODO set tolerance
+                if(eigs.eigenvalues()[i] > 1e-4 || true ) //TODO set tolerance
                 {
-                    std::cout << "POSITIVE. cos distance to grad = " << eigs.eigenvectors().col(i).dot(gradient)/gradient.norm() << std::endl;
+                    std::cout << "POSITIVE. cos distance to grad = " << eigs.eigenvectors().col(i).dot(gradient)/gradient.norm()
+                              << ", eigs = " << eigs.eigenvalues()[i] << std::endl;
                     pseudoInv += (1.0/eigs.eigenvalues()(i)) * eigs.eigenvectors().col(i) * eigs.eigenvectors().col(i).transpose();
                     // XXX why is this function not monotonically decreasing? this is annoying, but makes clamping a bad idea: LM!
                 }
                 else
                 {
                     std::cout << "NEGATIVE. cos distance to grad = " << eigs.eigenvectors().col(i).dot(gradient)/gradient.norm()
-                          << ", eigs = " << eigs.eigenvalues()[i] << std::endl;
+                              << ", eigs = " << eigs.eigenvalues()[i] << std::endl;
 
                 }
             }
@@ -436,14 +438,20 @@ void PlaneRegistration::update_state(const MatX1 &dx)
     }
 }
 
-void PlaneRegistration::bookeep_states()
+void PlaneRegistration::bookkeep_state()
 {
-    //TODO
-    trajectory_->back();
+    bookept_trajectory_ = trajectory_->back();
 }
 
-void PlaneRegistration::update_bookept_states()
+void PlaneRegistration::update_state_from_bookkeep()
 {
-    //TODO
+    Mat61 xiFinal = trajectory_->back().ln_vee();
+    double  tau = 1.0 / (double)(numberPoses_-1);
+    Mat61 dxi;
+    for (uint_t t = 1 ; t < numberPoses_-1; ++t)
+    {
+        dxi = tau * t * xiFinal;
+        trajectory_->at(t) = SE3(dxi);
+    }
 }
 

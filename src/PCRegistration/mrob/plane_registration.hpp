@@ -49,11 +49,11 @@ class PlaneRegistration: public Optimizer{
     ~PlaneRegistration();
 
     // Function from the parent class Optimizer
-    virtual matData_t calculate_error();
-    virtual void calculate_gradient_hessian();
-    virtual void update_state(const MatX1 &dx);
-    virtual void bookeep_states();
-    virtual void update_bookept_states();
+    virtual matData_t calculate_error() override;
+    virtual void calculate_gradient_hessian() override;
+    virtual void update_state(const MatX1 &dx) override;
+    virtual void bookkeep_state() override;
+    virtual void update_state_from_bookkeep() override;
 
 
     // Specific methods

@@ -97,17 +97,20 @@ uint_t Optimizer::optimize_levenberg_marquardt()
     matData_t previous_error = calculate_error(), diff_error, current_error;
     do
     {
+        iters++;
         // 1) solve the current subproblem by Newton Raphson
-        this->bookeep_states();
+        this->bookkeep_state();
         optimize_newton_raphson_one_iteration(true);
         current_error = calculate_error();
+        std::cout << "iter " << iters << ", error = " << current_error << ", lambda = "<< lambda_ << std::endl;
         diff_error = previous_error - current_error;
 
         // 2) Check for convergence, hillclimb
         if (diff_error < 0)
         {
+            std::cout << "no improvement\n";
             lambda_ *= beta1;
-            this->update_bookept_states();
+            this->update_state_from_bookkeep();//TODO we need to calcualte the error again for correct estimates?
             continue;
         }
         previous_error = current_error;
@@ -121,13 +124,14 @@ uint_t Optimizer::optimize_levenberg_marquardt()
         //     err(x_k) - m_k(dx)
         // where m_k is the quadratized model = ||r||^2 - dx'*J' r + 0.5 dx'(Hessian + LM)dx
         matData_t modelFidelity = diff_error / (dx_.dot(gradient_) - 0.5*dx_.dot(hessian_* dx_));
+        // TODO something here is wrong, this value is negative and it should not be.
+        std::cout << "Model fidelity" << modelFidelity << std::endl;
 
         // 4) update lambda
         if (modelFidelity < sigma1)
             lambda_ *= beta1;
         if (modelFidelity > sigma2)
             lambda_ *= beta2;
-
 
     }while(iters < 1e2);
 

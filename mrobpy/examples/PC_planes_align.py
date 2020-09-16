@@ -69,9 +69,9 @@ draw_planes_pc(problem)
 problem.reset_solution()
 problem.solve(mrob.registration.INITIALIZE)
 #problem.solve(mrob.registration.GN_CLAMPED_HESSIAN)
-#problem.solve(mrob.registration.LM_HESSIAN)
+problem.solve(mrob.registration.LM_HESSIAN)
 draw_planes_pc(problem)
-r= problem.print_evaluate()
+r= problem.print_evaluate() #TODO check this function with base class optimizer.cpp
 print('overall results([0]error, [1]iters, hessdet[2], conditioningNumber[3]):\n',r)
 
 # printing for hessian at initial steps
@@ -82,7 +82,7 @@ print('overall results([0]error, [1]iters, hessdet[2], conditioningNumber[3]):\n
 #print('overall results ([0]error, [1]iters, hessdet[2], conditioningNumber[3]):\n',r)
 
 
-if 1:
+if 0:
     for i in range(10):
         problem.solve(mrob.registration.GN_CLAMPED_HESSIAN, True)
         draw_planes_pc(problem)

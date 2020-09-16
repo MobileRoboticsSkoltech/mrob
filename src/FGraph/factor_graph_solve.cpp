@@ -141,7 +141,7 @@ uint_t FGraphSolve::optimize_levenberg_marquardt(uint_t maxIters)
         iter++;
         // 1) solve subproblem and current error
         this->optimize_gauss_newton(true);// Test if solved anything? no nans
-        currentChi2 = this->chi2(false);// residuals don't need to be calculated again
+        currentChi2 = this->chi2(false);// TODO residuals don't need to be calculated again (see optimizer.cpp)
         this->synchronize_nodes_auxiliary_state();// book-keeps states to undo updates
         this->update_nodes();
 

@@ -76,15 +76,15 @@ public:
     virtual void update_state(const MatX1 &dx) = 0;
     /**
      * For Levenberg-Marquard
-     * This function bookeeps the current state values
+     * This function bookkeeps the current state values
      * This is in case the optimization step does not improve
      */
-    virtual void bookeep_states() = 0;
+    virtual void bookkeep_state() = 0;
     /**
      * For Levenberg-Marquard
      * Undoes an incorrect update
      */
-    virtual void update_bookept_states() = 0;
+    virtual void update_state_from_bookkeep() = 0;
 
 protected:
 
