@@ -92,13 +92,13 @@ for t in range(1,N):
         #print_2d_graph(graph)
         pass
 
-if 0:
+if 1:
     print('current initial chi2 = ', graph.chi2() )
     graph.solve(mrob.fgraph.LM, 50)
     print('LM chi2 = ', graph.chi2() )
-    print_2d_graph(graph)
+    #print_2d_graph(graph)
 
-if 1:
+if 0:
     graph.solve(mrob.fgraph.GN)
     print('Iter 0 chi2 = ', graph.chi2() )
     graph.solve(mrob.fgraph.GN)
@@ -114,15 +114,6 @@ if 1:
     graph.solve(mrob.fgraph.GN)
     print('Iter 5 chi2 = ', graph.chi2() ) #already converges
     print_2d_graph(graph)
-
-
-graph.print(False)
-if 0:
-    plt.figure()
-    plt.plot(processing_time)
-    plt.title('Eigen simplicial LDLT with AMD Ordering')
-    plt.show()
-    
 
 
 

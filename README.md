@@ -1,10 +1,10 @@
 # MROB: Mobile Robotics library
 The Skoltech Mobile Robotics library (mrob) is our common framework for implementing our robotics research and projects. It includes a core set of functionalities including perception, path planning and optimization. The present library is meant to be a self-contained library.
-* [common](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/src/common): common matrix definitions and typedefs.
-* [SE3](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/src/SE3): Rigid Body Transformations library.
-* [Fgraph](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/src/FGraph): Factor Graph (WIP)
-* [PCReg](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/src/PCRegistration): Point Cloud Registration (WIP)
-* [mrobPy](https://cdise-bitbucket.skoltech.ru/projects/MR/repos/mrob/browse/mrobpy) Python bindings (using pybind11) for some of the above methods.
+* [common](https://github.com/MobileRoboticsSkoltech/mrob/tree/master/src/common): common matrix definitions and typedefs.
+* [SE3](https://github.com/MobileRoboticsSkoltech/mrob/tree/master/src/SE3): Rigid Body Transformations library.
+* [Fgraph](https://github.com/MobileRoboticsSkoltech/mrob/tree/master/src/FGraph): Factor Graph (WIP)
+* [PCReg](https://github.com/MobileRoboticsSkoltech/mrob/tree/master/src/PCRegistration): Point Cloud Registration (WIP)
+* [mrobPy](https://github.com/MobileRoboticsSkoltech/mrob/tree/master/mrobpy) Python bindings (using pybind11) for some of the above methods.
 
 ## Dependencies
 * C++'14

@@ -11,6 +11,8 @@
 
 
 #include <pybind11/pybind11.h>
+#include <pybind11/iostream.h>
+
 namespace py = pybind11;
 
 
@@ -25,6 +27,8 @@ void init_PCPlanes(py::module &m);
 PYBIND11_MODULE(mrob, m) {
     m.doc() = "pybind11 MROB library, now including \n-geometry: SE3, SO3 and other routines\n-registration: routines for PC aligment and others\n-fgrad: Factors Graphs ";
     // Later, in binding code:
+    py::add_ostream_redirect(m, "ostream_redirect");
+
     py::module m_geom = m.def_submodule("geometry");
     init_geometry(m_geom);
 
