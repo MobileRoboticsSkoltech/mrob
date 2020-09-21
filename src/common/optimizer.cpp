@@ -34,8 +34,8 @@ Optimizer::~Optimizer()
     {
       case NEWTON_RAPHSON:
           return optimize_newton_raphson();
-      case LEVENBERG_MARQUARDT_S:
-      case LEVENBERG_MARQUARDT_E:
+      case LEVENBERG_MARQUARDT_SPHER:
+      case LEVENBERG_MARQUARDT_ELLIP:
           return optimize_levenberg_marquardt();
     }
     return 0;
@@ -48,12 +48,12 @@ uint_t Optimizer::optimize_newton_raphson_one_iteration(bool useLambda)
     calculate_gradient_hessian();
     if (useLambda)
     {
-        if (optimization_method_ == LEVENBERG_MARQUARDT_S)
+        if (optimization_method_ == LEVENBERG_MARQUARDT_SPHER)
         {
             for (uint_t i = 0; i < hessian_.diagonalSize() ; ++i)
                 hessian_(i,i) += lambda_;
         }
-        if (optimization_method_ == LEVENBERG_MARQUARDT_E)
+        if (optimization_method_ == LEVENBERG_MARQUARDT_ELLIP)
         {
             for (uint_t i = 0; i < hessian_.diagonalSize() ; ++i)
                 hessian_(i,i) *= 1.0 + lambda_;
@@ -95,6 +95,7 @@ uint_t Optimizer::optimize_levenberg_marquardt()
     matData_t beta1(2.0), beta2(0.25); // lambda updates multiplier values, beta1 > 1 > beta2 >0
     uint_t iters = 0;
     matData_t previous_error = calculate_error(), diff_error, current_error;
+    bool improvement; // variable for controlling when no update is done and number of iterations is exceeded.
     do
     {
         iters++;
@@ -104,13 +105,15 @@ uint_t Optimizer::optimize_levenberg_marquardt()
         current_error = calculate_error();
         std::cout << "iter " << iters << ", error = " << current_error << ", lambda = "<< lambda_ << std::endl;
         diff_error = previous_error - current_error;
+        improvement = true;
 
         // 2) Check for convergence, hillclimb
         if (diff_error < 0)
         {
             std::cout << "no improvement\n";
             lambda_ *= beta1;
-            this->update_state_from_bookkeep();//TODO we need to calcualte the error again for correct estimates?
+            this->update_state_from_bookkeep();
+            improvement = false;
             continue;
         }
         previous_error = current_error;
@@ -120,12 +123,12 @@ uint_t Optimizer::optimize_levenberg_marquardt()
             return iters;
 
         // 3 Fidelity of the quadratized model vs non-linear error evaluation.
-        // f = err(x_k) - err(x_k + dx)
+        // f = err(x_k) - err(x_k + dx)  ( >0 if upgrade)
         //     err(x_k) - m_k(dx)
-        // where m_k is the quadratized model = ||r||^2 - dx'*J' r + 0.5 dx'(Hessian + LM)dx
-        matData_t modelFidelity = diff_error / (dx_.dot(gradient_) - 0.5*dx_.dot(hessian_* dx_));
-        // TODO something here is wrong, this value is negative and it should not be.
-        std::cout << "Model fidelity" << modelFidelity << std::endl;
+        // where m_k is the quadratized model m_k(dx) = err(x_k) + dx'*Grad r + 0.5 dx'(Hessian + LM)dx
+        // => f = d err / (-dx'*Grad r - 0.5 dx'(Hessian + LM)dx)
+        matData_t modelFidelity = diff_error / (-dx_.dot(gradient_) - 0.5*dx_.dot(hessian_* dx_));
+
 
         // 4) update lambda
         if (modelFidelity < sigma1)
@@ -135,11 +138,15 @@ uint_t Optimizer::optimize_levenberg_marquardt()
 
     }while(iters < 1e2);
 
+    if (!improvement)
+    {
+        this->update_state_from_bookkeep();//If no improvement shown, undo again
+    }
+
 
     // output
     std::cout << "Optimizer::optimize_levenberg_marquardt: failed to converge after "
-              << iters << " iterations and error " << current_error
-              << ", and delta = " << diff_error
+              << iters << " iterations and error " << calculate_error()
               << std::endl;
 
     return 0;

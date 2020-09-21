@@ -47,8 +47,8 @@ public:
 	 *  - LM_S: Levenberg Marquardt: Spherical
 	 *  - LM_E: Levenberg Marquardt: Eliptical
 	 */
-	enum optimMethod{NEWTON_RAPHSON=0, LEVENBERG_MARQUARDT_S, LEVENBERG_MARQUARDT_E};
-    Optimizer(matData_t solutionTolerance = 1e-4, matData_t lambda = 1e-6);
+	enum optimMethod{NEWTON_RAPHSON=0, LEVENBERG_MARQUARDT_SPHER, LEVENBERG_MARQUARDT_ELLIP};
+    Optimizer(matData_t solutionTolerance = 1e-4, matData_t lambda = 1e-5);
     virtual ~Optimizer();
 
     /**
@@ -65,9 +65,12 @@ public:
     virtual matData_t calculate_error() = 0;
     /**
      * Gradient calculates the gradient and Hessian
-     * This function will be called always after a calculate
-     * error, so the method using optimizer can keep some information
-     * and no need to re-calculated everything
+     * This function may be called after calculate_error()
+     * or not (some cases of LM). For a general purpose it is required
+     * that this function is either:
+     * 1) self-contained. No assumptions made and recalculated (redundantly) residuals
+     * 2) Most of the times will be called after calculate_error. No recalculations are requires except
+     *    inside the update_bookkeep_state which will have invalid residuals and need update (less prefered option)
      */
     virtual void calculate_gradient_hessian() = 0;
     /**

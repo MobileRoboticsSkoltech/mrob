@@ -78,9 +78,10 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
             return optimize(NEWTON_RAPHSON);
         case SolveMode::GN_CLAMPED_HESSIAN:
             return solve_interpolate_hessian(singleIteration);
-        case SolveMode::LM_HESSIAN:
-            return optimize(LEVENBERG_MARQUARDT_S);
-        case SolveMode::LM_CLAMPED_HESSIAN:
+        case SolveMode::LM_SPHER:
+            return optimize(LEVENBERG_MARQUARDT_SPHER);
+        case SolveMode::LM_ELLIP:
+            return optimize(LEVENBERG_MARQUARDT_ELLIP);
         default:
             return 0;
     }
@@ -156,6 +157,7 @@ uint_t PlaneRegistration::solve_interpolate_gradient(bool singleIteration)
     return solveIters_;
 }
 
+// TO BE DEPRECATED. Only used for clamped Hessian, and that is shown NOT to work.
 uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
 {
     // iterative process, on convergence basis | error_k - error_k-1| < tol
@@ -172,6 +174,7 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
         diffError = previousError - initialError;
         previousError = initialError;
 
+        solveIters_++;
         std::cout << "current error iteration " << solveIters_ << " = "<< initialError << std::endl;
 
         // 2) calculate Gradient and Hessian
@@ -230,7 +233,6 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
             dxi = tau * t * xiFinal;
             trajectory_->at(t) = SE3(dxi);
         }
-        solveIters_++;
     }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters_ < 1e4);
     return solveIters_;
 }
@@ -348,7 +350,7 @@ void PlaneRegistration::print(bool plotPlanes) const
 
 
 // resturns: [0]error, [1]iters, hessdet[2], conditioningNumber[3]
-std::vector<double> PlaneRegistration::print_evaluate() const
+std::vector<double> PlaneRegistration::print_evaluate()
 {
     std::vector<double> result(6,0.0);
 
@@ -358,6 +360,21 @@ std::vector<double> PlaneRegistration::print_evaluate() const
     MatX allPlanes(numberPlanes_,4);
     MatX allNormals(numberPlanes_,3);
     uint_t i = 0;
+
+
+    switch(solveMode_)
+    {
+        case SolveMode::GRADIENT:
+        case SolveMode::GRADIENT_BENGIOS_NAG:
+            hessian__.setZero();
+            break;
+        case SolveMode::GN_HESSIAN:
+        case SolveMode::LM_SPHER:
+        case SolveMode::LM_ELLIP:
+            gradient__ = gradient_;
+            hessian__ = hessian_;
+    }
+
     // Normals on planes, check for rank
     for (auto plane : planes_)
     {
@@ -445,7 +462,8 @@ void PlaneRegistration::bookkeep_state()
 
 void PlaneRegistration::update_state_from_bookkeep()
 {
-    Mat61 xiFinal = trajectory_->back().ln_vee();
+    trajectory_->back() = bookept_trajectory_;
+    Mat61 xiFinal = bookept_trajectory_.ln_vee();
     double  tau = 1.0 / (double)(numberPoses_-1);
     Mat61 dxi;
     for (uint_t t = 1 ; t < numberPoses_-1; ++t)
@@ -453,5 +471,7 @@ void PlaneRegistration::update_state_from_bookkeep()
         dxi = tau * t * xiFinal;
         trajectory_->at(t) = SE3(dxi);
     }
+    calculate_error();// planes get recalculated, which is a requisite for later
+    //(this class construction, in general grad should be self-contained...)
 }
 

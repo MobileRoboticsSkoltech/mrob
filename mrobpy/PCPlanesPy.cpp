@@ -37,12 +37,11 @@ void init_PCPlanes(py::module &m)
 {
     py::enum_<PlaneRegistration::SolveMode>(m, "PlaneRegistration.SolveMethod")
         .value("INITIALIZE", PlaneRegistration::SolveMode::INITIALIZE)
-        .value("GRADIENT", PlaneRegistration::SolveMode::GRADIENT)
         .value("GRADIENT_BENGIOS_NAG", PlaneRegistration::SolveMode::GRADIENT_BENGIOS_NAG)
         .value("GN_HESSIAN", PlaneRegistration::SolveMode::GN_HESSIAN)
-        .value("LM_HESSIAN", PlaneRegistration::SolveMode::LM_HESSIAN)
         .value("GN_CLAMPED_HESSIAN", PlaneRegistration::SolveMode::GN_CLAMPED_HESSIAN)
-        .value("LM_CLAMPED_HESSIAN", PlaneRegistration::SolveMode::LM_CLAMPED_HESSIAN)
+        .value("LM_SPHER", PlaneRegistration::SolveMode::LM_SPHER)
+        .value("LM_ELLIP", PlaneRegistration::SolveMode::LM_ELLIP)
         .export_values()
         ;
 	// This class creates a synthetic testing
@@ -60,7 +59,7 @@ void init_PCPlanes(py::module &m)
             .def(py::init<>(),
                     "Constructor, by default empty structure")
             .def("solve", &PlaneRegistration::solve,
-                    py::arg("mode") = PlaneRegistration::SolveMode::GRADIENT,
+                    py::arg("mode") = PlaneRegistration::SolveMode::GRADIENT_BENGIOS_NAG,
                     py::arg("singleIteration") = false)
             .def("reset_solution", &PlaneRegistration::reset_solution, "resets the current solution and maintains the data from planes (PC)")
             .def("print", &PlaneRegistration::print,

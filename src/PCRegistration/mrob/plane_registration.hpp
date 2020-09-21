@@ -39,9 +39,9 @@ class PlaneRegistration: public Optimizer{
                    GRADIENT,
                    GRADIENT_BENGIOS_NAG,
                    GN_HESSIAN,
-                   LM_HESSIAN,
                    GN_CLAMPED_HESSIAN,
-                   LM_CLAMPED_HESSIAN};
+                   LM_SPHER,
+                   LM_ELLIP};
 
   public:
     PlaneRegistration();
@@ -127,7 +127,7 @@ class PlaneRegistration: public Optimizer{
      *          3) number of negative eigenvalues
      *          4) conditioning number
      */
-    std::vector<double> print_evaluate() const;
+    std::vector<double> print_evaluate();
 
     /**
      * add point_cloud requires a complete set of points observed at a given time
