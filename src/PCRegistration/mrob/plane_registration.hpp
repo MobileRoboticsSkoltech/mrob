@@ -16,6 +16,7 @@
 #include "mrob/SE3.hpp"
 #include <Eigen/StdVector>
 #include "mrob/plane.hpp"
+#include "mrob/optimizer.hpp"
 
 #include <unordered_map>
 #include <memory>
@@ -27,33 +28,49 @@ namespace mrob{
  * class PlaneRegistration introduced a class for the alignment of
  * planes.
  */
-class PlaneRegistration{
+class PlaneRegistration: public Optimizer{
 
   public:
+    // XXX is this mode used anymore? deprecated?
     enum TrajectoryMode{SEQUENCE=0, INTERPOLATION};
-    enum SolveMode{GRADIENT_DESCENT_NAIVE=0, GRADIENT_DESCENT_INCR, STEEPEST, HEAVYBALL, MOMENTUM, MOMENTUM_SEQ, BENGIOS_NAG, GRADIENT_DESCENT_BACKTRACKING, BFGS};
+    // XXX Solve method is almost deprecated
+    //enum SolveModeGrad{GRADIENT_DESCENT_NAIVE=0, GRADIENT_DESCENT_INCR, STEEPEST, HEAVYBALL, MOMENTUM, MOMENTUM_SEQ, BENGIOS_NAG, GRADIENT_DESCENT_BACKTRACKING, BFGS};
+    enum SolveMode{INITIALIZE=0,
+                   GRADIENT,
+                   GRADIENT_BENGIOS_NAG,
+                   GN_HESSIAN,
+                   GN_CLAMPED_HESSIAN,
+                   LM_SPHER,
+                   LM_ELLIP};
 
   public:
     PlaneRegistration();
     //PlaneRegistration(uint_t numberPlanes , uint_t numberPoses);
     ~PlaneRegistration();
 
+    // Function from the parent class Optimizer
+    virtual matData_t calculate_error() override;
+    virtual void calculate_gradient_hessian() override;
+    virtual void update_state(const MatX1 &dx) override;
+    virtual void bookkeep_state() override;
+    virtual void update_state_from_bookkeep() override;
+
+
+    // Specific methods
     void set_number_planes_and_poses(uint_t numPlanes, uint_t numPoses);
     uint_t get_number_planes() const {return numberPlanes_;};
     uint_t get_number_poses() const {return numberPoses_;};
-
-    void set_solving_method(SolveMode mode) {solveMode_ = mode;};
 
     /**
      * solve() calculates the poses on trajectory such that the minimization objective
      * is met: J = sum (lamda_min_plane)
      */
-    uint_t solve(bool singleIteration = false);
+    uint_t solve(SolveMode mode, bool singleIteration = false);
     /**
      * solve_interpolate() calculates the poses on trajectory such that the minimization objective
      * is met: J = sum (lamda_min_plane), and the trajectory is described as an interpolation from I to T_f
      */
-    uint_t solve_interpolate(bool singleIteration = false);
+    uint_t solve_interpolate_gradient(bool singleIteration = false);
     /**
      * solve_interpolate_hessian() calculates the poses on trajectory such that the minimization objective
      * is met: J = sum (lamda_min_plane), and the trajectory is described as an interpolation from I to T_f
@@ -66,11 +83,16 @@ class PlaneRegistration{
      */
     uint_t solve_initialize();
     /**
+     * Solve quaternion plane uses a paramteric representation for each plane, a quaternion,
+     * and optimizes both the plane parameters and the trajectory variables
+     */
+    uint_t solve_quaternion_plane();
+    /**
      * reset_solution, resets the current calculated solution while maintainting all data (planes)
      * This function is intended for comparing different solvers without replicating data
      */
     void reset_solution();
-    double get_current_error();
+    double get_current_error() const;
     /**
      * Get trajectory returns a smart pointer to the vector of transformations,
      * which is already shared by all Plane objects.
@@ -95,6 +117,19 @@ class PlaneRegistration{
     void print(bool plotPlanes = true) const;
 
     /**
+     * print evaluate looks for degenerate cases, such as planes normal vectors,
+     * Hessian rank, det of all normals, etc. Basically this function tries to answer
+     * if the problem is ill-conditioned
+     *
+     * Returns: 0) current error
+     *          1) number of iters,
+     *          2) determinant
+     *          3) number of negative eigenvalues
+     *          4) conditioning number
+     */
+    std::vector<double> print_evaluate();
+
+    /**
      * add point_cloud requires a complete set of points observed at a given time
      * stamp (XXX now only an integer) and fills in the registration structure.
      */
@@ -114,12 +149,20 @@ class PlaneRegistration{
     uint_t time_;
     std::unordered_map<uint_t, std::shared_ptr<Plane>> planes_;
     std::shared_ptr<std::vector<SE3>> trajectory_;
+    SE3 bookept_trajectory_;//last pose is stored/bookept
+    double tau_;//variable for weighting the number of poses in traj
+    uint_t solveIters_;
 
     // 1st order parameters methods if used
     PlaneRegistration::SolveMode solveMode_;
     std::vector<Mat61> previousState_;
     double c1_, c2_;    //parameters for the Wolfe conditions DEPRECATED?
     double alpha_, beta_;
+
+
+    //2nd order data (if used) TODO remove since they are defined in parent class
+    Mat61 gradient__;
+    Mat6 hessian__;
 
 };
 

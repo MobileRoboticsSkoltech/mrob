@@ -33,6 +33,7 @@ void init_geometry(py::module &m) {
 				py::return_value_policy::copy)
         .def(py::init<const Mat61 &>(), py::return_value_policy::copy)
         .def(py::init<const SE3 &>(), py::return_value_policy::copy)
+        .def(py::init<const SO3 &, const Mat31>(), py::return_value_policy::copy)
         .def("T", &SE3::T, py::return_value_policy::copy) // makes a copy of the 4x4 Transformation
         .def("R", &SE3::R, py::return_value_policy::copy)
         .def("t", &SE3::t, py::return_value_policy::copy)
@@ -47,6 +48,8 @@ void init_geometry(py::module &m) {
         .def("inv", &SE3::inv, py::return_value_policy::copy)
         .def("adj", &SE3::adj, py::return_value_policy::copy)
         .def("distance", &SE3::distance)
+        .def("distance_rotation", &SE3::distance_rotation)
+        .def("distance_trans", &SE3::distance_trans)
         .def("print", &SE3::print)
         ;
     m.def("isSE3", &mrob::isSE3, "Returns True is the matrix is a valid transformation and False if not");

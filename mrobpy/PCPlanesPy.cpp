@@ -35,6 +35,15 @@ using namespace mrob;
 
 void init_PCPlanes(py::module &m)
 {
+    py::enum_<PlaneRegistration::SolveMode>(m, "PlaneRegistration.SolveMethod")
+        .value("INITIALIZE", PlaneRegistration::SolveMode::INITIALIZE)
+        .value("GRADIENT_BENGIOS_NAG", PlaneRegistration::SolveMode::GRADIENT_BENGIOS_NAG)
+        .value("GN_HESSIAN", PlaneRegistration::SolveMode::GN_HESSIAN)
+        .value("GN_CLAMPED_HESSIAN", PlaneRegistration::SolveMode::GN_CLAMPED_HESSIAN)
+        .value("LM_SPHER", PlaneRegistration::SolveMode::LM_SPHER)
+        .value("LM_ELLIP", PlaneRegistration::SolveMode::LM_ELLIP)
+        .export_values()
+        ;
 	// This class creates a synthetic testing
     py::class_<CreatePoints>(m,"CreatePoints")
             .def(py::init<uint_t, uint_t, uint_t, double>())
@@ -49,14 +58,14 @@ void init_PCPlanes(py::module &m)
     py::class_<PlaneRegistration>(m,"PlaneRegistration")
             .def(py::init<>(),
                     "Constructor, by default empty structure")
-            .def("solve_initialize", &PlaneRegistration::solve_initialize) //Add all solvers into 1 function
-            .def("solve", &PlaneRegistration::solve_interpolate,
-                    py::arg("singleIteration") = false)
-            .def("solve_hessian", &PlaneRegistration::solve_interpolate_hessian,
+            .def("solve", &PlaneRegistration::solve,
+                    py::arg("mode") = PlaneRegistration::SolveMode::GRADIENT_BENGIOS_NAG,
                     py::arg("singleIteration") = false)
             .def("reset_solution", &PlaneRegistration::reset_solution, "resets the current solution and maintains the data from planes (PC)")
             .def("print", &PlaneRegistration::print,
                     py::arg("plotPlanes") =  false)
+            .def("print_evaluate", &PlaneRegistration::print_evaluate,
+                    "returns: current error,1) number of iters, 2) determinant 3) number of negative eigenvalues 4) conditioning number")
 			// TODO add methods to fill in the data structure more properly, now it is a reference pass by sharing the smart pointer
             .def("get_point_cloud", &PlaneRegistration::get_point_cloud,
                     "Gets the point cloud at input time index")

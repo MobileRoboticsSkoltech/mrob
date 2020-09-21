@@ -31,7 +31,17 @@ SE3::SE3(const Mat61 &xi) : T_(Mat4::Identity())
 SE3::SE3(const SE3 &T): T_(T.T())
 {
 }
+SE3::SE3(const SO3 &R, const Mat31 t)
+{
+    T_  << R.R(), t,
+           0,0,0,1;
+}
 
+SE3::SE3(const Mat3 &R, const Mat31 t)
+{
+    T_  << R, t,
+           0,0,0,1;
+}
 template<typename OtherDerived>
 SE3::SE3(const Eigen::MatrixBase<OtherDerived>& rhs)  :
     T_(rhs)
@@ -236,6 +246,16 @@ double SE3::distance(const SE3 &rhs) const
     return (*this * rhs.inv()).ln_vee().norm();
 }
 
+double SE3::distance_rotation(const SE3 &rhs) const
+{
+    Mat3 dR = this->R() * rhs.R().transpose();
+    return SO3( dR ).ln_vee().norm();
+}
+
+double SE3::distance_trans(const SE3 &rhs) const
+{
+    return (this->t() - rhs.t()).norm();
+}
 void SE3::print(void) const
 {
     std::cout << T_ << std::endl;

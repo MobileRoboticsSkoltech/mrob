@@ -52,6 +52,14 @@ public:
      */
     SE3(const SE3 &T);
     /**
+     * Constructor, requires the Rotation in SO3 and translation
+     */
+    SE3(const SO3 &R, const Mat31 t);
+    /**
+     * Constructor, requires the Rotation as a 3x3 matrix and translation
+     */
+    SE3(const Mat3 &R, const Mat31 t);
+    /**
      * This constructor allows to construct from Eigen expressions
      * Eigen suggestion: TopicCustomizingEigen.html
      */
@@ -147,6 +155,16 @@ public:
      * of the ln(T * T_rhs^{-1})
      */
     double distance(const SE3 &rhs) const;
+    /**
+     * Provide the distance on the rotation in the tangent space
+     * of the ln(R * R_rhs^{-1})
+     */
+    double distance_rotation(const SE3 &rhs) const;
+    /**
+     * Provide the distance of the translation part
+     * ||t - t'||
+     */
+    double distance_trans(const SE3 &rhs) const;
     /**
      * Regenerate, does the following operation:
      * T = Exp ( Ln(T) )
