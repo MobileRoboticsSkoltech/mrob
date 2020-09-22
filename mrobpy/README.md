@@ -2,7 +2,7 @@
 
 First, compile the project as explained in the README. We recommend to use the path ~/soft. Then add the following line to .bashrc or .bash_aliases:
 
-'echo "export PYTHONPATH=${PYTHONPATH}:${HOME}/soft/mrob/lib" >> ~/.bash_aliases'
+`echo "export PYTHONPATH=${PYTHONPATH}:${HOME}/soft/mrob/lib" >> ~/.bash_aliases`
 
 Make sure that the path to lib is correct
 
