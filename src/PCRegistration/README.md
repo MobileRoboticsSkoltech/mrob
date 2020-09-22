@@ -7,9 +7,3 @@ Point Cloud Registration. Different methods implemente for point cloud registrat
 
 ## Dependencies
 C++'14, Eigen
-
-
-
-## Coding conventions
-Please check the common conventions for [mrob](https://github.com/MobileRoboticsSkoltech/mrob/tree/master/).
-

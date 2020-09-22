@@ -8,9 +8,3 @@ The present library is meant to be part of the mrob library, by implementing met
 
 ## Dependencies
 C++'14, Eigen
-
-
-
-## Coding conventions
-Please check the common conventions for [mrob](https://github.com/MobileRoboticsSkoltech/mrob/tree/master/).
-

@@ -18,8 +18,3 @@ Bipartite is in the sense that edges of the graph are always from nodes to facto
 ## Dependencies
 C++'14, Eigen
 
-
-
-## Coding conventions
-Please check the common code conventions for [mrob](https://github.com/MobileRoboticsSkoltech/mrob/tree/master/).
-
