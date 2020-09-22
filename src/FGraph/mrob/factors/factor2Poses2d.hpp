@@ -1,5 +1,8 @@
-/* Copyright 2018-2019 Skolkovo Institute of Science and Technology (Skoltech)
+/* Copyright (c) 2018, Skolkovo Institute of Science and Technology (Skoltech)
  * All rights reserved.
+ *
+ * See LICENSE file in the root of the mrob library.
+ *
  *
  *  Created on: Jan 14, 2019
  *      Author: Gonzalo Ferrer

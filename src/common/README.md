@@ -5,9 +5,3 @@ Common strucutres and data conventions taken acrros all project. This includes:
 
 ## Dependencies
 C++'14, Eigen
-
-
-
-## Coding conventions
-Please check the common conventions for [skmr](https://github.com/MobileRoboticsSkoltech/mrob/tree/master/).
-

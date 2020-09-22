@@ -1,5 +1,8 @@
-/* $COPYRIGHT_SKOLTECH
- * $LICENSE_LGPL
+/* Copyright (c) 2018, Skolkovo Institute of Science and Technology (Skoltech)
+ * All rights reserved.
+ *
+ * See LICENSE file in the root of the mrob library.
+ *
  *
  * optimizer.cpp
  *
