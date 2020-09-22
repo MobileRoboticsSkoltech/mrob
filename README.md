@@ -9,31 +9,19 @@ The Skoltech Mobile Robotics library (mrob) is our common framework for implemen
 ## Dependencies
 * C++'14
 * CMake
-* [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) (requires installation)
-* [pybind11](https://github.com/pybind/pybind11)
+* [Eigen](https://gitlab.com/libeigen/eigen) (included as a submodule)
+* [pybind11](https://github.com/pybind/pybind11) (included as a submodule)
   - python3-distutils
   - python3-dev
 
-`sudo apt install build-essential cmake python3-distutils python3-dev libeigen3-dev`
+`sudo apt install build-essential cmake python3-distutils python3-dev`
 
 
 
 
-## Repository configuration SSH
-
-Create a SSH key and configure your account appropriately.
-Clone the project from CDISE bitbucket:
-
-`git clone --recursive ssh://git@cdise-bitbucket.skoltech.ru:7999/mr/mrob.git`
-
-
-`git remote remove origin`
-
-Create a new repository at your private space.
-
-`git remote add origin ssh://yourUserName@cdise-bitbucket.skoltech.ru:7999/mr/yourNewProject.git`
-
-`git push -u origin master`
+## Repository 
+Standard github cloining, adding the recursive term for submodules.
+`git clone --recursive git@github.com:MobileRoboticsSkoltech/mrob.git`
 
 
 ## Installation
