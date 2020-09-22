@@ -149,7 +149,6 @@ for t in range(1,N):
 
     # plot the current problem
     if (t+1) % 15 == 0:
-        #print_3d_graph(graph) #TODO this does not work
         pass
         
 
@@ -157,16 +156,18 @@ for t in range(1,N):
 graph.print(False)
 
 # Solves the batch problem
-if 0:
+if 1:
     print('Current state of the graph: chi2 = ' , graph.chi2() )
-    print_3d_graph(graph)
+    # uncomment for visualization
+    #print_3d_graph(graph)
     start = time.time()
     graph.solve(mrob.fgraph.LM,100)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
-    print_3d_graph(graph)
+    # uncomment for visualization
+    #print_3d_graph(graph)
 
-if 1:
+if 0:
     print('Current state of the graph: chi2 = ' , graph.chi2() )
     #print_3d_graph(graph)
     for k in range(2):

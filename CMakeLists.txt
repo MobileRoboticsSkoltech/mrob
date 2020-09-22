@@ -26,20 +26,13 @@ SET(CMAKE_CXX_STANDARD 14)
 
 # ===================================================================
 # DEPENDENCIES: locate the necessary dependencies for the project
-# DEPENDENCIES: Eigen
-find_package(Eigen QUIET)
-if(Eigen_FOUND)
-  MESSAGE("Eigen found in CMake modules:" ${Eigen_INCLUDE_DIRS})
-ELSE(Eigen_FOUND)  
-    SET(Eigen_INCLUDE_DIRS /usr/local/include/eigen3;/usr/include/eigen3)
-    MESSAGE("Eigen not found, adding manually directories. BE CAREFULL to have installed Eigen here:" ${Eigen_INCLUDE_DIRS})
-    MESSAGE(${Eigen_INCLUDE_DIRS})
-ENDIF(Eigen_FOUND)
+# DEPENDENCIES: Eigen (submodule pointing to 3.3.7)
+SET(Eigen_INCLUDE_DIRS ./external/Eigen)
 INCLUDE_DIRECTORIES(${Eigen_INCLUDE_DIRS})
 
-# DEPENDENCIES: pybind11
+# DEPENDENCIES: pybind11 (submodule)
 SET(PYBIND11_CPP_STANDARD -std=c++14)
-ADD_SUBDIRECTORY(./pybind11)
+ADD_SUBDIRECTORY(./external/pybind11)
 
 
 # ===================================================================
