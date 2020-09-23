@@ -1,4 +1,6 @@
-![mrob library](http://sites.skoltech.ru/app/data/uploads/sites/50/2018/02/mr_animate1.gif)
+<p align="center">
+  <img src="http://sites.skoltech.ru/app/data/uploads/sites/50/2018/02/mr_animate1.gif" width="450">
+</p>
 
 # MROB: Mobile Robotics library
 The Skoltech Mobile Robotics library (mrob) is our common framework for implementing our robotics research and projects. It includes a core set of functionalities such as geometric transformations (SE3), factor graphs for general state estimation, optimization, 3D point cloud registration and more to come.
