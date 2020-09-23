@@ -3,40 +3,6 @@ import mrob
 import numpy as np
 import time
 
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-
-
-
-def print_3d_graph(graph):
-    '''This function draws the state variables for a 3D pose graph'''
-    
-    # read graph, returns a list (vector) of state (np arrays)
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    x = graph.get_estimated_state()
-    To =  mrob.geometry.SE3(vertex_ini[0]) #XXX for some reason (ownership?) can't do this is 1 line
-    prev_p =To.T()[:3,3]
-    for xi in x:
-        Ti = mrob.geometry.SE3(xi)
-        p = Ti.T()[:3,3]
-        ax.plot((prev_p[0],p[0]),(prev_p[1],p[1]),(prev_p[2],p[2]) , '-b')
-        prev_p = np.copy(p)
-    plt.show()
-
-
-def plot_from_vertex(vertex):
-    "given a dictionary of vertex plots the xyz"
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    for i in range(1,N):
-        p = mrob.geometry.SE3(vertex[i]).T()[:3,3]
-        prev_p = mrob.geometry.SE3(vertex[i-1]).T()[:3,3]
-        #ax.scatter(p[0],p[1],p[2],color='green')
-        ax.plot((prev_p[0],p[0]),(prev_p[1],p[1]),(prev_p[2],p[2]) , '-b')
-        #prev_p = np.copy(p)
-    plt.show()
-
 # Initialize data structures
 vertex_ini = {}
 factors = {}
@@ -46,9 +12,8 @@ N = 2500
 
 
 # load file, .g2o format from https://github.com/RainerKuemmerle/g2o/wiki/File-Format
-#file_path = '../../datasets/sphere_bignoise_vertex3.g2o'
-#file_path = '../../datasets/sphere_gt.g2o'
-file_path = '../../datasets/sphere.g2o'
+#file_path = '../../benchmarks/sphere_gt.g2o'
+file_path = '../../benchmarks/sphere.g2o'
 with open(file_path, 'r') as file:
     for line in file:
         d = line.split()
@@ -107,8 +72,6 @@ with open(file_path, 'r') as file:
 #print(factors_dictionary)
 
 
-#plot_from_vertex(vertex_ini)
-
 # Initialize FG
 graph = mrob.fgraph.FGraph()
 x = vertex_ini[0]
@@ -138,45 +101,16 @@ for t in range(1,N):
         # for end. no more loop inside the factors
         
         
-    # solve the problem 7s 2500nodes
-    start = time.time()
+    # solve the problem incrementally
     #graph.solve(mrob.GN)
-    #graph.solve(mrob.LM, 5)
-    end = time.time()
-    #print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
-    processing_time.append(1e3*(end - start))
+    #graph.solve(mrob.LM, 3)        
 
-
-    # plot the current problem
-    if (t+1) % 15 == 0:
-        pass
-        
-
-
-graph.print(False)
 
 # Solves the batch problem
-if 1:
-    print('Current state of the graph: chi2 = ' , graph.chi2() )
-    # uncomment for visualization
-    #print_3d_graph(graph)
-    start = time.time()
-    graph.solve(mrob.fgraph.LM,100)
-    end = time.time()
-    print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
-    # uncomment for visualization
-    #print_3d_graph(graph)
-
-if 0:
-    print('Current state of the graph: chi2 = ' , graph.chi2() )
-    #print_3d_graph(graph)
-    for k in range(2):
-        start = time.time()
-        graph.solve(mrob.fgraph.GN)
-        end = time.time()
-        print('Iter ', k, ' chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
-    
-    #print_3d_graph(graph)
-
+print('Current state of the graph: chi2 = ' , graph.chi2() )
+start = time.time()
+graph.solve(mrob.fgraph.LM,100)
+end = time.time()
+print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
 
 

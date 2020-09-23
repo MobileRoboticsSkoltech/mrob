@@ -3,24 +3,6 @@ import mrob
 import numpy as np
 import time
 
-import matplotlib.pyplot as plt
-
-
-
-def print_2d_graph(graph):
-    '''This function draws the state variables for a 2D pose graph'''
-    
-    # read graph, returns a list (vector) of state (np arrays)
-    x = graph.get_estimated_state()
-    prev_p = np.zeros(3)
-    plt.figure()
-    for p in x:
-        #plt.plot(p[0],p[1],'ob')
-        plt.plot((prev_p[0],p[0]),(prev_p[1],p[1]) , '-b')
-        prev_p = p
-    plt.show()
-
-
 
 
 # Initialize data structures
@@ -30,7 +12,7 @@ factors_dictionary = {}
 N = 3500
 
 # load file
-with open('../../datasets/M3500.txt', 'r') as file:
+with open('../../benchmarks/M3500.txt', 'r') as file:
     for line in file:
         d = line.split()
         # read edges and vertex, in TORO format
@@ -45,7 +27,6 @@ with open('../../datasets/M3500.txt', 'r') as file:
             # create an empty list of pairs of nodes (factor) connected to each node
             factors_dictionary[int(d[1])] = []
 
-#print(factors_dictionary)
 
 # Initialize FG
 graph = mrob.fgraph.FGraph()
@@ -77,43 +58,13 @@ for t in range(1,N):
         # for end. no more loop inside the factors
         
         
-    # solve the problem 7s 2500nodes
-    start = time.time()
+    # solve the problem iteratively 2500nodes
     #graph.solve(mrob.GN)
-    end = time.time()
-    #print('Iteration = ', t, ', chi2 = ', graph.chi2() , ', time on calculation [ms] = ', 1e3*(end - start))
-    processing_time.append(1e3*(end - start))
-    
-    # problem error or xi2
-    #print('X2', t)
 
-    # plot the current problem
-    if (t+1) % 500 == 0:
-        #print_2d_graph(graph)
-        pass
-
-if 1:
-    print('current initial chi2 = ', graph.chi2() )
-    graph.solve(mrob.fgraph.LM, 50)
-    print('LM chi2 = ', graph.chi2() )
-    #print_2d_graph(graph)
-
-if 0:
-    graph.solve(mrob.fgraph.GN)
-    print('Iter 0 chi2 = ', graph.chi2() )
-    graph.solve(mrob.fgraph.GN)
-    print('Iter 1 chi2 = ', graph.chi2() )
-    graph.solve(mrob.fgraph.GN)
-    print('Iter 2 chi2 = ', graph.chi2() )
-    graph.solve(mrob.fgraph.GN)
-    print('Iter 3 chi2 = ', graph.chi2() )
-    #print_2d_graph(graph)
-
-    graph.solve(mrob.fgraph.GN)
-    print('Iter 4 chi2 = ', graph.chi2() )
-    graph.solve(mrob.fgraph.GN)
-    print('Iter 5 chi2 = ', graph.chi2() ) #already converges
-    print_2d_graph(graph)
-
+print('current initial chi2 = ', graph.chi2() )
+start = time.time()
+graph.solve(mrob.fgraph.LM, 50)
+end = time.time()
+print('\nLM chi2 = ', graph.chi2() , ', total time on calculation [s] = ', 1e0*(end - start))
 
 
