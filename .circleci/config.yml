@@ -18,7 +18,7 @@ jobs:
           name: "Install packages"
           command: |
             apt-get install -y build-essential cmake python3-distutils python3-dev
-            apt-get install -y virtualenv libgl1-mesa-glx
+            apt-get install -y virtualenv
       - run:
           name: "Build mrob library"
           command: |

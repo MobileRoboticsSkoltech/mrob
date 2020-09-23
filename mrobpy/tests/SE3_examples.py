@@ -13,7 +13,6 @@ R = mrob.geometry.SO3(w)
 R.print()
 T = np.eye(4)
 T[:3,:3] = R.R()
-T.print()
 
 
 # Rotation on z axis
@@ -21,7 +20,6 @@ w[2] = -np.pi/4
 R = mrob.geometry.SO3(w)
 R.print()
 T[:3,:3] = R.R()
-T.print()
 
     
 # Rotation on z axis
@@ -29,7 +27,6 @@ w = np.random.randn(3)
 R = mrob.geometry.SO3(w)
 R.print()
 T[:3,:3] = R.R()
-T.print()
 
 # Interpolation 
 # --------------------------------------------------------
@@ -38,7 +35,6 @@ xi_ini = np.array([0,0,0,0,0,0], dtype='float64')
 xi_fin = np.random.rand(6)*10
 if np.linalg.norm ( xi_fin[0:3] ) > np.pi:
     xi_fin[0:3] = xi_fin[0:3] / np.linalg.norm ( xi_fin[0:3] ) * (np.pi-1e-5)
-ax = plotConfig()
 N = 20
 xi = np.zeros((N,6))
 t = np.zeros(N)
