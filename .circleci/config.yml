@@ -18,7 +18,7 @@ jobs:
           name: "Install packages"
           command: |
             apt-get install -y build-essential cmake python3-distutils python3-dev
-            apt-get install -y virtualenv libgl1-mesa-glx
+            apt-get install -y virtualenv
       - run:
           name: "Build mrob library"
           command: |
@@ -30,54 +30,48 @@ jobs:
           command: |
             virtualenv -p python3 venv
             source venv/bin/activate
-            pip install numpy open3d
+            pip install numpy
       - run:
           name: "Run FGraph_2d"
           command: |
             export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
-            python3 mrobpy/examples/FGraph_2d.py
+            python3 mrobpy/tests/FGraph_2d.py
           when: always
       - run:
           name: "Run FGraph_M3500"
           command: |
             export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
-            cd mrobpy/examples/
+            cd mrobpy/tests/
             python3 FGraph_M3500.py
           when: always
       - run:
           name: "Run FGraph_sphere"
           command: |
             export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
-            cd mrobpy/examples/
+            cd mrobpy/tests/
             python3 FGraph_sphere.py
           when: always
       - run:
           name: "Run SE3_examples"
           command: |
             export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
-            python3 mrobpy/examples/SE3_examples.py
+            python3 mrobpy/tests/SE3_examples.py
           when: always
       - run:
           name: "Run FGraph_landmark_3d_example"
           command: |
             export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
-            python3 mrobpy/examples/FGraph_landmark_3d_example.py
+            python3 mrobpy/tests/FGraph_landmark_3d_example.py
           when: always
       - run:
           name: "Run FGraph_landmark_2d_example"
           command: |
             export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
-            python3 mrobpy/examples/FGraph_landmark_2d_example.py
+            python3 mrobpy/tests/FGraph_landmark_2d_example.py
           when: always
       - run:
           name: "Run PC_align"
           command: |
             export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
-            python3 mrobpy/examples/PC_align.py
-          when: always
-      - run:
-          name: "Run PC_planes_align"
-          command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
-            python3 mrobpy/examples/PC_planes_align.py
+            python3 mrobpy/tests/PC_align.py
           when: always
