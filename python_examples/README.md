@@ -1,4 +1,4 @@
-#Python examples using MROB
+# Python examples using MROB
 
 First, compile the project as explained in the README. We recommend to use the path ~/soft. Then add the following line to .bashrc or .bash_aliases:
 
