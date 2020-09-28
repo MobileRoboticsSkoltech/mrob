@@ -50,6 +50,6 @@ make -j
 
 
 ## License
-3-Clause BSD License
+Apache-2.0 License
 
 
