@@ -63,7 +63,7 @@ void PlaneRegistration::set_number_planes_and_poses(uint_t numberPlanes, uint_t 
     previousState_.clear();
     previousState_.resize(numberPoses, Mat61::Zero());
 
-    // TODO calculate number of points?
+    numberPoints_ = 0;
 }
 
 
@@ -81,25 +81,44 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
 {
     // just in case some methods, such as gradient, has several modes
     solveMode_ = mode;
-    // TODO some time profiling
+    uint_t iters = 0;
+
+    // time profiling
+    time_profiles_.reset();
     switch(mode)
     {
         case SolveMode::INITIALIZE:
             return solve_initialize();
         case SolveMode::GRADIENT:
         case SolveMode::GRADIENT_BENGIOS_NAG:
-            return solve_interpolate_gradient(singleIteration);
+            time_profiles_.start();
+            solve_interpolate_gradient(singleIteration);
+            time_profiles_.stop();
+            break;
         case SolveMode::GN_HESSIAN:
-            return optimize(NEWTON_RAPHSON);
+            time_profiles_.start();
+            solveIters_ = optimize(NEWTON_RAPHSON);
+            time_profiles_.stop();
+            break;
         case SolveMode::GN_CLAMPED_HESSIAN:
-            return solve_interpolate_hessian(singleIteration);
+            time_profiles_.start();
+            solveIters_ = solve_interpolate_hessian(singleIteration);
+            time_profiles_.stop();
+            break;
         case SolveMode::LM_SPHER:
-            return optimize(LEVENBERG_MARQUARDT_SPHER);
+            time_profiles_.start();
+            solveIters_ = optimize(LEVENBERG_MARQUARDT_SPHER);
+            time_profiles_.stop();
+            break;
         case SolveMode::LM_ELLIP:
-            return optimize(LEVENBERG_MARQUARDT_ELLIP);
+            time_profiles_.start();
+            solveIters_ = optimize(LEVENBERG_MARQUARDT_ELLIP);
+            time_profiles_.stop();
+            break;
         default:
             return 0;
     }
+    return iters;
 }
 
 uint_t PlaneRegistration::solve_interpolate_gradient(bool singleIteration)
@@ -313,6 +332,7 @@ void PlaneRegistration::add_plane(uint_t id, std::shared_ptr<Plane> &plane)
 {
     plane->set_trajectory(trajectory_);
     planes_.emplace(id, plane);
+    numberPoints_ += plane->get_total_number_points();
 }
 
 double PlaneRegistration::calculate_poses_rmse(std::vector<SE3> & groundTruth) const
@@ -364,7 +384,7 @@ void PlaneRegistration::print(bool plotPlanes) const
 }
 
 
-//         Nplanes[0], Nposes[1], Npoints[2], iters[3],  time[4],
+//         Nplanes[0], Nposes[1], Npoints[2], iters[3],  process-time[4],
 //         IniError/point/poses[5],   error/point/poses[7],
 //         trajErrorIni[8-9] rot/trans, trajError[10-11] rot/trans]
 std::vector<double> PlaneRegistration::print_evaluate()
@@ -375,8 +395,9 @@ std::vector<double> PlaneRegistration::print_evaluate()
     result[1] = numberPoses_;
     result[2] = numberPoints_;
     result[3] = solveIters_;
-    result[4] = 0.0;//TODO use time profiling
-    result[0] = get_current_error();
+    result[4] = time_profiles_.total_time();
+    result[5] = get_current_error();
+    //TODO more erros/vars
 
     MatX allPlanes(numberPlanes_,4);
     MatX allNormals(numberPlanes_,3);
@@ -442,6 +463,7 @@ void PlaneRegistration::calculate_gradient_hessian()
     Mat6 hessian = Mat6::Zero();
     gradient_.setZero();
     hessian_.setZero();
+    get_current_error();//this recalculates the current planes estimation, required for LM proper undoing.
     double  tau = 1.0 / (double)(numberPoses_-1);
     for (uint_t t = 1 ; t < numberPoses_; ++t)
     {

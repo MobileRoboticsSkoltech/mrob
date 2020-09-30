@@ -29,6 +29,7 @@
 #include <Eigen/StdVector>
 #include "mrob/plane.hpp"
 #include "mrob/optimizer.hpp"
+#include "mrob/time_profiling.hpp"
 
 #include <unordered_map>
 #include <memory>
@@ -175,6 +176,9 @@ class PlaneRegistration: public Optimizer{
     //2nd order data (if used) TODO remove since they are defined in parent class
     Mat61 gradient__;
     Mat6 hessian__;
+
+    // time profiling
+    TimeProfiling time_profiles_;
 
 };
 

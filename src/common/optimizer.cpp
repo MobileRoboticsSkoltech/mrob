@@ -56,7 +56,7 @@ Optimizer::~Optimizer()
 
 uint_t Optimizer::optimize_newton_raphson_one_iteration(bool useLambda)
 {
-    // 1) build problem: Gradient and Hessian
+    // 1) build problem: Gradient and Hessian and re-evaluates
     calculate_gradient_hessian();
     if (useLambda)
     {
@@ -114,7 +114,7 @@ uint_t Optimizer::optimize_levenberg_marquardt()
         // 1) solve the current subproblem by Newton Raphson
         this->bookkeep_state();
         optimize_newton_raphson_one_iteration(true);
-        current_error = calculate_error();
+        current_error = calculate_error();//TODO this function requires re-evaluation of current state/error.
         std::cout << "iter " << iters << ", error = " << current_error << ", lambda = "<< lambda_ << std::endl;
         diff_error = previous_error - current_error;
         improvement = true;

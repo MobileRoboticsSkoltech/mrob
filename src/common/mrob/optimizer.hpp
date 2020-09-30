@@ -55,7 +55,7 @@ class Optimizer
 public:
 	/**
 	 * This enums optimization methods available:
-	 *  - NR: Newton-Raphson (Gauss_newtow is a variant with approximmations in the Hessian)
+	 *  - NR: Newton-Raphson (Gauss_newtow is a variant with approximations in the Hessian)
 	 *  - LM_S: Levenberg Marquardt: Spherical
 	 *  - LM_E: Levenberg Marquardt: Eliptical
 	 */

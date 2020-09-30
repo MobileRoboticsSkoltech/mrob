@@ -60,11 +60,16 @@ public:
     /**
      * stop() records given the string the time spent since last start() call
      */
-    void stop(const std::string &key);
+    void stop(const std::string &key="");
     /**
      * print: displays the information gathered so far
      */
     void print();
+    /**
+     * total_time: returns the number of microsecond
+     * accumulated in the class
+     */
+    double total_time();
 
 protected:
     std::chrono::steady_clock::time_point t1_;
