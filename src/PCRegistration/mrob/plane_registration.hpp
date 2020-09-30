@@ -155,7 +155,7 @@ class PlaneRegistration: public Optimizer{
 
   protected:
     // flag for detecting when is has been solved
-    uint_t numberPlanes_, numberPoses_;
+    uint_t numberPlanes_, numberPoses_, numberPoints_;
     uint_t isSolved_;
     PlaneRegistration::TrajectoryMode trajMode_;
     uint_t time_;

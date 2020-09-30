@@ -35,7 +35,7 @@ using namespace mrob;
 
 
 PlaneRegistration::PlaneRegistration():
-        numberPlanes_(0), numberPoses_(0),isSolved_(0), trajectory_(new std::vector<SE3>(8,SE3())),
+        numberPlanes_(0), numberPoses_(0),numberPoints_(0),isSolved_(0), trajectory_(new std::vector<SE3>(8,SE3())),
         solveMode_(SolveMode::GRADIENT),
         c1_(1e-4), c2_(0.9), alpha_(0.75), beta_(0.1)
 {
@@ -62,6 +62,8 @@ void PlaneRegistration::set_number_planes_and_poses(uint_t numberPlanes, uint_t 
 
     previousState_.clear();
     previousState_.resize(numberPoses, Mat61::Zero());
+
+    // TODO calculate number of points?
 }
 
 
@@ -79,6 +81,7 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
 {
     // just in case some methods, such as gradient, has several modes
     solveMode_ = mode;
+    // TODO some time profiling
     switch(mode)
     {
         case SolveMode::INITIALIZE:
@@ -361,13 +364,19 @@ void PlaneRegistration::print(bool plotPlanes) const
 }
 
 
-// resturns: [0]error, [1]iters, hessdet[2], conditioningNumber[3]
+//         Nplanes[0], Nposes[1], Npoints[2], iters[3],  time[4],
+//         IniError/point/poses[5],   error/point/poses[7],
+//         trajErrorIni[8-9] rot/trans, trajError[10-11] rot/trans]
 std::vector<double> PlaneRegistration::print_evaluate()
 {
-    std::vector<double> result(6,0.0);
+    std::vector<double> result(12,0.0);
 
+    result[0] = numberPlanes_;
+    result[1] = numberPoses_;
+    result[2] = numberPoints_;
+    result[3] = solveIters_;
+    result[4] = 0.0;//TODO use time profiling
     result[0] = get_current_error();
-    result[1] = solveIters_;
 
     MatX allPlanes(numberPlanes_,4);
     MatX allNormals(numberPlanes_,3);

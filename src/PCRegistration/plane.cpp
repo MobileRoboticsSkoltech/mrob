@@ -143,6 +143,7 @@ double Plane::estimate_plane()
     return lambda_;
 }
 
+// Is this really used anywhere?
 double Plane::estimate_plane_incrementally(uint_t t)
 {
     accumulatedQ_ -= matrixQ_[t];
