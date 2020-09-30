@@ -119,6 +119,8 @@ uint_t Optimizer::optimize_levenberg_marquardt()
         diff_error = previous_error - current_error;
         improvement = true;
 
+        //TODO there is an error here, diff error is correct, but the current state get changed! how
+
         // 2) Check for convergence, hillclimb
         if (diff_error < 0)
         {

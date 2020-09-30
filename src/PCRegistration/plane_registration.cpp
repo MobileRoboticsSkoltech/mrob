@@ -407,20 +407,15 @@ std::vector<double> PlaneRegistration::print_evaluate()
     //             "\n and det = \n" << allNormals.determinant() << std::endl;
 
     // Hessian rank and eigen, look for negative vaps. Lasta hessina calculateds
-    Eigen::EigenSolver<MatX> eigs(hessian__);
+    Eigen::SelfAdjointEigenSolver<MatX> eigs(hessian__);
     std::cout << "eigen values are: \n" << eigs.eigenvalues() << std::endl;
     // Determinant of stacked normals
     std::cout << "det(Hessian) = \n" << hessian__ << std::endl;
-    // Hessian conditioning number
-    Eigen::JacobiSVD<Mat6> svd(hessian__, Eigen::ComputeThinU | Eigen::ComputeThinV);
-    // TODO remove
-    //std::cout << "SVD decomposition : \n" << svd.singularValues() <<
-    //              "\n vectors :\n" << svd.matrixU() <<
-    //             "\n and conditioning number = " << svd.singularValues()(0)/svd.singularValues()(5) << std::endl;
+
 
     result[2] = hessian__.determinant();
     //TODO count this and optimze
-    result[3] = svd.singularValues()(0)/svd.singularValues()(5);
+    result[3] = eigs.eigenvalues()(5)/eigs.eigenvalues()(0);
 
     return result;
 }
