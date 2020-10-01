@@ -39,7 +39,7 @@ Optimizer::~Optimizer()
 }
 
 
- uint_t Optimizer::optimize(optimMethod method)
+ uint_t Optimizer::optimize(optimMethod method, double lambda)
 {
     optimization_method_ = method;
     switch(method)
@@ -48,6 +48,7 @@ Optimizer::~Optimizer()
           return optimize_newton_raphson();
       case LEVENBERG_MARQUARDT_SPHER:
       case LEVENBERG_MARQUARDT_ELLIP:
+          lambda_ = lambda;
           return optimize_levenberg_marquardt();
     }
     return 0;

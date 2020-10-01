@@ -179,6 +179,7 @@ class PlaneRegistration: public Optimizer{
 
     // time profiling
     TimeProfiling time_profiles_;
+    double initial_error_; // for benchmark purposes
 
 };
 

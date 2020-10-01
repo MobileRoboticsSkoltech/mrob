@@ -50,7 +50,7 @@ PlaneRegistration::~PlaneRegistration()
 
 }
 
-
+// XXX: is this function used??
 void PlaneRegistration::set_number_planes_and_poses(uint_t numberPlanes, uint_t numberPoses)
 {
     planes_.clear();
@@ -82,6 +82,7 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
     // just in case some methods, such as gradient, has several modes
     solveMode_ = mode;
     uint_t iters = 0;
+    initial_error_ = get_current_error();
 
     // time profiling
     time_profiles_.reset();
@@ -385,19 +386,18 @@ void PlaneRegistration::print(bool plotPlanes) const
 
 
 //         Nplanes[0], Nposes[1], Npoints[2], iters[3],  process-time[4],
-//         IniError/point/poses[5],   error/point/poses[7],
-//         trajErrorIni[8-9] rot/trans, trajError[10-11] rot/trans]
+//         error/point/poses[5], eigenvalues[6-11]
 std::vector<double> PlaneRegistration::print_evaluate()
 {
-    std::vector<double> result(12,0.0);
+    std::vector<double> result(13,0.0);
 
     result[0] = numberPlanes_;
     result[1] = numberPoses_;
     result[2] = numberPoints_;
     result[3] = solveIters_;
     result[4] = time_profiles_.total_time();
-    result[5] = get_current_error();
-    //TODO more erros/vars
+    result[5] = initial_error_;
+    result[6] = get_current_error();
 
     MatX allPlanes(numberPlanes_,4);
     MatX allNormals(numberPlanes_,3);
@@ -427,7 +427,7 @@ std::vector<double> PlaneRegistration::print_evaluate()
         ++i;
     }
     // Orthogonality between planes (4 dim)
-    std::cout << "current gradient \n" << gradient__ << std::endl;
+    //std::cout << "current gradient \n" << gradient__ << std::endl;
     // XXX : NO, Orthogonolaity was not an issue
     //std::cout << "solution\n" << allPlanes << "\nOrthogonality between planes: \n" << allPlanes * allPlanes.transpose() <<
     //              "\n and det  = \n" << allPlanes.determinant() << std::endl;
@@ -438,14 +438,12 @@ std::vector<double> PlaneRegistration::print_evaluate()
 
     // Hessian rank and eigen, look for negative vaps. Lasta hessina calculateds
     Eigen::SelfAdjointEigenSolver<MatX> eigs(hessian__);
-    std::cout << "eigen values are: \n" << eigs.eigenvalues() << std::endl;
+    //std::cout << "eigen values are: \n" << eigs.eigenvalues() << std::endl;
     // Determinant of stacked normals
-    std::cout << "det(Hessian) = \n" << hessian__ << std::endl;
+    //std::cout << "det(Hessian) = \n" << hessian__ << std::endl;
 
-
-    result[2] = hessian__.determinant();
-    //TODO count this and optimze
-    result[3] = eigs.eigenvalues()(5)/eigs.eigenvalues()(0);
+    for (uint_t i = 0; i < 6; ++i)
+        result[6+i] = eigs.eigenvalues()(i);
 
     return result;
 }

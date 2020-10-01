@@ -77,7 +77,8 @@ void init_PCPlanes(py::module &m)
             .def("print", &PlaneRegistration::print,
                     py::arg("plotPlanes") =  false)
             .def("print_evaluate", &PlaneRegistration::print_evaluate,
-                    "returns: current error,1) number of iters, 2) determinant 3) number of negative eigenvalues 4) conditioning number")
+                    "returns: current error,1) number of iters, 2) determinant 3) number of negative eigenvalues 4) conditioning number",
+                    py::return_value_policy::copy)
 			// TODO add methods to fill in the data structure more properly, now it is a reference pass by sharing the smart pointer
             .def("get_point_cloud", &PlaneRegistration::get_point_cloud,
                     "Gets the point cloud at input time index")

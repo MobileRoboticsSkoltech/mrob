@@ -34,7 +34,7 @@
 using namespace mrob;
 
 Plane::Plane(uint_t timeLength):
-        timeLength_(timeLength), isPlaneEstimated_(false)
+        timeLength_(timeLength), isPlaneEstimated_(false), numberPoints_(0)
 {
     allPlanePoints_.reserve(timeLength_);
     // there should be an individual reservation of points
@@ -103,6 +103,7 @@ void Plane::push_back_point(Mat31 &point, uint_t t)
         //homogeneousPoint << point, 1.0;
         //allPlanePoints_[t].push_back(homogeneousPoint);
         allPlanePoints_[t].push_back(point);
+        ++numberPoints_;
     }
 }
 
@@ -172,7 +173,6 @@ void Plane::calculate_all_matrices_S(bool reset)
         matrixS_.clear();
     if (matrixS_.empty())
     {
-        numberPoints_ = 0;
         for (uint_t t = 0; t < timeLength_; ++t)
         {
             Mat4 S = Mat4::Zero();
@@ -183,7 +183,6 @@ void Plane::calculate_all_matrices_S(bool reset)
                 S += pHomog * pHomog.transpose();
             }
             matrixS_.push_back(S);
-            ++numberPoints_;
         }
     }
 }

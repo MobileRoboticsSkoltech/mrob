@@ -68,7 +68,7 @@ public:
      * Input: optmization method from {NR=0, LM_S, LM_E}
      * output: number of iterations
      */
-    uint_t optimize(optimMethod method);
+    uint_t optimize(optimMethod method, double lambda = 1e-5);
 
     /**
      * General abstract functions to implement:
