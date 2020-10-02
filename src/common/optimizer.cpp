@@ -90,7 +90,7 @@ uint_t Optimizer::optimize_newton_raphson()
     {
         this->optimize_newton_raphson_one_iteration(false);
         matData_t current_error = this->calculate_error();
-        std::cout << "iter " << iters << ", error = " << current_error <<std::endl;
+        //std::cout << "iter " << iters << ", error = " << current_error <<std::endl;
         diff_error = previous_error - current_error;
         previous_error = current_error;
         iters++;
@@ -115,8 +115,8 @@ uint_t Optimizer::optimize_levenberg_marquardt()
         // 1) solve the current subproblem by Newton Raphson
         this->bookkeep_state();
         optimize_newton_raphson_one_iteration(true);
-        current_error = calculate_error();//TODO this function requires re-evaluation of current state/error.
-        std::cout << "iter " << iters << ", error = " << current_error << ", lambda = "<< lambda_ << std::endl;
+        current_error = calculate_error();
+        //std::cout << "iter " << iters << ", error = " << current_error << ", lambda = "<< lambda_ << std::endl;
         diff_error = previous_error - current_error;
         improvement = true;
 
@@ -125,7 +125,7 @@ uint_t Optimizer::optimize_levenberg_marquardt()
         // 2) Check for convergence, hillclimb
         if (diff_error < 0)
         {
-            std::cout << "no improvement\n";
+            //std::cout << "no improvement\n";
             lambda_ *= beta1;
             this->update_state_from_bookkeep();
             improvement = false;

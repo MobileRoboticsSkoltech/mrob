@@ -108,12 +108,12 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
             break;
         case SolveMode::LM_SPHER:
             time_profiles_.start();
-            solveIters_ = optimize(LEVENBERG_MARQUARDT_SPHER);
+            solveIters_ = optimize(LEVENBERG_MARQUARDT_SPHER,1e-2);
             time_profiles_.stop();
             break;
         case SolveMode::LM_ELLIP:
             time_profiles_.start();
-            solveIters_ = optimize(LEVENBERG_MARQUARDT_ELLIP);
+            solveIters_ = optimize(LEVENBERG_MARQUARDT_ELLIP,1e-2);
             time_profiles_.stop();
             break;
         default:
@@ -139,7 +139,7 @@ uint_t PlaneRegistration::solve_interpolate_gradient(bool singleIteration)
         diffError = previousError - initialError;
         previousError = initialError;
 
-        std::cout << "current error iteration " << solveIters_ << " = "<< initialError << std::endl;
+        //std::cout << "current error iteration " << solveIters_ << " = "<< initialError << std::endl;
 
         // 2) calculate Gradient = Jacobian^T. We maintain the nomenclature Jacobian for coherence on the project,
         //    but actually this Jacobian should be transposed.
@@ -210,7 +210,7 @@ uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
         previousError = initialError;
 
         solveIters_++;
-        std::cout << "current error iteration " << solveIters_ << " = "<< initialError << std::endl;
+        //std::cout << "current error iteration " << solveIters_ << " = "<< initialError << std::endl;
 
         // 2) calculate Gradient and Hessian
         Mat61 gradient = Mat61::Zero();
@@ -386,7 +386,7 @@ void PlaneRegistration::print(bool plotPlanes) const
 
 
 //         Nplanes[0], Nposes[1], Npoints[2], iters[3],  process-time[4],
-//         error/point/poses[5], eigenvalues[6-11]
+//         ini_error[5] error[6], eigenvalues[6-11]
 std::vector<double> PlaneRegistration::print_evaluate()
 {
     std::vector<double> result(13,0.0);
@@ -395,9 +395,10 @@ std::vector<double> PlaneRegistration::print_evaluate()
     result[1] = numberPoses_;
     result[2] = numberPoints_;
     result[3] = solveIters_;
+    double k = numberPoints_;
     result[4] = time_profiles_.total_time();
-    result[5] = initial_error_;
-    result[6] = get_current_error();
+    result[5] = initial_error_/k;
+    result[6] = get_current_error()/k;
 
     MatX allPlanes(numberPlanes_,4);
     MatX allNormals(numberPlanes_,3);
