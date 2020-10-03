@@ -65,6 +65,8 @@ void init_PCPlanes(py::module &m)
             		"Input time index and outputs the plane IDs of each point, in the exact same order")
             .def("create_plane_registration", &CreatePoints::create_plane_registration,
             		"This fills in the structure for the class plane registration, ready to optimized with the synthetically created points. TODO this is a reference, not a deep copy!")
+            .def("get_ground_truth_last_pose", &CreatePoints::get_ground_truth_last_pose,
+                    "return SE3 of the last pose")
             ;
     // This class is a data structure, containing all points and calculating plane registration
     py::class_<PlaneRegistration>(m,"PlaneRegistration")
@@ -84,5 +86,6 @@ void init_PCPlanes(py::module &m)
                     "Gets the point cloud at input time index")
             .def("get_number_poses", &PlaneRegistration::get_number_poses)
             .def("get_trajectory", &PlaneRegistration::get_trajectory)
+            .def("get_last_pose", &PlaneRegistration::get_last_pose)
             ;
 }

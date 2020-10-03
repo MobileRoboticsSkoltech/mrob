@@ -114,6 +114,8 @@ class PlaneRegistration: public Optimizer{
     //std::shared_ptr<std::vector<SE3>>& get_trajectory() {return trajectory_;};//if solved
     Mat4 get_trajectory(uint_t time);
 
+    SE3 get_last_pose() {return trajectory_->back();}
+
     /**
      * add_plane adds a plane structure already initialized and filled with data
      */

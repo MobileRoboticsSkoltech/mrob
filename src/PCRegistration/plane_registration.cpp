@@ -386,7 +386,8 @@ void PlaneRegistration::print(bool plotPlanes) const
 
 
 //         Nplanes[0], Nposes[1], Npoints[2], iters[3],  process-time[4],
-//         ini_error[5] error[6], eigenvalues[6-11]
+//         ini_error[5] error[6], eigenvalues[7-12]
+// TODO position error as well!
 std::vector<double> PlaneRegistration::print_evaluate()
 {
     std::vector<double> result(13,0.0);
@@ -444,7 +445,7 @@ std::vector<double> PlaneRegistration::print_evaluate()
     //std::cout << "det(Hessian) = \n" << hessian__ << std::endl;
 
     for (uint_t i = 0; i < 6; ++i)
-        result[6+i] = eigs.eigenvalues()(i);
+        result[7+i] = eigs.eigenvalues()(i);
 
     return result;
 }
