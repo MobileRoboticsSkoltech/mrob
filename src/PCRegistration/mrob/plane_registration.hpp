@@ -120,6 +120,20 @@ class PlaneRegistration: public Optimizer{
      * add_plane adds a plane structure already initialized and filled with data
      */
     void add_plane(uint_t id, std::shared_ptr<Plane> &plane);
+    /**
+     * add new plane is an ALTERNATIVE (for py) to the above function
+     * which creates a new plane inside the class and then points are added one by one
+     *
+     */
+    void add_new_plane(uint_t id);
+    /**
+     * add a point to the new plane. An ALTERNATIVE (for py) to add points into the sover
+     * class (instead of adding the point fully as in add_plane())
+     *
+     */
+    void plane_push_back_point(uint_t id, uint_t t, Mat31 &point);
+
+    uint_t calculate_total_number_points();
     std::shared_ptr<Plane> & get_plane(uint_t id);
 
     std::unordered_map<uint_t, std::shared_ptr<Plane>>& get_all_planes() {return planes_;};
@@ -182,6 +196,9 @@ class PlaneRegistration: public Optimizer{
     // time profiling
     TimeProfiling time_profiles_;
     double initial_error_; // for benchmark purposes
+
+
+    // alternative structure to keep planes. This is only for the python bindings
 
 };
 

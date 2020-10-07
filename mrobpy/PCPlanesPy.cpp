@@ -32,6 +32,7 @@
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
+#include "mrob/plane.hpp"
 #include "mrob/create_points.hpp"
 #include "mrob/plane_registration.hpp"
 
@@ -44,6 +45,7 @@ using namespace mrob;
 
 	return data;
 }*/
+
 
 void init_PCPlanes(py::module &m)
 {
@@ -68,14 +70,27 @@ void init_PCPlanes(py::module &m)
             .def("get_ground_truth_last_pose", &CreatePoints::get_ground_truth_last_pose,
                     "return SE3 of the last pose")
             ;
+  /* to be removed?  // This class creates a plane
+    py::class_<Plane>(m,"Plane")
+            .def(py::init<uint_t>(),"input length of the sequence")
+            .def("push_back_point", &Plane::push_back_point,
+                    "point as a vector 3 and time, that is position in the sequence [0,t-1]")
+            .def("get_points", &Plane::get_points,
+                    "Input time index and outputs pointcloud")
+            .def("clear_point", &Plane::clear_points,
+                    "Clears all points")
+            ;*/
     // This class is a data structure, containing all points and calculating plane registration
     py::class_<PlaneRegistration>(m,"PlaneRegistration")
             .def(py::init<>(),
                     "Constructor, by default empty structure")
+            .def("set_number_planes_and_poses", &PlaneRegistration::set_number_planes_and_poses,
+                    "sets the number of poses. Also deletes all planes and point inside.")
+            .def("reset_solution", &PlaneRegistration::reset_solution,
+                    "resets the current solution and maintains the data from planes (PC)")
             .def("solve", &PlaneRegistration::solve,
                     py::arg("mode") = PlaneRegistration::SolveMode::GRADIENT_BENGIOS_NAG,
                     py::arg("singleIteration") = false)
-            .def("reset_solution", &PlaneRegistration::reset_solution, "resets the current solution and maintains the data from planes (PC)")
             .def("print", &PlaneRegistration::print,
                     py::arg("plotPlanes") =  false)
             .def("print_evaluate", &PlaneRegistration::print_evaluate,
@@ -87,5 +102,9 @@ void init_PCPlanes(py::module &m)
             .def("get_number_poses", &PlaneRegistration::get_number_poses)
             .def("get_trajectory", &PlaneRegistration::get_trajectory)
             .def("get_last_pose", &PlaneRegistration::get_last_pose)
+            .def("add_plane", &PlaneRegistration::add_new_plane,
+                    "input plane id (any integer and plane data structure")
+            .def("plane_push_back_point", &PlaneRegistration::plane_push_back_point,
+                    "input plane id and time id and 3 vector point")
             ;
 }

@@ -164,5 +164,5 @@ uint_t Optimizer::optimize_levenberg_marquardt()
               << iters << " iterations and error " << calculate_error()
               << std::endl;
 
-    return 0;
+    return iters;
 }

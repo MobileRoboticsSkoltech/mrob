@@ -333,8 +333,28 @@ void PlaneRegistration::add_plane(uint_t id, std::shared_ptr<Plane> &plane)
 {
     plane->set_trajectory(trajectory_);
     planes_.emplace(id, plane);
-    numberPoints_ += plane->get_total_number_points();
 }
+
+void PlaneRegistration::add_new_plane(uint_t id)
+{
+    std::shared_ptr<Plane> plane(new Plane(numberPoses_));
+    plane->set_trajectory(trajectory_);
+    planes_.emplace(id, plane);
+}
+
+void PlaneRegistration::plane_push_back_point(uint_t id, uint_t t, Mat31 &point)
+{
+    planes_.at(id)->push_back_point(point,t);
+}
+
+uint_t PlaneRegistration::calculate_total_number_points()
+{
+    numberPoints_ = 0;
+    for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
+        numberPoints_ += it->second->get_total_number_points();
+    return numberPoints_;
+}
+
 
 double PlaneRegistration::calculate_poses_rmse(std::vector<SE3> & groundTruth) const
 {
@@ -387,19 +407,19 @@ void PlaneRegistration::print(bool plotPlanes) const
 
 //         Nplanes[0], Nposes[1], Npoints[2], iters[3],  process-time[4],
 //         ini_error[5] error[6], eigenvalues[7-12]
-// TODO position error as well!
 std::vector<double> PlaneRegistration::print_evaluate()
 {
     std::vector<double> result(13,0.0);
 
     result[0] = numberPlanes_;
     result[1] = numberPoses_;
+    calculate_total_number_points();
     result[2] = numberPoints_;
     result[3] = solveIters_;
-    double k = numberPoints_;
+    double k = 1.0;//numberPoints_;
     result[4] = time_profiles_.total_time();
     result[5] = initial_error_/k;
-    result[6] = get_current_error()/k;
+    result[6] = get_current_error()/k; //TODO this does not work for GN (but yes to GN ini...)
 
     MatX allPlanes(numberPlanes_,4);
     MatX allNormals(numberPlanes_,3);
