@@ -70,16 +70,6 @@ void init_PCPlanes(py::module &m)
             .def("get_ground_truth_last_pose", &CreatePoints::get_ground_truth_last_pose,
                     "return SE3 of the last pose")
             ;
-  /* to be removed?  // This class creates a plane
-    py::class_<Plane>(m,"Plane")
-            .def(py::init<uint_t>(),"input length of the sequence")
-            .def("push_back_point", &Plane::push_back_point,
-                    "point as a vector 3 and time, that is position in the sequence [0,t-1]")
-            .def("get_points", &Plane::get_points,
-                    "Input time index and outputs pointcloud")
-            .def("clear_point", &Plane::clear_points,
-                    "Clears all points")
-            ;*/
     // This class is a data structure, containing all points and calculating plane registration
     py::class_<PlaneRegistration>(m,"PlaneRegistration")
             .def(py::init<>(),
@@ -106,5 +96,11 @@ void init_PCPlanes(py::module &m)
                     "input plane id (any integer and plane data structure")
             .def("plane_push_back_point", &PlaneRegistration::plane_push_back_point,
                     "input plane id and time id and 3 vector point")
+            .def("get_error", &PlaneRegistration::get_current_error,
+                    "get current error in plane estimation")
+            .def("get_plane_error", &PlaneRegistration::get_current_error,
+                    "input plane id (any integer and plane data structure")
+            .def("initialize_last_pose_solution", &PlaneRegistration::set_last_pose,
+                    "initializes the solution for some final input plane id (any integer and plane data structure")
             ;
 }
