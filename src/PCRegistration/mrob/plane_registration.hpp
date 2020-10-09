@@ -51,6 +51,7 @@ class PlaneRegistration: public Optimizer{
     enum SolveMode{INITIALIZE=0,
                    GRADIENT,
                    GRADIENT_BENGIOS_NAG,
+                   GRADIENT_ALL_POSES,
                    GN_HESSIAN,
                    GN_CLAMPED_HESSIAN,
                    LM_SPHER,
@@ -84,12 +85,14 @@ class PlaneRegistration: public Optimizer{
      * is met: J = sum (lamda_min_plane), and the trajectory is described as an interpolation from I to T_f
      */
     uint_t solve_interpolate_gradient(bool singleIteration = false);
+    //Gradient for all poses
+    uint_t solve_gradient_all_poses(bool singleIteration = false);
     /**
      * solve_interpolate_hessian() calculates the poses on trajectory such that the minimization objective
      * is met: J = sum (lamda_min_plane), and the trajectory is described as an interpolation from I to T_f
      * using second order methods with Hessian. Very similar to solve_interpolate
      */
-    uint_t solve_interpolate_hessian(bool singleIteration = false);
+    //uint_t solve_interpolate_hessian(bool singleIteration = false);
     /**
      * Initialization_solve give a first guess on all poses by using classical point-point
      * methods SVD-based to calculate an initial condition closer to the true solution
