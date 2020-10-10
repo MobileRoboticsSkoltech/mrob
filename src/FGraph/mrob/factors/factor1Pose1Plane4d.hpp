@@ -40,8 +40,40 @@ namespace mrob{
 class Factor1Poses1Plane4d : public Factor
 {
   public:
-    Factor1Poses1Plane4d();
+    Factor1Poses1Plane4d(const Mat41 &observation, std::shared_ptr<Node> &nodePose,
+            std::shared_ptr<Node> &nodePlane, const Mat4 &obsInf);
     ~Factor1Poses1Plane4d();
+
+    /**
+     * Jacobians are not evaluated, just the residuals
+     */
+    virtual void evaluate_residuals() override;
+    /**
+     * Evaluates residuals and Jacobians
+     */
+    virtual void evaluate_jacobians() override;
+    virtual void evaluate_chi2() override;
+
+    virtual void print() const;
+
+    virtual const Eigen::Ref<const MatX> get_obs() const override {return obs_;};
+    virtual const Eigen::Ref<const MatX1> get_residual() const override {return r_;};
+    virtual const Eigen::Ref<const MatX> get_information_matrix() const override {return W_;};
+    virtual const Eigen::Ref<const MatX> get_jacobian() const override {return J_;};
+
+
+  private:
+    Mat41 obs_, r_; //residuals
+    Mat<4,10> J_;//Jacobians dimensions obs x [plane(4) + pose(6)]
+    Mat4 W_;//inverse of observation covariance (information matrix)
+    bool reversedNodeOrder_;
+    // intermediate variables to keep
+    Mat41 plane_;
+    Mat4 Tinv_transp_;
+
+  public:
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
 };
 
 }

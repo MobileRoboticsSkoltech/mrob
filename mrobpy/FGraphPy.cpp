@@ -217,7 +217,7 @@ void init_FGraph(py::module &m)
                             py::arg("obsInvCov"),
                             py::arg("updateNodeTarget") = false)
                             // -----------------------------------------------------------------------------
-            // SLandmark or Point 3D
+            // Landmark or Point 3D
             .def("add_node_landmark_3d", &FGraphPy::add_node_landmark_3d,
                     "Ladmarks are 3D points, in [x,y,z]")
             .def("add_factor_1pose_1landmark_3d", &FGraphPy::add_factor_1pose_1landmark_3d,
