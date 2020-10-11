@@ -32,8 +32,8 @@ Factor1Pose1Plane4d::Factor1Pose1Plane4d(const Mat41 &observation, std::shared_p
         std::shared_ptr<Node> &nodePlane, const Mat4 &obsInf):
                 Factor(4,10), obs_(observation), W_(obsInf), reversedNodeOrder_(false)
 {
-    // ensure that plane 4d \in P^3
-    obs_.normalize();
+    // ensure that plane 4d, normal \in P2 and distance \in R
+    obs_.head(3).normalize();
     // To preserve the order when building the Adjacency matrix
     if (nodePose->get_id() < nodePlane->get_id())
     {
@@ -72,10 +72,10 @@ void Factor1Pose1Plane4d::evaluate_residuals()
     }
     Mat4 Tx = get_neighbour_nodes()->at(poseIndex)->get_state();
     // The transformation we are looking for here is Txw, from world to local x.
-    // So that is exactly Tx^-1, so no need to invert twice.
-    Tinv_transp_ = SE3(Tx).T().transpose();
+    // Check on transfomration of planes
+    Tinv_transp_ = SE3(Tx).inv().T().transpose();
     plane_ = get_neighbour_nodes()->at(landmarkIndex)->get_state();
-    r_ = obs_ - Tinv_transp_*plane_;
+    r_ = Tinv_transp_*plane_ - obs_;
 }
 void Factor1Pose1Plane4d::evaluate_jacobians()
 {
