@@ -28,10 +28,12 @@
 
 using namespace mrob;
 
-Factor1Poses1Plane4d::Factor1Poses1Plane4d(const Mat41 &observation, std::shared_ptr<Node> &nodePose,
+Factor1Pose1Plane4d::Factor1Pose1Plane4d(const Mat41 &observation, std::shared_ptr<Node> &nodePose,
         std::shared_ptr<Node> &nodePlane, const Mat4 &obsInf):
                 Factor(4,10), obs_(observation), W_(obsInf), reversedNodeOrder_(false)
 {
+    // ensure that plane 4d \in P^3
+    obs_.normalize();
     // To preserve the order when building the Adjacency matrix
     if (nodePose->get_id() < nodePlane->get_id())
     {
@@ -46,12 +48,12 @@ Factor1Poses1Plane4d::Factor1Poses1Plane4d(const Mat41 &observation, std::shared
         reversedNodeOrder_ = true;
     }
 }
-Factor1Poses1Plane4d::~Factor1Poses1Plane4d()
+Factor1Pose1Plane4d::~Factor1Pose1Plane4d()
 {
 
 }
 
-void Factor1Poses1Plane4d::evaluate_residuals()
+void Factor1Pose1Plane4d::evaluate_residuals()
 {
     // From nosePose we observe a plane, in local coordinates
     // which then it is related to the landmark plane, in global coordinates. Thus,
@@ -75,7 +77,7 @@ void Factor1Poses1Plane4d::evaluate_residuals()
     plane_ = get_neighbour_nodes()->at(landmarkIndex)->get_state();
     r_ = obs_ - Tinv_transp_*plane_;
 }
-void Factor1Poses1Plane4d::evaluate_jacobians()
+void Factor1Pose1Plane4d::evaluate_jacobians()
 {
     Mat<4,6> Jx = Mat<4,6>::Zero();
     Mat41 pi = Tinv_transp_*plane_;
@@ -93,12 +95,18 @@ void Factor1Poses1Plane4d::evaluate_jacobians()
         J_.topRightCorner<4,6>() = Jx;
     }
 }
-void Factor1Poses1Plane4d::evaluate_chi2()
+void Factor1Pose1Plane4d::evaluate_chi2()
 {
     chi2_ = 0.5 * r_.dot(W_ * r_);
 }
 
-void Factor1Poses1Plane4d::print() const
+void Factor1Pose1Plane4d::print() const
 {
-
+    std::cout << "Printing Plane Factor: " << id_ << ", obs= \n" << obs_
+               << "\n Residuals= \n" << r_
+               << " \nand Information matrix\n" << W_
+               << "\n Calculated Jacobian = \n" << J_
+               << "\n Chi2 error = " << chi2_
+               << " and neighbour Nodes " << neighbourNodes_.size()
+               << std::endl;
 }

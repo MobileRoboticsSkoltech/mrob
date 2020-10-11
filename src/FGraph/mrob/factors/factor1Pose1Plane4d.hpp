@@ -37,12 +37,12 @@ namespace mrob{
  *
  */
 
-class Factor1Poses1Plane4d : public Factor
+class Factor1Pose1Plane4d : public Factor
 {
   public:
-    Factor1Poses1Plane4d(const Mat41 &observation, std::shared_ptr<Node> &nodePose,
+    Factor1Pose1Plane4d(const Mat41 &observation, std::shared_ptr<Node> &nodePose,
             std::shared_ptr<Node> &nodePlane, const Mat4 &obsInf);
-    ~Factor1Poses1Plane4d();
+    ~Factor1Pose1Plane4d();
 
     /**
      * Jacobians are not evaluated, just the residuals

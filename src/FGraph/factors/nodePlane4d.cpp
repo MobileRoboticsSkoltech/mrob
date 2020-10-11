@@ -33,6 +33,9 @@ NodePlane4d::NodePlane4d(const Mat41 &initial_x):
 {
     assert(initial_x.rows() == 4 && "NodePlane4d:: Incorrect dimension on initial state rows" );
     assert(initial_x.cols() == 1 && "NodePlane4d:: Incorrect dimension on initial state cols" );
+    // ensure that plane 4d \in P^3
+    state_.normalize();
+    auxiliaryState_.normalize();
 }
 
 NodePlane4d::~NodePlane4d()
