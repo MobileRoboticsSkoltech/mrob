@@ -29,6 +29,7 @@
 #include <Eigen/StdVector>
 #include "mrob/plane.hpp"
 #include "mrob/optimizer.hpp"
+#include "mrob/time_profiling.hpp"
 
 #include <unordered_map>
 #include <memory>
@@ -50,6 +51,7 @@ class PlaneRegistration: public Optimizer{
     enum SolveMode{INITIALIZE=0,
                    GRADIENT,
                    GRADIENT_BENGIOS_NAG,
+                   GRADIENT_ALL_POSES,
                    GN_HESSIAN,
                    GN_CLAMPED_HESSIAN,
                    LM_SPHER,
@@ -83,12 +85,14 @@ class PlaneRegistration: public Optimizer{
      * is met: J = sum (lamda_min_plane), and the trajectory is described as an interpolation from I to T_f
      */
     uint_t solve_interpolate_gradient(bool singleIteration = false);
+    //Gradient for all poses
+    uint_t solve_gradient_all_poses(bool singleIteration = false);
     /**
      * solve_interpolate_hessian() calculates the poses on trajectory such that the minimization objective
      * is met: J = sum (lamda_min_plane), and the trajectory is described as an interpolation from I to T_f
      * using second order methods with Hessian. Very similar to solve_interpolate
      */
-    uint_t solve_interpolate_hessian(bool singleIteration = false);
+    //uint_t solve_interpolate_hessian(bool singleIteration = false);
     /**
      * Initialization_solve give a first guess on all poses by using classical point-point
      * methods SVD-based to calculate an initial condition closer to the true solution
@@ -113,10 +117,31 @@ class PlaneRegistration: public Optimizer{
     //std::shared_ptr<std::vector<SE3>>& get_trajectory() {return trajectory_;};//if solved
     Mat4 get_trajectory(uint_t time);
 
+    SE3 get_last_pose() {return trajectory_->back();}
+
+    /**
+     * Sets the trajectory (current solution) by addint the last pose
+     */
+    void set_last_pose(SE3 &last);
+
     /**
      * add_plane adds a plane structure already initialized and filled with data
      */
     void add_plane(uint_t id, std::shared_ptr<Plane> &plane);
+    /**
+     * add new plane is an ALTERNATIVE (for py) to the above function
+     * which creates a new plane inside the class and then points are added one by one
+     *
+     */
+    void add_new_plane(uint_t id);
+    /**
+     * add a point to the new plane. An ALTERNATIVE (for py) to add points into the sover
+     * class (instead of adding the point fully as in add_plane())
+     *
+     */
+    void plane_push_back_point(uint_t id, uint_t t, Mat31 &point);
+
+    uint_t calculate_total_number_points();
     std::shared_ptr<Plane> & get_plane(uint_t id);
 
     std::unordered_map<uint_t, std::shared_ptr<Plane>>& get_all_planes() {return planes_;};
@@ -155,7 +180,7 @@ class PlaneRegistration: public Optimizer{
 
   protected:
     // flag for detecting when is has been solved
-    uint_t numberPlanes_, numberPoses_;
+    uint_t numberPlanes_, numberPoses_, numberPoints_;
     uint_t isSolved_;
     PlaneRegistration::TrajectoryMode trajMode_;
     uint_t time_;
@@ -175,6 +200,13 @@ class PlaneRegistration: public Optimizer{
     //2nd order data (if used) TODO remove since they are defined in parent class
     Mat61 gradient__;
     Mat6 hessian__;
+
+    // time profiling
+    TimeProfiling time_profiles_;
+    double initial_error_; // for benchmark purposes
+
+
+    // alternative structure to keep planes. This is only for the python bindings
 
 };
 

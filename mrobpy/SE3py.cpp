@@ -59,9 +59,9 @@ void init_geometry(py::module &m) {
               "Input is a an array Nx3 and output is Nx3") // makes a copy of the array. TODO, pass by Ref and avoid copying, look at ownership
         .def("inv", &SE3::inv, py::return_value_policy::copy)
         .def("adj", &SE3::adj, py::return_value_policy::copy)
-        .def("distance", &SE3::distance)
-        .def("distance_rotation", &SE3::distance_rotation)
-        .def("distance_trans", &SE3::distance_trans)
+        .def("distance", &SE3::distance, py::arg("rhs")=SE3())
+        .def("distance_rotation", &SE3::distance_rotation, py::arg("rhs")=SE3())
+        .def("distance_trans", &SE3::distance_trans, py::arg("rhs")=SE3())
         .def("print", &SE3::print)
         ;
     m.def("isSE3", &mrob::isSE3, "Returns True is the matrix is a valid transformation and False if not");

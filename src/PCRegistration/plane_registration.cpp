@@ -35,7 +35,7 @@ using namespace mrob;
 
 
 PlaneRegistration::PlaneRegistration():
-        numberPlanes_(0), numberPoses_(0),isSolved_(0), trajectory_(new std::vector<SE3>(8,SE3())),
+        numberPlanes_(0), numberPoses_(0),numberPoints_(0),isSolved_(0), trajectory_(new std::vector<SE3>(8,SE3())),
         solveMode_(SolveMode::GRADIENT),
         c1_(1e-4), c2_(0.9), alpha_(0.75), beta_(0.1)
 {
@@ -50,7 +50,7 @@ PlaneRegistration::~PlaneRegistration()
 
 }
 
-
+// XXX: is this function used??
 void PlaneRegistration::set_number_planes_and_poses(uint_t numberPlanes, uint_t numberPoses)
 {
     planes_.clear();
@@ -62,6 +62,8 @@ void PlaneRegistration::set_number_planes_and_poses(uint_t numberPlanes, uint_t 
 
     previousState_.clear();
     previousState_.resize(numberPoses, Mat61::Zero());
+
+    numberPoints_ = 0;
 }
 
 
@@ -79,25 +81,52 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
 {
     // just in case some methods, such as gradient, has several modes
     solveMode_ = mode;
+    uint_t iters = 0;
+    initial_error_ = get_current_error();
+
+    // time profiling
+    time_profiles_.reset();
     switch(mode)
     {
         case SolveMode::INITIALIZE:
             return solve_initialize();
-        case SolveMode::GRADIENT:
+        case SolveMode::GRADIENT_ALL_POSES:
+            time_profiles_.start();
+            solve_gradient_all_poses();
+            time_profiles_.stop();
+            break;
         case SolveMode::GRADIENT_BENGIOS_NAG:
-            return solve_interpolate_gradient(singleIteration);
+            time_profiles_.start();
+            solve_interpolate_gradient(singleIteration);
+            time_profiles_.stop();
+            break;
         case SolveMode::GN_HESSIAN:
-            return optimize(NEWTON_RAPHSON);
+            time_profiles_.start();
+            solveIters_ = optimize(NEWTON_RAPHSON);
+            time_profiles_.stop();
+            break;
         case SolveMode::GN_CLAMPED_HESSIAN:
-            return solve_interpolate_hessian(singleIteration);
+            time_profiles_.start();
+            //solveIters_ = solve_interpolate_hessian(singleIteration);//deprecated
+            time_profiles_.stop();
+            break;
         case SolveMode::LM_SPHER:
-            return optimize(LEVENBERG_MARQUARDT_SPHER);
+            time_profiles_.start();
+            solveIters_ = optimize(LEVENBERG_MARQUARDT_SPHER,1e-2);
+            time_profiles_.stop();
+            break;
         case SolveMode::LM_ELLIP:
-            return optimize(LEVENBERG_MARQUARDT_ELLIP);
+            time_profiles_.start();
+            solveIters_ = optimize(LEVENBERG_MARQUARDT_ELLIP,1e-2);
+            time_profiles_.stop();
+            break;
         default:
             return 0;
     }
+    return iters;
 }
+
+
 
 uint_t PlaneRegistration::solve_interpolate_gradient(bool singleIteration)
 {
@@ -116,7 +145,7 @@ uint_t PlaneRegistration::solve_interpolate_gradient(bool singleIteration)
         diffError = previousError - initialError;
         previousError = initialError;
 
-        std::cout << "current error iteration " << solveIters_ << " = "<< initialError << std::endl;
+        //std::cout << "current error iteration " << solveIters_ << " = "<< initialError << std::endl;
 
         // 2) calculate Gradient = Jacobian^T. We maintain the nomenclature Jacobian for coherence on the project,
         //    but actually this Jacobian should be transposed.
@@ -169,86 +198,45 @@ uint_t PlaneRegistration::solve_interpolate_gradient(bool singleIteration)
     return solveIters_;
 }
 
-// TO BE DEPRECATED. Only used for clamped Hessian, and that is shown NOT to work.
-uint_t PlaneRegistration::solve_interpolate_hessian(bool singleIteration)
+uint_t PlaneRegistration::solve_gradient_all_poses(bool singleIteration)
 {
-    // iterative process, on convergence basis | error_k - error_k-1| < tol
-    // For now, only 1 iteration
+    // This function is from the first implementation too, is just kept for comparisons in a full traj optimization
     solveIters_ = 0;
     double previousError = 1e20, diffError = 10;
-
     do
     {
-
-        // 1) calculate plane estimation given the current trajectory. Same as solve_interpolate
+        // 1) calculate plane estimation given the current trajectory
         double  initialError = get_current_error();
-
         diffError = previousError - initialError;
         previousError = initialError;
 
-        solveIters_++;
-        std::cout << "current error iteration " << solveIters_ << " = "<< initialError << std::endl;
+        //std::cout << "current error iteration " << solveIters_ << " = "<< initialError << std::endl;
 
-        // 2) calculate Gradient and Hessian
-        Mat61 gradient = Mat61::Zero();
-        Mat6 hessian = Mat6::Zero();
-        gradient__.setZero();
-        hessian__.setZero();
-        double  tau = 1.0 / (double)(numberPoses_-1);
+        // 2) calculate Gradient
+        MatX1 jacobian = MatX1::Zero(numberPoses_*6);
+        double  numberPoints, tau = 1.0 / (double)(numberPoses_-1);
         for (uint_t t = 1 ; t < numberPoses_; ++t)
         {
-            gradient.setZero();
-            hessian.setZero();
+            numberPoints = 0.0;
             for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
             {
-                gradient += it->second->calculate_gradient(t);
-                hessian += it->second->calculate_hessian(t);
+                jacobian.segment<6>(t*6) += it->second->calculate_gradient(t);
+                numberPoints += it->second->get_number_points(t);
             }
-            // TODO this should be changed to time stamps later
-            gradient__ +=  (tau *  t)  * gradient;
-            hessian__ += (tau *  t) * hessian.selfadjointView<Eigen::Upper>();
+
         }
-        // 3) calculate update Tf = exp(-dxi) * Tf (our convention, we expanded from the left)
+        // 3) update results Tf = exp(-dxi) * Tf (our convention, we expanded from the left)
+        // 3-1)
         Mat61 dxi;
-        if (solveMode_ == SolveMode::GN_CLAMPED_HESSIAN)
+        for (uint_t t = 1 ; t < numberPoses_; ++t)
         {
-            // we clamp the vector spaces corresponding to negative eigenvals
-            Mat6 pseudoInv = Mat6::Zero();
-            Eigen::SelfAdjointEigenSolver<Mat6> eigs(hessian__);
-            for (uint_t i = 0; i < 6 ; ++i)
-            {
-                if(eigs.eigenvalues()[i] > 1e-4 || true ) //TODO set tolerance
-                {
-                    std::cout << "POSITIVE. cos distance to grad = " << eigs.eigenvectors().col(i).dot(gradient)/gradient.norm()
-                              << ", eigs = " << eigs.eigenvalues()[i] << std::endl;
-                    pseudoInv += (1.0/eigs.eigenvalues()(i)) * eigs.eigenvectors().col(i) * eigs.eigenvectors().col(i).transpose();
-                    // XXX why is this function not monotonically decreasing? this is annoying, but makes clamping a bad idea: LM!
-                }
-                else
-                {
-                    std::cout << "NEGATIVE. cos distance to grad = " << eigs.eigenvectors().col(i).dot(gradient)/gradient.norm()
-                              << ", eigs = " << eigs.eigenvalues()[i] << std::endl;
-
-                }
-            }
-            dxi = - pseudoInv * gradient__;
+            Mat61 dxi = -(alpha_ / numberPoints / numberPoses_ )*jacobian.segment<6>(t*6);
+            trajectory_->at(t).update_lhs(dxi);
         }
-        else
-            dxi = - hessian__.inverse() * gradient__;
-        trajectory_->back().update_lhs(dxi);
-
-
-        // 4) update full trajectory. Here we assume a full rank matrix TODO check for degenerate cases
-        Mat61 xiFinal = trajectory_->back().ln_vee();
-        for (uint_t t = 1 ; t < numberPoses_-1; ++t)
-        {
-            dxi = tau * t * xiFinal;
-            trajectory_->at(t) = SE3(dxi);
-        }
+        ++solveIters_;
     }while(fabs(diffError) > 1e-4 && !singleIteration && solveIters_ < 1e4);
     return solveIters_;
 }
-
 
 uint_t PlaneRegistration::solve_quaternion_plane()
 {
@@ -306,11 +294,44 @@ double PlaneRegistration::get_current_error() const
     return currentError;
 }
 
+void PlaneRegistration::set_last_pose(SE3 &last)
+{
+    Mat61 xiFinal = last.ln_vee();
+    double  tau = 1.0 / (double)(numberPoses_-1);
+    Mat61 dxi;
+    for (uint_t t = 1 ; t < numberPoses_-1; ++t)
+    {
+        dxi = tau * t * xiFinal;
+        trajectory_->at(t) = SE3(dxi);
+    }
+}
+
 void PlaneRegistration::add_plane(uint_t id, std::shared_ptr<Plane> &plane)
 {
     plane->set_trajectory(trajectory_);
     planes_.emplace(id, plane);
 }
+
+void PlaneRegistration::add_new_plane(uint_t id)
+{
+    std::shared_ptr<Plane> plane(new Plane(numberPoses_));
+    plane->set_trajectory(trajectory_);
+    planes_.emplace(id, plane);
+}
+
+void PlaneRegistration::plane_push_back_point(uint_t id, uint_t t, Mat31 &point)
+{
+    planes_.at(id)->push_back_point(point,t);
+}
+
+uint_t PlaneRegistration::calculate_total_number_points()
+{
+    numberPoints_ = 0;
+    for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
+        numberPoints_ += it->second->get_total_number_points();
+    return numberPoints_;
+}
+
 
 double PlaneRegistration::calculate_poses_rmse(std::vector<SE3> & groundTruth) const
 {
@@ -361,13 +382,21 @@ void PlaneRegistration::print(bool plotPlanes) const
 }
 
 
-// resturns: [0]error, [1]iters, hessdet[2], conditioningNumber[3]
+//         Nplanes[0], Nposes[1], Npoints[2], iters[3],  process-time[4],
+//         ini_error[5] error[6], eigenvalues[7-12]
 std::vector<double> PlaneRegistration::print_evaluate()
 {
-    std::vector<double> result(6,0.0);
+    std::vector<double> result(13,0.0);
 
-    result[0] = get_current_error();
-    result[1] = solveIters_;
+    result[0] = numberPlanes_;
+    result[1] = numberPoses_;
+    calculate_total_number_points();
+    result[2] = numberPoints_;
+    result[3] = solveIters_;
+    double k = 1.0;//numberPoints_;
+    result[4] = time_profiles_.total_time();
+    result[5] = initial_error_/k;
+    result[6] = get_current_error()/k; //TODO this does not work for GN (but yes to GN ini...)
 
     MatX allPlanes(numberPlanes_,4);
     MatX allNormals(numberPlanes_,3);
@@ -378,6 +407,7 @@ std::vector<double> PlaneRegistration::print_evaluate()
     {
         case SolveMode::GRADIENT:
         case SolveMode::GRADIENT_BENGIOS_NAG:
+        case SolveMode::GRADIENT_ALL_POSES:
             hessian__.setZero();
             break;
         case SolveMode::GN_HESSIAN:
@@ -397,7 +427,7 @@ std::vector<double> PlaneRegistration::print_evaluate()
         ++i;
     }
     // Orthogonality between planes (4 dim)
-    std::cout << "current gradient \n" << gradient__ << std::endl;
+    //std::cout << "current gradient \n" << gradient__ << std::endl;
     // XXX : NO, Orthogonolaity was not an issue
     //std::cout << "solution\n" << allPlanes << "\nOrthogonality between planes: \n" << allPlanes * allPlanes.transpose() <<
     //              "\n and det  = \n" << allPlanes.determinant() << std::endl;
@@ -407,20 +437,13 @@ std::vector<double> PlaneRegistration::print_evaluate()
     //             "\n and det = \n" << allNormals.determinant() << std::endl;
 
     // Hessian rank and eigen, look for negative vaps. Lasta hessina calculateds
-    Eigen::EigenSolver<MatX> eigs(hessian__);
-    std::cout << "eigen values are: \n" << eigs.eigenvalues() << std::endl;
+    Eigen::SelfAdjointEigenSolver<MatX> eigs(hessian__);
+    //std::cout << "eigen values are: \n" << eigs.eigenvalues() << std::endl;
     // Determinant of stacked normals
-    std::cout << "det(Hessian) = \n" << hessian__ << std::endl;
-    // Hessian conditioning number
-    Eigen::JacobiSVD<Mat6> svd(hessian__, Eigen::ComputeThinU | Eigen::ComputeThinV);
-    // TODO remove
-    //std::cout << "SVD decomposition : \n" << svd.singularValues() <<
-    //              "\n vectors :\n" << svd.matrixU() <<
-    //             "\n and conditioning number = " << svd.singularValues()(0)/svd.singularValues()(5) << std::endl;
+    //std::cout << "det(Hessian) = \n" << hessian__ << std::endl;
 
-    result[2] = hessian__.determinant();
-    //TODO count this and optimze
-    result[3] = svd.singularValues()(0)/svd.singularValues()(5);
+    for (uint_t i = 0; i < 6; ++i)
+        result[7+i] = eigs.eigenvalues()(i);
 
     return result;
 }
@@ -438,6 +461,7 @@ void PlaneRegistration::calculate_gradient_hessian()
     Mat6 hessian = Mat6::Zero();
     gradient_.setZero();
     hessian_.setZero();
+    get_current_error();//this recalculates the current planes estimation, required for LM proper undoing.
     double  tau = 1.0 / (double)(numberPoses_-1);
     for (uint_t t = 1 ; t < numberPoses_; ++t)
     {

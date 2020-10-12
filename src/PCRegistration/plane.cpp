@@ -25,15 +25,16 @@
 
 #include "mrob/plane.hpp"
 #include <iostream>
-#include <Eigen/SVD>
-#include <Eigen/LU>
+//#include <Eigen/SVD>
+//#include <Eigen/LU>
+#include <Eigen/Eigenvalues>
 
 
 
 using namespace mrob;
 
 Plane::Plane(uint_t timeLength):
-        timeLength_(timeLength), isPlaneEstimated_(false)
+        timeLength_(timeLength), isPlaneEstimated_(false), numberPoints_(0)
 {
     allPlanePoints_.reserve(timeLength_);
     // there should be an individual reservation of points
@@ -96,12 +97,13 @@ void Plane::reserve(uint_t d, uint_t t)
 
 void Plane::push_back_point(Mat31 &point, uint_t t)
 {
-    // XXX for now it only works on consecutive observations TODO
+    // XXX for now it only works on consecutive observations TODO if t> time length increase
     if (t < timeLength_)
     {
         //homogeneousPoint << point, 1.0;
         //allPlanePoints_[t].push_back(homogeneousPoint);
         allPlanePoints_[t].push_back(point);
+        ++numberPoints_;
     }
 }
 
@@ -129,13 +131,12 @@ double Plane::estimate_plane()
         //std::cout << Qi << std::endl;
     }
 
-    // sum( v * p_i )
-    Eigen::JacobiSVD<Mat4> svd(accumulatedQ_, Eigen::ComputeFullU );
-    // XXX actually SelfAdjointEigenSolver is faster (https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html)
-    planeEstimation_ = svd.matrixU().col(3);
-    //std::cout << svd.matrixU() << "\n and solution \n" << planeEstimation_ <<  std::endl;
-    //std::cout << "plane estimation error: " << svd.singularValues() <<  std::endl;
-    lambda_ = svd.singularValues()(3);
+    // Eigen::SelfAdjointEigenSolver return sorted elements from min(0) to max (3)
+    Eigen::SelfAdjointEigenSolver<Mat4> eigs(accumulatedQ_);
+    planeEstimation_ = eigs.eigenvectors().col(0);
+    //std::cout << eigs.eigenvectors() << "\n and solution \n" << planeEstimation_ <<  std::endl;
+    //std::cout << "plane estimation error: " << eigs.eigenvalues() <<  std::endl;
+    lambda_ = eigs.eigenvalues()(0);
 
     // new estimation is done, set flags TODO why?
     isPlaneEstimated_ = true;
@@ -143,14 +144,15 @@ double Plane::estimate_plane()
     return lambda_;
 }
 
+// Is this really used anywhere?
 double Plane::estimate_plane_incrementally(uint_t t)
 {
     accumulatedQ_ -= matrixQ_[t];
     accumulatedQ_ +=  trajectory_->at(t).T() * matrixS_[t] * trajectory_->at(t).T().transpose();
     //std::cout << "new acc Q " << accumulatedQ_ << std::endl;
-    Eigen::JacobiSVD<Mat4> svd(accumulatedQ_, Eigen::ComputeFullU );
-    planeEstimation_ = svd.matrixU().col(3);
-    return svd.singularValues()(3);
+    Eigen::SelfAdjointEigenSolver<Mat4> eigs(accumulatedQ_);
+    planeEstimation_ = eigs.eigenvectors().col(0);
+    return eigs.eigenvalues()(0);
 }
 
 double Plane::get_error_incremental(uint_t t) const
@@ -161,8 +163,8 @@ double Plane::get_error_incremental(uint_t t) const
     //std::cout << "substract: Q " << Q << std::endl;
     Q +=  trajectory_->at(t).T() * matrixS_[t] * trajectory_->at(t).T().transpose();
     //std::cout << "new acc Q " << Q << std::endl;
-    Eigen::JacobiSVD<Mat4> svd(Q, Eigen::ComputeFullU );
-    return svd.singularValues()(3);
+    Eigen::SelfAdjointEigenSolver<Mat4> eigs(Q);
+    return eigs.eigenvalues()(0);
 }
 
 void Plane::calculate_all_matrices_S(bool reset)
@@ -171,7 +173,6 @@ void Plane::calculate_all_matrices_S(bool reset)
         matrixS_.clear();
     if (matrixS_.empty())
     {
-        numberPoints_ = 0;
         for (uint_t t = 0; t < timeLength_; ++t)
         {
             Mat4 S = Mat4::Zero();
@@ -182,7 +183,6 @@ void Plane::calculate_all_matrices_S(bool reset)
                 S += pHomog * pHomog.transpose();
             }
             matrixS_.push_back(S);
-            ++numberPoints_;
         }
     }
 }
@@ -293,6 +293,7 @@ Mat6 Plane::calculate_hessian(uint_t t)
         {
             ddQ.setZero();
             ddQ = lieGenerativeMatrices_[i]*lieGenerativeMatrices_[j] + lieGenerativeMatrices_[j]*lieGenerativeMatrices_[i];
+            //compound operator *= as in a*=b (this multiplies on the right: a*=b is equivalent to a = a*b)
             ddQ *= 0.5 * Q;
             ddQ += lieGenerativeMatrices_[i] * gradQ_[j];
             ddQ += ddQ.transpose().eval();

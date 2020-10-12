@@ -37,8 +37,8 @@ namespace mrob{
  *
  * The state is an observed RBT, coincident with the node state it is connected to.
  *
- * In particular, the residual of this factor is: TODO better formulate
- *   r = obs-x
+ * In particular, the residual of this factor is:
+ *   r = (x - obs) = Tx * Tobs^{-1}
  */
 
 class Factor1Pose3d : public Factor

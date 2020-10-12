@@ -39,7 +39,7 @@ Optimizer::~Optimizer()
 }
 
 
- uint_t Optimizer::optimize(optimMethod method)
+ uint_t Optimizer::optimize(optimMethod method, double lambda)
 {
     optimization_method_ = method;
     switch(method)
@@ -48,6 +48,7 @@ Optimizer::~Optimizer()
           return optimize_newton_raphson();
       case LEVENBERG_MARQUARDT_SPHER:
       case LEVENBERG_MARQUARDT_ELLIP:
+          lambda_ = lambda;
           return optimize_levenberg_marquardt();
     }
     return 0;
@@ -56,7 +57,7 @@ Optimizer::~Optimizer()
 
 uint_t Optimizer::optimize_newton_raphson_one_iteration(bool useLambda)
 {
-    // 1) build problem: Gradient and Hessian
+    // 1) build problem: Gradient and Hessian and re-evaluates
     calculate_gradient_hessian();
     if (useLambda)
     {
@@ -89,7 +90,7 @@ uint_t Optimizer::optimize_newton_raphson()
     {
         this->optimize_newton_raphson_one_iteration(false);
         matData_t current_error = this->calculate_error();
-        std::cout << "iter " << iters << ", error = " << current_error <<std::endl;
+        //std::cout << "iter " << iters << ", error = " << current_error <<std::endl;
         diff_error = previous_error - current_error;
         previous_error = current_error;
         iters++;
@@ -115,14 +116,16 @@ uint_t Optimizer::optimize_levenberg_marquardt()
         this->bookkeep_state();
         optimize_newton_raphson_one_iteration(true);
         current_error = calculate_error();
-        std::cout << "iter " << iters << ", error = " << current_error << ", lambda = "<< lambda_ << std::endl;
+        //std::cout << "iter " << iters << ", error = " << current_error << ", lambda = "<< lambda_ << std::endl;
         diff_error = previous_error - current_error;
         improvement = true;
+
+        //TODO there is an error here, diff error is correct, but the current state get changed! how
 
         // 2) Check for convergence, hillclimb
         if (diff_error < 0)
         {
-            std::cout << "no improvement\n";
+            //std::cout << "no improvement\n";
             lambda_ *= beta1;
             this->update_state_from_bookkeep();
             improvement = false;
@@ -161,5 +164,5 @@ uint_t Optimizer::optimize_levenberg_marquardt()
               << iters << " iterations and error " << calculate_error()
               << std::endl;
 
-    return 0;
+    return iters;
 }

@@ -57,12 +57,18 @@ void TimeProfiling::stop(const std::string &key)
 
 void TimeProfiling::print()
 {
-    double sum = 0;
-    for (auto t : time_profiles_)
-        sum += t.second;
+    double sum = total_time();
 
     std::cout << "\nTime profile for " << sum/1e3 << " [ms]: ";
     for (auto t : time_profiles_)
         std::cout << t.first << " = " << t.second/sum *100 << "%, ";
     std::cout << "\n";
+}
+
+double TimeProfiling::total_time()
+{
+    double sum = 0;
+    for (auto t : time_profiles_)
+        sum += t.second;
+    return sum;
 }

@@ -55,7 +55,7 @@ class Optimizer
 public:
 	/**
 	 * This enums optimization methods available:
-	 *  - NR: Newton-Raphson (Gauss_newtow is a variant with approximmations in the Hessian)
+	 *  - NR: Newton-Raphson (Gauss_newtow is a variant with approximations in the Hessian)
 	 *  - LM_S: Levenberg Marquardt: Spherical
 	 *  - LM_E: Levenberg Marquardt: Eliptical
 	 */
@@ -68,7 +68,7 @@ public:
      * Input: optmization method from {NR=0, LM_S, LM_E}
      * output: number of iterations
      */
-    uint_t optimize(optimMethod method);
+    uint_t optimize(optimMethod method, double lambda = 1e-5);
 
     /**
      * General abstract functions to implement:

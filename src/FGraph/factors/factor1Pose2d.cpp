@@ -37,12 +37,12 @@ Factor1Pose2d::Factor1Pose2d(const Mat31 &observation, std::shared_ptr<Node> &n1
 void Factor1Pose2d::evaluate_jacobians()
 {
     // Evaluate Jacobian
-    J_ = -Mat3::Identity();
+    J_ = Mat3::Identity();
 }
 
 void Factor1Pose2d::evaluate_residuals()
 {
-    r_ = obs_ - get_neighbour_nodes()->at(0).get()->get_state();
+    r_ = get_neighbour_nodes()->at(0).get()->get_state() - obs_;
 }
 
 void Factor1Pose2d::evaluate_chi2()

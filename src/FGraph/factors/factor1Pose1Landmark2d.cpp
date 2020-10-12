@@ -71,6 +71,7 @@ void Factor1Pose1Landmark2d::evaluate_residuals()
         poseIndex = 1;
     }
     // From the local frame we observe the landmark
+    // TODO LM needs too many iterations, check once again gradients
     state_ = get_neighbour_nodes()->at(poseIndex)->get_state();
     landmark_ = get_neighbour_nodes()->at(landmarkIndex)->get_state();
     dx_ = landmark_(0) - state_(0);

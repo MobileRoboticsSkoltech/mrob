@@ -59,10 +59,9 @@ void Factor1Pose1Plane4d::evaluate_residuals()
     // which then it is related to the landmark plane, in global coordinates. Thus,
     // the residual is formulated, according to our convention in factor.hpp:
     //
-    //      r = z_pi - h(T,pi_0) = z_pi - T^{-T}pi.
+    //      r = h(T,pi) - z_pi = T^{-T}pi - z_pi
     //
     //  Points and planes are duals in 3D, as explained in Multiview-geometry by hartley and zisserman
-    // From T we observe z_pi, and the residual is r = z - T^{-T}pi
     uint_t poseIndex = 0;
     uint_t landmarkIndex = 1;
     if (reversedNodeOrder_)
@@ -71,9 +70,9 @@ void Factor1Pose1Plane4d::evaluate_residuals()
         poseIndex = 1;
     }
     Mat4 Tx = get_neighbour_nodes()->at(poseIndex)->get_state();
-    // The transformation we are looking for here is Txw, from world to local x.
-    // Check on transfomration of planes
-    Tinv_transp_ = SE3(Tx).inv().T().transpose();
+    // The transformation we are looking for here is xTw, from world to local x.
+    // which is the inverse of the current pose Tx
+    Tinv_transp_ = SE3(Tx).T().transpose();
     plane_ = get_neighbour_nodes()->at(landmarkIndex)->get_state();
     r_ = Tinv_transp_*plane_ - obs_;
 }
@@ -82,8 +81,8 @@ void Factor1Pose1Plane4d::evaluate_jacobians()
     Mat<4,6> Jx = Mat<4,6>::Zero();
     Mat41 pi = Tinv_transp_*plane_;
     Mat31 normal = pi.head(3);
-    Jx.topLeftCorner<3,3>() = hat3(normal);
-    Jx.bottomRightCorner<1,3>() =  normal;
+    Jx.topLeftCorner<3,3>() = -hat3(normal);
+    Jx.bottomRightCorner<1,3>() =  -normal;
     if (!reversedNodeOrder_)
     {
         J_.topLeftCorner<4,6>() = Jx;

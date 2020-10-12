@@ -41,9 +41,12 @@ namespace mrob{
  * shared_ptr's.
  * We provide the node's Id to get the correspondent Jacobian
  *
- * Following the convention in the library r = f(x) - z.
- * In particular, the relation between the transformation of poses is:
+ * The convention in the library r = f(x) - z.
+ *
+ * In this particular factor, we will follow a similar convention as in odometry 2d,
+ * where we 'observe' the last pose, and thus, the relation between the transformation of poses is:
  *   T_o * T_obs = T_t
+ *
  *
  *
  * T_o is the transformation encoded by the 3D pose 'origin'. Also note that the
@@ -54,7 +57,10 @@ namespace mrob{
  * and the residual is thus:
  *   r = Ln ( T_o * T_obs * T_t^-1 )
  *
- * (equivalent to x_origin + observation - x_target)
+ * (equivalent to odometry 2d x_origin + observation - x_target)
+ *
+ *
+ * (it could also be formulated as T_o^-1*T_t*Tob^-1, but the former way is more intuitive
  *
  * Constructor functions will be overloaded to include the pointers of the nodes,
  * The convention is from node origin, we observe node destination,
