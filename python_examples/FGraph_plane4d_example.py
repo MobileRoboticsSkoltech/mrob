@@ -34,7 +34,7 @@ obs = np.array([1,0,0,1])
 graph.add_factor_1pose_1plane_4d(obs,n1,l2,W)
 
 # PLane facing Y
-obs = np.array([0,1,0,-1])
+obs = np.array([1,-1,0.1,10])
 graph.add_factor_1pose_1plane_4d(obs,n1,l3,W)
 #graph.print(True)
 

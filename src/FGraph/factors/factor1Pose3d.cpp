@@ -52,19 +52,20 @@ Factor1Pose3d::~Factor1Pose3d()
 
 void Factor1Pose3d::evaluate_residuals()
 {
-    // Anchor residuals as r = obs - x
-    // r = ln(Tobs * x^-1) = - ln(X * Tobs^-1)
+    // Anchor residuals as r = x - obs
+    // r = ln(X * Tobs^-1) = - ln(Tobs * x^-1)
     // NOTE Tobs is a global observation (reference identity)
     Mat4 x = get_neighbour_nodes()->at(0).get()->get_state();
-    Tr_ = Tobs_ * SE3(x).inv();
+    Tr_ = SE3(x) * Tobs_.inv();
     r_ = Tr_.ln_vee();
 }
 
 void Factor1Pose3d::evaluate_jacobians()
 {
-    // Evaluate Jacobian (see document on SE3 and small perturbations TODO)
+    // Evaluate Jacobian (see document on SE3 and small perturbations)
     // J = d/dxi ln(T X-1 exp(-xi) (T X-1)-1)= - Adj_{T X-1} = - Adj(Tr)
-    J_ = -Tr_.adj();
+    // J = d/dxi ln(exp(xi)X T-1  (T X-1)-1)= I
+    J_ = Mat6::Identity();
 }
 
 void Factor1Pose3d::evaluate_chi2()
