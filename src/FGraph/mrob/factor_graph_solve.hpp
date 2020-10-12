@@ -33,6 +33,27 @@ namespace mrob {
 
 /**
  * Class FGraphSolve creates all the required matrices for solving the LSQ problem.
+ * The problem takes the following form:
+ *
+ * x* = argmin {C(x)} = argmin {sum ||h(x)-z_i||2_W}.
+ *
+ * The solution is found after linearization of each of terms:
+ *
+ * h(x0) + dx'J - z = dx'J - (z - h(x0)) = dx'J - r_i
+ *
+ * In this library we will follow the above convention, where residuals are
+ * r_i =  z_i - h(x0)
+ *
+ * With this arrangement, the linearized factor minus the residual (r):
+ * ||h(x) - z||2_W = ||h(x0) + J dx - z||2_W = ||J dx - r||2_W
+ *
+ * When optimizing the linearized LSQ:
+ * (J'WJ)dx = J'Wr   =>  dx = (J'WJ)^-1 J'Wr
+ *
+ *
+ * This convention will be followed by all factors in this library, otherwise the optimization
+ * will not work properly.
+ *
  * Different options are provided:
  * 	- Adjacency matrix (plus indirect construction of Information)
  * 	- TODO Information matrix (direct)

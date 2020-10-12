@@ -6,7 +6,6 @@ SET(headers
     mrob/factor.hpp
     mrob/factor_graph.hpp
     mrob/factor_graph_solve.hpp
-    mrob/CustomCholesky.hpp
 )
 
 # extra source files
@@ -27,7 +26,10 @@ SET(factors_headers
     mrob/factors/nodeLandmark2d.hpp
     mrob/factors/nodeLandmark3d.hpp
     mrob/factors/factor1Pose1Landmark2d.hpp
-    mrob/factors/factor1Pose1Landmark3d.hpp)
+    mrob/factors/factor1Pose1Landmark3d.hpp
+    mrob/factors/nodePlane4d.hpp
+    mrob/factors/factor1Pose1plane4d.hpp
+)
 
 SET(factors_sources
     factors/nodePose3d.cpp
@@ -39,7 +41,10 @@ SET(factors_sources
     factors/nodeLandmark2d.cpp
     factors/nodeLandmark3d.cpp
     factors/factor1Pose1Landmark2d.cpp
-    factors/factor1Pose1Landmark3d.cpp)
+    factors/factor1Pose1Landmark3d.cpp
+    factors/nodePlane4d.cpp
+    factors/factor1Pose1Plane4d.cpp
+)
 
 # create the shared library
 ADD_LIBRARY(FGraph SHARED  ${sources} ${factors_sources})

@@ -41,9 +41,10 @@ namespace mrob{
  * shared_ptr's.
  * We provide the node's Id to get the correspondent Jacobian
  *
- *
+ * Following the convention in the library r = f(x) - z.
  * In particular, the relation between the transformation of poses is:
  *   T_o * T_obs = T_t
+ *
  *
  * T_o is the transformation encoded by the 3D pose 'origin'. Also note that the
  * transformation from a pose (Exp(x_o) transforms point in the local 'origin' frame to the world reference.
@@ -74,19 +75,19 @@ class Factor2Poses3d : public Factor
     /**
      * Jacobians are not evaluated, just the residuals
      */
-    void evaluate_residuals() override;
+    virtual void evaluate_residuals() override;
     /**
      * Evaluates residuals and Jacobians
      */
-    void evaluate_jacobians() override;
-    void evaluate_chi2() override;
+    virtual void evaluate_jacobians() override;
+    virtual void evaluate_chi2() override;
 
-    void print() const;
+    virtual void print() const;
 
-    const Eigen::Ref<const MatX> get_obs() const {return Tobs_.T();};
-    const Eigen::Ref<const MatX1> get_residual() const {return r_;};
-    const Eigen::Ref<const MatX> get_information_matrix() const {return W_;};
-    const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
+    virtual const Eigen::Ref<const MatX> get_obs() const {return Tobs_.T();};
+    virtual const Eigen::Ref<const MatX1> get_residual() const {return r_;};
+    virtual const Eigen::Ref<const MatX> get_information_matrix() const {return W_;};
+    virtual const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
 
   protected:
     // The Jacobians' correspondant nodes are ordered on the vector<Node>

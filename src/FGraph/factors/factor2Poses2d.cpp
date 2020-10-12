@@ -60,6 +60,7 @@ void Factor2Poses2d::evaluate_residuals() {
             nodeTarget = get_neighbour_nodes()->at(1).get()->get_state();
 
     // r = h(i,j) - obs = Ri^T * (xj- xi) - obs .  From "i", i.e, at its reference frame, we observe xj
+    // TODO correct this to follow the convention r = z - h(x) (later is solved at the jacobian...)
     Mat31 h = nodeTarget - nodeOrigin;
     Mat2 RiT;
     double c1 = cos(nodeOrigin(2)),
