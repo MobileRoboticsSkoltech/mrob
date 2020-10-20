@@ -213,6 +213,14 @@ std::vector<uint_t>& CreatePoints::get_point_plane_ids(uint_t t)
     return pointId_[t];
 }
 
+SE3 CreatePoints::get_ground_truth_pose(uint_t i)
+{
+    assert(i < numberPoses_ && "CreatePoints::get_ground_truth_trajectory: temporal index larger than number of calculated poses\n");
+    if (i < numberPoses_ )
+        return goundTruthTrajectory_.at(i);
+    return SE3();
+}
+
 void CreatePoints::print() const
 {
     std::cout << "Printing generated scene:\n - Trajectory:\n";

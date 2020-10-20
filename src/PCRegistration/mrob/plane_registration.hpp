@@ -110,13 +110,11 @@ class PlaneRegistration: public Optimizer{
     void reset_solution();
     double get_current_error() const;
     /**
-     * Get trajectory returns a smart pointer to the vector of transformations,
-     * which is already shared by all Plane objects.
-     * It serves for checking the solution and for modifying the initial conditions for optimization (if any).
+     * Get trajectory returns a SE3 transformations,
      */
-    //std::shared_ptr<std::vector<SE3>>& get_trajectory() {return trajectory_;};//if solved
-    Mat4 get_trajectory(uint_t time);
+    SE3 get_trajectory(uint_t time);
 
+    // XXX Used anywhere??
     SE3 get_last_pose() {return trajectory_->back();}
 
     /**

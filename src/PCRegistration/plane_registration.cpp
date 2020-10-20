@@ -251,7 +251,7 @@ uint_t PlaneRegistration::solve_quaternion_plane()
 
 uint_t PlaneRegistration::solve_initialize()
 {
-    // TODO Maybe solve this as a plane-to-point alignment wrt T0
+    // TODO The solution should admit irregular number of observed planes.
     // Initialize matrices of points
     MatX X(numberPlanes_,3), Y(numberPlanes_,3);
 
@@ -361,12 +361,12 @@ std::vector<Mat31> PlaneRegistration::get_point_cloud(uint_t time)
 	return aggregated_pc;
 }
 
-Mat4 PlaneRegistration::get_trajectory(uint_t time)
+SE3 PlaneRegistration::get_trajectory(uint_t time)
 {
     assert(time < numberPoses_ && "CreatePoints::getPointCloud: temporal index larger than number of calculated poses\n");
     if (time < numberPoses_ )
-        return trajectory_->at(time).T();
-    return Mat4::Identity();
+        return trajectory_->at(time);
+    return SE3();
 }
 
 void PlaneRegistration::print(bool plotPlanes) const

@@ -103,6 +103,7 @@ public:
 
     std::vector<SE3>& get_ground_truth_trajectory() {return goundTruthTrajectory_;};
     SE3 get_ground_truth_last_pose() {return goundTruthTrajectory_.back();};
+    SE3 get_ground_truth_pose(uint_t i);
 
     std::vector<SE3>& get_plane_poses() {return planePoses_;};
     std::vector<std::pair<uint_t, std::shared_ptr<Plane> >>& get_all_planes() {return planes_;}
