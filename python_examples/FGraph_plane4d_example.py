@@ -8,12 +8,12 @@ graph = mrob.fgraph.FGraph()
 
 #initial point at [0,0,0] with some noise
 #n1 = graph.add_node_pose_3d(mrob.geometry.SE3(np.random.randn(6)*0.05))
-n1 = graph.add_node_pose_3d(mrob.geometry.SE3(np.array([0.0791869, 0.0458932,-0.0127219, -0.085251, 0.0202256, 0.0510333])))
 
 # non-initialized landmarks, but they could be initialiazed
 l1 = graph.add_node_plane_4d(np.array([0,1,0,0]))
 l2 = graph.add_node_plane_4d(np.array([1,0,0,0]))
 l3 = graph.add_node_plane_4d(np.array([1,0,0,0]))
+n1 = graph.add_node_pose_3d(mrob.geometry.SE3(np.array([0.0791869, 0.0458932,-0.0127219, -0.085251, 0.0202256, 0.0510333])))
 print('node pose id = ', n1, ' , node landmark 1 id = ', l1 , ' , node landmark 2 id = ', l2, ' , node landmark 3 id = ', l3)
 
 

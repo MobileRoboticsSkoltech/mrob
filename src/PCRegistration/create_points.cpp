@@ -112,9 +112,9 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         transRange_(4.0),
         lamdaOutlier_(0.0),
         //samplePoses_(M_PI/sqrt(3),1.0),//TODO test this new value <|pi|
-        samplePoses_(M_PI,1.0),//TODO test this new value <|pi|
+        samplePoses_(M_PI*0.0001,1.0),//TODO test this new value <|pi|
         samplePlanes_(rotationRange_,transRange_),
-        samplePoints_(noisePerPoint_, noiseBias_),
+        samplePoints_(noisePerPoint_*0.01, noiseBias_),
         // Trajectory parameters
         xRange_(10.0),
         yRange_(10.0),
@@ -161,7 +161,10 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         // (1-t)ln(T0) + t ln(T1) only works if |dw| < pi, which we can not guarantee on these sampling conditions
         // If T0 = I, then the previous condition will always hold (|dw| < pi), we we can interpolate as
         //    T(t) = exp (t ln(T1))
-        Mat61 tdx =  double(t) / double(numberPoses_-1) * dxi;
+        double k = double(t)/double(numberPoses_-1);
+        if (numberPoses_ == 1)
+            k = 0.0;
+        Mat61 tdx =  k * dxi;
         SE3 pose = SE3( tdx ) * initialPose_;
         goundTruthTrajectory_.push_back(pose);
     }
