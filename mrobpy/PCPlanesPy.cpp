@@ -61,7 +61,7 @@ void init_PCPlanes(py::module &m)
         ;
 	// This class creates a synthetic testing
     py::class_<CreatePoints>(m,"CreatePoints")
-            .def(py::init<uint_t, uint_t, uint_t, double>())
+            .def(py::init<uint_t, uint_t, uint_t, double, double>())
             .def("get_point_cloud", &CreatePoints::get_point_cloud,
             		"Input time index and outputs all points at that instant in time")
             .def("get_point_plane_ids", &CreatePoints::get_point_plane_ids,

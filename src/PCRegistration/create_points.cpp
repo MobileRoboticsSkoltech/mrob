@@ -120,6 +120,7 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         yRange_(10.0),
         numberPoses_(numberPoses)
 {
+    std::cout << "samples bias = " << noiseBias_ << "\n and point noise = " << noisePerPoint_ <<  std::endl;
     // 0) initialize vectors and variables
     X_.reserve(numberPoses_);
     pointId_.reserve(numberPoses_);
@@ -177,7 +178,7 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         samplePoints_.sampleBias();
         for (uint_t i = 0; i < numberPoints_ ; ++i)
         {
-            // parameter is the legnth of the observed plane
+            // parameter is the length of the observed plane
             uint_t planeId = std::floor((float)i * (float)numberPlanes_/ (float)numberPoints_);
             Mat31 point = planePoses_[planeId].transform( samplePoints_.samplePoint() );
             point = transInvPose.transform(point);
