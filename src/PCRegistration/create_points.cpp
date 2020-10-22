@@ -111,10 +111,10 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         rotationRange_(M_PI),
         transRange_(4.0),
         lamdaOutlier_(0.0),
-        //samplePoses_(M_PI/sqrt(3),1.0),//TODO test this new value <|pi|
-        samplePoses_(M_PI*0.0001,1.0),//TODO test this new value <|pi|
+        samplePoses_(M_PI/sqrt(3),1.0),
+        //samplePoses_(M_PI,1.0),//TODO test this new value <|pi|
         samplePlanes_(rotationRange_,transRange_),
-        samplePoints_(noisePerPoint_*0.01, noiseBias_),
+        samplePoints_(noisePerPoint_, noiseBias_),
         // Trajectory parameters
         xRange_(10.0),
         yRange_(10.0),

@@ -70,8 +70,8 @@ void Factor1Pose1Plane4d::evaluate_residuals()
         poseIndex = 1;
     }
     Mat4 Tx = get_neighbour_nodes()->at(poseIndex)->get_state();
-    // The transformation we are looking for here is xTw, from world to local x.
-    // which is the inverse of the current pose Tx
+    // The transformation we are looking for here is Txw, from world to local x.
+    // which is the inverse of the current pose Tx in the state vector
     Tinv_transp_ = SE3(Tx).T().transpose();
     plane_ = get_neighbour_nodes()->at(landmarkIndex)->get_state();
     r_ = Tinv_transp_*plane_ - obs_;
@@ -79,19 +79,18 @@ void Factor1Pose1Plane4d::evaluate_residuals()
 void Factor1Pose1Plane4d::evaluate_jacobians()
 {
     Mat<4,6> Jx = Mat<4,6>::Zero();
-    Mat41 pi = Tinv_transp_*plane_;
-    Mat31 normal = pi.head(3);
-    Jx.topLeftCorner<3,3>() = -hat3(normal);
-    Jx.bottomRightCorner<1,3>() =  -normal;
+    Mat31 normal = plane_.head(3);
+    Jx.topLeftCorner<3,3>() = hat3(normal);
+    Jx.bottomRightCorner<1,3>() =  normal;
     if (!reversedNodeOrder_)
     {
-        J_.topLeftCorner<4,6>() = Jx;
+        J_.topLeftCorner<4,6>() = Tinv_transp_ * Jx;
         J_.topRightCorner<4,4>() = Tinv_transp_;
     }
     else
     {
         J_.topLeftCorner<4,4>() = Tinv_transp_;
-        J_.topRightCorner<4,6>() = Jx;
+        J_.topRightCorner<4,6>() = Tinv_transp_ * Jx;
     }
 }
 void Factor1Pose1Plane4d::evaluate_chi2()

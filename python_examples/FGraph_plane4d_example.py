@@ -21,22 +21,38 @@ print('node pose id = ', n1, ' , node landmark 1 id = ', l1 , ' , node landmark 
 W_0 = np.identity(6)
 T_0 = mrob.geometry.SE3(np.array([0,0,0,10,20,0]))
 #T_0 = mrob.geometry.SE3(np.random.randn(6)*0.05)
+n2 = graph.add_node_pose_3d(mrob.geometry.SE3())
 graph.add_factor_1pose_3d(T_0,n1,1e6*W_0)
+W = np.identity(4)
 
 # plane factors
-W = np.identity(4)
 # ground plane aligned with z
-obs = np.array([0,0,1,0])
+obs = np.array([0,0,1,3])
 graph.add_factor_1pose_1plane_4d(obs,n1,l1,W)
 
-#Planes should be a 4d vector normalized (P^3). Constructor takes care of normalizing.
+#Planes should be a 4d vector normalized at  |n|=1. Constructor takes care of normalizing.
 obs = np.array([1,0,0,1])
 graph.add_factor_1pose_1plane_4d(obs,n1,l2,W)
 
 # PLane facing Y
-obs = np.array([1,-1,0.1,10])
+obs = np.array([0,-1,0.1,-15])
 graph.add_factor_1pose_1plane_4d(obs,n1,l3,W)
 #graph.print(True)
+
+
+
+# plane factors at time 2
+# ground plane aligned with z, stays the same
+obs = np.array([0,0,1,3])
+graph.add_factor_1pose_1plane_4d(obs,n2,l1,W)
+
+obs = np.array([1,0,0,1])
+graph.add_factor_1pose_1plane_4d(obs,n2,l2,W)
+
+# PLane facing Y
+obs = np.array([0,-1,0.1,-17])
+graph.add_factor_1pose_1plane_4d(obs,n2,l3,W)
+    #graph.print(True)
 
 
 
