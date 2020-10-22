@@ -74,7 +74,13 @@ void Factor1Pose1Plane4d::evaluate_residuals()
     // which is the inverse of the current pose Tx in the state vector
     Tinv_transp_ = SE3(Tx).T().transpose();
     plane_ = get_neighbour_nodes()->at(landmarkIndex)->get_state();
-    r_ = Tinv_transp_*plane_ - obs_;
+    Mat41 pi_local = Tinv_transp_*plane_;
+    r_ = pi_local - obs_;
+    // Normals must have the same direction, so we ensure this here. XXX: Temporary solution
+    if (pi_local.head(3).dot(obs_.head(3)) < 0.0)
+    {
+        r_ = pi_local + obs_;
+    }
 }
 void Factor1Pose1Plane4d::evaluate_jacobians()
 {
