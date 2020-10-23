@@ -77,8 +77,9 @@ void Factor1Pose1Plane4d::evaluate_residuals()
     Mat41 pi_local = Tinv_transp_*plane_;
     r_ = pi_local - obs_;
     // Normals must have the same direction, so we ensure this here. XXX: Temporary solution
-    if (pi_local.head(3).dot(obs_.head(3)) < 0.0)
+    if (pi_local.head(3).dot(obs_.head(3)) < 0.5)
     {
+        std::cout << "correction" << std::endl;
         r_ = pi_local + obs_;
     }
 }
