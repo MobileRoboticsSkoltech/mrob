@@ -251,28 +251,47 @@ uint_t PlaneRegistration::solve_quaternion_plane()
 
 uint_t PlaneRegistration::solve_initialize()
 {
-    // TODO The solution should admit irregular number of observed planes.
-    // Initialize matrices of points
-    MatX X(numberPlanes_,3), Y(numberPlanes_,3);
+    // Initialize matrices of , all points in the Y matrix
+    std::vector<Mat31> Y_points_all;
+    Y_points_all.reserve(numberPlanes_);
 
-    // create points Y (from frame t =0), minimum 3 planes per pose
-    uint_t t = 0;
+    // update data structure for init. All point in the fist pose
     for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
     {
         it->second->calculate_all_matrices_S();
-        Y.row(t) = it->second->get_mean_point(0);
-        ++t;
+        if (it->second->get_number_points(0) > 0 )
+            Y_points_all.push_back(it->second->get_mean_point(0));
     }
 
-    // create points X, for t = 1, ... T, minimum 3 planes per pose
+    uint_t t = 0;
+    // create points Y,X, for t = 1, ... T, minimum 3 planes per pose
+    std::vector<Mat31> X_points, Y_points;
+    X_points.reserve(numberPlanes_);
+    Y_points.reserve(numberPlanes_);
+    uint_t number_points;
+
     for (t = 1; t < numberPoses_; ++t)
     {
-        uint_t cont = 0;
-        X.setZero();
+        X_points.clear();
+        Y_points.clear();
+        number_points = 0;
+        uint_t cont =0;
         for (auto it = planes_.cbegin();  it != planes_.cend(); ++it)
         {
-            X.row(cont) = it->second->get_mean_point(t);
-            ++cont;
+            if (it->second->get_number_points(t) > 0 )
+            {
+                X_points.push_back(it->second->get_mean_point(t));
+                Y_points.push_back(Y_points_all[cont]);
+                number_points++;
+            }
+            cont++;
+        }
+        // Create the matrices X,Y
+        MatX X(number_points,3), Y(number_points,3);
+        for (uint_t i = 0; i < number_points; ++i)
+        {
+            X.row(i) = X_points[i];
+            Y.row(i) = Y_points[i];
         }
         // Arun solver
         SE3 estimatedPose;
