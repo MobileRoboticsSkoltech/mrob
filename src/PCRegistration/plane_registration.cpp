@@ -299,7 +299,7 @@ void PlaneRegistration::set_last_pose(SE3 &last)
     Mat61 xiFinal = last.ln_vee();
     double  tau = 1.0 / (double)(numberPoses_-1);
     Mat61 dxi;
-    for (uint_t t = 1 ; t < numberPoses_-1; ++t)
+    for (uint_t t = 1 ; t < numberPoses_; ++t)
     {
         dxi = tau * t * xiFinal;
         trajectory_->at(t) = SE3(dxi);
