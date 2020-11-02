@@ -122,6 +122,13 @@ class PlaneRegistration: public Optimizer{
      */
     void set_last_pose(SE3 &last);
 
+    SE3 get_last_pose() {return trajectory_->back();}
+
+    /**
+     * Sets the trajectory (current solution) by addint the last pose
+     */
+    void set_last_pose(SE3 &last);
+
     /**
      * add_plane adds a plane structure already initialized and filled with data
      */
