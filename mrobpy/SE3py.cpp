@@ -38,51 +38,98 @@ using namespace mrob;
 void init_geometry(py::module &m) {
     py::class_<SE3>(m, "SE3")
 		.def(py::init<>(),
-				"Default contructor, creates the identity transformation",
+				"The Default constructor creates the identity transformation",
 				py::return_value_policy::copy)
         .def(py::init<const Mat4 &>(),
-        		"Matrix contructor, requires a 4x4 RBT matrix",
+        		"Matrix constructor, requires a 4x4 RBT matrix",
 				py::return_value_policy::copy)
-        .def(py::init<const Mat61 &>(), py::return_value_policy::copy)
-        .def(py::init<const SE3 &>(), py::return_value_policy::copy)
-        .def(py::init<const SO3 &, const Mat31>(), py::return_value_policy::copy)
-        .def("T", &SE3::T, py::return_value_policy::copy) // makes a copy of the 4x4 Transformation
-        .def("R", &SE3::R, py::return_value_policy::copy)
-        .def("t", &SE3::t, py::return_value_policy::copy)
-        .def("mul", &SE3::mul, "multiplies a SE3 on the right hand side of the current object", py::return_value_policy::copy)
-        .def("update", &SE3::update_lhs)
-        .def("update_lhs", &SE3::update_lhs)
-        .def("update_rhs", &SE3::update_rhs)
-        .def("Ln", &SE3::ln_vee, "Logarithm + vee operator, returns 6 coordinates in the manifold", py::return_value_policy::copy)
-        .def("transform", &SE3::transform, py::return_value_policy::copy)
-        .def("transform_array", &SE3::transform_array, py::return_value_policy::copy,
+        .def(py::init<const Mat61 &>(),
+                "Given a vector xi in R^6, creates a RBT with the exponential mapping.",
+                py::return_value_policy::copy)
+        .def(py::init<const SE3 &>(),
+                "Creates an SE3 from, copying another SE3",
+                py::return_value_policy::copy)
+        .def(py::init<const SO3 &, const Mat31>(),
+                "Creates a RBT with a rotation object SO3 and a translation",
+                py::return_value_policy::copy)
+        .def("T", &SE3::T,
+                "Outputs a 4x4 array with the RBT",
+                py::return_value_policy::copy)
+        .def("R",&SE3::R,
+                "Outputs the Rotation array 3x3 component of the RBT",
+                py::return_value_policy::copy)
+        .def("t", &SE3::t,
+                "Outputs the translation array 3D component of the RBT",
+                py::return_value_policy::copy)
+        .def("mul", &SE3::mul,
+                "multiplies the current SE3 object by a second element. The order is: the right hand side of the current object times the second object",
+                py::return_value_policy::copy)
+        .def("update", &SE3::update_lhs,
+                "updates the value of the SE3 by the tangent space coordinates provided. By default this is lhs")
+        .def("update_lhs", &SE3::update_lhs,
+                "updates the value of the SE3 by the tangent space coordinates provided. left hand sided")
+        .def("update_rhs", &SE3::update_rhs,
+                "updates the value of the SE3 by the tangent space coordinates provided. Right hand sided")
+        .def("Ln", &SE3::ln_vee,
+                "Logarithm + vee operator, returns 6D coordinates of the tangent space around the identity",
+                py::return_value_policy::copy)
+        .def("transform", &SE3::transform,
+                "given a point in 3D, is transformed by the current RBT",
+                py::return_value_policy::copy)
+        .def("transform_array", &SE3::transform_array,
+                "Given a stacked array of point Nx3, are transformed by the current RBT",
+                py::return_value_policy::copy,
               "Input is a an array Nx3 and output is Nx3") // makes a copy of the array. TODO, pass by Ref and avoid copying, look at ownership
-        .def("inv", &SE3::inv, py::return_value_policy::copy)
-        .def("adj", &SE3::adj, py::return_value_policy::copy)
-        .def("distance", &SE3::distance, py::arg("rhs")=SE3())
-        .def("distance_rotation", &SE3::distance_rotation, py::arg("rhs")=SE3())
-        .def("distance_trans", &SE3::distance_trans, py::arg("rhs")=SE3())
-        .def("print", &SE3::print)
+        .def("inv", &SE3::inv,
+                "Outputs the inverse of the current SE3. This is a new object",
+                py::return_value_policy::copy)
+        .def("adj", &SE3::adj,
+                "Returns the 6x6 adjoint matrix of the current SE3",
+                py::return_value_policy::copy)
+        .def("distance", &SE3::distance,
+                "Calculates the distance between the current object and the argument as d = ||Ln(T^{1}*T_)||. If no element is provided, this is the norm of the object",
+                py::arg("rhs")=SE3())
+        .def("distance_rotation", &SE3::distance_rotation,
+                "Calculates the rotation distance (of SO3 elements). If no element is provided this is just the element norm",
+                py::arg("rhs")=SE3())
+        .def("distance_trans", &SE3::distance_trans,
+                "Calculates the translation distance. If no element is provided this is just the element norm",
+                py::arg("rhs")=SE3())
+        .def("print", &SE3::print, "Prints the current SE3 element")
         ;
     m.def("isSE3", &mrob::isSE3, "Returns True is the matrix is a valid transformation and False if not");
 
     py::class_<SO3>(m, "SO3")
-		.def(py::init<>(), py::return_value_policy::copy)
-		.def(py::init<const Mat31 &>(), py::return_value_policy::copy)
-        .def(py::init<const Mat3 &>(), py::return_value_policy::copy)
-        .def(py::init<const SO3 &>(), py::return_value_policy::copy)
-        .def("R", &SO3::R, py::return_value_policy::copy)
-        .def("mul", &SO3::mul, "multiplies a SO3 on the right hand side of the current object", py::return_value_policy::copy)
-        .def("update", &SO3::update_lhs )
-        .def("update_lhs", &SO3::update_lhs )
-        .def("update_rhs", &SO3::update_rhs )
-        .def("Ln", &SO3::ln_vee, py::return_value_policy::copy)
-        .def("inv", &SO3::inv, py::return_value_policy::copy)
-        .def("adj", &SO3::adj, py::return_value_policy::copy)
-        .def("distance", &SO3::distance)
-        .def("print", &SO3::print)
+		.def(py::init<>(), "Default SO3 construction, the identityt(3)", py::return_value_policy::copy)
+		.def(py::init<const Mat31 &>(), "SO3 constructor with a 3D vector. Inside uses the exponential map",
+		        py::return_value_policy::copy)
+        .def(py::init<const Mat3 &>(), "SO3 constructor directly from an array 3x3", py::return_value_policy::copy)
+        .def(py::init<const SO3 &>(), "Creates a new copy of the provided SO3", py::return_value_policy::copy)
+        .def("R", &SO3::R,
+                "Outputs the Rotation array 3x3 component",
+                py::return_value_policy::copy)
+        .def("mul", &SO3::mul,
+                "multiplies a SO3 on the right hand side of the current object", py::return_value_policy::copy)
+        .def("update", &SO3::update_lhs,
+                "updates the value of the SO3 by the tangent space coordinates provided. By default this is lhs")
+        .def("update_lhs", &SO3::update_lhs,
+                "updates the value of the SO3 by the tangent space coordinates provided. left hand sided")
+        .def("update_rhs", &SO3::update_rhs,
+                "updates the value of the SO3 by the tangent space coordinates provided. right hand convention")
+        .def("Ln", &SO3::ln_vee,
+                "Logarithm operation, mapping to the tangent space around the identity element",
+                py::return_value_policy::copy)
+        .def("inv", &SO3::inv,
+                "Creates a copy of the inverse",
+                py::return_value_policy::copy)
+        .def("adj", &SO3::adj,
+                "Returns the 3x3 adjoint matrix of the SO3 element",
+                py::return_value_policy::copy)
+        .def("distance", &SO3::distance,
+                "Calculates the distance between rotation matrices as ||Ln(R'*R_i)||")
+        .def("print", &SO3::print, "Prints current information of the rotation")
         ;
-    m.def("hat3", &mrob::hat3, "Returns a skew symetric matrix 3x3 from a 3-vector", py::return_value_policy::copy);
+    m.def("hat3", &mrob::hat3, "Returns a skew symmetric matrix 3x3 from a 3-vector", py::return_value_policy::copy);
     m.def("hat6", &mrob::hat6, "Returns a Lie algebra matrix 4x4 from a 6-vector", py::return_value_policy::copy);
 
     // AUxiliary functions to support other conventions (TORO, g2o)
