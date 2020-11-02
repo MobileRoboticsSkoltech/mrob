@@ -61,7 +61,7 @@ void init_PCPlanes(py::module &m)
         ;
 	// This class creates a synthetic testing
     py::class_<CreatePoints>(m,"CreatePoints")
-            .def(py::init<uint_t, uint_t, uint_t, double>())
+            .def(py::init<uint_t, uint_t, uint_t, double, double>())
             .def("get_point_cloud", &CreatePoints::get_point_cloud,
             		"Input time index and outputs all points at that instant in time")
             .def("get_point_plane_ids", &CreatePoints::get_point_plane_ids,
@@ -70,6 +70,7 @@ void init_PCPlanes(py::module &m)
             		"This fills in the structure for the class plane registration, ready to optimized with the synthetically created points. TODO this is a reference, not a deep copy!")
             .def("get_ground_truth_last_pose", &CreatePoints::get_ground_truth_last_pose,
                     "return SE3 of the last pose")
+            .def("get_trajectory", &CreatePoints::get_ground_truth_pose)
             ;
     // This class is a data structure, containing all points and calculating plane registration
     py::class_<PlaneRegistration>(m,"PlaneRegistration")
