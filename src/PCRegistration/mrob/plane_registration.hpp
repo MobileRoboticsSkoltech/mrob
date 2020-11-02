@@ -114,14 +114,6 @@ class PlaneRegistration: public Optimizer{
      */
     SE3 get_trajectory(uint_t time);
 
-    // XXX Used anywhere??
-    SE3 get_last_pose() {return trajectory_->back();}
-
-    /**
-     * Sets the trajectory (current solution) by addint the last pose
-     */
-    void set_last_pose(SE3 &last);
-
     SE3 get_last_pose() {return trajectory_->back();}
 
     /**
