@@ -41,9 +41,13 @@ namespace mrob{
  * shared_ptr's.
  * We provide the node's Id to get the correspondent Jacobian
  *
+ * The convention in the library r = f(x) - z.
  *
- * In particular, the relation between the transformation of poses is:
+ * In this particular factor, we will follow a similar convention as in odometry 2d,
+ * where we 'observe' the last pose, and thus, the relation between the transformation of poses is:
  *   T_o * T_obs = T_t
+ *
+ *
  *
  * T_o is the transformation encoded by the 3D pose 'origin'. Also note that the
  * transformation from a pose (Exp(x_o) transforms point in the local 'origin' frame to the world reference.
@@ -53,7 +57,10 @@ namespace mrob{
  * and the residual is thus:
  *   r = Ln ( T_o * T_obs * T_t^-1 )
  *
- * (equivalent to x_origin + observation - x_target)
+ * (equivalent to odometry 2d x_origin + observation - x_target)
+ *
+ *
+ * (it could also be formulated as T_o^-1*T_t*Tob^-1, but the former way is more intuitive
  *
  * Constructor functions will be overloaded to include the pointers of the nodes,
  * The convention is from node origin, we observe node destination,
@@ -74,19 +81,19 @@ class Factor2Poses3d : public Factor
     /**
      * Jacobians are not evaluated, just the residuals
      */
-    void evaluate_residuals() override;
+    virtual void evaluate_residuals() override;
     /**
      * Evaluates residuals and Jacobians
      */
-    void evaluate_jacobians() override;
-    void evaluate_chi2() override;
+    virtual void evaluate_jacobians() override;
+    virtual void evaluate_chi2() override;
 
-    void print() const;
+    virtual void print() const;
 
-    const Eigen::Ref<const MatX> get_obs() const {return Tobs_.T();};
-    const Eigen::Ref<const MatX1> get_residual() const {return r_;};
-    const Eigen::Ref<const MatX> get_information_matrix() const {return W_;};
-    const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
+    virtual const Eigen::Ref<const MatX> get_obs() const {return Tobs_.T();};
+    virtual const Eigen::Ref<const MatX1> get_residual() const {return r_;};
+    virtual const Eigen::Ref<const MatX> get_information_matrix() const {return W_;};
+    virtual const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
 
   protected:
     // The Jacobians' correspondant nodes are ordered on the vector<Node>

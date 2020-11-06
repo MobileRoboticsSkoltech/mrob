@@ -37,6 +37,8 @@
 #include "mrob/factors/factor1Pose1Landmark3d.hpp"
 #include "mrob/factors/nodeLandmark2d.hpp"
 #include "mrob/factors/factor1Pose1Landmark2d.hpp"
+#include "mrob/factors/nodePlane4d.hpp"
+#include "mrob/factors/factor1Pose1Plane4d.hpp"
 
 #include <Eigen/Geometry>
 
@@ -156,6 +158,26 @@ public:
         return f->get_id();
     }
 
+    // Planes in 4d, i.e. pi = [nx.ny,nz,d] \in P^3
+    // There is a problem with scaling of long distances (d->inf n->0), but well, this
+    // is not a minimal representation. For finite distances should be fine.
+    // ------------------------------------------------------------------------------------
+    id_t add_node_plane_4d(const py::EigenDRef<const Mat41> x)
+    {
+        std::shared_ptr<mrob::Node> n(new mrob::NodePlane4d(x));
+        this->add_node(n);
+        return n->get_id();
+    }
+    id_t add_factor_1pose_1plane_4d(const py::EigenDRef<const Mat41> obs, uint_t nodePoseId,
+                uint_t nodeLandmarkId, const py::EigenDRef<const Mat4> obsInvCov)
+    {
+        auto n1 = this->get_node(nodePoseId);
+        auto n2 = this->get_node(nodeLandmarkId);
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Plane4d(obs,n1,n2,obsInvCov));
+        this->add_factor(f);
+        return f->get_id();
+    }
+
 };
 
 void init_FGraph(py::module &m)
@@ -176,11 +198,14 @@ void init_FGraph(py::module &m)
             .def("chi2", &FGraphSolve::chi2,
                     "Calculated the chi2 of the problem. By default re-evaluates residuals, set to false if doesn't",
                     py::arg("evaluateResidualsFlag") = true)
-            .def("get_estimated_state", &FGraphSolve::get_estimated_state)
-            .def("number_nodes", &FGraphSolve::number_nodes)
-            .def("number_factors", &FGraphSolve::number_factors)
-            .def("get_factor_chi2", &FGraph::get_factor_chi2)
-            .def("evaluate_factor_chi2", &FGraph::evaluate_factor_chi2)
+            .def("get_estimated_state", &FGraphSolve::get_estimated_state,
+                    "returns the list of states ordered according to ids. Some of these elements might be matrices if the are 3D poses")
+            .def("number_nodes", &FGraphSolve::number_nodes, "Returns the number of nodes")
+            .def("number_factors", &FGraphSolve::number_factors, "Returns the number of factors")
+            .def("get_factor_chi2", &FGraph::get_factor_chi2,
+                    "Gets the last calculated chi2. It does not calculate it, so if there is no previous calculation, this value will be meaningless.")
+            .def("evaluate_factor_chi2", &FGraph::evaluate_factor_chi2,
+                    "Re-evaluates residuals and calculates the current chi2")
             .def("print", &FGraph::print, "By default False: does not print all the information on the Fgraph", py::arg("completePrint") = false)
             // -----------------------------------------------------------------------------
             // Specific call to 2D
@@ -216,8 +241,8 @@ void init_FGraph(py::module &m)
                             py::arg("nodeTargetId"),
                             py::arg("obsInvCov"),
                             py::arg("updateNodeTarget") = false)
-                            // -----------------------------------------------------------------------------
-            // SLandmark or Point 3D
+            // -----------------------------------------------------------------------------
+            // Landmark or Point 3D
             .def("add_node_landmark_3d", &FGraphPy::add_node_landmark_3d,
                     "Ladmarks are 3D points, in [x,y,z]")
             .def("add_factor_1pose_1landmark_3d", &FGraphPy::add_factor_1pose_1landmark_3d,
@@ -227,6 +252,16 @@ void init_FGraph(py::module &m)
                             py::arg("nodeLandmarkId"),
                             py::arg("obsInvCov"),
                             py::arg("initializeLandmark") = false)
+            // -----------------------------------------------------------------------------
+            // Plane 4d Landmark to Pose 3D
+            .def("add_node_plane_4d", &FGraphPy::add_node_plane_4d,
+                    "Panes are points in P^3, in [nx,ny,nz, d]")
+            .def("add_factor_1pose_1plane_4d", &FGraphPy::add_factor_1pose_1plane_4d,
+                            "Factor observing a plane(landmark) from the current pose.",
+                            py::arg("obs"),
+                            py::arg("nodePoseId"),
+                            py::arg("nodeLandmarkId"),
+                            py::arg("obsInvCov"))
             ;
 
 }

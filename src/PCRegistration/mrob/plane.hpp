@@ -38,13 +38,16 @@ namespace mrob{
  * class Plane stores a vector of point clouds from different observations
  * and  provides the gradients with respect to those poses.
  *
+ * It requires the exact number of poses that it is being considering.
+ * This is a design limitation, to be solved soon.
+ *
  */
 class Plane{
   public:
     Plane(uint_t timeLength);
     ~Plane();
 
-    void reserve(uint_t d, uint_t t);
+    void reserve(uint_t d, uint_t t);//XXX not used
     Mat41 get_plane(void) {return planeEstimation_;};
     /**
      * This function is intended to add a point that belongs to the plane at time t

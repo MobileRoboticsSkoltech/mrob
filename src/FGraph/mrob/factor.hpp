@@ -38,17 +38,13 @@ class Node;
  * the second type of vertexes on factor graphs (bipartite).
  * Factors keep track of all their neighbour nodes they are connected to.
  *
- * In general, the residuals are formulated as follows:
- * z (observation) = h(nodeOrigin,nodeTarget)
- * or
- * residual =  z - h(x0)
+ * By convention, the residuals r_i are ALWAYS formulated as follows:
  *
- * With this arrangement, the linearized factor substracts the residual (r)
- * to the first order term of the nonlinear observation function:
- * || h(x) - z  || = || h(x0) + J dx - z || = || J dx - r ||
+ * -------------------------------------------
+ * |           r(x) =  h(x) - z              |
+ * -------------------------------------------
  *
- * This convention will be followed by all factors in this library, otherwise the optimization
- * will not work properly.
+ * otherwise the optimization will not work properly.
  *
  * Because the number of Nodes they point to is fixed, we only allow
  * to indicate its node neighbours at the object declaration.

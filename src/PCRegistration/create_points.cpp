@@ -111,7 +111,8 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         rotationRange_(M_PI),
         transRange_(4.0),
         lamdaOutlier_(0.0),
-        samplePoses_(M_PI,1.0),
+        samplePoses_(M_PI/sqrt(3),1.0),
+        //samplePoses_(M_PI,1.0),//TODO test this new value <|pi|
         samplePlanes_(rotationRange_,transRange_),
         samplePoints_(noisePerPoint_, noiseBias_),
         // Trajectory parameters
@@ -119,6 +120,7 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         yRange_(10.0),
         numberPoses_(numberPoses)
 {
+    std::cout << "samples bias = " << noiseBias_ << "\n and point noise = " << noisePerPoint_ <<  std::endl;
     // 0) initialize vectors and variables
     X_.reserve(numberPoses_);
     pointId_.reserve(numberPoses_);
@@ -160,7 +162,10 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         // (1-t)ln(T0) + t ln(T1) only works if |dw| < pi, which we can not guarantee on these sampling conditions
         // If T0 = I, then the previous condition will always hold (|dw| < pi), we we can interpolate as
         //    T(t) = exp (t ln(T1))
-        Mat61 tdx =  double(t) / double(numberPoses_-1) * dxi;
+        double k = double(t)/double(numberPoses_-1);
+        if (numberPoses_ == 1)
+            k = 0.0;
+        Mat61 tdx =  k * dxi;
         SE3 pose = SE3( tdx ) * initialPose_;
         goundTruthTrajectory_.push_back(pose);
     }
@@ -173,7 +178,7 @@ CreatePoints::CreatePoints(uint_t numberPoints, uint_t numberPlanes, uint_t numb
         samplePoints_.sampleBias();
         for (uint_t i = 0; i < numberPoints_ ; ++i)
         {
-            // parameter is the legnth of the observed plane
+            // parameter is the length of the observed plane
             uint_t planeId = std::floor((float)i * (float)numberPlanes_/ (float)numberPoints_);
             Mat31 point = planePoses_[planeId].transform( samplePoints_.samplePoint() );
             point = transInvPose.transform(point);
@@ -210,6 +215,14 @@ std::vector<uint_t>& CreatePoints::get_point_plane_ids(uint_t t)
 {
     assert(t < numberPoses_ && "CreatePoints::get_plane_id: temporal index larger than number of calculated poses\n");
     return pointId_[t];
+}
+
+SE3 CreatePoints::get_ground_truth_pose(uint_t i)
+{
+    assert(i < numberPoses_ && "CreatePoints::get_ground_truth_trajectory: temporal index larger than number of calculated poses\n");
+    if (i < numberPoses_ )
+        return goundTruthTrajectory_.at(i);
+    return SE3();
 }
 
 void CreatePoints::print() const
