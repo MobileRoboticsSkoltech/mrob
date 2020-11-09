@@ -99,18 +99,22 @@ public:
     /**
      * Returns the chi2 corresponding to a particular factor. Use this only if the value has been updated recently
      * Mainly the purpose of this function is for testing
+     * XXX deprecated
      */
-    matData_t get_factor_chi2(uint_t key);
+    //matData_t get_factor_chi2(uint_t key);
     /**
      * Evaluates the residual and returns the chi2 value
+     * Gonzalo: DEPRECATED. Remove me later
      */
-    matData_t evaluate_factor_chi2(uint_t key);
+    //matData_t evaluate_factor_chi2(uint_t key);
 
     /**
      * FGraph information
      */
     uint_t number_nodes() {return nodes_.size();};
     uint_t number_factors() {return factors_.size();};
+    uint_t get_dimension_state() {return stateDim_;};
+    uint_t get_dimension_obs() {return obsDim_;};
 
     //TODO
     void save_graph() const;
