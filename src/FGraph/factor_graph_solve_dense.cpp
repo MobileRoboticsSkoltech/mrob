@@ -82,46 +82,54 @@ void FGraphSolveDense::calculate_gradient_hessian()
         uint_t dim = nodes_[i]->get_dim();
         indNodesMatrix.push_back(N);
         N += dim;
-
     }
     assert(N == stateDim_ && "FGraphSolveDense::HessianAndGradient: State Dimensions are not coincident\n");
 
-    // 4) create Hessian and gradient, by traversing all nodes
+    // 4) create Hessian and gradient, by traversing all nodes, looking for its factors
+    //    and completing the rows in the Hessian and gradient.
     for (uint_t n = 0; n < nodes_.size(); ++n)
     {
         auto node = nodes_[n];
-        // TODO n is the ID, but we want the local index in the factor vector. Fix this
+        uint_t node_id =  node->get_id();
+        N = node->get_dim();
         auto factors = node->get_neighbour_factors();
         for ( uint_t i = 0; i < factors->size(); ++i )
         {
             auto f = factors_[i];
             auto nodes_connected = f->get_neighbour_nodes();
             MatX J = f->get_jacobian();
-            N = node->get_dim();
             uint_t D = f->get_dim();
-            MatX J_n = J.topLeftCorner(D, N);
-            uint_t M_counter = N;
+
+            // get the trans Jacobian corresponding to the node n. Always premultiplies in Hessian
+            MatX J_n_t;
+            uint_t matrix_index = 0;
+            for (uint_t m = 0; m < nodes_connected->size() ; ++m)
+            {
+                std::cout << "node " << m << std::endl;
+                if ((*nodes_connected)[m]->get_id() ==  node_id)
+                {
+                    // TODO sometime it misses this point, why? fix this
+                    J_n_t = J.block(0, matrix_index, D,N ).transpose();
+                    continue;
+                }
+                matrix_index += (*nodes_connected)[m]->get_dim();
+            }
+
+            // Calculate the second part corresponding on the second factor
+            matrix_index = 0;
             for (uint_t m = 0; m < nodes_connected->size() ; ++m)
             {
                 auto node2 = (*nodes_connected)[m];
-                // Gradient: Grad(n) = \sum J_m'*W*r
                 M = node2->get_dim();
-                MatX J_m_t = J.block(0, M_counter, D, M).transpose();
-                M_counter += M;
-                gradient_.segment(indNodesMatrix[m], M) +=
-                        J_m_t * f->get_information_matrix() * f->get_residual();
-                // Hessian: H(n,m) = \sum J_m'*W*J_n
-                if (m!=n)
-                {
-                    MatX block_hessian = J_m_t * f->get_information_matrix() * J_n;
-                    hessian_.block(indNodesMatrix[n], indNodesMatrix[m], N, M) += block_hessian;
-                    hessian_.block(indNodesMatrix[m], indNodesMatrix[n], M, N) += block_hessian.transpose();
-                }
-                else
-                {
-                    hessian_.block(indNodesMatrix[n], indNodesMatrix[n], N, N) +=
-                            J_n.transpose() * f->get_information_matrix() * J_n;
-                }
+                MatX J_m = J.block(0, matrix_index, D,M);
+                matrix_index += M;
+                // Gradient: Grad(n) = \sum J_n_t*W*r
+                gradient_.segment(indNodesMatrix[n], N) +=
+                        J_n_t * f->get_information_matrix() * f->get_residual();
+                // Hessian: H(n,m) = \sum J_n_t'*W*J_m
+                // Only the current block row is filled in (corresponding to the n-node)
+                hessian_.block(indNodesMatrix[n], indNodesMatrix[m],N,M) +=
+                        J_n_t * f->get_information_matrix() * J_m;
             }
         }
     }
