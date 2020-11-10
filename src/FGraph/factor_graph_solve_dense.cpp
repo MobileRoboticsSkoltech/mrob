@@ -23,6 +23,7 @@
 
 
 #include "mrob/factor_graph_solve_dense.hpp"
+#include <iostream>
 
 using namespace mrob;
 
@@ -65,6 +66,7 @@ void FGraphSolveDense::calculate_gradient_hessian()
     for (uint_t i = 0; i < factors_.size(); ++i)
     {
         auto f = factors_[i];
+        // XXX: If using some flags, this should no be needed (only for a case in LM)
         f->evaluate_residuals();
         f->evaluate_jacobians();
         f->evaluate_chi2();
@@ -88,6 +90,7 @@ void FGraphSolveDense::calculate_gradient_hessian()
     for (uint_t n = 0; n < nodes_.size(); ++n)
     {
         auto node = nodes_[n];
+        // TODO n is the ID, but we want the local index in the factor vector. Fix this
         auto factors = node->get_neighbour_factors();
         for ( uint_t i = 0; i < factors->size(); ++i )
         {
@@ -108,11 +111,21 @@ void FGraphSolveDense::calculate_gradient_hessian()
                 gradient_.segment(indNodesMatrix[m], M) +=
                         J_m_t * f->get_information_matrix() * f->get_residual();
                 // Hessian: H(n,m) = \sum J_m'*W*J_n
-                hessian_.block(indNodesMatrix[n], indNodesMatrix[m], N, M) +=
-                        J_m_t * f->get_information_matrix() * J_n;
+                if (m!=n)
+                {
+                    MatX block_hessian = J_m_t * f->get_information_matrix() * J_n;
+                    hessian_.block(indNodesMatrix[n], indNodesMatrix[m], N, M) += block_hessian;
+                    hessian_.block(indNodesMatrix[m], indNodesMatrix[n], M, N) += block_hessian.transpose();
+                }
+                else
+                {
+                    hessian_.block(indNodesMatrix[n], indNodesMatrix[n], N, N) +=
+                            J_n.transpose() * f->get_information_matrix() * J_n;
+                }
             }
         }
     }
+    std::cout << "hessian matrix> \n" << gradient_ << std::endl;
 
 }
 void FGraphSolveDense::update_state(const MatX1 &dx)

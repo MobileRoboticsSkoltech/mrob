@@ -75,9 +75,6 @@ int main ()
     // solve the Gauss Newton optimization
     graph.print(true);
     graph.solve();
-    graph.solve();
-    graph.solve();
-    graph.solve();
 
     graph.print(true);
     std::cout << "\n\n\nSolved, chi2 = " << graph.chi2() << std::endl;

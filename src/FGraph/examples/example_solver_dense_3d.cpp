@@ -38,7 +38,7 @@ int main ()
 
     // create a simple graph to solve:
     //     anchor ------ X1 ------- obs ---------- X2
-    mrob::FGraphSolveDense graph();
+    mrob::FGraphSolveDense graph;
 
     // Initial node is defined at 0,0,0, 0,0,0 and anchor factor actually observing it at 0
     Mat61 obs;
@@ -74,7 +74,7 @@ int main ()
 
     // solve the Gauss Newton optimization
     graph.print(true);
-    graph.solve();
+    graph.optimize(mrob::Optimizer::NEWTON_RAPHSON);
 
     graph.print(true);
     std::cout << "\n\n\nSolved, chi2 = " << graph.calculate_error() << std::endl;

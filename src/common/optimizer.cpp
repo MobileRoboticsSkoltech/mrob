@@ -94,7 +94,7 @@ uint_t Optimizer::optimize_newton_raphson()
         diff_error = previous_error - current_error;
         previous_error = current_error;
         iters++;
-    }while(fabs(diff_error) > solutionTolerance_ && iters < 1e2);
+    }while(fabs(diff_error) > solutionTolerance_ && iters < 1);
 
 
     return iters;
