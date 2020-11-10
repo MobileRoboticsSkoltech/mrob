@@ -26,7 +26,8 @@
 
 using namespace mrob;
 
-FGraphSolveDense::FGraphSolveDense()
+FGraphSolveDense::FGraphSolveDense():
+        FGraph(), Optimizer()
 {
 
 }
@@ -61,9 +62,9 @@ void FGraphSolveDense::calculate_gradient_hessian()
     hessian_.setZero();
 
     // 2) evaluate residuals and Jacobians
-    for (uint_t i = 0; i < factors_->size(); ++i)
+    for (uint_t i = 0; i < factors_.size(); ++i)
     {
-        auto f = (*factors_)[i];
+        auto f = factors_[i];
         f->evaluate_residuals();
         f->evaluate_jacobians();
         f->evaluate_chi2();
@@ -71,39 +72,44 @@ void FGraphSolveDense::calculate_gradient_hessian()
 
     // 3) calculate the indexes for the nodes for block allocation
     std::vector<uint_t> indNodesMatrix;
-    indNodesMatrix.reserve(nodes->size());
-    uint_t N_ = 0;
-    for (id_t i = 0; i < nodes_->size(); ++i)
+    indNodesMatrix.reserve(nodes_.size());
+    uint_t N = 0, M = 0;
+    for (id_t i = 0; i < nodes_.size(); ++i)
     {
         // calculate the indices to access
-        uint_t dim = (*nodes_)[i]->get_dim();
-        indNodesMatrix.push_back(N_);
-        N_ += dim;
+        uint_t dim = nodes_[i]->get_dim();
+        indNodesMatrix.push_back(N);
+        N += dim;
 
     }
-    assert(N_ == stateDim_ && "FGraphSolveDense::HessianAndGradient: State Dimensions are not coincident\n");
+    assert(N == stateDim_ && "FGraphSolveDense::HessianAndGradient: State Dimensions are not coincident\n");
 
     // 4) create Hessian and gradient, by traversing all nodes
-    for (uint_t n = 0; n < nodes_->size(); ++n)
+    for (uint_t n = 0; n < nodes_.size(); ++n)
     {
-        auto node = (*nodes_)[n];
+        auto node = nodes_[n];
         auto factors = node->get_neighbour_factors();
-        for ( uint_t i = 0; i < factors.size(); ++i )
+        for ( uint_t i = 0; i < factors->size(); ++i )
         {
-            auto f = (*factors_)[i];
+            auto f = factors_[i];
             auto nodes_connected = f->get_neighbour_nodes();
             MatX J = f->get_jacobian();
-            MatX J_n = J.topLeftCorner(n->get_dim(), n->get_dim());
-            for (uint_t j = 0; j < nodes_connected->size() ; ++j)
+            N = node->get_dim();
+            uint_t D = f->get_dim();
+            MatX J_n = J.topLeftCorner(D, N);
+            uint_t M_counter = N;
+            for (uint_t m = 0; m < nodes_connected->size() ; ++m)
             {
-                auto node2 = nodes_connected[j];
-                // Gradient: Grad(n) = \sum J_j'*W*r
-                MatX J_j = J.block().transpose();
-                gradient_.segment(indFactorsMatrix[j], node2->get_dim()) +=
-                        J_j * get_information_matrix() * f->get_residual();
-                // Hessian: H(n,n) = \sum J_j'*W*J_n
-                hessian_.block(indFactorsMatrix[n], indFactorsMatrix[j], n->get_dim(), node2->get_dim()) +=
-                        J_j * get_information_matrix() * J_n;
+                auto node2 = (*nodes_connected)[m];
+                // Gradient: Grad(n) = \sum J_m'*W*r
+                M = node2->get_dim();
+                MatX J_m_t = J.block(0, M_counter, D, M).transpose();
+                M_counter += M;
+                gradient_.segment(indNodesMatrix[m], M) +=
+                        J_m_t * f->get_information_matrix() * f->get_residual();
+                // Hessian: H(n,m) = \sum J_m'*W*J_n
+                hessian_.block(indNodesMatrix[n], indNodesMatrix[m], N, M) +=
+                        J_m_t * f->get_information_matrix() * J_n;
             }
         }
     }

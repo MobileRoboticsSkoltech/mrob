@@ -6,6 +6,7 @@ SET(headers
     mrob/factor.hpp
     mrob/factor_graph.hpp
     mrob/factor_graph_solve.hpp
+    factor_graph_solve_dense.hpp
 )
 
 # extra source files
@@ -14,6 +15,7 @@ SET(sources
     factor.cpp
     factor_graph.cpp
     factor_graph_solve.cpp
+    factor_graph_solve_dense.cpp
 )
 
 SET(factors_headers
