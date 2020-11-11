@@ -23,6 +23,8 @@
 
 
 #include "mrob/factor_graph_solve_dense.hpp"
+#include <algorithm>
+#include <iterator>
 #include <iostream>
 
 using namespace mrob;
@@ -73,14 +75,16 @@ void FGraphSolveDense::calculate_gradient_hessian()
     }
 
     // 3) calculate the indexes for the nodes for block allocation
-    std::vector<uint_t> indNodesMatrix;
+    std::vector<uint_t> indNodesMatrix, indNodeId;
     indNodesMatrix.reserve(nodes_.size());
+    indNodeId.reserve(nodes_.size());
     uint_t N = 0, M = 0;
     for (id_t i = 0; i < nodes_.size(); ++i)
     {
         // calculate the indices to access
         uint_t dim = nodes_[i]->get_dim();
         indNodesMatrix.push_back(N);
+        indNodeId.push_back(nodes_[i]->get_id()); //bookkeeps the nodes ids
         N += dim;
     }
     assert(N == stateDim_ && "FGraphSolveDense::HessianAndGradient: State Dimensions are not coincident\n");
@@ -95,7 +99,7 @@ void FGraphSolveDense::calculate_gradient_hessian()
         auto factors = node->get_neighbour_factors();
         for ( uint_t i = 0; i < factors->size(); ++i )
         {
-            auto f = factors_[i];
+            auto f = (*factors)[i];
             auto nodes_connected = f->get_neighbour_nodes();
             MatX J = f->get_jacobian();
             uint_t D = f->get_dim();
@@ -105,12 +109,10 @@ void FGraphSolveDense::calculate_gradient_hessian()
             uint_t matrix_index = 0;
             for (uint_t m = 0; m < nodes_connected->size() ; ++m)
             {
-                std::cout << "node " << m << std::endl;
                 if ((*nodes_connected)[m]->get_id() ==  node_id)
                 {
-                    // TODO sometime it misses this point, why? fix this
                     J_n_t = J.block(0, matrix_index, D,N ).transpose();
-                    continue;
+                    break;
                 }
                 matrix_index += (*nodes_connected)[m]->get_dim();
             }
@@ -128,12 +130,14 @@ void FGraphSolveDense::calculate_gradient_hessian()
                         J_n_t * f->get_information_matrix() * f->get_residual();
                 // Hessian: H(n,m) = \sum J_n_t'*W*J_m
                 // Only the current block row is filled in (corresponding to the n-node)
-                hessian_.block(indNodesMatrix[n], indNodesMatrix[m],N,M) +=
+                auto it = std::find(indNodeId.begin(), indNodeId.end(), node2->get_id());
+                uint_t index = std::distance(indNodeId.begin(), it);
+                hessian_.block(indNodesMatrix[n], indNodesMatrix[index],N,M) +=
                         J_n_t * f->get_information_matrix() * J_m;
             }
         }
     }
-    std::cout << "hessian matrix> \n" << gradient_ << std::endl;
+    //std::cout << "hessian matrix> \n" << hessian_ << std::endl;
 
 }
 void FGraphSolveDense::update_state(const MatX1 &dx)

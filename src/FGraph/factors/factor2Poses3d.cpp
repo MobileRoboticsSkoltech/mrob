@@ -116,7 +116,8 @@ void Factor2Poses3d::print() const
               << " \nand Information matrix\n" << W_
               << "\n Calculated Jacobian = \n" << J_
               << "\n Chi2 error = " << chi2_
-              << " and neighbour Nodes " << neighbourNodes_.size()
+              << " and neighbour Node ids: " << neighbourNodes_[0]->get_id()
+              << ", " << neighbourNodes_[1]->get_id()
               << std::endl;
 }
 
