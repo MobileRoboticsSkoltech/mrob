@@ -34,7 +34,6 @@
 // data types conventions
 typedef double matData_t;
 typedef unsigned int uint_t;
-typedef unsigned int id_t;
 
 
 // Definition of squared matrices, by default column major

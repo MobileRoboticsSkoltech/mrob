@@ -15,7 +15,7 @@
  *
  * example_solver_3d.cpp
  *
- *  Created on: May 20, 2019
+ *  Created on: Nov 10, 2020
  *      Author: Gonzalo Ferrer
  *              g.ferrer@skoltech.ru
  *              Mobile Robotics Lab, Skoltech
@@ -25,7 +25,7 @@
 
 
 
-#include "mrob/factor_graph_solve.hpp"
+#include "mrob/factor_graph_solve_dense.hpp"
 #include "mrob/factors/nodePose3d.hpp"
 #include "mrob/factors/factor1Pose3d.hpp"
 #include "mrob/factors/factor2Poses3d.hpp"
@@ -38,7 +38,7 @@ int main ()
 
     // create a simple graph to solve:
     //     anchor ------ X1 ------- obs ---------- X2
-    mrob::FGraphSolve graph(mrob::FGraphSolve::ADJ,mrob::FGraphSolve::GN);
+    mrob::FGraphSolveDense graph;
 
     // Initial node is defined at 0,0,0, 0,0,0 and anchor factor actually observing it at 0
     Mat61 obs;
@@ -74,9 +74,12 @@ int main ()
 
     // solve the Gauss Newton optimization
     graph.print(true);
-    graph.solve();
+    graph.optimize(mrob::Optimizer::NEWTON_RAPHSON);
 
     graph.print(true);
-    std::cout << "\n\n\nSolved, chi2 = " << graph.chi2() << std::endl;
+    std::cout << "\n\n\nSolved, chi2 = " << graph.calculate_error() << std::endl;
     return 0;
 }
+
+
+

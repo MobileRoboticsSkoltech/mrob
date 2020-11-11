@@ -202,10 +202,6 @@ void init_FGraph(py::module &m)
                     "returns the list of states ordered according to ids. Some of these elements might be matrices if the are 3D poses")
             .def("number_nodes", &FGraphSolve::number_nodes, "Returns the number of nodes")
             .def("number_factors", &FGraphSolve::number_factors, "Returns the number of factors")
-            .def("get_factor_chi2", &FGraph::get_factor_chi2,
-                    "Gets the last calculated chi2. It does not calculate it, so if there is no previous calculation, this value will be meaningless.")
-            .def("evaluate_factor_chi2", &FGraph::evaluate_factor_chi2,
-                    "Re-evaluates residuals and calculates the current chi2")
             .def("print", &FGraph::print, "By default False: does not print all the information on the Fgraph", py::arg("completePrint") = false)
             // -----------------------------------------------------------------------------
             // Specific call to 2D

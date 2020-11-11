@@ -76,12 +76,15 @@ std::shared_ptr<Factor>& FGraph::get_factor(uint_t key)
     return factors_[key];
 }
 
+/* XXX: Deprecated, remove me
 matData_t FGraph::get_factor_chi2(uint_t key)
 {
     auto f = this->get_factor(key);
     return f->get_chi2();
 }
+*/
 
+/* XXX: Deprecated, remove me
 matData_t FGraph::evaluate_factor_chi2(uint_t key)
 {
     auto f = this->get_factor(key);
@@ -89,7 +92,7 @@ matData_t FGraph::evaluate_factor_chi2(uint_t key)
     f->evaluate_chi2();
     return f->get_chi2();
 }
-
+*/
 void FGraph::print(bool completePrint) const
 {
     std::cout << "Status of graph: " <<
