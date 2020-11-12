@@ -108,19 +108,20 @@ void SO3::exp(const Mat3 &w_hat)
 {
     Mat31 w = vee3(w_hat);
     double o = w.norm();
+    double o2 = w.squaredNorm();
     double c1,c2;
     // See numerical_test.cpp to justify this thershold
     if ( o < 1e-5){
         // sin(o)/o = 1 - x^2/3! + x^4/5! + O(x^6)
-        c1 =  1 - o*o/6.0;
+        c1 =  1 - o2/6.0;
         // (1-cos(o))/o^2 = 0.5 + 1/2*f''*x^2/ + ... , where f'' = 1/12
-        c2 = 0.5 - o*o/24.0;
+        c2 = 0.5 - o2/24.0;
     }
     else
     {
         // Standard case with the well-known Rodriguez formula
         c1 = std::sin(o)/o;
-        c2 = (1 - std::cos(o))/o/o;
+        c2 = (1 - std::cos(o))/o2;
     }
     R_ << Mat3::Identity() + c1 * w_hat + c2 * w_hat *w_hat;
 }

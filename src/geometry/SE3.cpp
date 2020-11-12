@@ -125,18 +125,19 @@ void SE3::exp(const Mat4 &xi_hat)
     // where o = norm(w), c2 = (1 - cos(o))/o^2, c3 = (o- sin(o) / o^3
     Mat3 V = Mat3::Identity();
     double o = w.norm();
+    double o2 = w.squaredNorm();
     // If rotation is not zero
     matData_t c2, c3;
     if ( o > 1e-3){ // c2 and c3 become numerically imprecise for o < 1-5, so we choose a conservative threshold 1e-3
-        c2 = (1 - std::cos(o))/o/o;
-        c3 = (o - std::sin(o))/o/o/o;
+        c2 = (1 - std::cos(o))/o2;
+        c3 = (o - std::sin(o))/o2/o;
     }
     else
     {
         // second order Taylor (first order is zero since this is an even function)
-        c2 = 0.5 - o*o/24;
+        c2 = 0.5 - o2/24;
         // Second order Taylor
-        c3 = 1.0/6.0 - o*o/120;
+        c3 = 1.0/6.0 - o2/120;
     }
     V += c2*w_hat + c3*w_hat*w_hat;
 
