@@ -35,6 +35,7 @@ graph.print(True)
 print('\n\n\n Solving Fgraph:\n')
 #graph.solve(mrob.fgraph.GN) #1 iteration of Gauss-Newton
 graph.solve(mrob.fgraph.LM) #as many iterations until convergence for Levenberg Marquardt
-graph.print(True)
+#graph.print(True)
 
-
+L = graph.get_information_matrix()
+print(L)

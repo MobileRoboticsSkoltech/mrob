@@ -116,6 +116,12 @@ public:
     void set_build_matrix_method(matrixMethod method) {matrixMethod_ = method;};
     matrixMethod get_build_matrix_method() { return matrixMethod_;};
 
+    /**
+     * Returns a reference to the information matrix.
+     * TODO If true, it re-evaluates the problem
+     * TODO should this be a RowMat? why did I created it to be Col??
+     */
+    SMatCol get_information_matrix() { return L_;}
 
 protected:
     /**

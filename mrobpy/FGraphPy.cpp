@@ -200,6 +200,8 @@ void init_FGraph(py::module &m)
                     py::arg("evaluateResidualsFlag") = true)
             .def("get_estimated_state", &FGraphSolve::get_estimated_state,
                     "returns the list of states ordered according to ids. Some of these elements might be matrices if the are 3D poses")
+            .def("get_information_matrix", &FGraphSolve::get_information_matrix,
+                    "Returns the information matrix. It requires to be calculated -> solved the problem")
             .def("number_nodes", &FGraphSolve::number_nodes, "Returns the number of nodes")
             .def("number_factors", &FGraphSolve::number_factors, "Returns the number of factors")
             .def("print", &FGraph::print, "By default False: does not print all the information on the Fgraph", py::arg("completePrint") = false)
