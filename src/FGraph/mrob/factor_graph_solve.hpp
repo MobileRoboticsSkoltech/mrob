@@ -119,9 +119,12 @@ public:
     /**
      * Returns a reference to the information matrix.
      * TODO If true, it re-evaluates the problem
-     * TODO should this be a RowMat? why did I created it to be Col??
      */
     SMatCol get_information_matrix() { return L_;}
+    /**
+     * Returns a vector of chi2 values for each of the factors.
+     */
+    MatX1 get_chi2_array();
 
 protected:
     /**

@@ -37,5 +37,12 @@ print('\n\n\n Solving Fgraph:\n')
 graph.solve(mrob.fgraph.LM) #as many iterations until convergence for Levenberg Marquardt
 #graph.print(True)
 
+
+
+
+# testing matrix
+import matplotlib.pyplot as plt
 L = graph.get_information_matrix()
-print(L)
+plt.spy(L, marker='o', markersize=5)
+plt.title('Information matrix $\Lambda$')
+plt.show()

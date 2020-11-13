@@ -155,17 +155,27 @@ for t in range(1,N):
 
 graph.print(False)
 
+
+
 # Solves the batch problem
 if 1:
     print('Current state of the graph: chi2 = ' , graph.chi2() )
     # uncomment for visualization
     #print_3d_graph(graph)
     start = time.time()
-    graph.solve(mrob.fgraph.LM,100)
+    graph.solve(mrob.fgraph.LM,20)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     # uncomment for visualization
     print_3d_graph(graph)
+
+if 0:
+    # testing matrix
+    import matplotlib.pyplot as plt
+    L = graph.get_information_matrix()
+    plt.spy(L, marker='o', markersize=5)
+    plt.title('Information matrix $\Lambda$')
+    plt.show()
 
 if 0:
     print('Current state of the graph: chi2 = ' , graph.chi2() )
