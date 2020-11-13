@@ -112,6 +112,7 @@ void FGraphSolve::build_problem(bool useLambda)
 
 void FGraphSolve::optimize_gauss_newton(bool useLambda)
 {
+    // requires a Column-storage matrix
     SimplicialLDLT<SMatCol,Lower, AMDOrdering<SMatCol::StorageIndex>> cholesky;
 
     this->build_problem(useLambda);
@@ -384,6 +385,19 @@ std::vector<MatX> FGraphSolve::get_estimated_state()
         //nodes_[i]->print();
         MatX updated_pos = nodes_[i]->get_state();
         results.emplace_back(updated_pos);
+    }
+
+    return results;
+}
+
+MatX1 FGraphSolve::get_chi2_array()
+{
+    MatX1 results(factors_.size());
+
+    for (uint_t i = 0; i < factors_.size(); ++i)
+    {
+        auto f = factors_[i];
+        results(i) = f->get_chi2();
     }
 
     return results;

@@ -103,6 +103,19 @@ print('solution drawn')
 print_2d_graph(graph)
 
 
+if 0:
+    # Information matrix
+    import matplotlib.pyplot as plt
+    L = graph.get_information_matrix()
+    plt.spy(L, marker='o', markersize=5)
+    plt.title('Information matrix $\Lambda$')
+    plt.show()
+    
+    # ch2
+    chi2_array = graph.get_chi2_array()
+    plt.plot(chi2_array)
+    plt.show()
+
 # alternative use Gauss-Newton
 if 0:
     graph.solve(mrob.fgraph.GN)

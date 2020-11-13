@@ -116,6 +116,15 @@ public:
     void set_build_matrix_method(matrixMethod method) {matrixMethod_ = method;};
     matrixMethod get_build_matrix_method() { return matrixMethod_;};
 
+    /**
+     * Returns a reference to the information matrix.
+     * TODO If true, it re-evaluates the problem
+     */
+    SMatCol get_information_matrix() { return L_;}
+    /**
+     * Returns a vector of chi2 values for each of the factors.
+     */
+    MatX1 get_chi2_array();
 
 protected:
     /**
