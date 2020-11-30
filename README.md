@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="http://sites.skoltech.ru/app/data/uploads/sites/50/2018/02/mr_animate1.gif" width="450">
+  <img src="https://sites.skoltech.ru/app/data/uploads/sites/50/2018/02/mr_animate1.gif" width="450">
 </p>
 
 # MROB: Mobile Robotics library
