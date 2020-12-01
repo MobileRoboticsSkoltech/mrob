@@ -40,6 +40,12 @@
 #include "mrob/factors/nodePlane4d.hpp"
 #include "mrob/factors/factor1Pose1Plane4d.hpp"
 
+
+// This requires to link the IMU library as well
+#include "mrob/nodeImuBias.hpp"
+#include "mrob/factorImuBias.hpp"
+#include "mrob/factorBiasPropagation.hpp"
+
 #include <Eigen/Geometry>
 
 namespace py = pybind11;
@@ -174,6 +180,25 @@ public:
         auto n1 = this->get_node(nodePoseId);
         auto n2 = this->get_node(nodeLandmarkId);
         std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Plane4d(obs,n1,n2,obsInvCov));
+        this->add_factor(f);
+        return f->get_id();
+    }
+
+    // IMU factors
+    // TODO check functions
+    id_t add_node_imu_bias(const py::EigenDRef<const Mat61> x)
+    {
+        std::shared_ptr<mrob::Node> n(new mrob::NodeImuBias(x));
+        this->add_node(n);
+        return n->get_id();
+    }
+    id_t add_factor_imu_bias(std::vector<Mat61> obs, uint_t nodeOriginId,
+                uint_t nodeTargetId, uint_t nodeBiasId, const py::EigenDRef<const Mat6> obsInvCov)
+    {
+        auto n1 = this->get_node(nodeOriginId);
+        auto n2 = this->get_node(nodeTargetId);
+        auto b = this->get_node(nodeBiasId);
+        std::shared_ptr<mrob::Factor> f(new mrob::FactorImuBias(obs,n1,n2,b,obsInvCov));
         this->add_factor(f);
         return f->get_id();
     }
