@@ -299,6 +299,8 @@ void FGraphSolve::build_adjacency()
 
 
         // 5) Get information matrix for every factor
+        // TODO for robust factors, here is where the robust weights should be applied
+        matData_t robust_weight = 1.0;
         for (uint_t l = 0; l < f->get_dim(); ++l)
         {
             // only iterates over the upper triangular part
@@ -306,9 +308,7 @@ void FGraphSolve::build_adjacency()
             {
                 uint_t iRow = indFactorsMatrix[i] + l;
                 uint_t iCol = indFactorsMatrix[i] + k;
-                W_.insert(iRow,iCol) = f->get_information_matrix()(l,k);
-                // If QR, then we need the following, but we dont suppoort QR anyway
-                //W_.insert(iRow,iCol) = f->get_trans_sqrt_information_matrix()(l,k);
+                W_.insert(iRow,iCol) = robust_weight * f->get_information_matrix()(l,k);
             }
         }
     } //end factors loop

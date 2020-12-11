@@ -60,6 +60,15 @@ class Node;
  *
  * - Jacobian is a block matrix corresponding to the Jacobian of the first node J1,
  *   then second node J2, etc, such that J = [J1, J2, ..., Jn],
+ *
+ * Robust Factors TODO
+ *  All factors also allow for robust factors, they just have to be specified at the constructor.
+ *  By the default the robust factor is quadratic (no effect)
+ *  Currently suporte robust factors:
+ *   - Huber
+ *   - Cauchy
+ *   - McClure
+ *   - Ransac, this is equivalent to the truncated least sqaures problem TODO parameter passing
  */
 
 class Factor{
@@ -68,7 +77,8 @@ public:
      * On the derived class constructor we will specify the (ordered)
      * nodes that the factor is connected to.
      */
-    Factor(uint_t dim, uint_t allNodesDim, uint_t potNumberNodes = 5);
+    enum robustFactorType{QUADRATIC = 0, HUBER, CAUCHY, MCCLURE, RANSAC};
+    Factor(uint_t dim, uint_t allNodesDim, robustFactorType factor_type = QUADRATIC, uint_t potNumberNodes = 5);
     virtual ~Factor();
     /**
      * Residuals are evaluated with respect to the current solution
@@ -124,6 +134,9 @@ public:
     const std::vector<std::shared_ptr<Node> >*
             get_neighbour_nodes(void) const {return &neighbourNodes_;};
 
+    // Robust functions, given the current distance u = sqrt(r' W r)
+    void evaluate_robust_weight(matData_t u, matData_t params = 0.0);
+
 protected:
     id_t id_;
     /**
@@ -134,6 +147,10 @@ protected:
     uint_t dim_;//dimension of the observation
     uint_t allNodesDim_;//summation of all the nodes that the factor affects
     matData_t chi2_;
+
+    // Robust factor weighting the "iteratively weighted LSQ"
+    robustFactorType robust_type_;
+    matData_t robust_weight_; // dp/du 1/u or influence by the inverse of the distance u
 
     // variables to declare on child Factor, for instance of dim 6
     //Mat61 obs_, r_; //and residuals

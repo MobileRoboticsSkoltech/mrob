@@ -26,8 +26,8 @@
 
 using namespace mrob;
 
-Factor::Factor(uint_t dim, uint_t allNodesDim, uint_t potNumberNodes):
-		id_(0), dim_(dim), allNodesDim_(allNodesDim), chi2_(0)
+Factor::Factor(uint_t dim, uint_t allNodesDim, robustFactorType factor_type, uint_t potNumberNodes):
+		id_(0), dim_(dim), allNodesDim_(allNodesDim), chi2_(0), robust_type_(factor_type), robust_weight_(0.0)
 {
     // Child factor must specify dimensions
     neighbourNodes_.reserve( potNumberNodes );
@@ -38,3 +38,18 @@ Factor::~Factor()
     neighbourNodes_.clear();
 }
 
+
+void Factor::evaluate_robust_weight(matData_t u, matData_t params)
+{
+    switch(robust_type_)
+    {
+        case HUBER:
+        case CAUCHY:
+        case MCCLURE:
+        case RANSAC:
+        case QUADRATIC:
+        default:
+            robust_weight_ = 1.0;
+            return;
+    }
+}
