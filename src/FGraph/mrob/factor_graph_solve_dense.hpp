@@ -32,7 +32,7 @@ namespace mrob {
 
 
 /**
- * Class FGraphSolveDense solve a factor graph problem asuming dense
+ * Class FGraphSolveDense solve a factor graph problem assuming dense
  * precision matrix.
  *
  * It inherits from two classes:
