@@ -10,6 +10,7 @@ SET(sources
     create_points.cpp
     weight_point.cpp
     plane_to_pc_registration.cpp
+    estimate_plane.cpp
 )
 
 # extra header files
@@ -19,6 +20,7 @@ SET(headers
     mrob/plane_registration.hpp
     mrob/create_points.hpp
     mrob/plane_to_pc_registration.hpp
+    mrob/estimate_plane.hpp
 )
 
 # create the shared library
