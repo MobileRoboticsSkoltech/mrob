@@ -12,14 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * factor1PoseToPlaneAndPoint.cpp
+ * factor1PosePoint2Point.hpp
  *
- *  Created on: Dec 24, 2020
+ *  Created on: Dec 29, 2020
  *      Author: Gonzalo Ferrer
  *              g.ferrer@skoltech.ru
  *              Mobile Robotics Lab.
  */
 
+#ifndef FACTORS_FACTOR1POSEPOINT2POINT_HPP_
+#define FACTORS_FACTOR1POSEPOINT2POINT_HPP_
 
 
 
+
+
+#endif /* FACTORS_FACTOR1POSEPOINT2POINT_HPP_ */
