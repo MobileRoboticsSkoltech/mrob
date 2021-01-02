@@ -23,4 +23,18 @@
 #include "mrob/factors/factor1PosePoint2Plane.hpp"
 
 
+using namespace mrob;
 
+Factor1PosePoint2Plane::Factor1PosePoint2Plane(const Mat31 &z_point, const Mat41 &z_plane,  std::shared_ptr<Node> &node,
+        const Mat1 &obsInf):
+    Factor(6,1), z_point_(z_point), z_plane_(z_plane), r_(0.0), W_(obsInf)
+{
+    r_ = Mat1(z_point.dot(z_plane.head(3)) + z_plane(3));//XXX why do we really want a mat1 instead of a double?
+    neighbourNodes_.push_back(node);
+}
+
+
+Factor1PosePoint2Plane::~Factor1PosePoint2Plane()
+{
+
+}

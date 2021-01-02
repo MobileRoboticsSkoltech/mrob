@@ -54,7 +54,8 @@ namespace mrob{
 class Factor1PosePoint2Plane: public Factor
 {
   public:
-    Factor1PosePoint2Plane();
+    Factor1PosePoint2Plane(const Mat31 &z_point, const Mat41 &z_plane,  std::shared_ptr<Node> &nodePose,
+            const Mat1 &obsInf);
     ~Factor1PosePoint2Plane();
     /**
      * Jacobians are not evaluated, just the residuals
@@ -68,12 +69,16 @@ class Factor1PosePoint2Plane: public Factor
 
     virtual void print() const;
 
-    virtual const Eigen::Ref<const MatX> get_obs() const {return Mat31();};
+    virtual const Eigen::Ref<const MatX> get_obs() const {return r_;};
     virtual const Eigen::Ref<const MatX1> get_residual() const {return r_;};
     virtual const Eigen::Ref<const MatX> get_information_matrix() const {return W_;};
     virtual const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
 
   protected:
+    Mat31 z_point_;
+    Mat41 z_plane_;
+    // the residual of the point projected to the plane:
+    //    r = <p,pi>
     Mat1 r_;//residual, for convention, we will keep an eigen object for the scalar
     Mat1 W_;
     Mat<1,6> J_;
