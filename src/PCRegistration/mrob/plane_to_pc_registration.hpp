@@ -37,6 +37,9 @@ namespace mrob{
  * and plane estimation. A single observation of this problem would yield a rank deficient
  * solution, is for that reason that we require several observations, with changing conditions.
  *
+ * We have used the object FGraphDense as a back end and this class is a simple wrapper
+ * specific for this problem
+ *
  * In general, this class aims to solve the (calibrated) camera to range sensor calibration problem,
  * where we want to estimate the transformation between both sensors.
  *
@@ -54,8 +57,16 @@ namespace mrob{
 
 class PlaneToPcRegistration {
   public:
-    PlaneToPcRegistration();
+    PlaneToPcRegistration(const SE3 &initial_guess = SE3());
     ~PlaneToPcRegistration();
+
+    /**
+     * This function is a wraper of Fgraph for the 3Pose point to plane factor.
+     * It could be implemented on the general FGraph, we have decided to separate it for simplicity.
+     */
+    void add_observation(const Mat31 &z_point, const Mat41 &z_plane, const Mat1 &obsInf);
+
+    SE3 calculate_solution();
 
   private:
     FGraphSolveDense graph_;

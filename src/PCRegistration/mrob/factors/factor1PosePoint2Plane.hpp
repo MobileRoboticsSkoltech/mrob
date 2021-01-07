@@ -40,7 +40,8 @@ namespace mrob{
  *  - Plane estimation, from reference 1
  *  - Set of points, from reference 2
  *
- * State to estimate is 3D pose 1^T_2
+ * State to estimate is 3D pose 1^T_2.
+ * The transformation T is, thus, the transformation from the point reference to the plane reference
  *
  * The residual, as a convention in the library is:
  *   r = f(x) = z_pi * T(x) * z_points -> 0 if the point is in the plane.
@@ -59,10 +60,14 @@ class Factor1PosePoint2Plane: public Factor
     ~Factor1PosePoint2Plane();
     /**
      * Jacobians are not evaluated, just the residuals
+     * r = <pi, T p>
+     *
+     * The transformation T is, thus, the transformation from the point reference to the plane reference
      */
     virtual void evaluate_residuals() override;
     /**
      * Evaluates residuals and Jacobians
+     * J = dr/dxi = pi'*[-Tp^. I]
      */
     virtual void evaluate_jacobians() override;
     virtual void evaluate_chi2() override;
@@ -75,7 +80,7 @@ class Factor1PosePoint2Plane: public Factor
     virtual const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
 
   protected:
-    Mat31 z_point_;
+    Mat31 z_point_, Tpoint_;
     Mat41 z_plane_;
     // the residual of the point projected to the plane:
     //    r = <p,pi>

@@ -22,40 +22,54 @@
 
 #include "mrob/factors/factor1PosePoint2Plane.hpp"
 
+#include <iostream>
+
 
 using namespace mrob;
 
 Factor1PosePoint2Plane::Factor1PosePoint2Plane(const Mat31 &z_point, const Mat41 &z_plane,  std::shared_ptr<Node> &node,
         const Mat1 &obsInf):
-    Factor(6,1), z_point_(z_point), z_plane_(z_plane), r_(0.0), W_(obsInf)
+    Factor(6,1), z_point_(z_point), z_plane_(z_plane), Tpoint_(Mat31::Zero()), r_(0.0), W_(obsInf)
 {
-    r_ = Mat1(z_point.dot(z_plane.head(3)) + z_plane(3));//XXX why do we really want a mat1 instead of a double?
     neighbourNodes_.push_back(node);
 }
 
 
 Factor1PosePoint2Plane::~Factor1PosePoint2Plane()
 {
-
 }
 
 
 void Factor1PosePoint2Plane::evaluate_residuals()
 {
-
+    // r = <pi, Tp>
+    Mat4 Tx = get_neighbour_nodes()->at(1)->get_state();
+    SE3 T = SE3(Tx).inv();
+    Tpoint_ = T.transform(z_point_);
+    r_ = Mat1(z_plane_.head(3).dot(Tpoint_) + z_plane_(3));
 }
 
 void Factor1PosePoint2Plane::evaluate_jacobians()
 {
-
+    // it assumes you already have evaluated residuals
+    Mat<3,6> Jr;
+    Jr << -hat3(Tpoint_) , Mat3::Identity();
+    J_ = z_plane_.head(3).transpose() * Jr;
 }
 
 void Factor1PosePoint2Plane::evaluate_chi2()
 {
-
+    chi2_ = 0.5 * r_.dot(W_ * r_);
 }
 
 void Factor1PosePoint2Plane::print() const
 {
-
+    std::cout << "Printing Factor: " << id_ << ", obs point= \n" << z_point_
+              << "obs plane =\n" << z_plane_
+              << "\n Residuals= \n" << r_
+              << " \nand Information matrix\n" << W_
+              << "\n Calculated Jacobian = \n" << J_
+              << "\n Chi2 error = " << chi2_
+              << " and neighbour Node ids: " << neighbourNodes_[0]->get_id()
+              << std::endl;
 }

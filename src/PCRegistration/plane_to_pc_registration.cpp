@@ -26,8 +26,8 @@
 
 using namespace mrob;
 
-PlaneToPcRegistration::PlaneToPcRegistration():
-        graph_(), T_from_camera_to_range_()
+PlaneToPcRegistration::PlaneToPcRegistration(const SE3 &initial_guess):
+        graph_(), T_from_camera_to_range_(initial_guess)
 {
     // Initialialization, single node in the Fgraph
     std::shared_ptr<mrob::Node> n0(new mrob::NodePose3d(T_from_camera_to_range_));
@@ -39,5 +39,14 @@ PlaneToPcRegistration::~PlaneToPcRegistration()
 
 }
 
+void PlaneToPcRegistration::add_observation(const Mat31 &z_point, const Mat41 &z_plane, const Mat1 &obsInf)
+{
+
+}
+
+SE3 PlaneToPcRegistration::calculate_solution()
+{
+
+}
 
 
