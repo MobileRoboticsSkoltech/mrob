@@ -33,6 +33,7 @@
 namespace mrob{
 
 /**
+ * TODO to remove
  * class PlaneToPcRegistration solves the registration problem between a point cloud and
  * and plane estimation. A single observation of this problem would yield a rank deficient
  * solution, is for that reason that we require several observations, with changing conditions.
