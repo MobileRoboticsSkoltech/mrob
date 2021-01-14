@@ -34,7 +34,7 @@ namespace py = pybind11;
 
 void init_geometry(py::module &m);
 void init_FGraph(py::module &m);
-void init_FGraphDense(py::module &m);
+//void init_FGraphDense(py::module &m);
 void init_PCRegistration(py::module &m);
 void init_PCPlanes(py::module &m);
 
@@ -52,12 +52,13 @@ PYBIND11_MODULE(mrob, m) {
         .export_values()
         ;
 
+    // TODO to be deprecated this namespace
     py::module m_geom = m.def_submodule("geometry");
     init_geometry(m_geom);
 
-    py::module m_fg = m.def_submodule("fgraph");
-    init_FGraph(m_fg);
-    init_FGraphDense(m_fg);
+    // deprecated have removed this namespace
+    //py::module m_fg = m.def_submodule("fgraph");
+    init_FGraph(m);
 
     py::module m_reg = m.def_submodule("registration");
     init_PCRegistration(m_reg);

@@ -41,7 +41,7 @@ namespace mrob{
  * class PlaneRegistration introduced a class for the alignment of
  * planes.
  */
-class PlaneRegistration: public Optimizer{
+class PlaneRegistration: public OptimizerDense{
 
   public:
     // XXX is this mode used anymore? deprecated?

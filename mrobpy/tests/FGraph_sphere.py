@@ -73,7 +73,7 @@ with open(file_path, 'r') as file:
 
 
 # Initialize FG
-graph = mrob.fgraph.FGraph()
+graph = mrob.FGraph()
 x = vertex_ini[0]
 print(x.T())
 n = graph.add_node_pose_3d(x)
@@ -109,7 +109,7 @@ for t in range(1,N):
 # Solves the batch problem
 print('Current state of the graph: chi2 = ' , graph.chi2() )
 start = time.time()
-graph.solve(mrob.fgraph.LM,100)
+graph.solve(mrob.LM,8)
 end = time.time()
 print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
 

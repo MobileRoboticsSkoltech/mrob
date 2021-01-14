@@ -39,7 +39,7 @@ namespace mrob {
  *  - FGraph: structure for adding generic factors
  *  - Optimizer: Optimization methods given some abstract routines
  */
-class FGraphSolveDense: public FGraph, public Optimizer
+class FGraphSolveDense: public FGraph, public OptimizerDense
 {
   public:
     FGraphSolveDense();

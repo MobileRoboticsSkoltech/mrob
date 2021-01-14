@@ -66,9 +66,11 @@ public:
     /**
      * Optimization call.
      * Input: optmization method from {NR=0, LM_S, LM_E}
+     *       - max_iterations
+     *       - lambda: initial value of lambda for LM methods
      * output: number of iterations
      */
-    uint_t optimize(optimMethod method, double lambda = 1e-5);
+    uint_t solve(optimMethod method, uint_t max_iters = 1e2, double lambda = 1e-5);
 
     /**
      * General abstract functions to implement:
@@ -116,7 +118,7 @@ protected:
     /**
      * One iteration of the RN method
      */
-    uint_t optimize_newton_raphson_one_iteration(bool useLambda = false);
+    virtual uint_t optimize_newton_raphson_one_iteration(bool useLambda = false) = 0;
 
     /**
      * Levenberg-Marquardt method, inside will distinguish between elliptic and spherical
@@ -126,17 +128,44 @@ protected:
      */
     uint_t optimize_levenberg_marquardt();
 
+    /**
+     * calculate_model_fidely returns the difference between the quadratized
+     * model and the current error, as required for the LM algorithm.
+     *
+     * This is a an abstrct class since the hessian matrix might be different
+     * for the sparse and the dense case
+     */
+    virtual matData_t calculate_model_fidelity(matData_t diff_error) = 0;
+
 
     optimMethod optimization_method_;
     matData_t solutionTolerance_;
+    uint_t max_iters_;
     MatX1 gradient_, dx_;
-    MatX hessian_;
 
     // Necessary for LM, Other LM parameters are set to default (see .cpp)
     matData_t lambda_;
 
 };
+
+class OptimizerDense : public Optimizer
+{
+  public:
+    OptimizerDense(matData_t solutionTolerance = 1e-4, matData_t lambda = 1e-5);
+    virtual ~OptimizerDense();
+  protected:
+    uint_t optimize_newton_raphson_one_iteration(bool useLambda = false);
+    matData_t calculate_model_fidelity(matData_t diff_error);
+    MatX hessian_;
+};
+
+
+class OptimizerSparse: public Optimizer
+{
+  protected:
+    MatX hessian_;
+};
+
+
 }
-
-
 #endif /* SRC_COMMON_MROB_OPTIMIZER_HPP_ */

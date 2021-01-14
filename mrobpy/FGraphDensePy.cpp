@@ -121,30 +121,30 @@ void init_FGraphDense(py::module &m)
     py::class_<FGraphDensePy> (m,"FGraphDense")
             .def(py::init<>(),
                     "Constructor, solveType default is ADJ and GN.")
-            .def("solve", &FGraohSolveDense::solve,
-                    "Solves the corresponding FG",
-                    py::arg("method") =  FGraohSolveDense::optimMethod::GN,
+            .def("solve", &FGraphSolveDense::solve,
+                    "Optimizes the solvution of the corresponding FG",
+                    py::arg("method") =  FGraphSolveDense::optimMethod::GN,
                     py::arg("maxIters") = 30)
-            .def("chi2", &FGraohSolveDense::chi2,
+            .def("chi2", &FGraphSolveDense::chi2,
                     "Calculated the chi2 of the problem. By default re-evaluates residuals, set to false if doesn't",
                     py::arg("evaluateResidualsFlag") = true)
-            .def("get_estimated_state", &FGraohSolveDense::get_estimated_state,
+            .def("get_estimated_state", &FGraphSolveDense::get_estimated_state,
                     "returns the list of states ordered according to ids. Some of these elements might be matrices if the are 3D poses")
-            .def("get_information_matrix", &FGraohSolveDense::get_information_matrix,
+            .def("get_information_matrix", &FGraphSolveDense::get_information_matrix,
                     "Returns the information matrix. It requires to be calculated -> solved the problem",
                     py::return_value_policy::copy)
-            .def("get_chi2_array", &FGraohSolveDense::get_chi2_array,
+            .def("get_chi2_array", &FGraphSolveDense::get_chi2_array,
                     "Returns the vector of chi2 values for each factor. It requires to be calculated -> solved the problem",
                     py::return_value_policy::copy)
-            .def("number_nodes", &FGraohSolveDense::number_nodes, "Returns the number of nodes")
-            .def("number_factors", &FGraohSolveDense::number_factors, "Returns the number of factors")
+            .def("number_nodes", &FGraphSolveDense::number_nodes, "Returns the number of nodes")
+            .def("number_factors", &FGraphSolveDense::number_factors, "Returns the number of factors")
             .def("print", &FGraph::print, "By default False: does not print all the information on the Fgraph", py::arg("completePrint") = false)
             // -----------------------------------------------------------------------------
             // Specific call to 3D
-            .def("add_node_pose_3d", &FGraphPy::add_node_pose_3d,
+            .def("add_node_pose_3d", &FGraphDensePy::add_node_pose_3d,
                     "Input are 3D poses, as Lie Algebra of RBT around the Identity")
-            .def("add_factor_1pose_3d", &FGraphPy::add_factor_1pose_3d)
-            .def("add_factor_2poses_3d", &FGraphPy::add_factor_2poses_3d,
+            .def("add_factor_1pose_3d", &FGraphDensePy::add_factor_1pose_3d)
+            .def("add_factor_2poses_3d", &FGraphDensePy::add_factor_2poses_3d,
                             "Factors connecting 2 poses. If last input set to true (by default false), also updates the value of the target Node according to the new obs + origin node",
                             py::arg("obs"),
                             py::arg("nodeOridingId"),
@@ -153,9 +153,9 @@ void init_FGraphDense(py::module &m)
                             py::arg("updateNodeTarget") = false)
             // -----------------------------------------------------------------------------
             // Landmark or Point 3D
-            .def("add_node_landmark_3d", &FGraphPy::add_node_landmark_3d,
+            .def("add_node_landmark_3d", &FGraphDensePy::add_node_landmark_3d,
                     "Ladmarks are 3D points, in [x,y,z]")
-            .def("add_factor_1pose_1landmark_3d", &FGraphPy::add_factor_1pose_1landmark_3d,
+            .def("add_factor_1pose_1landmark_3d", &FGraphDensePy::add_factor_1pose_1landmark_3d,
                             "Factor connecting 1 pose and 1 point (landmark).",
                             py::arg("obs"),
                             py::arg("nodePoseId"),

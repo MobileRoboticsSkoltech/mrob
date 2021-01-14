@@ -28,7 +28,7 @@
 using namespace mrob;
 
 Optimizer::Optimizer(matData_t solutionTolerance, matData_t lambda) :
-        solutionTolerance_(solutionTolerance), lambda_(lambda)
+        solutionTolerance_(solutionTolerance), max_iters_(1e2), lambda_(lambda)
 {
 
 }
@@ -39,9 +39,10 @@ Optimizer::~Optimizer()
 }
 
 
- uint_t Optimizer::optimize(optimMethod method, double lambda)
+ uint_t Optimizer::solve(optimMethod method, uint_t max_iters, double lambda)
 {
     optimization_method_ = method;
+    max_iters_ = max_iters;
     switch(method)
     {
       case NEWTON_RAPHSON:
@@ -55,7 +56,7 @@ Optimizer::~Optimizer()
 }
 
 
-uint_t Optimizer::optimize_newton_raphson_one_iteration(bool useLambda)
+uint_t OptimizerDense::optimize_newton_raphson_one_iteration(bool useLambda)
 {
     // 1) build problem: Gradient and Hessian and re-evaluates
     calculate_gradient_hessian();
@@ -94,7 +95,7 @@ uint_t Optimizer::optimize_newton_raphson()
         diff_error = previous_error - current_error;
         previous_error = current_error;
         iters++;
-    }while(fabs(diff_error) > solutionTolerance_ && iters < 1e2);
+    }while(fabs(diff_error) > solutionTolerance_ && iters < max_iters_);
 
 
     return iters;
@@ -140,7 +141,8 @@ uint_t Optimizer::optimize_levenberg_marquardt()
         //     err(x_k) - m_k(dx)
         // where m_k is the quadratized model m_k(dx) = err(x_k) + dx'*Grad r + 0.5 dx'(Hessian + LM)dx
         // => f = d err / (-dx'*Grad r - 0.5 dx'(Hessian + LM)dx)
-        matData_t modelFidelity = diff_error / (-dx_.dot(gradient_) - 0.5*dx_.dot(hessian_* dx_));
+        //matData_t modelFidelity = diff_error / (-dx_.dot(gradient_) - 0.5*dx_.dot(hessian_* dx_));
+        matData_t modelFidelity = calculate_model_fidelity(diff_error);
 
 
         // 4) update lambda
@@ -149,7 +151,7 @@ uint_t Optimizer::optimize_levenberg_marquardt()
         if (modelFidelity > sigma2)
             lambda_ *= beta2;
 
-    }while(iters < 1e2);
+    }while(iters < max_iters_);
 
     if (!improvement)
     {
@@ -163,4 +165,20 @@ uint_t Optimizer::optimize_levenberg_marquardt()
               << std::endl;
 
     return iters;
+}
+
+OptimizerDense::OptimizerDense(matData_t solutionTolerance, matData_t lambda):
+        Optimizer(solutionTolerance, lambda)
+{
+
+}
+OptimizerDense::~OptimizerDense()
+{
+
+}
+
+matData_t OptimizerDense::calculate_model_fidelity(matData_t diff_error)
+{
+
+    return diff_error / (-dx_.dot(gradient_) - 0.5*dx_.dot(hessian_* dx_));
 }

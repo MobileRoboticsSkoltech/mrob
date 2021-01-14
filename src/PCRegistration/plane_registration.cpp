@@ -102,7 +102,7 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
             break;
         case SolveMode::GN_HESSIAN:
             time_profiles_.start();
-            solveIters_ = optimize(NEWTON_RAPHSON);
+            solveIters_ = Optimizer::solve(NEWTON_RAPHSON);
             time_profiles_.stop();
             break;
         case SolveMode::GN_CLAMPED_HESSIAN:
@@ -112,12 +112,12 @@ uint_t PlaneRegistration::solve(SolveMode mode, bool singleIteration)
             break;
         case SolveMode::LM_SPHER:
             time_profiles_.start();
-            solveIters_ = optimize(LEVENBERG_MARQUARDT_SPHER,1e-2);
+            solveIters_ = Optimizer::solve(LEVENBERG_MARQUARDT_SPHER,100,1e-2);
             time_profiles_.stop();
             break;
         case SolveMode::LM_ELLIP:
             time_profiles_.start();
-            solveIters_ = optimize(LEVENBERG_MARQUARDT_ELLIP,1e-2);
+            solveIters_ = Optimizer::solve(LEVENBERG_MARQUARDT_ELLIP,100,1e-2);
             time_profiles_.stop();
             break;
         default:
