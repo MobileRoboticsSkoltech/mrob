@@ -75,3 +75,53 @@ jobs:
             export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
             python3 mrobpy/tests/PC_align.py
           when: always
+  build-wheel:
+    docker:
+      - image: miloserdoval/building-wheel-manylinux
+    steps:
+      - checkout  
+      - run:
+          name: "Clone"
+          command: |
+             git submodule update --init --recursive
+          when: always
+      - run:
+          name: "Build"
+          command: ./scripts/build-wheels.sh
+          when: always
+      - store_artifacts:
+          path: /root/project/build/wheelhouse
+          destination: ~/artifacts
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/build/wheelhouse
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+              VERSION=v$(ls ~/project/build/wheelhouse/*.whl | awk -F"-" '{ print $2 }')
+              ghr -t "${GITHUB_TOKEN}" \
+                  -u "${CIRCLE_PROJECT_USERNAME}" \
+                  -r "${CIRCLE_PROJECT_REPONAME}" \
+                  -c "${CIRCLE_SHA1}" \
+                  -delete \
+                  ${VERSION} ~/project/build/wheelhouse/*.whl
+          when: always
+
+workflows:
+  build_and_test:
+    jobs:
+      - build
+      - build-wheel:
+          requires:
+            - build
+      - publish-github-release:
+          requires:
+            - build-wheel
+            
