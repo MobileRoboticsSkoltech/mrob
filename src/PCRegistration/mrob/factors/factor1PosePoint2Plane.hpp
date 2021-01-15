@@ -36,18 +36,18 @@ namespace mrob{
  * Mainly, it will include a pointcloud from images (chessboard) after solving the PnP (external)
  * and any sensor providing depth.
  *
- * There are two different observations required:
- *  - Plane estimation, from reference 1
- *  - Set of points, from reference 2
+* Observations
+ *  - Point x
+ *  - Point y, normal n_y, from reference y
  *
- * State to estimate is 3D pose 1^T_2.
+ * State to estimate is 3D pose y^T_x.
  * The transformation T is, thus, the transformation from the point reference to the plane reference
  *
  * The residual, as a convention in the library is:
- *   r = f(x) = z_pi * T(x) * z_points -> 0 if the point is in the plane.
+ *   r = f(x) = n_y' * (Tx - y) -> 0 if the relative point is in the plane.
  *
  * The Jacobian is then
- *  dr = z_pi [-(Tp)^, I]
+ *  dr = n_y [-(Tp)^, I]
  *
  * TODO: correctly characterize the covariance, since this is a contribution from 2 rv
  */

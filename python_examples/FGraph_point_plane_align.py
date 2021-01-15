@@ -7,8 +7,8 @@ import time
 
 
 # generate random data
-N_points = 50
-N_planes = 3
+N_points = 500
+N_planes = 5
 N_poses = 2
 point_noise = 0.05
 
@@ -33,7 +33,7 @@ def vis_her(X, Y, T = []):
     blue = np.array([0,0,1], dtype='float64')
     red = np.array([1,0,0], dtype='float64')
     if T!=[]:
-        open3d.visualization.draw_geometries([pcd_1(X,red), pcd_1(Y,blue, T)])
+        open3d.visualization.draw_geometries([pcd_1(X,red,T), pcd_1(Y,blue)])
     else:
         open3d.visualization.draw_geometries([pcd_1(X,red), pcd_1(Y,blue)])
 
@@ -55,22 +55,28 @@ for p in range(N_planes):
     Xi = np.array(Xi)
     pi.append( mrob.registration.estimate_plane(Xi))
 
-# solve the problem
+# solve the problem. It finds transformation from the point reference (Y) frame to the plane reference frame (X)
 graph = mrob.FGraph()
 W = np.array([1])
 print(W)
 n1 = graph.add_node_pose_3d(mrob.geometry.SE3())
 for i in range(N_points):
-    graph.add_factor_1pose_point2plane(z_point = X[i],
+    graph.add_factor_1pose_point2plane(z_point = Y[i],
                                        z_plane = pi[ids[i]],
                                        nodePoseId = n1,
                                        obsInf = W)
 
-graph.print(True)
+#graph.print(True)
 print('Current state of the graph: chi2 = ' , graph.chi2() )
 start = time.time()
-graph.solve(mrob.LM,20)
+graph.solve()
+graph.solve()
 end = time.time()
-#print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
+print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
+results = graph.get_estimated_state()
 
+print(results)
+Testimated = mrob.geometry.SE3(results[0])
+# initial visualization
+vis_her(Y,X,Testimated.T())
 

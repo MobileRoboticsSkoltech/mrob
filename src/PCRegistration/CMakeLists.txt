@@ -9,7 +9,6 @@ SET(sources
     plane_registration.cpp
     create_points.cpp
     weight_point.cpp
-    plane_to_pc_registration.cpp
     estimate_plane.cpp
     factors/factor1PosePoint2Plane.cpp
 )
@@ -20,7 +19,6 @@ SET(headers
     mrob/plane.hpp
     mrob/plane_registration.hpp
     mrob/create_points.hpp
-    mrob/plane_to_pc_registration.hpp
     mrob/estimate_plane.hpp
     mrob/factors/factor1PosePoint2Plane.hpp
 )

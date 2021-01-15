@@ -255,7 +255,7 @@ void FGraphSolve::build_adjacency()
         for (uint_t j = 0; j < dim; ++j)
         {
             reservationA.push_back(allDim);
-            reservationW.push_back(dim-j);
+            reservationW.push_back(dim-j);//XXX this might be allocating more elements than necessary, check
         }
         indFactorsMatrix.push_back(M_);
         M_ += dim;

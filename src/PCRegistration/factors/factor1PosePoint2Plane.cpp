@@ -29,7 +29,7 @@ using namespace mrob;
 
 Factor1PosePoint2Plane::Factor1PosePoint2Plane(const Mat31 &z_point, const Mat41 &z_plane,  std::shared_ptr<Node> &node,
         const Mat1 &obsInf):
-    Factor(6,1), z_point_(z_point), z_plane_(z_plane), Tpoint_(Mat31::Zero()), r_(0.0), W_(obsInf)
+    Factor(1,6), z_point_(z_point), z_plane_(z_plane), Tpoint_(Mat31::Zero()), r_(0.0), W_(obsInf)
 {
     neighbourNodes_.push_back(node);
 }
@@ -43,8 +43,8 @@ Factor1PosePoint2Plane::~Factor1PosePoint2Plane()
 void Factor1PosePoint2Plane::evaluate_residuals()
 {
     // r = <pi, Tp>
-    Mat4 Tx = get_neighbour_nodes()->at(1)->get_state();
-    SE3 T = SE3(Tx).inv();
+    Mat4 Tx = get_neighbour_nodes()->at(0)->get_state();
+    SE3 T = SE3(Tx);
     Tpoint_ = T.transform(z_point_);
     r_ = Mat1(z_plane_.head(3).dot(Tpoint_) + z_plane_(3));
 }
@@ -65,7 +65,7 @@ void Factor1PosePoint2Plane::evaluate_chi2()
 void Factor1PosePoint2Plane::print() const
 {
     std::cout << "Printing Factor: " << id_ << ", obs point= \n" << z_point_
-              << "obs plane =\n" << z_plane_
+              << "\nobs plane =\n" << z_plane_
               << "\n Residuals= \n" << r_
               << " \nand Information matrix\n" << W_
               << "\n Calculated Jacobian = \n" << J_
