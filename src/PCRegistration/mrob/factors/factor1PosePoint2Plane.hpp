@@ -41,13 +41,12 @@ namespace mrob{
  *  - Point y, normal n_y, from reference y
  *
  * State to estimate is 3D pose y^T_x.
- * The transformation T is, thus, the transformation from the point reference to the plane reference
  *
  * The residual, as a convention in the library is:
  *   r = f(x) = n_y' * (Tx - y) -> 0 if the relative point is in the plane.
  *
  * The Jacobian is then
- *  dr = n_y [-(Tp)^, I]
+ *  dr = n_y' [-(Tp)^, I]
  *
  * TODO: correctly characterize the covariance, since this is a contribution from 2 rv
  */
@@ -55,8 +54,8 @@ namespace mrob{
 class Factor1PosePoint2Plane: public Factor
 {
   public:
-    Factor1PosePoint2Plane(const Mat31 &z_point, const Mat41 &z_plane,  std::shared_ptr<Node> &nodePose,
-            const Mat1 &obsInf);
+    Factor1PosePoint2Plane(const Mat31 &z_point_x, const Mat31 &z_point_y, const Mat31 &z_normal_y,
+            std::shared_ptr<Node> &node,  const Mat1 &obsInf);
     ~Factor1PosePoint2Plane();
     /**
      * Jacobians are not evaluated, just the residuals
@@ -80,10 +79,9 @@ class Factor1PosePoint2Plane: public Factor
     virtual const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
 
   protected:
-    Mat31 z_point_, Tpoint_;
-    Mat41 z_plane_;
+    Mat31 z_point_x_, z_point_y_,  Tx_;
+    Mat31 z_normal_y_;
     // the residual of the point projected to the plane:
-    //    r = <p,pi>
     Mat1 r_;//residual, for convention, we will keep an eigen object for the scalar
     Mat1 W_;
     Mat<1,6> J_;

@@ -27,9 +27,9 @@
 
 using namespace mrob;
 
-Factor1PosePoint2Plane::Factor1PosePoint2Plane(const Mat31 &z_point, const Mat41 &z_plane,  std::shared_ptr<Node> &node,
-        const Mat1 &obsInf):
-    Factor(1,6), z_point_(z_point), z_plane_(z_plane), Tpoint_(Mat31::Zero()), r_(0.0), W_(obsInf)
+Factor1PosePoint2Plane::Factor1PosePoint2Plane(const Mat31 &z_point_x, const Mat31 &z_point_y, const Mat31 &z_normal_y,
+        std::shared_ptr<Node> &node,  const Mat1 &obsInf):
+    Factor(1,6), z_point_x_(z_point_x), z_point_y_(z_point_y), z_normal_y_(z_normal_y), Tx_(Mat31::Zero()), r_(0.0), W_(obsInf)
 {
     neighbourNodes_.push_back(node);
 }
@@ -45,16 +45,16 @@ void Factor1PosePoint2Plane::evaluate_residuals()
     // r = <pi, Tp>
     Mat4 Tx = get_neighbour_nodes()->at(0)->get_state();
     SE3 T = SE3(Tx);
-    Tpoint_ = T.transform(z_point_);
-    r_ = Mat1(z_plane_.head(3).dot(Tpoint_) + z_plane_(3));
+    Tx_ = T.transform(z_point_x_);
+    r_ = Mat1(z_normal_y_.dot(Tx_ - z_point_y_));
 }
 
 void Factor1PosePoint2Plane::evaluate_jacobians()
 {
     // it assumes you already have evaluated residuals
     Mat<3,6> Jr;
-    Jr << -hat3(Tpoint_) , Mat3::Identity();
-    J_ = z_plane_.head(3).transpose() * Jr;
+    Jr << -hat3(Tx_) , Mat3::Identity();
+    J_ = z_normal_y_.transpose() * Jr;
 }
 
 void Factor1PosePoint2Plane::evaluate_chi2()
@@ -64,8 +64,9 @@ void Factor1PosePoint2Plane::evaluate_chi2()
 
 void Factor1PosePoint2Plane::print() const
 {
-    std::cout << "Printing Factor: " << id_ << ", obs point= \n" << z_point_
-              << "\nobs plane =\n" << z_plane_
+    std::cout << "Printing Factor: " << id_ << ", obs point x= \n" << z_point_x_
+              << "\nobs point y =\n" << z_point_y_
+              << "\nobs normal y =\n" << z_normal_y_
               << "\n Residuals= \n" << r_
               << " \nand Information matrix\n" << W_
               << "\n Calculated Jacobian = \n" << J_

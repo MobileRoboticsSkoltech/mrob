@@ -44,9 +44,10 @@ int main ()
 
     for (uint_t t = 0; t < 10; t++)
     {
-        Mat41 z_plane  = Mat41::Random();
-        Mat31 z_point = Mat31::Random();
-        std::shared_ptr<mrob::Factor> f1(new mrob::Factor1PosePoint2Plane(z_point,z_plane,n0,W));
+        Mat31 z_normal_y  = Mat31::Random();
+        Mat31 z_point_y = Mat31::Random();
+        Mat31 z_point_x = Mat31::Random();
+        std::shared_ptr<mrob::Factor> f1(new mrob::Factor1PosePoint2Plane(z_point_x,z_point_y, z_normal_y,n0,W));
         graph.add_factor(f1);
     }
     graph.print();
