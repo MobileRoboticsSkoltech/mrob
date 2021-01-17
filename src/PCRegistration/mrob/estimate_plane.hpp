@@ -20,13 +20,13 @@
  *              Mobile Robotics Lab.
  */
 
+//TODO this file name should be changed since it provides more functionaloties for PCs
 #ifndef ESTIMATE_PLANE_HPP_
 #define ESTIMATE_PLANE_HPP_
 
 #include "mrob/matrix_base.hpp"
 
 namespace mrob{
-
 
 /**
  * Estimate plane: given a set of points, in a Nx3 array,
@@ -38,6 +38,27 @@ namespace mrob{
  */
 
 Mat41 estimate_plane(const Eigen::Ref<const MatX> X);
+
+
+/**
+ * Estimate normal: given a set of points, in a Nx3 array,
+ * calculates the noamrl plane
+ *    n \in R^3
+ *
+ */
+
+Mat31 estimate_normal(const Eigen::Ref<const MatX> X);
+
+
+/**
+ * Estimate centroid: given a set of points, in a Nx3 array,
+ * calculates the centroid point
+ *    p \in R^3
+ *
+ */
+
+Mat31 estimate_centroid(const Eigen::Ref<const MatX> X);
+
 
 }
 

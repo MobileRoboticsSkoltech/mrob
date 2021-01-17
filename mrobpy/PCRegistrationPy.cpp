@@ -77,7 +77,8 @@ void init_PCRegistration(py::module &m)
     m.def("gicp", &gicp_solve);
     m.def("weighted", &weighted_solve);
     m.def("estimate_plane", &estimate_plane_py);
-    //m.def("estimate_plane2", &estimate_plane);
+    m.def("estimate_normal", &estimate_normal);
+    m.def("estimate_centroid", &estimate_centroid);
 }
 
 

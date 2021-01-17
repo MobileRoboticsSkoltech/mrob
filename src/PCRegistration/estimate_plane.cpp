@@ -38,7 +38,7 @@ Mat41 mrob::estimate_plane(const Eigen::Ref<const MatX> X)
     return estimate_plane_centered(X);
 }
 
-//local function
+//local function, we also will test the homogeneous plane estimation
 Mat41 estimate_plane_centered(const Eigen::Ref<const MatX> X)
 {
     uint_t N = X.rows();
@@ -63,4 +63,25 @@ Mat41 estimate_plane_centered(const Eigen::Ref<const MatX> X)
     // error = eigs.eigenvalues()(0);
     return plane;
 
+}
+
+
+
+Mat31 mrob::estimate_normal(const Eigen::Ref<const MatX> X)
+{
+    Mat41 res = estimate_plane(X);
+    return res.head(3);
+}
+
+
+Mat31 mrob::estimate_centroid(const Eigen::Ref<const MatX> X)
+{
+    // Initialization
+    assert(X.cols() == 3  && "Estimate_centroid: Incorrect sizing, we expect Nx3");
+    assert(X.rows() >= 3  && "Estimate_centroid: Incorrect sizing, we expect at least 3 correspondences (not aligned)");
+
+    uint_t N = X.rows();
+    Mat13 c =  X.colwise().sum();
+    c /= (double)N;
+    return c;
 }

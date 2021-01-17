@@ -8,7 +8,7 @@ import time
 
 # generate random data
 N_points = 500
-N_planes = 5
+N_planes = 3
 N_poses = 2
 point_noise = 0.05
 
@@ -18,6 +18,7 @@ X = synthetic_points.get_point_cloud(1)
 ids =  synthetic_points.get_point_plane_ids(1)
 
 T = mrob.geometry.SE3(np.random.randn(6))
+T.print()
 Xa = np.array(X)
 Y = T.transform_array(X) + np.random.randn(N_points,3)*0.1
 
@@ -49,28 +50,31 @@ vis_her(X,Y)
 
 # calculate planes
 pi = []
+centroids = []
 for p in range(N_planes):
     #indexes of the points corresponding to the plane
-    Xi = [X[i] for i in range(N_points) if ids[i] == p]
-    Xi = np.array(Xi)
-    pi.append( mrob.registration.estimate_plane(Xi))
-
+    Yi = [Y[i] for i in range(N_points) if ids[i] == p]
+    Yi = np.array(Yi)
+    pi.append( mrob.registration.estimate_normal(Yi))
+    centroids.append(mrob.registration.estimate_centroid(Yi))
+print(centroids)
 # solve the problem. It finds transformation from the point reference (Y) frame to the plane reference frame (X)
 graph = mrob.FGraph()
 W = np.array([1])
 print(W)
 n1 = graph.add_node_pose_3d(mrob.geometry.SE3())
 for i in range(N_points):
-    graph.add_factor_1pose_point2plane(z_point = Y[i],
-                                       z_plane = pi[ids[i]],
+    graph.add_factor_1pose_point2plane(z_point_x = X[i],
+                                       z_point_y = centroids[ids[i]], #Y[i],
+                                       z_normal_y = pi[ids[i]],
                                        nodePoseId = n1,
                                        obsInf = W)
 
 #graph.print(True)
 print('Current state of the graph: chi2 = ' , graph.chi2() )
 start = time.time()
-graph.solve()
-graph.solve()
+#XXX initial ideal lambda is around 1e-1, vs the default 1e-5, so many more iterations are needed.
+graph.solve(mrob.LM, 30)
 end = time.time()
 print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
 results = graph.get_estimated_state()
@@ -78,5 +82,6 @@ results = graph.get_estimated_state()
 print(results)
 Testimated = mrob.geometry.SE3(results[0])
 # initial visualization
-vis_her(Y,X,Testimated.T())
+print('Error in poses rotation= ', T.distance_rotation(Testimated), ', distance trans = ', T.distance_trans(Testimated))
+vis_her(X,Y,Testimated.T())
 
