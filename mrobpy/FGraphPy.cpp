@@ -40,6 +40,8 @@
 #include "mrob/factors/nodePlane4d.hpp"
 #include "mrob/factors/factor1Pose1Plane4d.hpp"
 
+#include "mrob/factors/factor1PosePoint2Plane.hpp"
+
 #include <Eigen/Geometry>
 
 namespace py = pybind11;
@@ -178,6 +180,18 @@ public:
         return f->get_id();
     }
 
+    // point to plane and p2p optimizations. Variants of weighted ICP
+    // ----------------------------------------------------
+    // point to Plane factor
+    id_t add_factor_1pose_point2plane(const py::EigenDRef<const Mat31> z_point_x, const py::EigenDRef<const Mat31> z_point_y,
+            const py::EigenDRef<const Mat31> z_normal_y, id_t nodePoseId, const py::EigenDRef<const Mat1> obsInf)
+    {
+        auto n1 = this->get_node(nodePoseId);
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1PosePoint2Plane(z_point_x,z_point_y, z_normal_y,n1,obsInf));
+        this->add_factor(f);
+        return f->get_id();
+    }
+
 };
 
 void init_FGraph(py::module &m)
@@ -264,6 +278,15 @@ void init_FGraph(py::module &m)
                             py::arg("nodePoseId"),
                             py::arg("nodeLandmarkId"),
                             py::arg("obsInvCov"))
+            // ------------------------------------------------------------------------------
+            // point to plane registration
+            .def("add_factor_1pose_point2plane", &FGraphPy::add_factor_1pose_point2plane,
+                     "Factor measuring point to plane distance in a registration problem",
+                            py::arg("z_point_x"),
+                            py::arg("z_point_y"),
+                            py::arg("z_normal_y"),
+                            py::arg("nodePoseId"),
+                            py::arg("obsInf"))
             ;
 
 }

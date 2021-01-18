@@ -48,7 +48,7 @@ with open('../benchmarks/M3500.txt', 'r') as file:
 #print(factors_dictionary)
 
 # Initialize FG
-graph = mrob.fgraph.FGraph()
+graph = mrob.FGraph()
 x = np.zeros(3)
 n = graph.add_node_pose_2d(x)
 print('node 0 id = ', n) # id starts at 1
@@ -96,7 +96,7 @@ print('Initial problem drawn')
 print_2d_graph(graph)
 print('current initial chi2 = ', graph.chi2() )
 start = time.time()
-graph.solve(mrob.fgraph.LM, 50)
+graph.solve(mrob.LM, 50)
 end = time.time()
 print('\nLM chi2 = ', graph.chi2() , ', total time on calculation [s] = ', 1e0*(end - start))
 print('solution drawn')
@@ -120,17 +120,17 @@ if 0:
 if 0:
     graph.solve(mrob.fgraph.GN)
     print('Iter 0 chi2 = ', graph.chi2() )
-    graph.solve(mrob.fgraph.GN)
+    graph.solve(mrob.GN)
     print('Iter 1 chi2 = ', graph.chi2() )
-    graph.solve(mrob.fgraph.GN)
+    graph.solve(mrob.GN)
     print('Iter 2 chi2 = ', graph.chi2() )
-    graph.solve(mrob.fgraph.GN)
+    graph.solve(mrob.GN)
     print('Iter 3 chi2 = ', graph.chi2() )
     print_2d_graph(graph)
 
-    graph.solve(mrob.fgraph.GN)
+    graph.solve(mrob.GN)
     print('Iter 4 chi2 = ', graph.chi2() )
-    graph.solve(mrob.fgraph.GN)
+    graph.solve(mrob.GN)
     print('Iter 5 chi2 = ', graph.chi2() ) #already converges
     print_2d_graph(graph)
 
