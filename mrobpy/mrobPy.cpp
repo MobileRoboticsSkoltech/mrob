@@ -25,12 +25,16 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/iostream.h>
 
+
+#include "mrob/optimizer.hpp"
+
 namespace py = pybind11;
 
 
 
 void init_geometry(py::module &m);
 void init_FGraph(py::module &m);
+//void init_FGraphDense(py::module &m);
 void init_PCRegistration(py::module &m);
 void init_PCPlanes(py::module &m);
 
@@ -41,11 +45,20 @@ PYBIND11_MODULE(mrob, m) {
     // Later, in binding code:
     py::add_ostream_redirect(m, "ostream_redirect");
 
+    py::enum_<mrob::Optimizer::optimMethod>(m, "optimMethod")
+        .value("NEWTON_RAPHSON", mrob::Optimizer::optimMethod::NEWTON_RAPHSON)
+        .value("LEVENBERG_MARQUARDT_SPHER", mrob::Optimizer::optimMethod::LEVENBERG_MARQUARDT_SPHER)
+        .value("LEVENBERG_MARQUARDT_ELLIP", mrob::Optimizer::optimMethod::LEVENBERG_MARQUARDT_ELLIP)
+        .export_values()
+        ;
+
+    // TODO to be deprecated this namespace
     py::module m_geom = m.def_submodule("geometry");
     init_geometry(m_geom);
 
-    py::module m_fg = m.def_submodule("fgraph");
-    init_FGraph(m_fg);
+    // deprecated have removed this namespace
+    //py::module m_fg = m.def_submodule("fgraph");
+    init_FGraph(m);
 
     py::module m_reg = m.def_submodule("registration");
     init_PCRegistration(m_reg);

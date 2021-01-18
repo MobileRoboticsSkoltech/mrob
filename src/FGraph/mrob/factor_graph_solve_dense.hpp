@@ -32,14 +32,14 @@ namespace mrob {
 
 
 /**
- * Class FGraphSolveDense solve a factor graph problem asuming dense
+ * Class FGraphSolveDense solve a factor graph problem assuming dense
  * precision matrix.
  *
  * It inherits from two classes:
  *  - FGraph: structure for adding generic factors
  *  - Optimizer: Optimization methods given some abstract routines
  */
-class FGraphSolveDense: public FGraph, public Optimizer
+class FGraphSolveDense: public FGraph, public OptimizerDense
 {
   public:
     FGraphSolveDense();
