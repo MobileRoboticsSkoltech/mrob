@@ -13,13 +13,16 @@
 #  limitations under the License.
 # 
 # 
-#  pyproject.toml
+#  setup.py
 # 
-#  Created on: Oct 31, 2020
+#  Created on: Jan 22, 2020
 #       Author: Lyubov Miloserdova
 #               miloslubov@gmail.com
 #
 
-[build-system]
-requires = ["setuptools >= 40.8.0", "wheel", "setuptools-git-versioning >= 1.2.10"]
-build-backend = "setuptools.build_meta"
+
+import setuptools
+
+setuptools.setup(
+    version_config=True
+)
