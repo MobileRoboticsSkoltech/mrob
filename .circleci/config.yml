@@ -118,7 +118,12 @@ jobs:
                   -delete \
                   ${VERSION} ~/project/build/wheelhouse/*.whl
 
+# Jobs for branches are run by default, but jobs for tags MUST be turned on explicitly
+# for ALL dependencies too, not only for the single job.
 # https://circleci.com/docs/2.0/configuration-reference/#filters-1
+
+# Use YAML anchor/alias to reuse mapping, this helps to avoid text duplication.
+# https://circleci.com/docs/2.0/writing-yaml/#anchors-and-aliases
 filter-forall-tags: &all-tags
   tags:
     only: /.*/ # run for tags too, otherwise for branches only
