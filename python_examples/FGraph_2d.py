@@ -16,10 +16,10 @@ print('node 1 id = ', n1, ' , node 2 id = ', n2)
 
 
 invCov = np.identity(3)
-graph.add_factor_1pose_2d(np.zeros(3),n1,1e6*invCov)
+graph.add_factor_1pose_2d(np.array([0,0,np.pi/4]),n1,1e6*invCov)
 graph.add_factor_2poses_2d(np.ones(3),n1,n2,invCov)
 
-graph.solve(mrob.GN)
+graph.solve(mrob.LM)
 graph.print(True)
 
 
