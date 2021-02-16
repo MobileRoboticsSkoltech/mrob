@@ -117,6 +117,20 @@ jobs:
                   -c "${CIRCLE_SHA1}" \
                   -delete \
                   ${VERSION} ~/project/build/wheelhouse/*.whl
+  publish-pypi:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Upload to PyPI
+          command: |
+              echo -e "[pypi]" >> ~/.pypirc
+              echo -e "username = __token__" >> ~/.pypirc
+              echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+              python3 -m pip install --user --upgrade twine
+              twine upload ~/project/build/wheelhouse/*.whl
 
 # Jobs for branches are run by default, but jobs for tags MUST be turned on explicitly
 # for ALL dependencies too, not only for the single job.
@@ -142,4 +156,12 @@ workflows:
           filters:
             <<: *all-tags
             branches:
-              ignore: /.*/ # publish to GHR  only tagged commits
+              ignore: /.*/ # publish to GHR only tagged commits
+      - publish-pypi:
+          requires:
+            - build
+            - build-wheel
+          filters:
+            <<: *all-tags
+            branches:
+              ignore: /.*/ # publish to PyPI only tagged commits
