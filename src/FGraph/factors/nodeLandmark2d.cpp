@@ -43,21 +43,16 @@ NodeLandmark2d::~NodeLandmark2d()
 
 void NodeLandmark2d::update(const Eigen::Ref<const MatX1> &dx)
 {
-    //TODO test cast
-    Mat21 dxf = dx;
-    state_ += dxf;
+    state_ += dx;
 }
 
 void NodeLandmark2d::update_from_auxiliary(const Eigen::Ref<const MatX1> &dx)
 {
-    //TODO test cast
-    Mat21 dxf = dx;
-    state_ = auxiliaryState_ + dxf;
+    state_ = auxiliaryState_ + dx;
 }
 
 void NodeLandmark2d::set_state(const Eigen::Ref<const MatX> &x)
 {
-    // cast is done by Eigen
     state_ = x;
 }
 

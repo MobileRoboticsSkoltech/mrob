@@ -52,7 +52,11 @@ Factor1Pose1Landmark2d::Factor1Pose1Landmark2d(const Mat21 &observation, std::sh
 
     if (initializeLandmark)
     {
-        // TODO Initialize landmark value to whatever observation we see from current pose
+        Mat31 x = nodePose->get_state();
+        Mat21 dl;
+        dl << std::cos(obs_(1)+x(3)), std::sin(obs_(1)+x(3));
+        Mat21 land = x.head(2) + obs_(0)*dl;
+        nodeLandmark->set_state(land);
     }
 }
 
@@ -79,9 +83,8 @@ void Factor1Pose1Landmark2d::evaluate_residuals()
     q_ = dx_*dx_ + dy_*dy_;
     r_ << std::sqrt(q_),
          std::atan2(dy_,dx_) - state_(2);
-    r_ -= obs_;
+    r_ = r_-obs_;
     r_(2) = wrap_angle(r_(2));
-
 }
 void Factor1Pose1Landmark2d::evaluate_jacobians()
 {

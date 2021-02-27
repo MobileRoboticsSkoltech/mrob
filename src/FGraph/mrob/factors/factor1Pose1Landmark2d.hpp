@@ -49,9 +49,6 @@ namespace mrob{
  * z = [range,bearing] is a 2d vector, composed of a range and bearing in the local frame.
  * l is a 2d point encoding the landmark position l = [x,y]
  *
- * and the residual is thus:
- *   r = T-1*l - z
- *
  *
  * Constructor functions will be overloaded to include the pointers of the nodes,
  * The convention is 2d pose, we observe node destination,

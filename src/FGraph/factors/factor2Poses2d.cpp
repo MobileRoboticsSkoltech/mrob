@@ -133,7 +133,7 @@ void Factor2Poses2dOdom::evaluate_jacobians()
     // Get the position of node we are traversing from
     Mat31 node1 = get_neighbour_nodes()->at(0).get()->get_state();
 
-    auto s = -obs_[1] * sin(node1[2]), c = obs_[1] * sin(node1[2]);
+    auto s = -obs_[1] * sin(node1[2]), c = obs_[1] * cos(node1[2]);
 
     // Jacobians for odometry model which are: G and -I
     J_ <<   1, 0, s,    -1, 0, 0,
