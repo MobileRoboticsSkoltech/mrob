@@ -95,7 +95,7 @@ public:
      * ultimately on the function input,
      * by default optim method is Gauss Newton
      */
-    void solve(optimMethod method = GN, uint_t maxIters = 20);
+    void solve(optimMethod method = GN, uint_t maxIters = 20, matData_t lambda = 1e-6, matData_t solutionTolerance = 1e-2);
     /**
      * Evaluates the current solution chi2.
      *
@@ -117,10 +117,25 @@ public:
     matrixMethod get_build_matrix_method() { return matrixMethod_;};
 
     /**
-     * Returns a reference to the information matrix.
+     * Returns a copy to the information matrix.
      * TODO If true, it re-evaluates the problem
      */
     SMatCol get_information_matrix() { return L_;}
+    /**
+     * Returns a copy to the information matrix.
+     * TODO If true, it re-evaluates the problem
+     */
+    SMatCol get_adjacency_matrix() { return A_;}
+    /**
+     * Returns a copy to the W matrix.
+     * TODO If true, it re-evaluates the problem
+     */
+    SMatCol get_W_matrix() { return W_;}
+    /**
+     * Returns a copy to the processed residuals in state space b = A'Wr.
+     * TODO If true, it re-evaluates the problem
+     */
+    MatX1 get_vector_b() { return b_;}
     /**
      * Returns a vector of chi2 values for each of the factors.
      */
