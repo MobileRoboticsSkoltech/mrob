@@ -54,7 +54,7 @@ Factor1Pose1Landmark2d::Factor1Pose1Landmark2d(const Mat21 &observation, std::sh
     {
         Mat31 x = nodePose->get_state();
         Mat21 dl;
-        dl << std::cos(obs_(1)+x(3)), std::sin(obs_(1)+x(3));
+        dl << std::cos(obs_(1)+x(2)), std::sin(obs_(1)+x(2));
         Mat21 land = x.head(2) + obs_(0)*dl;
         nodeLandmark->set_state(land);
     }
@@ -75,16 +75,16 @@ void Factor1Pose1Landmark2d::evaluate_residuals()
         poseIndex = 1;
     }
     // From the local frame we observe the landmark
-    // TODO LM needs too many iterations, check once again gradients
     state_ = get_neighbour_nodes()->at(poseIndex)->get_state();
     landmark_ = get_neighbour_nodes()->at(landmarkIndex)->get_state();
     dx_ = landmark_(0) - state_(0);
     dy_ = landmark_(1) - state_(1);
     q_ = dx_*dx_ + dy_*dy_;
+    // r = [range, bearing]
     r_ << std::sqrt(q_),
          std::atan2(dy_,dx_) - state_(2);
     r_ = r_-obs_;
-    r_(2) = wrap_angle(r_(2));
+    r_(1) = wrap_angle(r_(1));
 }
 void Factor1Pose1Landmark2d::evaluate_jacobians()
 {

@@ -62,8 +62,8 @@ void Factor2Poses2d::evaluate_residuals() {
     // r = h(i,j) - obs = Ri^T * (xj- xi) - obs .  From "i", i.e, at its reference frame, we observe xj
     Mat31 h = nodeTarget - nodeOrigin;
     Mat2 RiT;
-    double c1 = cos(nodeOrigin(2)),
-           s1 = sin(nodeOrigin(2));
+    double c1 = std::cos(nodeOrigin(2)),
+           s1 = std::sin(nodeOrigin(2));
     RiT <<  c1, s1,
            -s1, c1;
     h.head(2) = RiT * h.head(2);
@@ -79,8 +79,8 @@ void Factor2Poses2d::evaluate_jacobians()
     // r =  Ri^T * (xj- xi) - obs
     // J1 = [-R1^T,    J2 = [R1^T 0]
     //      [  ]           [0    1]
-    double c1 = cos(nodeOrigin(2)),
-           s1 = sin(nodeOrigin(2)),
+    double c1 = std::cos(nodeOrigin(2)),
+           s1 = std::sin(nodeOrigin(2)),
            dx = nodeTarget(0) - nodeOrigin(0),
            dy = nodeTarget(1) - nodeOrigin(1);
     J_ <<   -c1, -s1, -s1*dx + c1*dy,     c1, s1, 0,
@@ -125,7 +125,7 @@ void Factor2Poses2dOdom::evaluate_residuals()
     auto prediction = get_odometry_prediction(stateOrigin, obs_);
 
     r_ =  prediction - stateTarget;
-    r_[2] = wrap_angle(r_[2]);
+    r_(2) = wrap_angle(r_(2));
 
 }
 void Factor2Poses2dOdom::evaluate_jacobians()
@@ -133,7 +133,7 @@ void Factor2Poses2dOdom::evaluate_jacobians()
     // Get the position of node we are traversing from
     Mat31 node1 = get_neighbour_nodes()->at(0).get()->get_state();
 
-    auto s = -obs_[1] * sin(node1[2]), c = obs_[1] * cos(node1[2]);
+    auto s = -obs_(1) * std::sin(node1(2)), c = obs_(1) * std::cos(node1(2));
 
     // Jacobians for odometry model which are: G and -I
     J_ <<   1, 0, s,    -1, 0, 0,
@@ -143,10 +143,10 @@ void Factor2Poses2dOdom::evaluate_jacobians()
 
 
 Mat31 Factor2Poses2dOdom::get_odometry_prediction(Mat31 state, Mat31 motion) {
-    state[2] += motion[0];
-    state[0] += motion[1] * cos(state[2]);
-    state[1] += motion[1] * sin(state[2]);
-    state[2] += motion[2];
+    state(2) += motion(0);
+    state(0) += motion(1) * std::cos(state(2));
+    state(1) += motion(1) * std::sin(state(2));
+    state(2) += motion(2);
 
     return state;
 }
