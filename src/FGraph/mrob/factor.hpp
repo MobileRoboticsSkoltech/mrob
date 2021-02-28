@@ -101,7 +101,7 @@ public:
      * Return a Ref to a dynamic matrix, while the child matrix should declare
      * all these variables as fixed size matrices, and ref takes care of
      * doing the conversion with minimal temporary artifacts
-     * Observation can be a 3d point, a 3d pose (transfromation 4x4), etc.
+     * Observation can be a 3d point, a 3d pose (transformation 4x4), etc.
      */
     virtual const Eigen::Ref<const MatX> get_obs() const = 0;
     /**

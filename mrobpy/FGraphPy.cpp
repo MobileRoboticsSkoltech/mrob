@@ -230,11 +230,18 @@ void init_FGraph(py::module &m)
             .def("add_factor_2poses_2d", &FGraphPy::add_factor_2poses_2d,
                     "Factors connecting 2 poses. If last input set to true (by default false), also updates the value of the target Node according to the new obs + origin node",
                     py::arg("obs"),
-                    py::arg("nodeOridingId"),
+                    py::arg("nodeOriginId"),
                     py::arg("nodeTargetId"),
                     py::arg("obsInvCov"),
                     py::arg("updateNodeTarget") = false)
-            .def("add_factor_2poses_2d_odom", &FGraphPy::add_factor_2poses_2d_odom)
+            .def("add_factor_2poses_2d_odom", &FGraphPy::add_factor_2poses_2d_odom,
+                    "add_factor_2poses_2d_odom(obs, nodeOriginId, nodeTargetId, W)"
+                    "\nFactor connecting 2 poses, following an odometry model."
+                    "\nArguments are obs, nodeOriginId, nodeTargetId and obsInvCov",
+                    py::arg("obs"),
+                    py::arg("nodeOriginId"),
+                    py::arg("nodeTargetId"),
+                    py::arg("obsInvCov"))
             // 2d Landmkarks
             .def("add_node_landmark_2d", &FGraphPy::add_node_landmark_2d,
                     "Ladmarks are 2D points, in [x,y]")

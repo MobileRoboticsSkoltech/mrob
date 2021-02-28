@@ -85,3 +85,11 @@ Testimated = mrob.geometry.SE3(results[0])
 print('Error in poses rotation= ', T.distance_rotation(Testimated), ', distance trans = ', T.distance_trans(Testimated))
 vis_her(X,Y,Testimated.T())
 
+
+
+L = graph.get_information_matrix().todense()
+D, U = np.linalg.eig(L)
+print(D)
+print(U)
+
+
