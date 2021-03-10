@@ -1,8 +1,8 @@
 #
 import mrob
 import numpy as np
+from os import path
 import time
-
 
 
 # Initialize data structures
@@ -12,7 +12,7 @@ factors_dictionary = {}
 N = 3500
 
 # load file
-with open('../../benchmarks/M3500.txt', 'r') as file:
+with open(path.join(path.dirname(__file__), '../../benchmarks/M3500.txt'), 'r') as file:
     for line in file:
         d = line.split()
         # read edges and vertex, in TORO format

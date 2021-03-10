@@ -19,6 +19,6 @@ bin/
 *.pdf
 *.pkl
 
-mrob/
+mrob
 dist/
 mrob.egg-info/

@@ -21,7 +21,16 @@
 #
 
 from mrob import mrob
-fgraph = mrob.fgraph
+
+FGraph = mrob.FGraph
+GN = mrob.GN
+LEVENBERG_MARQUARDT_ELLIP = mrob.LEVENBERG_MARQUARDT_ELLIP
+LEVENBERG_MARQUARDT_SPHER = mrob.LEVENBERG_MARQUARDT_SPHER 
+LM = mrob.LM
+NEWTON_RAPHSON = mrob.NEWTON_RAPHSON
 geometry = mrob.geometry
+optimMethod = mrob.optimMethod 
+ostream_redirect = mrob.ostream_redirect
 registration = mrob.registration
+
 del(mrob)
