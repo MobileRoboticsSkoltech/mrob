@@ -37,6 +37,7 @@ typedef unsigned int uint_t;
 
 
 // Definition of squared matrices, by default column major
+typedef Eigen::Matrix<matData_t, 1,1, Eigen::RowMajor> Mat1;
 typedef Eigen::Matrix<matData_t, 2,2, Eigen::RowMajor> Mat2;
 typedef Eigen::Matrix<matData_t, 3,3, Eigen::RowMajor> Mat3;
 typedef Eigen::Matrix<matData_t, 4,4, Eigen::RowMajor> Mat4;

@@ -30,7 +30,7 @@
 using namespace mrob;
 
 FGraphSolveDense::FGraphSolveDense():
-        FGraph(), Optimizer()
+        FGraph(), OptimizerDense()
 {
 
 }

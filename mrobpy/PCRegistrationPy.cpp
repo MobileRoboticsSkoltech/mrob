@@ -35,6 +35,8 @@ namespace py = pybind11;
 #include "mrob/SE3.hpp"
 #include "mrob/pc_registration.hpp"
 
+#include "mrob/estimate_plane.hpp"
+
 
 using namespace mrob;
 
@@ -63,12 +65,20 @@ SE3 weighted_solve(const py::EigenDRef<const MatX> X, const py::EigenDRef<const 
     return res;
 }
 
+Mat41 estimate_plane_py(const py::EigenDRef<const MatX> X)
+{
+    Mat41 plane = estimate_plane(X);
+    return plane;
+}
 
 void init_PCRegistration(py::module &m)
 {
     m.def("arun", &arun_solve);
     m.def("gicp", &gicp_solve);
     m.def("weighted", &weighted_solve);
+    m.def("estimate_plane", &estimate_plane_py);
+    m.def("estimate_normal", &estimate_normal);
+    m.def("estimate_centroid", &estimate_centroid);
 }
 
 

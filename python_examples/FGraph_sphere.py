@@ -110,7 +110,7 @@ with open(file_path, 'r') as file:
 #plot_from_vertex(vertex_ini)
 
 # Initialize FG
-graph = mrob.fgraph.FGraph()
+graph = mrob.FGraph()
 x = vertex_ini[0]
 print(x.T())
 n = graph.add_node_pose_3d(x)
@@ -163,7 +163,7 @@ if 1:
     # uncomment for visualization
     #print_3d_graph(graph)
     start = time.time()
-    graph.solve(mrob.fgraph.LM,20)
+    graph.solve(mrob.LM,20)
     end = time.time()
     print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     # uncomment for visualization
@@ -182,7 +182,7 @@ if 0:
     #print_3d_graph(graph)
     for k in range(2):
         start = time.time()
-        graph.solve(mrob.fgraph.GN)
+        graph.solve(mrob.GN)
         end = time.time()
         print('Iter ', k, ' chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
     

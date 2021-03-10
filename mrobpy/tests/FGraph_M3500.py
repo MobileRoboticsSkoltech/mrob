@@ -29,7 +29,7 @@ with open('../../benchmarks/M3500.txt', 'r') as file:
 
 
 # Initialize FG
-graph = mrob.fgraph.FGraph()
+graph = mrob.FGraph()
 x = np.zeros(3)
 n = graph.add_node_pose_2d(x)
 print('node 0 id = ', n) # id starts at 1
@@ -63,7 +63,7 @@ for t in range(1,N):
 
 print('current initial chi2 = ', graph.chi2() )
 start = time.time()
-graph.solve(mrob.fgraph.LM, 50)
+graph.solve(mrob.LM, 50)
 end = time.time()
 print('\nLM chi2 = ', graph.chi2() , ', total time on calculation [s] = ', 1e0*(end - start))
 

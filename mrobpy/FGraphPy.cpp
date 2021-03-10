@@ -40,6 +40,8 @@
 #include "mrob/factors/nodePlane4d.hpp"
 #include "mrob/factors/factor1Pose1Plane4d.hpp"
 
+#include "mrob/factors/factor1PosePoint2Plane.hpp"
+
 #include <Eigen/Geometry>
 
 namespace py = pybind11;
@@ -178,6 +180,18 @@ public:
         return f->get_id();
     }
 
+    // point to plane and p2p optimizations. Variants of weighted ICP
+    // ----------------------------------------------------
+    // point to Plane factor
+    id_t add_factor_1pose_point2plane(const py::EigenDRef<const Mat31> z_point_x, const py::EigenDRef<const Mat31> z_point_y,
+            const py::EigenDRef<const Mat31> z_normal_y, id_t nodePoseId, const py::EigenDRef<const Mat1> obsInf)
+    {
+        auto n1 = this->get_node(nodePoseId);
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1PosePoint2Plane(z_point_x,z_point_y, z_normal_y,n1,obsInf));
+        this->add_factor(f);
+        return f->get_id();
+    }
+
 };
 
 void init_FGraph(py::module &m)
@@ -192,16 +206,35 @@ void init_FGraph(py::module &m)
             .def(py::init<>(),
                     "Constructor, solveType default is ADJ and GN.")
             .def("solve", &FGraphSolve::solve,
-                    "Solves the corresponding FG",
+                    "Solves the corresponding FG.\n"
+                    "Options:\n method = mrob.GN (Gauss Newton), by default option. It carries out a SINGLE iteration.\n"
+                    "                  = mrob.LM (Levenberg-Marquard), it has several parameters:\n"
+                    " - marIters = 30 (by default). Only for LM\n"
+                    " - lambda = 1-6, LM paramter for the size of the update\n"
+                    " - solutionTolerance: convergence criteria.",
                     py::arg("method") =  FGraphSolve::optimMethod::GN,
-                    py::arg("maxIters") = 30)
+                    py::arg("maxIters") = 30,
+                    py::arg("lambda") = 1e-6,
+                    py::arg("solutionTolerance") = 1e-2)
             .def("chi2", &FGraphSolve::chi2,
-                    "Calculated the chi2 of the problem. By default re-evaluates residuals, set to false if doesn't",
+                    "Calculated the chi2 of the problem.\n"
+                    "By default re-evaluates residuals, \n"
+                    "if set to false if doesn't:    evaluateResidualsFlag = False",
                     py::arg("evaluateResidualsFlag") = true)
             .def("get_estimated_state", &FGraphSolve::get_estimated_state,
-                    "returns the list of states ordered according to ids. Some of these elements might be matrices if the are 3D poses")
+                    "returns the list of states ordered according to ids.\n"
+                    "Each state can be of different size and some of these elements might be matrices if the are 3D poses")
             .def("get_information_matrix", &FGraphSolve::get_information_matrix,
-                    "Returns the information matrix. It requires to be calculated -> solved the problem",
+                    "Returns the information matrix (sparse matrix). It requires to be calculated -> solved the problem",
+                    py::return_value_policy::copy)
+            .def("get_adjacency_matrix", &FGraphSolve::get_adjacency_matrix,
+                    "Returns the adjacency matrix (sparse matrix). It requires to be calculated -> solved the problem",
+                    py::return_value_policy::copy)
+            .def("get_W_matrix", &FGraphSolve::get_W_matrix,
+                    "Returns the W matrix of observation noises(sparse matrix). It requires to be calculated -> solved the problem",
+                    py::return_value_policy::copy)
+            .def("get_vector_b", &FGraphSolve::get_vector_b,
+                    "Returns the vector  b = A'Wr, from residuals. It requires to be calculated -> solved the problem",
                     py::return_value_policy::copy)
             .def("get_chi2_array", &FGraphSolve::get_chi2_array,
                     "Returns the vector of chi2 values for each factor. It requires to be calculated -> solved the problem",
@@ -211,26 +244,37 @@ void init_FGraph(py::module &m)
             .def("print", &FGraph::print, "By default False: does not print all the information on the Fgraph", py::arg("completePrint") = false)
             // -----------------------------------------------------------------------------
             // Specific call to 2D
-            .def("add_node_pose_2d", &FGraphPy::add_node_pose_2d)
+            .def("add_node_pose_2d", &FGraphPy::add_node_pose_2d,
+                    " - arguments, initial estimate (np.zeros(3)\n"
+                    "output, node id, for later usage")
             .def("add_factor_1pose_2d", &FGraphPy::add_factor_1pose_2d)
             .def("add_factor_2poses_2d", &FGraphPy::add_factor_2poses_2d,
-                    "Factors connecting 2 poses. If last input set to true (by default false), also updates the value of the target Node according to the new obs + origin node",
+                    "Factors connecting 2 poses. If last input set to true (by default false), also updates "
+                    "the value of the target Node according to the new obs + origin node",
                     py::arg("obs"),
-                    py::arg("nodeOridingId"),
+                    py::arg("nodeOriginId"),
                     py::arg("nodeTargetId"),
                     py::arg("obsInvCov"),
                     py::arg("updateNodeTarget") = false)
-            .def("add_factor_2poses_2d_odom", &FGraphPy::add_factor_2poses_2d_odom)
+            .def("add_factor_2poses_2d_odom", &FGraphPy::add_factor_2poses_2d_odom,
+                    "add_factor_2poses_2d_odom(obs, nodeOriginId, nodeTargetId, W)"
+                    "\nFactor connecting 2 poses, following an odometry model."
+                    "\nArguments are obs, nodeOriginId, nodeTargetId and obsInvCov",
+                    py::arg("obs"),
+                    py::arg("nodeOriginId"),
+                    py::arg("nodeTargetId"),
+                    py::arg("obsInvCov"))
             // 2d Landmkarks
             .def("add_node_landmark_2d", &FGraphPy::add_node_landmark_2d,
-                    "Ladmarks are 2D points, in [x,y]")
+                    "Landmarks are 2D points, in [x,y]. It requries initialization, "
+                    "although factor 1pose 1land 2d can initialize with the inverse observation function")
             .def("add_factor_1pose_1landmark_2d", &FGraphPy::add_factor_1pose_1landmark_2d,
-                            "Factor connecting 1 pose and 1 point (landmark).",
-                            py::arg("obs"),
-                            py::arg("nodePoseId"),
-                            py::arg("nodeLandmarkId"),
-                            py::arg("obsInvCov"),
-                            py::arg("initializeLandmark") = false)
+                    "Factor connecting 1 pose and 1 point (landmark).",
+                    py::arg("obs"),
+                    py::arg("nodePoseId"),
+                    py::arg("nodeLandmarkId"),
+                    py::arg("obsInvCov"),
+                    py::arg("initializeLandmark") = false)
             // -----------------------------------------------------------------------------
             // Specific call to 3D
             .def("add_node_pose_3d", &FGraphPy::add_node_pose_3d,
@@ -264,6 +308,15 @@ void init_FGraph(py::module &m)
                             py::arg("nodePoseId"),
                             py::arg("nodeLandmarkId"),
                             py::arg("obsInvCov"))
+            // ------------------------------------------------------------------------------
+            // point to plane registration
+            .def("add_factor_1pose_point2plane", &FGraphPy::add_factor_1pose_point2plane,
+                     "Factor measuring point to plane distance in a registration problem",
+                            py::arg("z_point_x"),
+                            py::arg("z_point_y"),
+                            py::arg("z_normal_y"),
+                            py::arg("nodePoseId"),
+                            py::arg("obsInf"))
             ;
 
 }
