@@ -3,76 +3,59 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/mariadb:bionic
+      - image: cimg/base:stable
+    environment:
+      PYTHONPATH=./lib
     steps:
       - checkout
       - run:
-          name: "Update Image"
+          name: "Install required packages from distro"
           command: |
-            apt-get update && apt-get install -y git
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends git build-essential g++ cmake python3-distutils python3-dev python3-numpy
       - run:
           name: "Pull Submodules"
           command: |
-            git submodule update --init --recursive      
+            git submodule update --init --recursive
       - run:
-          name: "Install packages"
+          name: "Configure and build native mrob library with Python bindings"
           command: |
-            apt-get install -y build-essential cmake python3-distutils python3-dev
-            apt-get install -y virtualenv
-      - run:
-          name: "Build mrob library"
-          command: |
-            mkdir build && cd build
-            cmake .. && make -j
-            cd ..
-      - run:
-          name: "Setup virtualenv"
-          command: |
-            virtualenv -p python3 venv
-            source venv/bin/activate
-            pip install numpy
+            mkdir -p build && pushd build
+            cmake $(dirs -l +1) && make -j 4
+            popd
       - run:
           name: "Run FGraph_2d"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
             python3 mrobpy/tests/FGraph_2d.py
           when: always
       - run:
           name: "Run FGraph_M3500"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
-            cd mrobpy/tests/
-            python3 FGraph_M3500.py
+            python3 mrobpy/tests/FGraph_M3500.py
           when: always
       - run:
           name: "Run FGraph_sphere"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
-            cd mrobpy/tests/
-            python3 FGraph_sphere.py
+            python3 mrobpy/tests/FGraph_sphere.py
           when: always
       - run:
           name: "Run SE3_examples"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
             python3 mrobpy/tests/SE3_examples.py
           when: always
       - run:
           name: "Run FGraph_landmark_3d_example"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
             python3 mrobpy/tests/FGraph_landmark_3d_example.py
           when: always
       - run:
           name: "Run FGraph_landmark_2d_example"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
             python3 mrobpy/tests/FGraph_landmark_2d_example.py
           when: always
       - run:
           name: "Run PC_align"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
             python3 mrobpy/tests/PC_align.py
           when: always
   build-wheel:
@@ -119,16 +102,18 @@ jobs:
                   ${VERSION} ~/project/build/wheelhouse/*.whl
   publish-pypi:
     docker:
-      - image: circleci/python:3.8
+      - image: cimg/python:3.9
     steps:
       - attach_workspace:
           at: ~/
       - run:
           name: Upload to PyPI
           command: |
-              echo -e "[pypi]" >> ~/.pypirc
-              echo -e "username = __token__" >> ~/.pypirc
-              echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+              cat >> ~/.pypirc \<< EOD
+              [pypi]
+              username = __token__
+              password = $PYPI_PASSWORD
+              EOD
               python3 -m pip install --user --upgrade twine
               twine upload ~/project/build/wheelhouse/*.whl
 

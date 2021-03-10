@@ -1,6 +1,7 @@
 #
 import mrob
 import numpy as np
+from os import path
 import time
 
 # Initialize data structures
@@ -14,7 +15,7 @@ N = 2500
 # load file, .g2o format from https://github.com/RainerKuemmerle/g2o/wiki/File-Format
 #file_path = '../../benchmarks/sphere_gt.g2o'
 file_path = '../../benchmarks/sphere.g2o'
-with open(file_path, 'r') as file:
+with open(path.join(path.dirname(__file__), file_path), 'r') as file:
     for line in file:
         d = line.split()
         # read edges and vertex
