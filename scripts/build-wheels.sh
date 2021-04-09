@@ -24,20 +24,20 @@
 set -euo pipefail
 export LC_ALL=C
 
-LATEST=""
+#Early check for build tools
+chrpath --version && cmake --version
 
-cd $(dirname $(readlink -f "${BASH_SOURCE[0]}"))
-cd ../ 
-
-mkdir ./build
-mkdir ./dist
-mkdir ./mrob
+cd $(dirname $(readlink -f "${BASH_SOURCE[0]}"))/..
+mkdir -p ./build ./dist ./mrob
 
 cp ./__init__.py ./mrob/__init__.py 
 
 cd ./build
 
 NUMPROC=$(grep -Ec '^processor\s+:' /proc/cpuinfo)
+echo "Running $NUMPROC parallel jobs"
+
+LATEST=""
 
 for PYBIN in /opt/python/cp3*/bin/
 do
@@ -46,7 +46,7 @@ do
     cmake .. -DPYTHON_EXECUTABLE:FILEPATH=${PYBIN}python3
     make -j $NUMPROC
     
-    mv ../lib/* ../mrob
+    mv --verbose ../lib/* ../mrob
 done
 
 chrpath -r '$ORIGIN' ../mrob/mrob.*.so
