@@ -23,6 +23,35 @@
 
 import setuptools
 
+
+try:
+    from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+    import platform, os
+
+    class bdist_wheel(_bdist_wheel):
+
+        def finalize_options(self):
+            _bdist_wheel.finalize_options(self)
+            if platform.system() == "Darwin":
+                self.root_is_pure = False
+
+        def get_tag(self):
+            python, abi, plat = _bdist_wheel.get_tag(self)
+            if platform.system() == "Darwin":
+                python, abi = 'py3', 'none'
+                name = plat[:plat.find("_")]
+                for i in range(3):
+                    plat = plat[plat.find("_") + 1:]   # skip name and version of OS
+                arch = plat
+                version = os.getenv('MACOSX_DEPLOYMENT_TARGET').replace('.', '_')
+                plat = name + "_" + version + "_" + arch
+            return python, abi, plat
+
+except ImportError:
+    bdist_wheel = None
+
+
 setuptools.setup(
-    version_config=True
+    version_config=True,
+    cmdclass={'bdist_wheel': bdist_wheel}
 )

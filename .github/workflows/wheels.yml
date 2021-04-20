@@ -1,0 +1,131 @@
+name: Build macOS wheels
+
+on: [push, pull_request]
+
+jobs:
+  build_wheel:
+    name: Build wheel on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-10.15]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install packages
+        run: brew install coreutils
+
+      - name: Build wheel
+        run: sudo ./scripts/build-wheels-macOS.sh
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./dist/mrob*.whl
+
+  test_wheel:
+    name: Test Python ${{ matrix.python }} wheel on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs: build_wheel
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-10.15]
+        python: [3.5, 3.9]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Install mrob & numpy
+        run: |
+          python3 -m pip install ./artifact/mrob*.whl numpy
+
+      - name: Run FGraph_2d
+        run: |
+          python3 mrobpy/tests/FGraph_2d.py
+
+      - name: Run FGraph_M3500
+        run: |
+          python3 mrobpy/tests/FGraph_M3500.py
+
+      - name: Run FGraph_sphere
+        run: |
+          python3 mrobpy/tests/FGraph_sphere.py
+
+      - name: Run SE3_examples
+        run: |
+          python3 mrobpy/tests/SE3_examples.py
+
+      - name: Run FGraph_landmark_3d_example
+        run: |
+          python3 mrobpy/tests/FGraph_landmark_3d_example.py
+
+      - name: Run FGraph_landmark_2d_example
+        run: |
+          python3 mrobpy/tests/FGraph_landmark_2d_example.py
+
+      - name: Run PC_align
+        run: |
+          python3 mrobpy/tests/PC_align.py
+
+  publish_pypi:
+    name: Publish macOS wheel to PyPI
+    needs: test_wheel
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          packages_dir: artifact/
+
+  publish-github-release:
+    name: Publish macOS wheel to GitHub Releases
+    needs: test_wheel
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Create Draft Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Export release assets
+        id: path
+        run: |
+          whl=$(find artifact/ -name '*.whl' -exec basename {} \;)
+          echo "::set-output name=WHL::$whl"
+
+      - uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifact/${{ steps.path.outputs.WHL }}
+          asset_name: ${{ steps.path.outputs.WHL }}
+          asset_content_type: application/octet-stream
+

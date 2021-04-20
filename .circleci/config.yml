@@ -84,6 +84,56 @@ jobs:
           root: ~/
           paths:
             - project/build/wheelhouse
+  test-wheel:
+    docker:
+      - image: cimg/base:stable
+    environment:
+      PYTHONPATH=./lib
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: "Install mrob & numpy"
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends python3-pip
+            python3 -m pip install ~/project/build/wheelhouse/mrob*.whl numpy
+      - run:
+          name: "Run FGraph_2d"
+          command: |
+            python3 mrobpy/tests/FGraph_2d.py
+          when: always
+      - run:
+          name: "Run FGraph_M3500"
+          command: |
+            python3 mrobpy/tests/FGraph_M3500.py
+          when: always
+      - run:
+          name: "Run FGraph_sphere"
+          command: |
+            python3 mrobpy/tests/FGraph_sphere.py
+          when: always
+      - run:
+          name: "Run SE3_examples"
+          command: |
+            python3 mrobpy/tests/SE3_examples.py
+          when: always
+      - run:
+          name: "Run FGraph_landmark_3d_example"
+          command: |
+            python3 mrobpy/tests/FGraph_landmark_3d_example.py
+          when: always
+      - run:
+          name: "Run FGraph_landmark_2d_example"
+          command: |
+            python3 mrobpy/tests/FGraph_landmark_2d_example.py
+          when: always
+      - run:
+          name: "Run PC_align"
+          command: |
+            python3 mrobpy/tests/PC_align.py
+          when: always
   publish-github-release:
     docker:
       - image: cibuilds/github:0.10
@@ -98,7 +148,6 @@ jobs:
                   -u "${CIRCLE_PROJECT_USERNAME}" \
                   -r "${CIRCLE_PROJECT_REPONAME}" \
                   -c "${CIRCLE_SHA1}" \
-                  -delete \
                   ${VERSION} ~/project/build/wheelhouse/*.whl
   publish-pypi:
     docker:
@@ -133,19 +182,23 @@ workflows:
       - build:
           filters: *all-tags
       - build-wheel:
+          requires:
+            - build
+          filters: *all-tags
+      - test-wheel:
+          requires:
+            - build-wheel
           filters: *all-tags
       - publish-github-release:
           requires:
-            - build
-            - build-wheel
+            - test-wheel
           filters:
             <<: *all-tags
             branches:
               ignore: /.*/ # publish to GHR only tagged commits
       - publish-pypi:
           requires:
-            - build
-            - build-wheel
+            - test-wheel
           filters:
             <<: *all-tags
             branches:
