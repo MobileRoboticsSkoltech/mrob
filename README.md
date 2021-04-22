@@ -1,3 +1,6 @@
+[![PyPi version](https://pypip.in/v/mrob/badge.png)](https://crate.io/packages/mrob/)
+[![PyPi downloads](https://pypip.in/d/mrob/badge.png)](https://crate.io/packages/mrob/)
+
 <p align="center">
   <img src="https://sites.skoltech.ru/app/data/uploads/sites/50/2018/02/mr_animate1.gif" width="450">
 </p>
