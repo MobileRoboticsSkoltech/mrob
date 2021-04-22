@@ -103,29 +103,8 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v2
 
-      - name: Create Draft Release
-        id: create_release
-        uses: actions/create-release@v1
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: artifact/*.whl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-      - name: Export release assets
-        id: path
-        run: |
-          whl=$(find artifact/ -name '*.whl' -exec basename {} \;)
-          echo "::set-output name=WHL::$whl"
-
-      - uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: artifact/${{ steps.path.outputs.WHL }}
-          asset_name: ${{ steps.path.outputs.WHL }}
-          asset_content_type: application/octet-stream
-
