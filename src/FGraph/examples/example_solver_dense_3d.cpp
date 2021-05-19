@@ -74,7 +74,7 @@ int main ()
 
     // solve the Gauss Newton optimization
     graph.print(true);
-    graph.optimize(mrob::Optimizer::NEWTON_RAPHSON);
+    graph.solve(mrob::Optimizer::NEWTON_RAPHSON);
 
     graph.print(true);
     std::cout << "\n\n\nSolved, chi2 = " << graph.calculate_error() << std::endl;

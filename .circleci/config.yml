@@ -3,75 +3,203 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/mariadb:bionic
+      - image: cimg/base:stable
+    environment:
+      PYTHONPATH=./lib
     steps:
       - checkout
       - run:
-          name: "Update Image"
+          name: "Install required packages from distro"
           command: |
-            apt-get update && apt-get install -y git
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends git build-essential g++ cmake python3-distutils python3-dev python3-numpy
       - run:
           name: "Pull Submodules"
           command: |
-            git submodule update --init --recursive      
+            git submodule update --init --recursive
       - run:
-          name: "Install packages"
+          name: "Configure and build native mrob library with Python bindings"
           command: |
-            apt-get install -y build-essential cmake python3-distutils python3-dev
-            apt-get install -y virtualenv
-      - run:
-          name: "Build mrob library"
-          command: |
-            mkdir build && cd build
-            cmake .. && make -j
-            cd ..
-      - run:
-          name: "Setup virtualenv"
-          command: |
-            virtualenv -p python3 venv
-            source venv/bin/activate
-            pip install numpy
+            mkdir -p build && pushd build
+            cmake $(dirs -l +1) && make -j 4
+            popd
       - run:
           name: "Run FGraph_2d"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
             python3 mrobpy/tests/FGraph_2d.py
           when: always
       - run:
           name: "Run FGraph_M3500"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
-            cd mrobpy/tests/
-            python3 FGraph_M3500.py
+            python3 mrobpy/tests/FGraph_M3500.py
           when: always
       - run:
           name: "Run FGraph_sphere"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
-            cd mrobpy/tests/
-            python3 FGraph_sphere.py
+            python3 mrobpy/tests/FGraph_sphere.py
           when: always
       - run:
           name: "Run SE3_examples"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
             python3 mrobpy/tests/SE3_examples.py
           when: always
       - run:
           name: "Run FGraph_landmark_3d_example"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
             python3 mrobpy/tests/FGraph_landmark_3d_example.py
           when: always
       - run:
           name: "Run FGraph_landmark_2d_example"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
             python3 mrobpy/tests/FGraph_landmark_2d_example.py
           when: always
       - run:
           name: "Run PC_align"
           command: |
-            export PYTHONPATH=${PYTHONPATH}:$(pwd)/lib && source venv/bin/activate
             python3 mrobpy/tests/PC_align.py
           when: always
+  build-wheel:
+    docker:
+      - image: quay.io/pypa/manylinux2010_x86_64
+    steps:
+      - checkout
+      - run:
+          name: "Install fresh CMake into ManyLinux container"
+          command: |
+            env pybin=$(LANG=C ls -d1r /opt/python/cp3*/bin | head -n 1) bash -c '$pybin/python -m pip install cmake && mkdir -p /usr/local/bin && ln -svf $pybin/cmake /usr/local/bin/cmake'
+            cmake --version
+      - run:
+          name: "Clone submodules"
+          command: git submodule update --init --recursive
+      - run:
+          name: "Install additional utils"
+          command: yum install -y chrpath
+      - run:
+          name: "Build Python wheels"
+          command: scripts/build-wheels.sh
+      - store_artifacts:
+          path: /root/project/build/wheelhouse
+          destination: ~/artifacts
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/build/wheelhouse
+  test-wheel:
+    docker:
+      - image: cimg/base:stable
+    environment:
+      PYTHONPATH=./lib
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: "Install mrob & numpy"
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends python3-pip
+            python3 -m pip install ~/project/build/wheelhouse/mrob*.whl numpy
+      - run:
+          name: "Run FGraph_2d"
+          command: |
+            python3 mrobpy/tests/FGraph_2d.py
+          when: always
+      - run:
+          name: "Run FGraph_M3500"
+          command: |
+            python3 mrobpy/tests/FGraph_M3500.py
+          when: always
+      - run:
+          name: "Run FGraph_sphere"
+          command: |
+            python3 mrobpy/tests/FGraph_sphere.py
+          when: always
+      - run:
+          name: "Run SE3_examples"
+          command: |
+            python3 mrobpy/tests/SE3_examples.py
+          when: always
+      - run:
+          name: "Run FGraph_landmark_3d_example"
+          command: |
+            python3 mrobpy/tests/FGraph_landmark_3d_example.py
+          when: always
+      - run:
+          name: "Run FGraph_landmark_2d_example"
+          command: |
+            python3 mrobpy/tests/FGraph_landmark_2d_example.py
+          when: always
+      - run:
+          name: "Run PC_align"
+          command: |
+            python3 mrobpy/tests/PC_align.py
+          when: always
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+              VERSION=v$(ls ~/project/build/wheelhouse/*.whl | awk -F"-" '{ print $2 }')
+              ghr -t "${GITHUB_TOKEN}" \
+                  -u "${CIRCLE_PROJECT_USERNAME}" \
+                  -r "${CIRCLE_PROJECT_REPONAME}" \
+                  -c "${CIRCLE_SHA1}" \
+                  ${VERSION} ~/project/build/wheelhouse/*.whl
+  publish-pypi:
+    docker:
+      - image: cimg/python:3.9
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Upload to PyPI
+          command: |
+              cat >> ~/.pypirc \<< EOD
+              [pypi]
+              username = __token__
+              password = $PYPI_PASSWORD
+              EOD
+              python3 -m pip install --user --upgrade twine
+              twine upload ~/project/build/wheelhouse/*.whl
+
+# Jobs for branches are run by default, but jobs for tags MUST be turned on explicitly
+# for ALL dependencies too, not only for the single job.
+# https://circleci.com/docs/2.0/configuration-reference/#filters-1
+
+# Use YAML anchor/alias to reuse mapping, this helps to avoid text duplication.
+# https://circleci.com/docs/2.0/writing-yaml/#anchors-and-aliases
+filter-forall-tags: &all-tags
+  tags:
+    only: /.*/ # run for tags too, otherwise for branches only
+
+workflows:
+  build_and_test:
+    jobs:
+      - build:
+          filters: *all-tags
+      - build-wheel:
+          requires:
+            - build
+          filters: *all-tags
+      - test-wheel:
+          requires:
+            - build-wheel
+          filters: *all-tags
+      - publish-github-release:
+          requires:
+            - test-wheel
+          filters:
+            <<: *all-tags
+            branches:
+              ignore: /.*/ # publish to GHR only tagged commits
+      - publish-pypi:
+          requires:
+            - test-wheel
+          filters:
+            <<: *all-tags
+            branches:
+              ignore: /.*/ # publish to PyPI only tagged commits

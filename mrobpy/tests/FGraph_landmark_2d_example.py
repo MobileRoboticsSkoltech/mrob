@@ -4,7 +4,7 @@ import mrob
 import numpy as np
 
 # create graph
-graph = mrob.fgraph.FGraph()
+graph = mrob.FGraph()
 
 #initial point at [0,0,0] with some noise
 n1 = graph.add_node_pose_2d(np.random.randn(3)*0.05)
@@ -28,8 +28,8 @@ graph.print(True)
 
 
 print('\n\n\n Solving Fgraph:\n')
-#graph.solve(mrob.fgraph.GN) #1 iteration of Gauss-Newton
-graph.solve(mrob.fgraph.LM) #as many iterations until convergence for Levenberg Marquardt
+#graph.solve(mrob.GN) #1 iteration of Gauss-Newton
+graph.solve(mrob.LM) #as many iterations until convergence for Levenberg Marquardt
 graph.print(True)
 print('Current chi2 = ', graph.chi2() ) # re-evaluates the error, on print it is only the error on evalation before update
 

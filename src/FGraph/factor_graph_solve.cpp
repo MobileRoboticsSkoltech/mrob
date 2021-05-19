@@ -46,7 +46,7 @@ FGraphSolve::FGraphSolve(matrixMethod method, optimMethod optim):
 FGraphSolve::~FGraphSolve() = default;
 
 
-void FGraphSolve::solve(optimMethod method, uint_t maxIters)
+void FGraphSolve::solve(optimMethod method, uint_t maxIters, matData_t lambda, matData_t solutionTolerance)
 {
     /**
      * 2800 2D nodes on M3500
@@ -58,6 +58,8 @@ void FGraphSolve::solve(optimMethod method, uint_t maxIters)
      *
      */
     optimMethod_ = method; // updates the optimization method
+    lambda_ = lambda;
+    solutionTolerance_ = solutionTolerance;
     time_profiles_.reset();
 
     // Optimization
@@ -255,7 +257,7 @@ void FGraphSolve::build_adjacency()
         for (uint_t j = 0; j < dim; ++j)
         {
             reservationA.push_back(allDim);
-            reservationW.push_back(dim-j);
+            reservationW.push_back(dim-j);//XXX this might be allocating more elements than necessary, check
         }
         indFactorsMatrix.push_back(M_);
         M_ += dim;

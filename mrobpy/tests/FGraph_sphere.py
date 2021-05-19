@@ -1,6 +1,7 @@
 #
 import mrob
 import numpy as np
+from os import path
 import time
 
 # Initialize data structures
@@ -14,7 +15,7 @@ N = 2500
 # load file, .g2o format from https://github.com/RainerKuemmerle/g2o/wiki/File-Format
 #file_path = '../../benchmarks/sphere_gt.g2o'
 file_path = '../../benchmarks/sphere.g2o'
-with open(file_path, 'r') as file:
+with open(path.join(path.dirname(__file__), file_path), 'r') as file:
     for line in file:
         d = line.split()
         # read edges and vertex
@@ -73,7 +74,7 @@ with open(file_path, 'r') as file:
 
 
 # Initialize FG
-graph = mrob.fgraph.FGraph()
+graph = mrob.FGraph()
 x = vertex_ini[0]
 print(x.T())
 n = graph.add_node_pose_3d(x)
@@ -109,7 +110,7 @@ for t in range(1,N):
 # Solves the batch problem
 print('Current state of the graph: chi2 = ' , graph.chi2() )
 start = time.time()
-graph.solve(mrob.fgraph.LM,100)
+graph.solve(mrob.LM,8)
 end = time.time()
 print(', chi2 = ', graph.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
 

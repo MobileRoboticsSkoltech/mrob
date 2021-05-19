@@ -5,7 +5,7 @@ import numpy as np
 
 # example translated from FGrpah/examples/example_solver_3d_landmarks.cpp
 
-graph = mrob.fgraph.FGraph()
+graph = mrob.FGraph()
 
 n1 = graph.add_node_pose_3d(mrob.geometry.SE3(np.random.randn(6)*0.05))
 # non-initialized landmarks, nut they could be initialiazed
@@ -34,7 +34,7 @@ graph.print(True)
 
 print('\n\n\n Solving Fgraph:\n')
 #graph.solve(mrob.fgraph.GN) #1 iteration of Gauss-Newton
-graph.solve(mrob.fgraph.LM) #as many iterations until convergence for Levenberg Marquardt
+graph.solve(mrob.LM) #as many iterations until convergence for Levenberg Marquardt
 graph.print(True)
 
 

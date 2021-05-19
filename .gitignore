@@ -18,3 +18,7 @@ bin/
 *.png
 *.pdf
 *.pkl
+
+mrob
+dist/
+mrob.egg-info/
