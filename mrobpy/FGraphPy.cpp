@@ -242,6 +242,9 @@ void init_FGraph(py::module &m)
             .def("number_nodes", &FGraphSolve::number_nodes, "Returns the number of nodes")
             .def("number_factors", &FGraphSolve::number_factors, "Returns the number of factors")
             .def("print", &FGraph::print, "By default False: does not print all the information on the Fgraph", py::arg("completePrint") = false)
+            // Robust factors GUI
+            // TODO, we want to set a default robust function? maybe at ini?
+            // TODO we want a way to change the robust factor for each node, maybe accesing by id? This could be away to inactivate factors...
             // -----------------------------------------------------------------------------
             // Specific call to 2D
             .def("add_node_pose_2d", &FGraphPy::add_node_pose_2d,

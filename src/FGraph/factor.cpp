@@ -39,17 +39,35 @@ Factor::~Factor()
 }
 
 
-void Factor::evaluate_robust_weight(matData_t u, matData_t params)
+matData_t Factor::evaluate_robust_weight(matData_t u, matData_t params)
 {
     switch(robust_type_)
     {
         case HUBER:
+            // p(u) = 1/2u^2    if u < d
+            //        d(u-1/2d)
+            if (u < 1.0) //XXX should this be set param?
+            {
+                robust_weight_ = 1.0;
+            }
+            else
+            {
+                robust_weight_ = 1.0/u;
+            }
+            break;
         case CAUCHY:
+            robust_weight_ = 1.0/(1+u*u);
+            break;
         case MCCLURE:
+            params = 1+u*u;
+            robust_weight_ = 1.0/params/params;
+            break;
         case RANSAC:
+            break;
         case QUADRATIC:
         default:
             robust_weight_ = 1.0;
-            return;
+            break;
     }
+    return robust_weight_;
 }

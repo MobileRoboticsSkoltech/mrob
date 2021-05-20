@@ -310,6 +310,7 @@ void FGraphSolve::build_adjacency()
             {
                 uint_t iRow = indFactorsMatrix[i] + l;
                 uint_t iCol = indFactorsMatrix[i] + k;
+                robust_weight = f->evaluate_robust_weight(std::sqrt(f->get_chi2()));
                 W_.insert(iRow,iCol) = robust_weight * f->get_information_matrix()(l,k);
             }
         }

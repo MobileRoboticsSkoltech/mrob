@@ -64,11 +64,16 @@ class Node;
  * Robust Factors TODO
  *  All factors also allow for robust factors, they just have to be specified at the constructor.
  *  By the default the robust factor is quadratic (no effect)
- *  Currently suporte robust factors:
- *   - Huber
- *   - Cauchy
- *   - McClure
- *   - Ransac, this is equivalent to the truncated least sqaures problem TODO parameter passing
+ *  Currently supports robust factors:
+ *                   Influence function                 robust weight
+ *                   --------------------             --------------------
+ *   - Quadratic:          p(u) = 1/2u^2              w(u)  = 1
+ *   - Huber:     p(u) = 1/2u^2    if u < d            w(u) = 1
+                          d(u-1/2d)                          1/u
+ *   - Cauchy:   p(u) = 1/2 ln(1+u^2)                  w(u) = 1/(1+u^2)
+ *   - McClure:   p(u) = 1/2 u^2 / (1+u^2)              w(u) = 1/(1+u^2)^2
+ *   - Ransac:   p(u) = 1/2u^2    if u < d            w(u) = 1
+ *                      d                                    0
  */
 
 class Factor{
@@ -134,8 +139,20 @@ public:
     const std::vector<std::shared_ptr<Node> >*
             get_neighbour_nodes(void) const {return &neighbourNodes_;};
 
-    // Robust functions, given the current distance u = sqrt(r' W r)
-    void evaluate_robust_weight(matData_t u, matData_t params = 0.0);
+    /**
+     * Robust functions, given the current distance u = sqrt(r' W r)
+     * It can be calucated in the base class for most of the robust functions
+     * given that we provide the following inputs:
+     *  - u = sqrt(r'Wr)
+     *  - param: may be used to pass some information for some losses
+     *
+     * Output:
+     *  - dp/du 1/u or influence by the inverse of the distance u.
+     *  The output is directly multiplied in the formation of the
+     *  matrix W when building the problem.
+     */
+
+    matData_t evaluate_robust_weight(matData_t u, matData_t params = 0.0);
 
 protected:
     id_t id_;
