@@ -60,14 +60,15 @@ jobs:
           when: always
   build-wheel:
     docker:
-      - image: quay.io/pypa/manylinux2010_x86_64
+      - image: quay.io/pypa/manylinux2010_x86_64:2021-04-09-c61dabe
     steps:
-      - checkout
       - run:
-          name: "Install fresh CMake into ManyLinux container"
+          name: "Install git and fresh CMake into ManyLinux container"
           command: |
+            yum install git -y
             env pybin=$(LANG=C ls -d1r /opt/python/cp3*/bin | head -n 1) bash -c '$pybin/python -m pip install cmake && mkdir -p /usr/local/bin && ln -svf $pybin/cmake /usr/local/bin/cmake'
             cmake --version
+      - checkout
       - run:
           name: "Clone submodules"
           command: git submodule update --init --recursive
