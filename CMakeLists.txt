@@ -15,20 +15,12 @@ IF (NOT CMAKE_BUILD_TYPE)
  SET(CMAKE_BUILD_TYPE "Release") 
 ENDIF (NOT CMAKE_BUILD_TYPE)
 
-# flag _REENTRANT for safe threads and NDEBUG to disable asserts
-SET(CMAKE_CXX_FLAGS_DEBUG "-g -Wall -D_REENTRANT")
-SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -D_REENTRANT -DNDEBUG")
-#SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD 14)
-
+SET(CMAKE_CXX_EXTENSIONS ON)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
 # ===================================================================
-# DEPENDENCIES: locate the necessary dependencies for the project
-# DEPENDENCIES: Eigen (submodule pointing to 3.3.7)
-SET(Eigen_INCLUDE_DIRS ./external/Eigen)
-INCLUDE_DIRECTORIES(${Eigen_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(SYSTEM ./external/Eigen)
 
-# DEPENDENCIES: pybind11 (submodule)
-SET(PYBIND11_CPP_STANDARD -std=c++14)
 ADD_SUBDIRECTORY(./external/pybind11)
 
 
@@ -56,40 +48,3 @@ ADD_SUBDIRECTORY(./src/PCRegistration)
 
 # MROB python bingins, defined here:
 ADD_SUBDIRECTORY(./mrobpy)
-
-
-
-ADD_CUSTOM_TARGET (distclean @echo cleaning cmake files)
-
-IF (UNIX)
-  ADD_CUSTOM_COMMAND(
-    COMMENT "distribution clean"
-    COMMAND make ARGS clean
-    COMMAND rm ARGS -rf ${CMAKE_SOURCE_DIR}/build/*
-
-    TARGET  distclean
-  )
-ELSE(UNIX)
-  ADD_CUSTOM_COMMAND(
-    COMMENT "distclean only implemented in unix"
-    TARGET  distclean
-  )
-ENDIF(UNIX)
-
-ADD_CUSTOM_TARGET (uninstall @echo uninstall package)
-
-IF (UNIX)
-  ADD_CUSTOM_COMMAND(
-    COMMENT "uninstall package"
-    COMMAND xargs ARGS rm < install_manifest.txt
-
-    TARGET  uninstall
-  )
-ELSE(UNIX)
-  ADD_CUSTOM_COMMAND(
-    COMMENT "uninstall only implemented in unix"
-    TARGET  uninstall
-  )
-ENDIF(UNIX)
-
-
