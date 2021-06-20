@@ -64,12 +64,12 @@ uint_t OptimizerDense::optimize_newton_raphson_one_iteration(bool useLambda)
     {
         if (optimization_method_ == LEVENBERG_MARQUARDT_SPHER)
         {
-            for (uint_t i = 0; i < hessian_.diagonalSize() ; ++i)
+            for (Eigen::Index i = 0; i < hessian_.diagonalSize() ; ++i)
                 hessian_(i,i) += lambda_;
         }
         if (optimization_method_ == LEVENBERG_MARQUARDT_ELLIP)
         {
-            for (uint_t i = 0; i < hessian_.diagonalSize() ; ++i)
+            for (Eigen::Index i = 0; i < hessian_.diagonalSize() ; ++i)
                 hessian_(i,i) *= 1.0 + lambda_;
         }
     }

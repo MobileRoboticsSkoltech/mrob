@@ -25,10 +25,10 @@
 #include <iostream>
 #include <iomanip>      // std::setprecision
 #include <cmath>
-#include "mrob/SE3.hpp"
-#include "mrob/SO3.hpp"
 #include <vector>
 
+#include "mrob/SE3.hpp"
+#include "mrob/SO3.hpp"
 
 int main()
 {

@@ -226,7 +226,7 @@ void FGraphSolve::build_adjacency()
     indNodesMatrix.reserve(nodes->size());
 
     N_ = 0;
-    for (id_t i = 0; i < nodes->size(); ++i)
+    for (size_t i = 0; i < nodes->size(); ++i)
     {
         // calculate the indices to access
         uint_t dim = (*nodes)[i]->get_dim();

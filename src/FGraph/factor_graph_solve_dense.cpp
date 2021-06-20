@@ -79,7 +79,7 @@ void FGraphSolveDense::calculate_gradient_hessian()
     indNodesMatrix.reserve(nodes_.size());
     indNodeId.reserve(nodes_.size());
     uint_t N = 0, M = 0;
-    for (id_t i = 0; i < nodes_.size(); ++i)
+    for (size_t i = 0; i < nodes_.size(); ++i)
     {
         // calculate the indices to access
         uint_t dim = nodes_[i]->get_dim();

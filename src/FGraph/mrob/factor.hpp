@@ -64,6 +64,7 @@ class Node;
 
 class Factor{
 public:
+    typedef std::size_t id_t;
     /**
      * On the derived class constructor we will specify the (ordered)
      * nodes that the factor is connected to.
