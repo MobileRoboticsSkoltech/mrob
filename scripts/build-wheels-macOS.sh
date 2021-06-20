@@ -40,10 +40,10 @@ do
     cmake .. -DPYTHON_EXECUTABLE:FILEPATH=$PYBIN \
              -DCMAKE_MACOSX_RPATH=ON \
              -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE \
-             -DCMAKE_INSTALL_RPATH="@loader_path" 
-    make -j $NUMPROC
-    
-    mv ../lib/* ../mrob
+             -DCMAKE_INSTALL_RPATH="@loader_path" \
+             -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/../bin \
+             -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$PWD/../mrob \
+    && cmake --build . -j $NUMPROC
 done
 
 cd ../

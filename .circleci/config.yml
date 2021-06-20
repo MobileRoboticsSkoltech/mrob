@@ -20,9 +20,11 @@ jobs:
       - run:
           name: "Configure and build native mrob library with Python bindings"
           command: |
-            mkdir -p build && pushd build
-            cmake $(dirs -l +1) && make -j 4
-            popd
+            mkdir -p build
+            cmake -S $PWD -B $PWD/build \
+             -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/bin \
+             -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$PWD/lib \
+            && cmake --build build -j $(nproc)
       - run:
           name: "Run FGraph_2d"
           command: |

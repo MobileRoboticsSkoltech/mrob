@@ -34,7 +34,7 @@ cp ./__init__.py ./mrob/__init__.py
 
 cd ./build
 
-NUMPROC=$(grep -Ec '^processor\s+:' /proc/cpuinfo)
+NUMPROC=$(nproc)
 echo "Running $NUMPROC parallel jobs"
 
 LATEST=""
@@ -42,11 +42,11 @@ LATEST=""
 for PYBIN in /opt/python/cp3*/bin/
 do
     LATEST=${PYBIN}
-
-    cmake .. -DPYTHON_EXECUTABLE:FILEPATH=${PYBIN}python3
-    make -j $NUMPROC
-    
-    mv --verbose ../lib/* ../mrob
+    cmake -S .. -B . \
+             -DPYTHON_EXECUTABLE:FILEPATH=${PYBIN}python3 \
+             -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/../bin \
+             -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$PWD/../mrob \
+    && cmake --build . -j $(nproc)
 done
 
 chrpath -r '$ORIGIN' ../mrob/mrob.*.so
