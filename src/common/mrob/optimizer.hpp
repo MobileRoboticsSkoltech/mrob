@@ -138,7 +138,7 @@ protected:
     virtual matData_t calculate_model_fidelity(matData_t diff_error) = 0;
 
 
-    optimMethod optimization_method_;
+    optimMethod optimization_method_ {};
     matData_t solutionTolerance_;
     uint_t max_iters_;
     MatX1 gradient_, dx_;

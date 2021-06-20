@@ -24,7 +24,7 @@
 
 #include "mrob/factors/nodePlane4d.hpp"
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 
 using namespace mrob;
 
@@ -45,15 +45,12 @@ NodePlane4d::~NodePlane4d()
 
 void NodePlane4d::update(const Eigen::Ref<const MatX1> &dx)
 {
-    Mat41 dpi = dx;
     state_ += dx;
-    //state_.head(3).normalize();
     state_.head(3).normalize();
 }
 
 void NodePlane4d::update_from_auxiliary(const Eigen::Ref<const MatX1> &dx)
 {
-    Mat41 dpi = dx;
     state_ = auxiliaryState_ + dx;
     state_.head(3).normalize();
 }

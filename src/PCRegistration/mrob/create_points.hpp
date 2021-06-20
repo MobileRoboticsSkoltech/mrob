@@ -75,7 +75,7 @@ class SamplePlanarSurface{
     std::default_random_engine generator_;
     std::uniform_real_distribution<double> x_, y_;
     std::normal_distribution<double> z_, bias_;
-    double xBias_, yBias_;
+    double xBias_ {}, yBias_ {};
 };
 
 /**

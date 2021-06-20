@@ -29,7 +29,7 @@ using namespace mrob;
 
 Factor1PosePoint2Plane::Factor1PosePoint2Plane(const Mat31 &z_point_x, const Mat31 &z_point_y, const Mat31 &z_normal_y,
         std::shared_ptr<Node> &node,  const Mat1 &obsInf):
-    Factor(1,6), z_point_x_(z_point_x), z_point_y_(z_point_y), z_normal_y_(z_normal_y), Tx_(Mat31::Zero()), r_(0.0), W_(obsInf)
+    Factor(1,6), z_point_x_(z_point_x), z_point_y_(z_point_y), Tx_(Mat31::Zero()), z_normal_y_(z_normal_y), r_(0.0), W_(obsInf)
 {
     neighbourNodes_.push_back(node);
 }
