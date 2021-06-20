@@ -365,14 +365,14 @@ void FGraphSolve::update_nodes()
 
 void FGraphSolve::synchronize_nodes_auxiliary_state()
 {
-    for (auto n : nodes_)
+    for (auto &&n : nodes_)
         n->set_auxiliary_state(n->get_state());
 }
 
 
 void FGraphSolve::synchronize_nodes_state()
 {
-    for (auto n : nodes_)
+    for (auto &&n : nodes_)
         n->set_state(n->get_auxiliary_state());
 }
 

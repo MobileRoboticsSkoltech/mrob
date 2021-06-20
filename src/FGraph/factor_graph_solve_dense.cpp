@@ -149,7 +149,7 @@ void FGraphSolveDense::update_state(const MatX1 &dx)
         // node update is the negative of dx just calculated.
         // x = x - alpha * H^(-1) * Grad = x - dx
         // Depending on the optimization, it is already taking care of the step alpha, so we assume alpha = 1
-        auto node_update = dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
+        const auto &node_update = dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
         nodes_[i]->update(node_update);
 
         acc_start += nodes_[i]->get_dim();
@@ -157,12 +157,12 @@ void FGraphSolveDense::update_state(const MatX1 &dx)
 }
 void FGraphSolveDense::bookkeep_state()
 {
-    for (auto n : nodes_)
+    for (auto &&n : nodes_)
         n->set_auxiliary_state(n->get_state());
 }
 void FGraphSolveDense::update_state_from_bookkeep()
 {
-    for (auto n : nodes_)
+    for (auto &&n : nodes_)
         n->set_state(n->get_auxiliary_state());
 }
 

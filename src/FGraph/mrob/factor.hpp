@@ -118,12 +118,12 @@ public:
     virtual const Eigen::Ref<const MatX> get_jacobian() const = 0;
 
 
-    id_t get_id() const {return id_;};
-    void set_id(id_t id) {id_ = id;};
-    uint_t get_dim() const {return dim_;};
-    uint_t get_all_nodes_dim(){ return allNodesDim_;};
+    id_t get_id() const {return id_;}
+    void set_id(id_t id) {id_ = id;}
+    uint_t get_dim() const {return dim_;}
+    uint_t get_all_nodes_dim(){ return allNodesDim_;}
     const std::vector<std::shared_ptr<Node> >*
-            get_neighbour_nodes(void) const {return &neighbourNodes_;};
+            get_neighbour_nodes(void) const {return &neighbourNodes_;}
 
 protected:
     id_t id_;

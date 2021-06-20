@@ -437,7 +437,7 @@ std::vector<double> PlaneRegistration::print_evaluate()
     }
 
     // Normals on planes, check for rank
-    for (auto plane : planes_)
+    for (auto &&plane : planes_)
     {
         Mat41 pi = plane.second->get_plane();
         //std::cout << "plane : \n" << pi << std::endl;
