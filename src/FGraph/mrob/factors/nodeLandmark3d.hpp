@@ -22,7 +22,7 @@
  */
 
 #ifndef NODELANDMARK3D_HPP_
-#define NODELANDMARK_HPP_
+#define NODELANDMARK3D_HPP_
 
 #include "mrob/matrix_base.hpp"
 #include "mrob/SE3.hpp" //requires including and linking SE3 library
@@ -62,4 +62,4 @@ class NodeLandmark3d : public Node
 }
 
 
-#endif /* NODEPOSE3D_HPP_ */
+#endif /* NODELANDMARK3D_HPP_ */

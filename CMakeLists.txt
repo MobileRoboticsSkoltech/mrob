@@ -6,10 +6,7 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-# The project name and the type of project
 PROJECT(mrob)
-#MESSAGE(Project\ name:\ ${PROJECT_NAME})
-
 
 IF (NOT CMAKE_BUILD_TYPE)
  SET(CMAKE_BUILD_TYPE "Release") 
@@ -22,8 +19,11 @@ IF(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") #TODO: /Wall but disable noisy warnings
     ADD_COMPILE_DEFINITIONS(_USE_MATH_DEFINES)
     SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-ELSE() #GCC or CLANG, but ...
+ELSEIF(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
+ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wno-inconsistent-missing-override")
+ELSE()
 ENDIF(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
 
@@ -31,7 +31,6 @@ ENDIF(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 # ===================================================================
 INCLUDE_DIRECTORIES(SYSTEM ./external/Eigen)
 
-ADD_SUBDIRECTORY(./external/pybind11)
 
 
 # ===================================================================
@@ -56,5 +55,7 @@ ADD_SUBDIRECTORY(./src/PCRegistration)
 
 # New modules should be included here
 
-# MROB python bingins, defined here:
-ADD_SUBDIRECTORY(./mrobpy)
+IF(NOT ANDROID)
+    ADD_SUBDIRECTORY(./external/pybind11)
+    ADD_SUBDIRECTORY(./mrobpy)
+ENDIF(NOT ANDROID)
