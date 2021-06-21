@@ -111,8 +111,8 @@ public:
     /**
      * FGraph information
      */
-    uint_t number_nodes() {return nodes_.size();};
-    uint_t number_factors() {return factors_.size();};
+    size_t number_nodes() {return nodes_.size();};
+    size_t number_factors() {return factors_.size();};
     uint_t get_dimension_state() {return stateDim_;};
     uint_t get_dimension_obs() {return obsDim_;};
 

@@ -25,6 +25,7 @@
 #define FACTOR_HPP_
 
 #include <vector>
+#include <memory>
 
 #include "mrob/matrix_base.hpp"
 #include "mrob/node.hpp"
@@ -92,12 +93,12 @@ public:
      * get chi2 returns the value in the variable chi2_. This value will be updated
      * every time there is a caluclation of residuals.
      */
-    matData_t get_chi2() const { return chi2_;};
+    matData_t get_chi2() const { return chi2_;}
     /**
      * The print utility could be re-implemented on child classes
      * if there are special needs
      */
-    virtual void print() const {};
+    virtual void print() const {}
     /**
      * Return a Ref to a dynamic matrix, while the child matrix should declare
      * all these variables as fixed size matrices, and ref takes care of

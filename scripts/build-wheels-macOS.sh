@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright (c) 2018, Skolkovo Institute of Science and Technology (Skoltech)
 # 
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +21,6 @@
 #               miloslubov@gmail.com
 #
 
-#!/bin/bash
 set -euo pipefail
 export LC_ALL=C
 export MACOSX_DEPLOYMENT_TARGET=10.9

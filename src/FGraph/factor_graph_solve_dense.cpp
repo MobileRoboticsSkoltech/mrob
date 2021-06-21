@@ -131,7 +131,7 @@ void FGraphSolveDense::calculate_gradient_hessian()
                 // Hessian: H(n,m) = \sum J_n_t'*W*J_m
                 // Look for the corresponding index
                 auto it = std::find(indNodeId.begin(), indNodeId.end(), node2->get_id());
-                uint_t index = std::distance(indNodeId.begin(), it);
+                auto index = std::distance(indNodeId.begin(), it);
                 // Only the current block row is filled in (corresponding to the n-node). We could use a triang view...
                 hessian_.block(indNodesMatrix[n], indNodesMatrix[index],N,M) +=
                         J_n_t * f->get_information_matrix() * J_m;

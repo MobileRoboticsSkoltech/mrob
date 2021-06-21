@@ -64,6 +64,9 @@ jobs:
     docker:
       - image: quay.io/pypa/manylinux2010_x86_64
     steps:
+      - run:
+          name: "Install additional utils"
+          command: yum install -y chrpath git openssh-clients
       - checkout
       - run:
           name: "Install fresh CMake into ManyLinux container"
@@ -73,9 +76,6 @@ jobs:
       - run:
           name: "Clone submodules"
           command: git submodule update --init --recursive
-      - run:
-          name: "Install additional utils"
-          command: yum install -y chrpath
       - run:
           name: "Build Python wheels"
           command: scripts/build-wheels.sh
@@ -138,14 +138,14 @@ jobs:
           when: always
   publish-github-release:
     docker:
-      - image: cibuilds/github:0.10
+      - image: cibuilds/github:0.13
     steps:
       - attach_workspace:
           at: ~/
       - run:
           name: "Publish Release on GitHub"
           command: |
-              VERSION=v$(ls ~/project/build/wheelhouse/*.whl | awk -F"-" '{ print $2 }')
+              VERSION=v$(ls ~/project/build/wheelhouse/*.whl | cut -f2 -d-)
               ghr -t "${GITHUB_TOKEN}" \
                   -u "${CIRCLE_PROJECT_USERNAME}" \
                   -r "${CIRCLE_PROJECT_REPONAME}" \

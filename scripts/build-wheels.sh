@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright (c) 2018, Skolkovo Institute of Science and Technology (Skoltech)
 # 
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +21,6 @@
 #               miloslubov@gmail.com
 #
 
-#!/bin/bash
 set -euo pipefail
 export LC_ALL=C
 
@@ -50,7 +50,7 @@ do
 done
 
 chrpath -r '$ORIGIN' ../mrob/mrob.*.so
-${LATEST}python3 -m pip install --user -q pep517
+${LATEST}python3 -m pip install $([[ -n "$VIRTUAL_ENV" ]] || echo "--user") -q pep517 auditwheel
 ${LATEST}python3 -m pep517.build ../
 auditwheel repair ../dist/*.whl
 
