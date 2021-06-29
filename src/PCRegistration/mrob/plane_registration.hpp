@@ -179,13 +179,13 @@ class PlaneRegistration: public OptimizerDense{
     // flag for detecting when is has been solved
     uint_t numberPlanes_, numberPoses_, numberPoints_;
     uint_t isSolved_;
-    PlaneRegistration::TrajectoryMode trajMode_;
-    uint_t time_;
+    PlaneRegistration::TrajectoryMode trajMode_ {};
+    uint_t time_{};
     std::unordered_map<uint_t, std::shared_ptr<Plane>> planes_;
     std::shared_ptr<std::vector<SE3>> trajectory_;
     SE3 bookept_trajectory_;//last pose is stored/bookept
-    double tau_;//variable for weighting the number of poses in traj
-    uint_t solveIters_;
+    double tau_ {};//variable for weighting the number of poses in traj
+    uint_t solveIters_ {};
 
     // 1st order parameters methods if used
     PlaneRegistration::SolveMode solveMode_;
@@ -200,7 +200,7 @@ class PlaneRegistration: public OptimizerDense{
 
     // time profiling
     TimeProfiling time_profiles_;
-    double initial_error_; // for benchmark purposes
+    double initial_error_ {}; // for benchmark purposes
 
 
     // alternative structure to keep planes. This is only for the python bindings

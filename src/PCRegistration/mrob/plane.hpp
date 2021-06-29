@@ -134,7 +134,7 @@ class Plane{
     // Overparametrized plane, as a transformation in SE3 TODO needed?
     //SE3 plane_;
     Mat41 planeEstimation_;
-    double lambda_;
+    double lambda_ {};
     bool isPlaneEstimated_;// XXX used or deprecated?
 
     // subset of pointcloud for the given plane

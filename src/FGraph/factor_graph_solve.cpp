@@ -226,7 +226,7 @@ void FGraphSolve::build_adjacency()
     indNodesMatrix.reserve(nodes->size());
 
     N_ = 0;
-    for (id_t i = 0; i < nodes->size(); ++i)
+    for (size_t i = 0; i < nodes->size(); ++i)
     {
         // calculate the indices to access
         uint_t dim = (*nodes)[i]->get_dim();
@@ -365,14 +365,14 @@ void FGraphSolve::update_nodes()
 
 void FGraphSolve::synchronize_nodes_auxiliary_state()
 {
-    for (auto n : nodes_)
+    for (auto &&n : nodes_)
         n->set_auxiliary_state(n->get_state());
 }
 
 
 void FGraphSolve::synchronize_nodes_state()
 {
-    for (auto n : nodes_)
+    for (auto &&n : nodes_)
         n->set_state(n->get_auxiliary_state());
 }
 

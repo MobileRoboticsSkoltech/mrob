@@ -214,7 +214,7 @@ uint_t PlaneRegistration::solve_gradient_all_poses(bool singleIteration)
 
         // 2) calculate Gradient
         MatX1 jacobian = MatX1::Zero(numberPoses_*6);
-        double  numberPoints, tau = 1.0 / (double)(numberPoses_-1);
+        double  numberPoints; //, tau = 1.0 / (double)(numberPoses_-1);
         for (uint_t t = 1 ; t < numberPoses_; ++t)
         {
             numberPoints = 0.0;
@@ -241,7 +241,6 @@ uint_t PlaneRegistration::solve_gradient_all_poses(bool singleIteration)
 uint_t PlaneRegistration::solve_quaternion_plane()
 {
     solveIters_ = 0;
-    double previousError = 1e20, diffError = 10;
 
     // TODO create factor graph or call dense solver?
 
@@ -437,7 +436,7 @@ std::vector<double> PlaneRegistration::print_evaluate()
     }
 
     // Normals on planes, check for rank
-    for (auto plane : planes_)
+    for (auto &&plane : planes_)
     {
         Mat41 pi = plane.second->get_plane();
         //std::cout << "plane : \n" << pi << std::endl;

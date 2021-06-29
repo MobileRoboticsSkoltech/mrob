@@ -25,10 +25,10 @@
 #include <iostream>
 #include <iomanip>      // std::setprecision
 #include <cmath>
-#include "mrob/SE3.hpp"
-#include "mrob/SO3.hpp"
 #include <vector>
 
+#include "mrob/SE3.hpp"
+#include "mrob/SO3.hpp"
 
 int main()
 {
@@ -89,7 +89,7 @@ int main()
     // RESULT -> -1/12 (0.08333)
     if (0)
     {
-        for ( auto x : X)
+        for ( auto &&x : X)
         {
             double c = std::cos(x), s = std::sin(x), xx = x*x;
             double res = (c*xx - s*x - 3*s*x + 6 - 6*c)/(xx*xx);
@@ -109,12 +109,12 @@ int main()
 
     if (0)
     {
-        for ( auto x : X)
+        for ( auto &&x : X)
         {
             double xp = M_PI - x;
             double res = xp / std::sin(xp);
-            double xx = xp*xp;
-            double resTaylor = 1 + 12*xx;// + xx*xx*120.0;
+            //double xx = xp*xp;
+            //double resTaylor = 1 + 12*xx;// + xx*xx*120.0;
             std::cout << "x/sin (" << x << ") = " << std::setprecision(40) << res << std::endl;
             //std::cout << "tayl (" << x << ") = " << std::setprecision(40) << resTaylor << std::endl;
             //std::cout << "diff (" << x << ") = " << std::setprecision(20) << res - resTaylor << std::endl;
@@ -131,7 +131,7 @@ int main()
     // that persist so it is not a good idea. In this case it is better to clip the o value to o = pi
      if (1)
      {
-         for ( auto x : X)
+         for ( auto &&x : X)
          {
              double xp = -1.0 + x;
              double res = std::acos(xp);
@@ -151,7 +151,7 @@ int main()
     // Taylor approximation x < 1e-3 already works well (error < 1e-8)
     if (0)
     {
-        for ( auto x : X)
+        for ( auto &&x : X)
         {
             double xx = x*x;
             double res = (x - std::sin(x))/xx/x;
@@ -180,11 +180,11 @@ int main()
     // Taylor approximation x < 1e-3 already works well (error < 1e-8)
     if (0)
     {
-        for ( auto x : X)
+        for ( auto &&x : X)
         {
             double c = std::cos(x), s = std::sin(x), xx = x*x;
             double res = (1-0.5*s*x/(1-c))/xx;
-            double res2 = (1 - c - 0.5*s*x)/xx/(1-c);
+            //double res2 = (1 - c - 0.5*s*x)/xx/(1-c);
             double resTaylor = 1/12.0 + xx/720;
             //std::cout << "f (" << x << ") = " << std::setprecision(40) << res << std::endl;
             //std::cout << "f2(" << x << ") = " << std::setprecision(40) << res2 << std::endl;

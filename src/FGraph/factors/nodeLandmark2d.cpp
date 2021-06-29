@@ -24,7 +24,7 @@
 #include "mrob/factors/nodeLandmark2d.hpp"
 
 #include <iostream>
-#include <assert.h>
+#include <cassert>
 
 
 using namespace mrob;

@@ -23,11 +23,11 @@
 
 
 #include <iostream>
-#include <Eigen/LU> // for inverse and determinant
 #include <cmath>
+#include <Eigen/LU> // for inverse and determinant
+
 #include "mrob/SE3.hpp"
 #include "mrob/SO3.hpp"
-
 
 int main()
 {

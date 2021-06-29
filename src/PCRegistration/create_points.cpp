@@ -25,7 +25,7 @@
 #include "mrob/create_points.hpp"
 
 #include <chrono>
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 #include <cmath>
 

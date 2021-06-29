@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright (c) 2018, Skolkovo Institute of Science and Technology (Skoltech)
 # 
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +21,6 @@
 #               miloslubov@gmail.com
 #
 
-#!/bin/bash
 set -euo pipefail
 export LC_ALL=C
 export MACOSX_DEPLOYMENT_TARGET=10.9
@@ -40,10 +40,10 @@ do
     cmake .. -DPYTHON_EXECUTABLE:FILEPATH=$PYBIN \
              -DCMAKE_MACOSX_RPATH=ON \
              -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE \
-             -DCMAKE_INSTALL_RPATH="@loader_path" 
-    make -j $NUMPROC
-    
-    mv ../lib/* ../mrob
+             -DCMAKE_INSTALL_RPATH="@loader_path" \
+             -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/../bin \
+             -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$PWD/../mrob \
+    && cmake --build . -j $NUMPROC
 done
 
 cd ../
