@@ -25,6 +25,7 @@
 #define FACTOR_HPP_
 
 #include <vector>
+#include <memory>
 
 #include "mrob/matrix_base.hpp"
 #include "mrob/node.hpp"
@@ -78,6 +79,7 @@ class Node;
 
 class Factor{
 public:
+    typedef std::size_t id_t;
     /**
      * On the derived class constructor we will specify the (ordered)
      * nodes that the factor is connected to.
@@ -106,12 +108,12 @@ public:
      * get chi2 returns the value in the variable chi2_. This value will be updated
      * every time there is a caluclation of residuals.
      */
-    matData_t get_chi2() const { return chi2_;};
+    matData_t get_chi2() const { return chi2_;}
     /**
      * The print utility could be re-implemented on child classes
      * if there are special needs
      */
-    virtual void print() const {};
+    virtual void print() const {}
     /**
      * Return a Ref to a dynamic matrix, while the child matrix should declare
      * all these variables as fixed size matrices, and ref takes care of
@@ -132,12 +134,12 @@ public:
     virtual const Eigen::Ref<const MatX> get_jacobian() const = 0;
 
 
-    id_t get_id() const {return id_;};
-    void set_id(id_t id) {id_ = id;};
-    uint_t get_dim() const {return dim_;};
-    uint_t get_all_nodes_dim(){ return allNodesDim_;};
+    id_t get_id() const {return id_;}
+    void set_id(id_t id) {id_ = id;}
+    uint_t get_dim() const {return dim_;}
+    uint_t get_all_nodes_dim(){ return allNodesDim_;}
     const std::vector<std::shared_ptr<Node> >*
-            get_neighbour_nodes(void) const {return &neighbourNodes_;};
+            get_neighbour_nodes(void) const {return &neighbourNodes_;}
 
     /**
      * Robust functions, given the current distance u = sqrt(r' W r)

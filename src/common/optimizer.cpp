@@ -64,12 +64,12 @@ uint_t OptimizerDense::optimize_newton_raphson_one_iteration(bool useLambda)
     {
         if (optimization_method_ == LEVENBERG_MARQUARDT_SPHER)
         {
-            for (uint_t i = 0; i < hessian_.diagonalSize() ; ++i)
+            for (Eigen::Index i = 0; i < hessian_.diagonalSize() ; ++i)
                 hessian_(i,i) += lambda_;
         }
         if (optimization_method_ == LEVENBERG_MARQUARDT_ELLIP)
         {
-            for (uint_t i = 0; i < hessian_.diagonalSize() ; ++i)
+            for (Eigen::Index i = 0; i < hessian_.diagonalSize() ; ++i)
                 hessian_(i,i) *= 1.0 + lambda_;
         }
     }
@@ -108,7 +108,7 @@ uint_t Optimizer::optimize_levenberg_marquardt()
     matData_t sigma1(0.25), sigma2(0.8);// 0 < sigma1 < sigma2 < 1
     matData_t beta1(2.0), beta2(0.25); // lambda updates multiplier values, beta1 > 1 > beta2 >0
     uint_t iters = 0;
-    matData_t previous_error = calculate_error(), diff_error, current_error;
+    matData_t previous_error = calculate_error();
     bool improvement; // variable for controlling when no update is done and number of iterations is exceeded.
     do
     {
@@ -116,9 +116,9 @@ uint_t Optimizer::optimize_levenberg_marquardt()
         // 1) solve the current subproblem by Newton Raphson
         this->bookkeep_state();
         optimize_newton_raphson_one_iteration(true);
-        current_error = calculate_error();
+        auto current_error = calculate_error();
         //std::cout << "iter " << iters << ", error = " << current_error << ", lambda = "<< lambda_ << std::endl;
-        diff_error = previous_error - current_error;
+        auto diff_error = previous_error - current_error;
         improvement = true;
 
         // 2) Check for convergence, hillclimb

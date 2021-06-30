@@ -20,9 +20,11 @@ jobs:
       - run:
           name: "Configure and build native mrob library with Python bindings"
           command: |
-            mkdir -p build && pushd build
-            cmake $(dirs -l +1) && make -j 4
-            popd
+            mkdir -p build
+            cmake -S $PWD -B $PWD/build \
+             -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/bin \
+             -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$PWD/lib \
+            && cmake --build build -j $(nproc)
       - run:
           name: "Run FGraph_2d"
           command: |
@@ -60,21 +62,20 @@ jobs:
           when: always
   build-wheel:
     docker:
-      - image: quay.io/pypa/manylinux2010_x86_64:2021-04-09-c61dabe
+      - image: quay.io/pypa/manylinux2010_x86_64
     steps:
       - run:
-          name: "Install git and fresh CMake into ManyLinux container"
+          name: "Install additional utils"
+          command: yum install -y chrpath git openssh-clients
+      - checkout
+      - run:
+          name: "Install fresh CMake into ManyLinux container"
           command: |
-            yum install git -y
             env pybin=$(LANG=C ls -d1r /opt/python/cp3*/bin | head -n 1) bash -c '$pybin/python -m pip install cmake && mkdir -p /usr/local/bin && ln -svf $pybin/cmake /usr/local/bin/cmake'
             cmake --version
-      - checkout
       - run:
           name: "Clone submodules"
           command: git submodule update --init --recursive
-      - run:
-          name: "Install additional utils"
-          command: yum install -y chrpath
       - run:
           name: "Build Python wheels"
           command: scripts/build-wheels.sh
@@ -137,14 +138,14 @@ jobs:
           when: always
   publish-github-release:
     docker:
-      - image: cibuilds/github:0.10
+      - image: cibuilds/github:0.13
     steps:
       - attach_workspace:
           at: ~/
       - run:
           name: "Publish Release on GitHub"
           command: |
-              VERSION=v$(ls ~/project/build/wheelhouse/*.whl | awk -F"-" '{ print $2 }')
+              VERSION=v$(ls ~/project/build/wheelhouse/*.whl | cut -f2 -d-)
               ghr -t "${GITHUB_TOKEN}" \
                   -u "${CIRCLE_PROJECT_USERNAME}" \
                   -r "${CIRCLE_PROJECT_REPONAME}" \

@@ -79,7 +79,7 @@ void FGraphSolveDense::calculate_gradient_hessian()
     indNodesMatrix.reserve(nodes_.size());
     indNodeId.reserve(nodes_.size());
     uint_t N = 0, M = 0;
-    for (id_t i = 0; i < nodes_.size(); ++i)
+    for (size_t i = 0; i < nodes_.size(); ++i)
     {
         // calculate the indices to access
         uint_t dim = nodes_[i]->get_dim();
@@ -131,7 +131,7 @@ void FGraphSolveDense::calculate_gradient_hessian()
                 // Hessian: H(n,m) = \sum J_n_t'*W*J_m
                 // Look for the corresponding index
                 auto it = std::find(indNodeId.begin(), indNodeId.end(), node2->get_id());
-                uint_t index = std::distance(indNodeId.begin(), it);
+                auto index = std::distance(indNodeId.begin(), it);
                 // Only the current block row is filled in (corresponding to the n-node). We could use a triang view...
                 hessian_.block(indNodesMatrix[n], indNodesMatrix[index],N,M) +=
                         J_n_t * f->get_information_matrix() * J_m;
@@ -149,7 +149,7 @@ void FGraphSolveDense::update_state(const MatX1 &dx)
         // node update is the negative of dx just calculated.
         // x = x - alpha * H^(-1) * Grad = x - dx
         // Depending on the optimization, it is already taking care of the step alpha, so we assume alpha = 1
-        auto node_update = dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
+        const auto &node_update = dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
         nodes_[i]->update(node_update);
 
         acc_start += nodes_[i]->get_dim();
@@ -157,12 +157,12 @@ void FGraphSolveDense::update_state(const MatX1 &dx)
 }
 void FGraphSolveDense::bookkeep_state()
 {
-    for (auto n : nodes_)
+    for (auto &&n : nodes_)
         n->set_auxiliary_state(n->get_state());
 }
 void FGraphSolveDense::update_state_from_bookkeep()
 {
-    for (auto n : nodes_)
+    for (auto &&n : nodes_)
         n->set_state(n->get_auxiliary_state());
 }
 

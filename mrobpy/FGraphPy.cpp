@@ -58,6 +58,7 @@ using namespace mrob;
 class FGraphPy : public FGraphSolve
 {
 public:
+    using id_t = Factor::id_t;
     /**
      * Constructor for the python binding. By default uses the Cholesky adjoint solving type, and some estimated number of nodes and factors.
      */

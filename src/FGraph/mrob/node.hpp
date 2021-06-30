@@ -26,7 +26,7 @@
 
 #include <vector>
 #include <memory>
-#include <assert.h>
+#include <cassert>
 
 #include "mrob/matrix_base.hpp"
 #include "mrob/factor.hpp"
@@ -98,10 +98,10 @@ class Node{
      * metal implementation, or for error evaluation
      */
     virtual const Eigen::Ref<const MatX> get_auxiliary_state() const = 0;
-    virtual void print() const {};
-    uint_t get_id() const {return id_;};
-    void set_id(uint_t id) {id_ = id;};
-    uint_t get_dim(void) const {return dim_;};
+    virtual void print() const {}
+    uint_t get_id() const {return id_;}
+    void set_id(uint_t id) {id_ = id;}
+    uint_t get_dim(void) const {return dim_;}
     /**
      * Adds a factor to the list of factors connected to this node.
      */
@@ -111,9 +111,9 @@ class Node{
      * so use only when necessary.
      */
     virtual bool rm_factor(std::shared_ptr<Factor> &factor);
-    void clear() {neighbourFactors_.clear();};
+    void clear() {neighbourFactors_.clear();}
     const std::vector<std::shared_ptr<Factor> >*
-            get_neighbour_factors(void) const {return &neighbourFactors_;};
+            get_neighbour_factors(void) const {return &neighbourFactors_;}
 
   protected:
     // no oder needed here

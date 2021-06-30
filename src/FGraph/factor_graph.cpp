@@ -35,7 +35,7 @@ FGraph::FGraph() :
 FGraph::~FGraph()
 {
     // clear every node's list of neigbours factors
-    for (auto n: nodes_)
+    for (auto &&n: nodes_)
         n->clear();
     factors_.clear();
     nodes_.clear();
@@ -45,8 +45,8 @@ bool FGraph::add_factor(std::shared_ptr<Factor> &factor)
 {
 	factor->set_id(factors_.size());
 	factors_.push_back(factor);
-    auto list = factor->get_neighbour_nodes();
-    for( auto n: *list)
+    auto *list = factor->get_neighbour_nodes();
+    for( auto &&n: *list)
     {
         n->add_factor(factor);
     }
@@ -101,9 +101,9 @@ void FGraph::print(bool completePrint) const
 
     if(completePrint)
     {
-        for (auto n : nodes_)
+        for (auto &&n : nodes_)
             n->print();
-        for (auto f : factors_)
+        for (auto &&f : factors_)
             f->print();
     }
 }
