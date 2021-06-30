@@ -28,6 +28,7 @@ The present library is meant to be a self-contained library. However, there are 
 * [pybind11](https://github.com/pybind/pybind11) (included as a submodule)
   - python3-distutils
   - python3-dev
+* [Catch2 v2.x branch](https://github.com/catchorg/Catch2/tree/v2.x) (included as a submodule)
 
 This is the list of required packages to install:
 `sudo apt install build-essential cmake python3-distutils python3-dev`

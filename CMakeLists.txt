@@ -26,12 +26,16 @@ ELSEIF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 ELSE()
 ENDIF(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
+IF(ANDROID)
+    SET(BUILD_TESTING OFF)
+ELSE(ANDROID)
+    SET(BUILD_TESTING ON)
+ENDIF(ANDROID)
 
+MESSAGE(STATUS "Build Tests ${BUILD_TESTING}")
 
 # ===================================================================
 INCLUDE_DIRECTORIES(SYSTEM ./external/Eigen)
-
-
 
 # ===================================================================
 # CODE: main modules and directories are included here
@@ -53,9 +57,12 @@ ADD_SUBDIRECTORY(./src/PCRegistration)
 #INCLUDE_DIRECTORIES(./src/EigenFactors)
 #ADD_SUBDIRECTORY(./src/EigenFactors)
 
+
+# ===================================================================
 # New modules should be included here
 
 IF(NOT ANDROID)
     ADD_SUBDIRECTORY(./external/pybind11)
+    ADD_SUBDIRECTORY(./external/Catch2)
     ADD_SUBDIRECTORY(./mrobpy)
 ENDIF(NOT ANDROID)
