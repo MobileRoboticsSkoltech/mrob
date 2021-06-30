@@ -43,6 +43,7 @@ typedef Eigen::Matrix<matData_t, 3,3, Eigen::RowMajor> Mat3;
 typedef Eigen::Matrix<matData_t, 4,4, Eigen::RowMajor> Mat4;
 typedef Eigen::Matrix<matData_t, 5,5, Eigen::RowMajor> Mat5;
 typedef Eigen::Matrix<matData_t, 6,6, Eigen::RowMajor> Mat6;
+typedef Eigen::Matrix<matData_t, 9,9, Eigen::RowMajor> Mat9;
 typedef Eigen::Matrix<matData_t, Eigen::Dynamic,Eigen::Dynamic, Eigen::RowMajor> MatX;
 
 //Sparse Matrices
@@ -56,6 +57,7 @@ typedef Eigen::Matrix<matData_t, 3,1> Mat31;
 typedef Eigen::Matrix<matData_t, 4,1> Mat41;
 typedef Eigen::Matrix<matData_t, 5,1> Mat51;
 typedef Eigen::Matrix<matData_t, 6,1> Mat61;
+typedef Eigen::Matrix<matData_t, 9,1> Mat91;
 typedef Eigen::Matrix<matData_t, Eigen::Dynamic,1> MatX1;
 
 // Definition of row matrices (vectors)
@@ -64,6 +66,7 @@ typedef Eigen::Matrix<matData_t, 1,3> Mat13;
 typedef Eigen::Matrix<matData_t, 1,4> Mat14;
 typedef Eigen::Matrix<matData_t, 1,5> Mat15;
 typedef Eigen::Matrix<matData_t, 1,6> Mat16;
+typedef Eigen::Matrix<matData_t, 1,9> Mat19;
 typedef Eigen::Matrix<matData_t, 1,Eigen::Dynamic> Mat1X;
 
 
