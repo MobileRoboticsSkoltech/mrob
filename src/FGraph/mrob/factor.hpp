@@ -143,7 +143,7 @@ public:
 
     /**
      * Robust functions, given the current distance u = sqrt(r' W r)
-     * It can be calucated in the base class for most of the robust functions
+     * It can be calculated in the base class for most of the robust functions
      * given that we provide the following inputs:
      *  - u = sqrt(r'Wr)
      *  - param: may be used to pass some information for some losses
@@ -170,6 +170,16 @@ protected:
     // Robust factor weighting the "iteratively weighted LSQ"
     robustFactorType robust_type_;
     matData_t robust_weight_; // dp/du 1/u or influence by the inverse of the distance u
+
+    /**
+     * TODO: for ransac factors, we can think of the problem as an hypothesis rejection test
+     * that the observation we have obtained actually belongs to a different distribution and hence
+     * we remove it from our estimation.
+     * we need a threshold (a ransac_significance level, e.g. 5%) and methods for setting it.
+     * TODO values could be the two-sided test if we assume Gaussian distributions, one-sided, etc.
+     * Note we need to account for the dimensionality of the node in oder to achive the p-value set.
+     */
+    //matData_t ransac_significance_level_;
 
     // variables to declare on child Factor, for instance of dim 6
     //Mat61 obs_, r_; //and residuals

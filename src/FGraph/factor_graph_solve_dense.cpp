@@ -141,7 +141,8 @@ void FGraphSolveDense::calculate_gradient_hessian()
     //std::cout << "hessian matrix> \n" << hessian_ << std::endl;
 
 }
-void FGraphSolveDense::update_state(const MatX1 &dx)
+//void FGraphSolveDense::update_state(const MatX1 &dx)
+void FGraphSolveDense::update_state()
 {
     int acc_start = 0;
     for (uint_t i = 0; i < nodes_.size(); i++)

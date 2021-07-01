@@ -48,7 +48,7 @@ class FGraphSolveDense: public FGraph, public OptimizerDense
     // Function from the parent class Optimizer
     virtual matData_t calculate_error() override;
     virtual void calculate_gradient_hessian() override;
-    virtual void update_state(const MatX1 &dx) override;
+    virtual void update_state() override;
     virtual void bookkeep_state() override;
     virtual void update_state_from_bookkeep() override;
 
