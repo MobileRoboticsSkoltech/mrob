@@ -32,7 +32,7 @@
 
 int main ()
 {
-    mrob::FGraphSolve graph(mrob::FGraphSolve::ADJ,mrob::FGraphSolve::GN);
+    mrob::FGraphSolve graph(mrob::FGraphSolve::ADJ);
 
     std::shared_ptr<mrob::Node> n0(new mrob::NodePose3d(mrob::SE3()));
     graph.add_node(n0);

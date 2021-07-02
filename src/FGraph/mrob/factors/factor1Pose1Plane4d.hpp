@@ -41,8 +41,9 @@ class Factor1Pose1Plane4d : public Factor
 {
   public:
     Factor1Pose1Plane4d(const Mat41 &observation, std::shared_ptr<Node> &nodePose,
-            std::shared_ptr<Node> &nodePlane, const Mat4 &obsInf);
-    ~Factor1Pose1Plane4d();
+            std::shared_ptr<Node> &nodePlane, const Mat4 &obsInf,
+            Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
+    ~Factor1Pose1Plane4d() override = default;
 
     /**
      * Jacobians are not evaluated, just the residuals

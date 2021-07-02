@@ -29,8 +29,8 @@
 using namespace mrob;
 
 Factor1PosePoint2Point::Factor1PosePoint2Point(const Mat31 &z_point_x, const Mat31 &z_point_y,  std::shared_ptr<Node> &node,
-            const Mat1 &obsInf):
-        Factor(3,6), z_point_x_(z_point_x), z_point_y_(z_point_y_), W_(obsInf)
+            const Mat1 &obsInf, Factor::robustFactorType robust_type):
+        Factor(3,6,robust_type), z_point_x_(z_point_x), z_point_y_(z_point_y_), W_(obsInf)
 {
     neighbourNodes_.push_back(node);
 }

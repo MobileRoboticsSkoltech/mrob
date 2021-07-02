@@ -62,8 +62,9 @@ class Factor1Pose1Landmark2d : public Factor
 {
   public:
     Factor1Pose1Landmark2d(const Mat21 &observation, std::shared_ptr<Node> &nodePose,
-            std::shared_ptr<Node> &nodeLandmark, const Mat2 &obsInf, bool initializeLandmark=false);
-    ~Factor1Pose1Landmark2d();
+            std::shared_ptr<Node> &nodeLandmark, const Mat2 &obsInf, bool initializeLandmark=false,
+            Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
+    ~Factor1Pose1Landmark2d() override = default;
     /**
      * Jacobians are not evaluated, just the residuals
      */

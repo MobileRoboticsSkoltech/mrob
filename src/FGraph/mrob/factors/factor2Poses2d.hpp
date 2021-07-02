@@ -53,7 +53,8 @@ namespace mrob{
     {
     public:
         Factor2Poses2d(const Mat31 &observation, std::shared_ptr<Node> &nodeOrigin,
-                       std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf, bool updateNodeTarget=false);
+                       std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf, bool updateNodeTarget=false,
+                       Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
         ~Factor2Poses2d() override = default;
 
         void evaluate_residuals() override;
@@ -98,7 +99,8 @@ namespace mrob{
          * 2) This factor also updates the value of node destination according to obs
          */
         Factor2Poses2dOdom(const Mat31 &observation, std::shared_ptr<Node> &nodeOrigin,
-                           std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf, bool updateNodeTarget=true);
+                           std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf, bool updateNodeTarget=true,
+                           Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
         ~Factor2Poses2dOdom() override = default;
 
         void evaluate_residuals() override;

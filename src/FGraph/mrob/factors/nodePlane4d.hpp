@@ -44,7 +44,7 @@ class NodePlane4d : public Node
      * DOF to 3 in total.
      */
     NodePlane4d(const Mat41 &initial_x);
-    virtual ~NodePlane4d();
+    virtual ~NodePlane4d()  override = default;
     /**
      * Update of 4d is simply addition and a clamping process to guarantee unit normal
      * pi'= clamped(pi + dx)

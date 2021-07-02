@@ -30,25 +30,20 @@ using namespace mrob;
 
 
 Factor1Pose3d::Factor1Pose3d(const Mat4 &observation, std::shared_ptr<Node> &n1,
-             const Mat6 &obsInf):
-             Factor(6,6), Tobs_(observation), W_(obsInf), J_(Mat6::Zero())
+             const Mat6 &obsInf, Factor::robustFactorType robust_type):
+             Factor(6,6, robust_type), Tobs_(observation), W_(obsInf), J_(Mat6::Zero())
 {
     // Ordering here is not a problem, the node is unique
     neighbourNodes_.push_back(n1);
 }
 
 Factor1Pose3d::Factor1Pose3d(const SE3 &observation, std::shared_ptr<Node> &n1,
-             const Mat6 &obsInf):
-             Factor(6,6), Tobs_(observation), W_(obsInf), J_(Mat6::Zero())
+             const Mat6 &obsInf, Factor::robustFactorType robust_type):
+             Factor(6,6, robust_type), Tobs_(observation), W_(obsInf), J_(Mat6::Zero())
 {
     // Ordering here is not a problem, the node is unique
     neighbourNodes_.push_back(n1);
 }
-
-Factor1Pose3d::~Factor1Pose3d()
-{
-}
-
 
 void Factor1Pose3d::evaluate_residuals()
 {

@@ -29,8 +29,9 @@
 using namespace mrob;
 
 Factor1Pose1Plane4d::Factor1Pose1Plane4d(const Mat41 &observation, std::shared_ptr<Node> &nodePose,
-        std::shared_ptr<Node> &nodePlane, const Mat4 &obsInf):
-                Factor(4,10), obs_(observation), W_(obsInf), reversedNodeOrder_(false)
+        std::shared_ptr<Node> &nodePlane, const Mat4 &obsInf,
+        Factor::robustFactorType robust_type):
+                Factor(4,10, robust_type), obs_(observation), W_(obsInf), reversedNodeOrder_(false)
 {
     // ensure that plane 4d, normal \in P2 and distance \in R
     obs_.head(3).normalize();
@@ -47,10 +48,6 @@ Factor1Pose1Plane4d::Factor1Pose1Plane4d(const Mat41 &observation, std::shared_p
         // set reverse mode
         reversedNodeOrder_ = true;
     }
-}
-Factor1Pose1Plane4d::~Factor1Pose1Plane4d()
-{
-
 }
 
 void Factor1Pose1Plane4d::evaluate_residuals()

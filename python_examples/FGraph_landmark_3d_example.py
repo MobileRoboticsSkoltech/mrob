@@ -1,11 +1,11 @@
 #
-# add path to local library mrob on bashr_rc: "export PYTHONPATH=${PYTHONPATH}:${HOME}/mrob/mrob/lib"
+# add path to local library mrob on bashr_rc: "export PYTHONPATH=${PYTHONPATH}:${HOME}/mrob/mrob/build/mrobpy"
 import mrob
 import numpy as np
 
 # example translated from FGrpah/examples/example_solver_3d_landmarks.cpp
 
-graph = mrob.FGraph()
+graph = mrob.FGraph(mrob.QUADRATIC)
 
 n1 = graph.add_node_pose_3d(mrob.geometry.SE3(np.random.randn(6)*0.05))
 # non-initialized landmarks, nut they could be initialiazed

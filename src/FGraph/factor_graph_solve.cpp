@@ -36,8 +36,8 @@ using namespace std;
 using namespace Eigen;
 
 
-FGraphSolve::FGraphSolve(matrixMethod method, optimMethod optim):
-	FGraph(), matrixMethod_(method), optimMethod_(optim), N_(0), M_(0),
+FGraphSolve::FGraphSolve(matrixMethod method):
+	FGraph(), matrixMethod_(method), N_(0), M_(0),
 	lambda_(1e-6), solutionTolerance_(1e-2)
 {
 
@@ -57,13 +57,12 @@ void FGraphSolve::solve(optimMethod method, uint_t maxIters, matData_t lambda, m
      *               1.3959 % update values,
      *
      */
-    optimMethod_ = method; // updates the optimization method
     lambda_ = lambda;
     solutionTolerance_ = solutionTolerance;
     time_profiles_.reset();
 
     // Optimization
-    switch(optimMethod_)
+    switch(method)
     {
       case GN:
         this->optimize_gauss_newton();// false => lambda = 0

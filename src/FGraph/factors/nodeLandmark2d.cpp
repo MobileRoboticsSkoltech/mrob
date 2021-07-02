@@ -36,10 +36,6 @@ NodeLandmark2d::NodeLandmark2d(const Mat21 &initial_x) :
     assert(initial_x.cols() == 1 && "NodeLandmark2d:: Incorrect dimension on initial state cols" );
 }
 
-NodeLandmark2d::~NodeLandmark2d()
-{
-
-}
 
 void NodeLandmark2d::update(const Eigen::Ref<const MatX1> &dx)
 {

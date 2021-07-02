@@ -60,11 +60,18 @@ class FGraphPy : public FGraphSolve
 public:
     using id_t = Factor::id_t;
     /**
-     * Constructor for the python binding. By default uses the Cholesky adjoint solving type, and some estimated number of nodes and factors.
+     * Constructor for the python binding. By default uses the Cholesky adjoint solving type.
+     * For the robust factor type, it indicates one (default - Quadratic)
+     * and all factors will automatically be this kind of robust factors
+     *
+     * NOTE: in cpp each new factor needs to specify the robust type, which give more freedom, but
+     * since the .py is a more "structured" class, it is included in the constructor and that's
+     * all the user will ever see
+     *
+     * TODO: change type of robust? maybe some apps would need that feature...
      */
-    FGraphPy() :
-        FGraphSolve(FGraphSolve::matrixMethod::ADJ,
-                    FGraphSolve::optimMethod::GN) {};
+    FGraphPy(mrob::Factor::robustFactorType robust_type = mrob::Factor::robustFactorType::QUADRATIC) :
+        FGraphSolve(FGraphSolve::matrixMethod::ADJ), robust_type_(robust_type) {}
     id_t add_node_pose_2d(const py::EigenDRef<const Mat31> x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodePose2d(x));
@@ -74,7 +81,7 @@ public:
     void add_factor_1pose_2d(const py::EigenDRef<const Mat31> obs, uint_t nodeId, const py::EigenDRef<const Mat3> obsInvCov)
     {
         auto n1 = this->get_node(nodeId);
-        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose2d(obs,n1,obsInvCov));
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose2d(obs,n1,obsInvCov,robust_type_));
         this->add_factor(f);
     }
     void add_factor_2poses_2d(const py::EigenDRef<const Mat31> obs, uint_t nodeOriginId, uint_t nodeTargetId,
@@ -82,14 +89,14 @@ public:
     {
         auto nO = this->get_node(nodeOriginId);
         auto nT = this->get_node(nodeTargetId);
-        std::shared_ptr<mrob::Factor> f(new mrob::Factor2Poses2d(obs,nO,nT,obsInvCov, updateNodeTarget));
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor2Poses2d(obs,nO,nT,obsInvCov, updateNodeTarget,robust_type_));
         this->add_factor(f);
     }
     void add_factor_2poses_2d_odom(const py::EigenDRef<const Mat31> obs, uint_t nodeOriginId, uint_t nodeTargetId, const py::EigenDRef<const Mat3> obsInvCov)
     {
         auto nO = this->get_node(nodeOriginId);
         auto nT = this->get_node(nodeTargetId);
-        std::shared_ptr<mrob::Factor> f(new mrob::Factor2Poses2dOdom(obs,nO,nT,obsInvCov,true));//true is to update the node value according to obs
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor2Poses2dOdom(obs,nO,nT,obsInvCov,true,robust_type_));//true is to update the node value according to obs
         this->add_factor(f);
     }
 
@@ -110,7 +117,7 @@ public:
     id_t add_factor_1pose_3d(const SE3 &obs, uint_t nodeId, const py::EigenDRef<const Mat6> obsInvCov)
     {
         auto n1 = this->get_node(nodeId);
-        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose3d(obs,n1,obsInvCov));
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose3d(obs,n1,obsInvCov,robust_type_));
         this->add_factor(f);
         return f->get_id();
     }
@@ -119,7 +126,7 @@ public:
     {
         auto nO = this->get_node(nodeOriginId);
         auto nT = this->get_node(nodeTargetId);
-        std::shared_ptr<mrob::Factor> f(new mrob::Factor2Poses3d(obs,nO,nT,obsInvCov, updateNodeTarget));
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor2Poses3d(obs,nO,nT,obsInvCov, updateNodeTarget, robust_type_));
         this->add_factor(f);
         return f->get_id();
     }
@@ -137,7 +144,7 @@ public:
     {
         auto n1 = this->get_node(nodePoseId);
         auto n2 = this->get_node(nodeLandmarkId);
-        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Landmark3d(obs,n1,n2,obsInvCov,initializeLandmark));
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Landmark3d(obs,n1,n2,obsInvCov,initializeLandmark, robust_type_));
         this->add_factor(f);
         return f->get_id();
     }
@@ -156,7 +163,7 @@ public:
     {
         auto n1 = this->get_node(nodePoseId);
         auto n2 = this->get_node(nodeLandmarkId);
-        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Landmark2d(obs,n1,n2,obsInvCov,initializeLandmark));
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Landmark2d(obs,n1,n2,obsInvCov,initializeLandmark, robust_type_));
         this->add_factor(f);
         return f->get_id();
     }
@@ -176,7 +183,7 @@ public:
     {
         auto n1 = this->get_node(nodePoseId);
         auto n2 = this->get_node(nodeLandmarkId);
-        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Plane4d(obs,n1,n2,obsInvCov));
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose1Plane4d(obs,n1,n2,obsInvCov, robust_type_));
         this->add_factor(f);
         return f->get_id();
     }
@@ -188,11 +195,12 @@ public:
             const py::EigenDRef<const Mat31> z_normal_y, id_t nodePoseId, const py::EigenDRef<const Mat1> obsInf)
     {
         auto n1 = this->get_node(nodePoseId);
-        std::shared_ptr<mrob::Factor> f(new mrob::Factor1PosePoint2Plane(z_point_x,z_point_y, z_normal_y,n1,obsInf));
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1PosePoint2Plane(z_point_x,z_point_y, z_normal_y,n1,obsInf, robust_type_));
         this->add_factor(f);
         return f->get_id();
     }
-
+private:
+    mrob::Factor::robustFactorType robust_type_;
 };
 
 void init_FGraph(py::module &m)
@@ -202,10 +210,19 @@ void init_FGraph(py::module &m)
         .value("LM", FGraphSolve::optimMethod::LM)
         .export_values()
         ;
+    py::enum_<Factor::robustFactorType>(m, "FGraph.robutsFactorType")
+        .value("QUADRATIC", Factor::robustFactorType::QUADRATIC)
+        .value("CAUCHY", Factor::robustFactorType::CAUCHY)
+        .value("HUBER", Factor::robustFactorType::HUBER)
+        .value("MCCLURE", Factor::robustFactorType::MCCLURE)
+        .value("RANSAC", Factor::robustFactorType::RANSAC)
+        .export_values()
+        ;
     // Fgraph class adding factors and providing method to solve the inference problem.
     py::class_<FGraphPy> (m,"FGraph")
-            .def(py::init<>(),
-                    "Constructor, solveType default is ADJ and GN.")
+            .def(py::init<Factor::robustFactorType>(),
+                    "Constructor, solveType default is ADJ and robust factor is quadratic.",
+                    py::arg("robust_type") =  Factor::robustFactorType::QUADRATIC)
             .def("solve", &FGraphSolve::solve,
                     "Solves the corresponding FG.\n"
                     "Options:\n method = mrob.GN (Gauss Newton), by default option. It carries out a SINGLE iteration.\n"
