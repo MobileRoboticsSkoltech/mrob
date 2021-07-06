@@ -24,7 +24,11 @@ jobs:
             cmake -S $PWD -B $PWD/build \
              -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/bin \
              -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$PWD/lib \
-            && cmake --build build -j $(nproc)
+            && cmake --build build -j $(nproc)  
+      - run:
+          name: "Unit tests for SE3 and SO3"
+          command: bin/test.SE3
+          when: always
       - run:
           name: "Run FGraph_2d"
           command: |
