@@ -74,10 +74,12 @@ class Factor2Poses3d : public Factor
 {
   public:
     Factor2Poses3d(const Mat4 &observation, std::shared_ptr<Node> &nodeOrigin,
-            std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf, bool updateNodeTarget=false);
+            std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf, bool updateNodeTarget=false,
+            Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
     Factor2Poses3d(const SE3 &observation, std::shared_ptr<Node> &nodeOrigin,
-            std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf, bool updateNodeTarget=false);
-    ~Factor2Poses3d();
+            std::shared_ptr<Node> &nodeTarget, const Mat6 &obsInf, bool updateNodeTarget=false,
+            Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
+    ~Factor2Poses3d() override = default;
     /**
      * Jacobians are not evaluated, just the residuals
      */

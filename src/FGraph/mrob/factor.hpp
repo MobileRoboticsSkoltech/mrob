@@ -61,6 +61,20 @@ class Node;
  *
  * - Jacobian is a block matrix corresponding to the Jacobian of the first node J1,
  *   then second node J2, etc, such that J = [J1, J2, ..., Jn],
+ *
+ * Robust Factors TODO
+ *  All factors also allow for robust factors, they just have to be specified at the constructor.
+ *  By the default the robust factor is quadratic (no effect)
+ *  Currently supports robust factors:
+ *                   Influence function                 robust weight
+ *                   --------------------             --------------------
+ *   - Quadratic:          p(u) = 1/2u^2              w(u)  = 1
+ *   - Huber:     p(u) = 1/2u^2    if u < d            w(u) = 1
+                          d(u-1/2d)                          1/u
+ *   - Cauchy:   p(u) = 1/2 ln(1+u^2)                  w(u) = 1/(1+u^2)
+ *   - McClure:   p(u) = 1/2 u^2 / (1+u^2)              w(u) = 1/(1+u^2)^2
+ *   - Ransac:   p(u) = 1/2u^2    if u < d            w(u) = 1
+ *                      d                                    0
  */
 
 class Factor{
@@ -70,7 +84,8 @@ public:
      * On the derived class constructor we will specify the (ordered)
      * nodes that the factor is connected to.
      */
-    Factor(uint_t dim, uint_t allNodesDim, uint_t potNumberNodes = 5);
+    enum robustFactorType{QUADRATIC = 0, HUBER, CAUCHY, MCCLURE, RANSAC};
+    Factor(uint_t dim, uint_t allNodesDim, robustFactorType factor_type = QUADRATIC, uint_t potNumberNodes = 5);
     virtual ~Factor();
     /**
      * Residuals are evaluated with respect to the current solution
@@ -126,6 +141,21 @@ public:
     const std::vector<std::shared_ptr<Node> >*
             get_neighbour_nodes(void) const {return &neighbourNodes_;}
 
+    /**
+     * Robust functions, given the current distance u = sqrt(r' W r)
+     * It can be calculated in the base class for most of the robust functions
+     * given that we provide the following inputs:
+     *  - u = sqrt(r'Wr)
+     *  - param: may be used to pass some information for some losses
+     *
+     * Output:
+     *  - dp/du 1/u or influence by the inverse of the distance u.
+     *  The output is directly multiplied in the formation of the
+     *  matrix W when building the problem.
+     */
+
+    matData_t evaluate_robust_weight(matData_t u, matData_t params = 0.0);
+
 protected:
     id_t id_;
     /**
@@ -136,6 +166,20 @@ protected:
     uint_t dim_;//dimension of the observation
     uint_t allNodesDim_;//summation of all the nodes that the factor affects
     matData_t chi2_;
+
+    // Robust factor weighting the "iteratively weighted LSQ"
+    robustFactorType robust_type_;
+    matData_t robust_weight_; // dp/du 1/u or influence by the inverse of the distance u
+
+    /**
+     * TODO: for ransac factors, we can think of the problem as an hypothesis rejection test
+     * that the observation we have obtained actually belongs to a different distribution and hence
+     * we remove it from our estimation.
+     * we need a threshold (a ransac_significance level, e.g. 5%) and methods for setting it.
+     * TODO values could be the two-sided test if we assume Gaussian distributions, one-sided, etc.
+     * Note we need to account for the dimensionality of the node in oder to achive the p-value set.
+     */
+    //matData_t ransac_significance_level_;
 
     // variables to declare on child Factor, for instance of dim 6
     //Mat61 obs_, r_; //and residuals

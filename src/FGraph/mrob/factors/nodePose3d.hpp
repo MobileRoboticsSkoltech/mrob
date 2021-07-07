@@ -44,7 +44,7 @@ class NodePose3d : public Node
      * Initialization directly on SE3 a matrix
      */
     NodePose3d(const SE3 &initial_x);
-    virtual ~NodePose3d();
+    ~NodePose3d()  override = default;
     /**
      * Left update operation corresponds to
      * T'=exp(dxi^)*T

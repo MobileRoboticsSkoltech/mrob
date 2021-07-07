@@ -433,6 +433,11 @@ std::vector<double> PlaneRegistration::print_evaluate()
         case SolveMode::LM_ELLIP:
             gradient__ = gradient_;
             hessian__ = hessian_;
+            break;
+        case SolveMode::INITIALIZE:
+        case SolveMode::GN_CLAMPED_HESSIAN:
+            std::cout << "PlaneRegistration::print_evaluate: Not handled" << std::endl;
+            break;
     }
 
     // Normals on planes, check for rank
@@ -496,9 +501,10 @@ void PlaneRegistration::calculate_gradient_hessian()
     }
 }
 
-void PlaneRegistration::update_state(const MatX1 &dx)
+void PlaneRegistration::update_state()
 {
-    trajectory_->back().update_lhs(dx);
+    // XXX this ws before passed as a function argument. Deprecated?
+    trajectory_->back().update_lhs(dx_);
     Mat61 xiFinal = trajectory_->back().ln_vee();
     double  tau = 1.0 / (double)(numberPoses_-1);
     Mat61 dxi;

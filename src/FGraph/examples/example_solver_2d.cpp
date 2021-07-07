@@ -38,7 +38,7 @@ int main ()
 
     // create a simple graph to solve:
     //     anchor ------ X1 ------- obs ---------- X2
-    mrob::FGraphSolve graph(mrob::FGraphSolve::ADJ,mrob::FGraphSolve::GN);
+    mrob::FGraphSolve graph(mrob::FGraphSolve::ADJ);
 
     // Initial node is defined at 0,0,0, and anchor factor actually observing it at 0
     Mat31 x, obs;

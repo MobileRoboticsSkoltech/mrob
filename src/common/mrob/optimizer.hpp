@@ -90,7 +90,7 @@ public:
     /**
      * Updates the current solution
      */
-    virtual void update_state(const MatX1 &dx) = 0;
+    virtual void update_state() = 0;
     /**
      * For Levenberg-Marquard
      * This function bookkeeps the current state values

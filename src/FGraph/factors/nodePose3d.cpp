@@ -43,10 +43,6 @@ NodePose3d::NodePose3d(const SE3 &initial_x) :
 	assert(isSE3(initial_x.T()) && "NodePose3d:: Incorrect initial state, not an element of SE3" );
 }
 
-NodePose3d::~NodePose3d()
-{
-
-}
 
 void NodePose3d::update(const Eigen::Ref<const MatX1> &dx)
 {

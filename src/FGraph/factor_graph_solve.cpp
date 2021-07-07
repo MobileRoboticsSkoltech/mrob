@@ -36,8 +36,8 @@ using namespace std;
 using namespace Eigen;
 
 
-FGraphSolve::FGraphSolve(matrixMethod method, optimMethod optim):
-	FGraph(), matrixMethod_(method), optimMethod_(optim), N_(0), M_(0),
+FGraphSolve::FGraphSolve(matrixMethod method):
+	FGraph(), matrixMethod_(method), N_(0), M_(0),
 	lambda_(1e-6), solutionTolerance_(1e-2)
 {
 
@@ -57,13 +57,12 @@ void FGraphSolve::solve(optimMethod method, uint_t maxIters, matData_t lambda, m
      *               1.3959 % update values,
      *
      */
-    optimMethod_ = method; // updates the optimization method
     lambda_ = lambda;
     solutionTolerance_ = solutionTolerance;
     time_profiles_.reset();
 
     // Optimization
-    switch(optimMethod_)
+    switch(method)
     {
       case GN:
         this->optimize_gauss_newton();// false => lambda = 0
@@ -301,6 +300,8 @@ void FGraphSolve::build_adjacency()
 
 
         // 5) Get information matrix for every factor
+        // TODO for robust factors, here is where the robust weights should be applied
+        matData_t robust_weight = 1.0;
         for (uint_t l = 0; l < f->get_dim(); ++l)
         {
             // only iterates over the upper triangular part
@@ -308,9 +309,8 @@ void FGraphSolve::build_adjacency()
             {
                 uint_t iRow = indFactorsMatrix[i] + l;
                 uint_t iCol = indFactorsMatrix[i] + k;
-                W_.insert(iRow,iCol) = f->get_information_matrix()(l,k);
-                // If QR, then we need the following, but we dont suppoort QR anyway
-                //W_.insert(iRow,iCol) = f->get_trans_sqrt_information_matrix()(l,k);
+                robust_weight = f->evaluate_robust_weight(std::sqrt(f->get_chi2()));
+                W_.insert(iRow,iCol) = robust_weight * f->get_information_matrix()(l,k);
             }
         }
     } //end factors loop

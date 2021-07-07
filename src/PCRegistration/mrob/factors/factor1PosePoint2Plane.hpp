@@ -55,7 +55,8 @@ class Factor1PosePoint2Plane: public Factor
 {
   public:
     Factor1PosePoint2Plane(const Mat31 &z_point_x, const Mat31 &z_point_y, const Mat31 &z_normal_y,
-            std::shared_ptr<Node> &node,  const Mat1 &obsInf);
+            std::shared_ptr<Node> &node,  const Mat1 &obsInf,
+            Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
     ~Factor1PosePoint2Plane();
     /**
      * Jacobians are not evaluated, just the residuals

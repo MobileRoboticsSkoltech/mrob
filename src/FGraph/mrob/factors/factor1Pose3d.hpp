@@ -44,11 +44,11 @@ namespace mrob{
 class Factor1Pose3d : public Factor
 {
   public:
-    Factor1Pose3d(const Mat4 &observation, std::shared_ptr<Node> &n1,
-             const Mat6 &obsInf);
-    Factor1Pose3d(const SE3 &observation, std::shared_ptr<Node> &n1,
-             const Mat6 &obsInf);
-    ~Factor1Pose3d();
+    Factor1Pose3d(const Mat4 &observation, std::shared_ptr<Node> &n1, const Mat6 &obsInf,
+            Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
+    Factor1Pose3d(const SE3 &observation, std::shared_ptr<Node> &n1, const Mat6 &obsInf,
+            Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
+    ~Factor1Pose3d() override = default;
     /**
      * Returns the chi2 error and fills the residual vector
      */

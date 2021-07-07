@@ -38,10 +38,7 @@ NodePlane4d::NodePlane4d(const Mat41 &initial_x):
     auxiliaryState_.head(3).normalize();
 }
 
-NodePlane4d::~NodePlane4d()
-{
 
-}
 
 void NodePlane4d::update(const Eigen::Ref<const MatX1> &dx)
 {

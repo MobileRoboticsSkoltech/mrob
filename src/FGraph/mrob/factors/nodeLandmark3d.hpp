@@ -38,7 +38,7 @@ class NodeLandmark3d : public Node
      */
     NodeLandmark3d(const Mat31 &initial_x);
     //NodePose3d(const SE3 &initial_T);
-    virtual ~NodeLandmark3d();
+    virtual ~NodeLandmark3d()  override = default;
 
     virtual void update(const Eigen::Ref<const MatX1> &dx);
     virtual void update_from_auxiliary(const Eigen::Ref<const MatX1> &dx);

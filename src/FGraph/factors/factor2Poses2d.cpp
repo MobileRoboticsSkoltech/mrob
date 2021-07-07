@@ -29,8 +29,9 @@ using namespace mrob;
 
 
 Factor2Poses2d::Factor2Poses2d(const Mat31 &observation, std::shared_ptr<Node> &nodeOrigin,
-                               std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf, bool updateNodeTarget):
-        Factor(3, 6), obs_(observation), W_(obsInf)
+                               std::shared_ptr<Node> &nodeTarget, const Mat3 &obsInf, bool updateNodeTarget,
+                               Factor::robustFactorType robust_type):
+        Factor(3, 6, robust_type), obs_(observation), W_(obsInf)
 {
     if (nodeOrigin->get_id() < nodeTarget->get_id())
     {
@@ -106,8 +107,8 @@ void Factor2Poses2d::print() const
 
 
 Factor2Poses2dOdom::Factor2Poses2dOdom(const Mat31 &observation, std::shared_ptr<Node> &nodeOrigin, std::shared_ptr<Node> &nodeTarget,
-                         const Mat3 &obsInf, bool updateNodeTarget) :
-                         Factor2Poses2d(observation, nodeOrigin, nodeTarget, obsInf)
+                         const Mat3 &obsInf, bool updateNodeTarget, Factor::robustFactorType robust_type) :
+                         Factor2Poses2d(observation, nodeOrigin, nodeTarget, obsInf, false, robust_type)
 {
     assert(nodeOrigin->get_id() < nodeTarget->get_id() && "Factor2Poses2dOdom::Factor2Poses2dodom: Node origin id is posterior to the destination node\n");
     if (updateNodeTarget)

@@ -77,7 +77,7 @@ uint_t OptimizerDense::optimize_newton_raphson_one_iteration(bool useLambda)
     // 2) dx = - h^-1 * grad XXX test for singularities?
     dx_ = - hessian_.inverse() * gradient_;
     // 3) update the solution
-    this->update_state(dx_);
+    this->update_state();
 
     return 1;
 }

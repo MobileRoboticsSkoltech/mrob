@@ -31,8 +31,9 @@ using namespace mrob;
 
 
 Factor1Pose1Landmark2d::Factor1Pose1Landmark2d(const Mat21 &observation, std::shared_ptr<Node> &nodePose,
-        std::shared_ptr<Node> &nodeLandmark, const Mat2 &obsInf, bool initializeLandmark):
-        Factor(2,5), obs_(observation), r_(Mat21::Zero()),landmark_(Mat21::Zero()),
+        std::shared_ptr<Node> &nodeLandmark, const Mat2 &obsInf, bool initializeLandmark,
+        Factor::robustFactorType robust_type):
+        Factor(2,5, robust_type), obs_(observation), r_(Mat21::Zero()),landmark_(Mat21::Zero()),
         state_(Mat31::Zero()),dx_(0.0), dy_(0.0), q_(0.0),
         W_(obsInf), reversedNodeOrder_(false)
 {
@@ -60,9 +61,6 @@ Factor1Pose1Landmark2d::Factor1Pose1Landmark2d(const Mat21 &observation, std::sh
     }
 }
 
-Factor1Pose1Landmark2d::~Factor1Pose1Landmark2d()
-{
-}
 
 void Factor1Pose1Landmark2d::evaluate_residuals()
 {

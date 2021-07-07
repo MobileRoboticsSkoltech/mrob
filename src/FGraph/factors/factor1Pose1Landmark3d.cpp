@@ -30,8 +30,9 @@ using namespace mrob;
 
 
 Factor1Pose1Landmark3d::Factor1Pose1Landmark3d(const Mat31 &observation, std::shared_ptr<Node> &nodePose,
-        std::shared_ptr<Node> &nodeLandmark, const Mat3 &obsInf, bool initializeLandmark):
-        Factor(3,9), obs_(observation), W_(obsInf), reversedNodeOrder_(false)
+        std::shared_ptr<Node> &nodeLandmark, const Mat3 &obsInf, bool initializeLandmark,
+        Factor::robustFactorType robust_type):
+        Factor(3,9, robust_type), obs_(observation), W_(obsInf), reversedNodeOrder_(false)
 {
     // chek for order, we need to ensure id_0 < id_1
     if (nodePose->get_id() < nodeLandmark->get_id())
@@ -53,9 +54,7 @@ Factor1Pose1Landmark3d::Factor1Pose1Landmark3d(const Mat31 &observation, std::sh
     }
 }
 
-Factor1Pose1Landmark3d::~Factor1Pose1Landmark3d()
-{
-}
+
 
 void Factor1Pose1Landmark3d::evaluate_residuals()
 {
