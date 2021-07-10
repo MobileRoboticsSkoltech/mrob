@@ -10,7 +10,11 @@ SET(sources
     create_points.cpp
     weight_point.cpp
     estimate_plane.cpp
+    factors/factor1PosePoint2Point.cpp
     factors/factor1PosePoint2Plane.cpp
+    factors/nodePlane4d.cpp
+    factors/factor1Pose1Plane4d.cpp
+    factors/EigenFactorPlane.cpp
 )
 
 # extra header files
@@ -20,7 +24,11 @@ SET(headers
     mrob/plane_registration.hpp
     mrob/create_points.hpp
     mrob/estimate_plane.hpp
+    mrob/factors/factor1PosePoint2Point.hpp
     mrob/factors/factor1PosePoint2Plane.hpp
+    mrob/factors/nodePlane4d.hpp
+    mrob/factors/factor1Pose1plane4d.hpp
+    mrob/factors/EigenFactorPlane.hpp
 )
 
 # create the shared library

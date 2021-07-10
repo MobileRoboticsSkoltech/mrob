@@ -35,11 +35,6 @@ Factor1PosePoint2Plane::Factor1PosePoint2Plane(const Mat31 &z_point_x, const Mat
 }
 
 
-Factor1PosePoint2Plane::~Factor1PosePoint2Plane()
-{
-}
-
-
 void Factor1PosePoint2Plane::evaluate_residuals()
 {
     // r = <pi, Tp>

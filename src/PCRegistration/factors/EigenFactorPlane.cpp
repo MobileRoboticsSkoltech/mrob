@@ -22,7 +22,7 @@
  */
 
 
-#include "mrob/plane_factor.hpp"
+#include "mrob/factors/EigenFactorPlane.hpp"
 
 #include <iostream>
 #include <Eigen/Eigenvalues>
@@ -30,8 +30,9 @@
 
 using namespace mrob;
 
-PlaneFactor::PlaneFactor(const Mat4 &S, std::shared_ptr<Node> &nodeOrigin):
-        Factor(0,0), //Dimension zero since this is a non-parametric factor. Also we don't known how many nodes will connect, so we set the second param to 0 (not-used)
+EigenFactorPlane::EigenFactorPlane(const Mat4 &S, std::shared_ptr<Node> &nodeOrigin,
+        Factor::robustFactorType robust_type):
+        Factor(0,0, robust_type), //Dimension zero since this is a non-parametric factor. Also we don't known how many nodes will connect, so we set the second param to 0 (not-used)
         planeEstimation_(Mat41::Zero()),
         planeError_(0.0)
 {
@@ -39,15 +40,29 @@ PlaneFactor::PlaneFactor(const Mat4 &S, std::shared_ptr<Node> &nodeOrigin):
     S_.emplace(nodeOrigin->get_id(), S);//TODO ids make sense? not really
 }
 
+void EigenFactorPlane::evaluate_residuals()
+{
 
-void PlaneFactor::add_observation(const Mat4& S, std::shared_ptr<Node> &newNode)
+}
+void EigenFactorPlane::evaluate_jacobians()
+{
+
+}
+
+void EigenFactorPlane::evaluate_chi2()
+{
+
+}
+
+
+void EigenFactorPlane::add_observation(const Mat4& S, std::shared_ptr<Node> &newNode)
 {
     //neighbourNodes_ contain only those node to be optimized
     planeNodes_.push_back(newNode);
     S_.emplace(newNode->get_id(), S);
 }
 
-double PlaneFactor::estimate_plane()
+double EigenFactorPlane::estimate_plane()
 {
     calculate_all_matrices_Q();
     accumulatedQ_ = Mat4::Zero();
@@ -67,7 +82,7 @@ double PlaneFactor::estimate_plane()
     return planeError_;
 }
 
-void PlaneFactor::calculate_all_matrices_Q()
+void EigenFactorPlane::calculate_all_matrices_Q()
 {
     Q_.clear();
     for (auto &element : S_)
@@ -83,7 +98,7 @@ void PlaneFactor::calculate_all_matrices_Q()
 }
 
 
-Mat61 PlaneFactor::calculate_jacobian(uint_t nodeId)
+Mat61 EigenFactorPlane::calculate_jacobian(uint_t nodeId)
 {
     if (S_.count(nodeId) == 0) return Mat61::Zero();
     Mat61 jacobian;
@@ -153,7 +168,7 @@ Mat61 PlaneFactor::calculate_jacobian(uint_t nodeId)
 }
 
 
-void PlaneFactor::print() const
+void EigenFactorPlane::print() const
 {
     std::cout << "Plane Eigen Factor" <<std::endl;
 }

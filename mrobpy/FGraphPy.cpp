@@ -41,6 +41,7 @@
 #include "mrob/factors/factor1Pose1Plane4d.hpp"
 
 #include "mrob/factors/factor1PosePoint2Plane.hpp"
+//#include "mrob/factors/factor1PosePoint2Point.hpp"
 
 #include <Eigen/Geometry>
 
@@ -187,7 +188,7 @@ public:
         return f->get_id();
     }
 
-    // point to plane and p2p optimizations. Variants of weighted ICP
+    // point to plane iterative optimizations. Variants of weighted ICP usng Fgraph
     // ----------------------------------------------------
     // point to Plane factor
     factor_id_t add_factor_1pose_point2plane(const py::EigenDRef<const Mat31> z_point_x, const py::EigenDRef<const Mat31> z_point_y,

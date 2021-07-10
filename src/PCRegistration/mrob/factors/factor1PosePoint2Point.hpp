@@ -20,8 +20,8 @@
  *              Mobile Robotics Lab.
  */
 
-#ifndef FACTORS_FACTOR1POSEPOINT2POINT_HPP_
-#define FACTORS_FACTOR1POSEPOINT2POINT_HPP_
+#ifndef FACTOR1POSEPOINT2POINT_HPP_
+#define FACTOR1POSEPOINT2POINT_HPP_
 
 #include "mrob/matrix_base.hpp"
 #include "mrob/SE3.hpp" //requires including and linking SE3 library
@@ -53,8 +53,8 @@ class Factor1PosePoint2Point : public Factor
 {
   public:
     Factor1PosePoint2Point(const Mat31 &z_point_x, const Mat31 &z_point_y,  std::shared_ptr<Node> &node,
-            const Mat1 &obsInf, Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
-    ~Factor1PosePoint2Point();
+            const Mat3 &obsInf, Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
+    ~Factor1PosePoint2Point() override = default;
     /**
      * Jacobians are not evaluated, just the residuals
      */
@@ -84,4 +84,4 @@ class Factor1PosePoint2Point : public Factor
 
 
 
-#endif /* FACTORS_FACTOR1POSEPOINT2POINT_HPP_ */
+#endif /* FACTOR1POSEPOINT2POINT_HPP_ */

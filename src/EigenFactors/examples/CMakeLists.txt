@@ -1,4 +1,0 @@
-ADD_EXECUTABLE(test_EF_Hessian  test_EF_Hessian.cpp)
-TARGET_LINK_LIBRARIES(test_EF_Hessian SE3)
-ADD_EXECUTABLE(example_EF_1_pose  example_solve_1_poses.cpp)
-TARGET_LINK_LIBRARIES(example_EF_1_pose EigenFactors)

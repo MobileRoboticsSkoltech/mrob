@@ -13,16 +13,17 @@
  * limitations under the License.
  *
  *
- * plane_factor.hpp
+ * EigenFactorPlane.hpp
  *
  *  Created on: Aug 16, 2019
+ *  Created on: July 10, 2021 (for real)
  *      Author: Gonzalo Ferrer
  *              g.ferrer@skoltech.ru
  *              Mobile Robotics Lab.
  */
 
-#ifndef PLANE_FACTOR_HPP_
-#define PLANE_FACTOR_HPP_
+#ifndef EIGENFACTORPLANE_HPP_
+#define EIGENFACTORPLANE_HPP_
 
 
 #include "mrob/factor.hpp"
@@ -32,7 +33,7 @@
 namespace mrob{
 
 /**
- * Plane factor is a vertex that complies with the Fgraph standards
+ * Eigen factor Plane is a vertex that complies with the Fgraph standards
  * and inherits from base factor.hpp
  *
  * The Plane factor connects different poses that have observed the same geometric entity.
@@ -45,13 +46,14 @@ namespace mrob{
  * This class assumes that matrices S = sum p*p' are calculated before since they are directly inputs
  * XXX should we store all points?
  */
-class PlaneFactor : public Factor{
+class EigenFactorPlane: public Factor{
 public:
     /**
      * Creates a plane. The minimum requirements are 1 pose.
      */
-    PlaneFactor(const Mat4 &S, std::shared_ptr<Node> &nodeOrigin);
-    ~PlaneFactor();
+    EigenFactorPlane(const Mat4 &S, std::shared_ptr<Node> &nodeOrigin,
+            Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
+    ~EigenFactorPlane() override = default;
     /**
      * Jacobians are not evaluated, just the residuals
      */
@@ -65,14 +67,12 @@ public:
     void print() const;
 
     // TODO are this functions useful? maybe add some assert inside
-    const Eigen::Ref<const MatX1> get_obs() const
-            {assert(0 && "PlaneFactor: method should not be called");return Mat31::Zero();};
+    const Eigen::Ref<const MatX> get_obs() const
+            {assert(0 && "PlaneFactor: method should not be called");return Mat31::Zero();}
     const Eigen::Ref<const MatX1> get_residual() const
-            {assert(0 && "PlaneFactor: method should not be called");return Mat31::Zero();};
+            {assert(0 && "PlaneFactor: method should not be called");return Mat31::Zero();}
     const Eigen::Ref<const MatX> get_information_matrix() const
-            {assert(0 && "PlaneFactor: method should not be called");return Mat4::Zero();};
-    const Eigen::Ref<const MatX> get_trans_sqrt_information_matrix() const
-            {assert(0 && "PlaneFactor: method should not be called");return Mat4::Zero();};
+            {assert(0 && "PlaneFactor: method should not be called");return Mat4::Zero();}
     const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
 
 
@@ -167,11 +167,11 @@ protected:
     Mat4 accumulatedQ_;//Q matrix of accumulated values for the incremental update of the error.
 
     Mat41 planeEstimation_;
-    double planeError_;
+    matData_t planeError_;
 
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen
 };
 
 }
-#endif /* PLANE_FACTOR_HPP_ */
+#endif /* EigenFactorPlane_HPP_ */
