@@ -39,14 +39,14 @@ int main ()
 
 
     // add observations, for now just random things
-    Mat1 W;
+    mrob::Mat1 W;
     W << 1.0;
 
-    for (uint_t t = 0; t < 10; t++)
+    for (int t = 0; t < 10; t++)
     {
-        Mat31 z_normal_y  = Mat31::Random();
-        Mat31 z_point_y = Mat31::Random();
-        Mat31 z_point_x = Mat31::Random();
+        mrob::Mat31 z_normal_y  = mrob::Mat31::Random();
+        mrob::Mat31 z_point_y = mrob::Mat31::Random();
+        mrob::Mat31 z_point_x = mrob::Mat31::Random();
         std::shared_ptr<mrob::Factor> f1(new mrob::Factor1PosePoint2Plane(z_point_x,z_point_y, z_normal_y,n0,W));
         graph.add_factor(f1);
     }

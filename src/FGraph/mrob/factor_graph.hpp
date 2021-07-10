@@ -52,7 +52,6 @@ namespace mrob{
  * Each problem instantaition should implement methods for solving the graph and storing the
  * necessary data, such as information matrix, factorizations, etc.
  *
- * TODO for large scale problems, build a subset of the graphs considered, using a tree or other structures
  */
 
 class FGraph{
@@ -69,54 +68,43 @@ public:
      *
      * Modifications of the structure of the graph are allowed
      * by removing the factor and adding the new updated one.
+     *
+     * returns factor id
      */
-    bool add_factor(std::shared_ptr<Factor> &factor);
+    factor_id_t add_factor(std::shared_ptr<Factor> &factor);
+    /**
+     * Adds an Eigen Factor, the special factor that is not formulated
+     * as a sum of residuals, but directly as a real value (eigenvalue)
+     * and therefore it requires a different processing, apart from the
+     * standard residual factors from above.
+     */
+    factor_id_t add_eigen_factor(std::shared_ptr<Factor> &factor);
     /**
       * Adds a node if it was not already on the set.
       */
-    bool add_node(std::shared_ptr<Node> &node);
+    factor_id_t add_node(std::shared_ptr<Node> &node);
+
     /**
-     * TODO Removes a Factor and on all the connected Nodes
-     * list of factors, it is removed as well
+     * get_node returns the node given the node id key, now a position on the data structure
      */
-    void rm_factor(std::shared_ptr<Factor> &factor);
+    std::shared_ptr<Node>& get_node(factor_id_t key);
+
     /**
-     * TODO Removes Node from list. TODO should we eliminate
-     * all factors pointing to that node?
+     * get_node returns the node given the node id key, now a position on the data structure
      */
-    void rm_node(std::shared_ptr<Node> &node);
+    std::shared_ptr<Factor>& get_factor(factor_id_t key);
     void print(bool complete = false) const;
 
-    /**
-     * get_node returns the node given the node id key, now a position on the data structure
-     */
-    std::shared_ptr<Node>& get_node(uint_t key);
-
-    /**
-     * get_node returns the node given the node id key, now a position on the data structure
-     */
-    std::shared_ptr<Factor>& get_factor(uint_t key);
-    /**
-     * Returns the chi2 corresponding to a particular factor. Use this only if the value has been updated recently
-     * Mainly the purpose of this function is for testing
-     * XXX deprecated
-     */
-    //matData_t get_factor_chi2(uint_t key);
-    /**
-     * Evaluates the residual and returns the chi2 value
-     * Gonzalo: DEPRECATED. Remove me later
-     */
-    //matData_t evaluate_factor_chi2(uint_t key);
 
     /**
      * FGraph information
      */
-    size_t number_nodes() {return nodes_.size();};
-    size_t number_factors() {return factors_.size();};
+    factor_id_t number_nodes() {return nodes_.size();};
+    factor_id_t number_factors() {return factors_.size();};
     uint_t get_dimension_state() {return stateDim_;};
     uint_t get_dimension_obs() {return obsDim_;};
 
-    //TODO
+    //TODO #46
     void save_graph() const;
     void load_graph();
 
@@ -136,6 +124,9 @@ protected:
 
     //std::unordered_set<std::shared_ptr<Factor> > factors_;
     std::deque<std::shared_ptr<Factor> > factors_; // no specific order needed
+
+    // This requires a special list for the factors
+    std::deque<std::shared_ptr<Factor> > eigen_factors_;
 
     /**
      * Total accumulated dimensions on both the state (nodes)

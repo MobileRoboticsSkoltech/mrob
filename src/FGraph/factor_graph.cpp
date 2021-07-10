@@ -27,7 +27,6 @@
 
 using namespace mrob;
 
-
 FGraph::FGraph() :
         stateDim_(0),obsDim_(0)
 {
@@ -39,9 +38,10 @@ FGraph::~FGraph()
         n->clear();
     factors_.clear();
     nodes_.clear();
+    eigen_factors_.clear();
 }
 
-bool FGraph::add_factor(std::shared_ptr<Factor> &factor)
+factor_id_t FGraph::add_factor(std::shared_ptr<Factor> &factor)
 {
 	factor->set_id(factors_.size());
 	factors_.push_back(factor);
@@ -51,48 +51,46 @@ bool FGraph::add_factor(std::shared_ptr<Factor> &factor)
         n->add_factor(factor);
     }
     obsDim_ += factor->get_dim();
-    return true;
+    return factor->get_id();
 }
 
-bool FGraph::add_node(std::shared_ptr<Node> &node)
+factor_id_t FGraph::add_eigen_factor(std::shared_ptr<Factor> &factor)
+{
+    factor->set_id(eigen_factors_.size());
+    eigen_factors_.push_back(factor);
+    auto *list = factor->get_neighbour_nodes();
+    for( auto &&n: *list)
+    {
+        n->add_factor(factor);
+    }
+    obsDim_ += factor->get_dim();
+    return factor->get_id();
+}
+
+
+factor_id_t FGraph::add_node(std::shared_ptr<Node> &node)
 {
 	node->set_id(nodes_.size());
 	nodes_.push_back(node);
 	stateDim_ += node->get_dim();
-	return true;
+	return node->get_id();
 }
 
-std::shared_ptr<Node>& FGraph::get_node(uint_t key)
+std::shared_ptr<Node>& FGraph::get_node(factor_id_t key)
 {
     // TODO key on a set or map?
     assert(key < nodes_.size() && "FGraph::get_node: incorrect key");
     return nodes_[key];// XXX test key  again
 }
 
-std::shared_ptr<Factor>& FGraph::get_factor(uint_t key)
+std::shared_ptr<Factor>& FGraph::get_factor(factor_id_t key)
 {
     // TODO key on a set or map?
     assert(key < factors_.size() && "FGraph::get_node: incorrect key");
     return factors_[key];
 }
 
-/* XXX: Deprecated, remove me
-matData_t FGraph::get_factor_chi2(uint_t key)
-{
-    auto f = this->get_factor(key);
-    return f->get_chi2();
-}
-*/
 
-/* XXX: Deprecated, remove me
-matData_t FGraph::evaluate_factor_chi2(uint_t key)
-{
-    auto f = this->get_factor(key);
-    f->evaluate_residuals();
-    f->evaluate_chi2();
-    return f->get_chi2();
-}
-*/
 void FGraph::print(bool completePrint) const
 {
     std::cout << "Status of graph: " <<

@@ -42,18 +42,18 @@ int main ()
     mrob::FGraphSolve graph(mrob::FGraphSolve::ADJ);
 
     // Initial node is defined at 0,0,0, 0,0,0 and anchor factor actually observing it at 0
-    Mat61 x, obs;
-    x = Mat61::Random()*0.05;
+    mrob::Mat61 x, obs;
+    x = mrob::Mat61::Random()*0.05;
     mrob::SE3 Tx(x);
     std::shared_ptr<mrob::Node> n0(new mrob::NodePose3d(Tx));
     graph.add_node(n0);
-    Mat4 Tobs = Mat4::Identity();
-    Mat6 obsInformation = Mat6::Identity();
+    mrob::Mat4 Tobs = mrob::Mat4::Identity();
+    mrob::Mat6 obsInformation = mrob::Mat6::Identity();
     std::shared_ptr<mrob::Factor> f0(new mrob::Factor1Pose3d(Tobs,n0,obsInformation*1e6));
     graph.add_factor(f0);
 
     // Add Ladmarks: uninitialized
-    Mat31 land;
+    mrob::Mat31 land;
     land << 0,0,0;
     std::shared_ptr<mrob::Node> l1(new mrob::NodeLandmark3d(land));// it will be later updated by the factor
     graph.add_node(l1);
@@ -63,7 +63,7 @@ int main ()
     graph.add_node(l3);
     
     // reuse of variable, now this is the observation of the landmark
-    Mat3 landInf = Mat3::Identity();
+    mrob::Mat3 landInf = mrob::Mat3::Identity();
     land << 1,0,0;
     std::shared_ptr<mrob::Factor> f1(new mrob::Factor1Pose1Landmark3d(land,n0,l1,landInf));
     graph.add_factor(f1);

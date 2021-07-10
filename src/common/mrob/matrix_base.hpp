@@ -31,10 +31,14 @@
 
 #define EIGEN_DEFAULT_TO_ROW_MAJOR
 
+
+
+namespace mrob{
+
 // data types conventions
 typedef double matData_t;
 typedef unsigned int uint_t;
-
+typedef std::size_t factor_id_t;
 
 // Definition of squared matrices, by default column major
 typedef Eigen::Matrix<matData_t, 1,1, Eigen::RowMajor> Mat1;
@@ -74,5 +78,7 @@ template<int Rw,int Col>
 using Mat = Eigen::Matrix<matData_t, Rw, Col, Eigen::RowMajor>;
 
 
+
+}//end of namespace
 
 #endif /* MATRIX_BASE_HPP_ */

@@ -41,9 +41,9 @@ int main ()
     mrob::FGraphSolve graph(mrob::FGraphSolve::ADJ);
 
     // Initial node is defined at 0,0,0, and anchor factor actually observing it at 0
-    Mat31 x, obs;
-    x = Mat31::Random()*0.1;
-    obs = Mat31::Zero();
+    mrob::Mat31 x, obs;
+    x = mrob::Mat31::Random()*0.1;
+    obs = mrob::Mat31::Zero();
     // Nodes and factors are added to the graph using polymorphism. That is why
     // we need to declare here what specific kind of nodes or factors we use
     // while the definition is an abstract class (Node or Factor)
