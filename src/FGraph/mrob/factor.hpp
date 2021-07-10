@@ -79,7 +79,6 @@ class Node;
 
 class Factor{
 public:
-    typedef std::size_t id_t;
     /**
      * On the derived class constructor we will specify the (ordered)
      * nodes that the factor is connected to.
@@ -106,7 +105,7 @@ public:
     virtual void evaluate_chi2() = 0;
     /**
      * get chi2 returns the value in the variable chi2_. This value will be updated
-     * every time there is a caluclation of residuals.
+     * every time there is a calculation of residuals.
      */
     matData_t get_chi2() const { return chi2_;}
     /**
@@ -134,8 +133,8 @@ public:
     virtual const Eigen::Ref<const MatX> get_jacobian() const = 0;
 
 
-    id_t get_id() const {return id_;}
-    void set_id(id_t id) {id_ = id;}
+    factor_id_t get_id() const {return id_;}
+    void set_id(factor_id_t id) {id_ = id;}
     uint_t get_dim() const {return dim_;}
     uint_t get_all_nodes_dim(){ return allNodesDim_;}
     const std::vector<std::shared_ptr<Node> >*
@@ -157,7 +156,7 @@ public:
     matData_t evaluate_robust_weight(matData_t u, matData_t params = 0.0);
 
 protected:
-    id_t id_;
+    factor_id_t id_;
     /**
      * This is a sorted list, so at the constructor we should check
      * of the order based on increasing ids (See examples)

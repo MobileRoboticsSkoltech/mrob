@@ -99,9 +99,9 @@ class Node{
      */
     virtual const Eigen::Ref<const MatX> get_auxiliary_state() const = 0;
     virtual void print() const {}
-    uint_t get_id() const {return id_;}
-    void set_id(uint_t id) {id_ = id;}
-    uint_t get_dim(void) const {return dim_;}
+    factor_id_t get_id() const {return id_;}
+    void set_id(factor_id_t id) {id_ = id;}
+    factor_id_t get_dim(void) const {return dim_;}
     /**
      * Adds a factor to the list of factors connected to this node.
      */
@@ -118,7 +118,7 @@ class Node{
   protected:
     // no oder needed here
     std::vector<std::shared_ptr<Factor> > neighbourFactors_;
-    uint_t id_;
+    factor_id_t id_;
     uint_t dim_;
     /**
      * On this pure abstract class we can't define a vector state,

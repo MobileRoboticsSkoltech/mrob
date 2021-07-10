@@ -33,12 +33,12 @@
 int main()
 {
     // Test the numerical stability of the sinc(x) function and it's power series.
-    uint_t N = 180;
+    int N = 180;
     std::vector<double> X(N);
     X[0] = 1; // initial seed
 
     // plot results
-    for ( uint_t i = 1; i < N ; ++i)
+    for ( int i = 1; i < N ; ++i)
         X[i] = X[i-1]*0.7;
 
 

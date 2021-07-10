@@ -41,9 +41,9 @@ int main ()
     mrob::FGraphSolve graph(mrob::FGraphSolve::ADJ);
 
     // Initial node is defined at 0,0,0, 0,0,0 and anchor factor actually observing it at 0
-    Mat61 obs;
-    Mat6 obsInformation= Mat6::Identity()*1e6;
-    Mat61 x = Mat61::Random()*0.05;
+    mrob::Mat61 obs;
+    mrob::Mat6 obsInformation = mrob::Mat6::Identity()*1e6;
+    mrob::Mat61 x = mrob::Mat61::Random()*0.05;
     mrob::SE3 Tobs;
     mrob::SE3 Tx(x);
     std::shared_ptr<mrob::Node> n0(new mrob::NodePose3d(Tx));
@@ -56,7 +56,7 @@ int main ()
     graph.add_node(n1);
     obs << -0.1,0.2,0.5, 1,-2 ,3;
     Tobs = mrob::SE3(obs);
-    obsInformation= Mat6::Identity();
+    obsInformation= mrob::Mat6::Identity();
     std::shared_ptr<mrob::Factor> f1(new mrob::Factor2Poses3d(Tobs,n0,n1,obsInformation, true));
     graph.add_factor(f1);
 

@@ -58,7 +58,6 @@ using namespace mrob;
 class FGraphPy : public FGraphSolve
 {
 public:
-    using id_t = Factor::id_t;
     /**
      * Constructor for the python binding. By default uses the Cholesky adjoint solving type.
      * For the robust factor type, it indicates one (default - Quadratic)
@@ -72,7 +71,7 @@ public:
      */
     FGraphPy(mrob::Factor::robustFactorType robust_type = mrob::Factor::robustFactorType::QUADRATIC) :
         FGraphSolve(FGraphSolve::matrixMethod::ADJ), robust_type_(robust_type) {}
-    id_t add_node_pose_2d(const py::EigenDRef<const Mat31> x)
+    factor_id_t add_node_pose_2d(const py::EigenDRef<const Mat31> x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodePose2d(x));
         this->add_node(n);
@@ -102,26 +101,26 @@ public:
 
     // 3D factor graph
     // ------------------------------------------------------------------------------------
-    /*id_t add_node_pose_3d(const py::EigenDRef<const Mat4> x)
+    /*factor_id_t add_node_pose_3d(const py::EigenDRef<const Mat4> x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodePose3d(x));
         this->add_node(n);
         return n->get_id();
     }*/
-    id_t add_node_pose_3d(const SE3 &x)
+    factor_id_t add_node_pose_3d(const SE3 &x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodePose3d(x));
         this->add_node(n);
         return n->get_id();
     }
-    id_t add_factor_1pose_3d(const SE3 &obs, uint_t nodeId, const py::EigenDRef<const Mat6> obsInvCov)
+    factor_id_t add_factor_1pose_3d(const SE3 &obs, uint_t nodeId, const py::EigenDRef<const Mat6> obsInvCov)
     {
         auto n1 = this->get_node(nodeId);
         std::shared_ptr<mrob::Factor> f(new mrob::Factor1Pose3d(obs,n1,obsInvCov,robust_type_));
         this->add_factor(f);
         return f->get_id();
     }
-    id_t add_factor_2poses_3d(const SE3 &obs, uint_t nodeOriginId, uint_t nodeTargetId,
+    factor_id_t add_factor_2poses_3d(const SE3 &obs, uint_t nodeOriginId, uint_t nodeTargetId,
             const py::EigenDRef<const Mat6> obsInvCov, bool updateNodeTarget)
     {
         auto nO = this->get_node(nodeOriginId);
@@ -133,13 +132,13 @@ public:
     
     // 3D Landmarks
     // ------------------------------------------------------------------------------------
-    id_t add_node_landmark_3d(const py::EigenDRef<const Mat31> x)
+    factor_id_t add_node_landmark_3d(const py::EigenDRef<const Mat31> x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodeLandmark3d(x));
         this->add_node(n);
         return n->get_id();
     }
-    id_t add_factor_1pose_1landmark_3d(const py::EigenDRef<const Mat31> obs, uint_t nodePoseId,
+    factor_id_t add_factor_1pose_1landmark_3d(const py::EigenDRef<const Mat31> obs, uint_t nodePoseId,
                 uint_t nodeLandmarkId, const py::EigenDRef<const Mat3> obsInvCov, bool initializeLandmark)
     {
         auto n1 = this->get_node(nodePoseId);
@@ -152,13 +151,13 @@ public:
 
     // 2D Landmarks
     // ------------------------------------------------------------------------------------
-    id_t add_node_landmark_2d(const py::EigenDRef<const Mat21> x)
+    factor_id_t add_node_landmark_2d(const py::EigenDRef<const Mat21> x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodeLandmark2d(x));
         this->add_node(n);
         return n->get_id();
     }
-    id_t add_factor_1pose_1landmark_2d(const py::EigenDRef<const Mat21> obs, uint_t nodePoseId,
+    factor_id_t add_factor_1pose_1landmark_2d(const py::EigenDRef<const Mat21> obs, uint_t nodePoseId,
                 uint_t nodeLandmarkId, const py::EigenDRef<const Mat2> obsInvCov, bool initializeLandmark)
     {
         auto n1 = this->get_node(nodePoseId);
@@ -172,13 +171,13 @@ public:
     // There is a problem with scaling of long distances (d->inf n->0), but well, this
     // is not a minimal representation. For finite distances should be fine.
     // ------------------------------------------------------------------------------------
-    id_t add_node_plane_4d(const py::EigenDRef<const Mat41> x)
+    factor_id_t add_node_plane_4d(const py::EigenDRef<const Mat41> x)
     {
         std::shared_ptr<mrob::Node> n(new mrob::NodePlane4d(x));
         this->add_node(n);
         return n->get_id();
     }
-    id_t add_factor_1pose_1plane_4d(const py::EigenDRef<const Mat41> obs, uint_t nodePoseId,
+    factor_id_t add_factor_1pose_1plane_4d(const py::EigenDRef<const Mat41> obs, uint_t nodePoseId,
                 uint_t nodeLandmarkId, const py::EigenDRef<const Mat4> obsInvCov)
     {
         auto n1 = this->get_node(nodePoseId);
@@ -191,8 +190,8 @@ public:
     // point to plane and p2p optimizations. Variants of weighted ICP
     // ----------------------------------------------------
     // point to Plane factor
-    id_t add_factor_1pose_point2plane(const py::EigenDRef<const Mat31> z_point_x, const py::EigenDRef<const Mat31> z_point_y,
-            const py::EigenDRef<const Mat31> z_normal_y, id_t nodePoseId, const py::EigenDRef<const Mat1> obsInf)
+    factor_id_t add_factor_1pose_point2plane(const py::EigenDRef<const Mat31> z_point_x, const py::EigenDRef<const Mat31> z_point_y,
+            const py::EigenDRef<const Mat31> z_normal_y, factor_id_t nodePoseId, const py::EigenDRef<const Mat1> obsInf)
     {
         auto n1 = this->get_node(nodePoseId);
         std::shared_ptr<mrob::Factor> f(new mrob::Factor1PosePoint2Plane(z_point_x,z_point_y, z_normal_y,n1,obsInf, robust_type_));
