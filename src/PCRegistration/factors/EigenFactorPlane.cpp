@@ -40,20 +40,6 @@ EigenFactorPlane::EigenFactorPlane(const Mat4 &S, std::shared_ptr<Node> &nodeOri
     S_.emplace(nodeOrigin->get_id(), S);//TODO ids make sense? not really
 }
 
-void EigenFactorPlane::evaluate_residuals()
-{
-
-}
-void EigenFactorPlane::evaluate_jacobians()
-{
-
-}
-
-void EigenFactorPlane::evaluate_chi2()
-{
-
-}
-
 
 void EigenFactorPlane::add_observation(const Mat4& S, std::shared_ptr<Node> &newNode)
 {

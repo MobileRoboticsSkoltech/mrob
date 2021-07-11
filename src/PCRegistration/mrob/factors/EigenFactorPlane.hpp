@@ -40,6 +40,10 @@ namespace mrob{
  * It is not required an explicit parametrization of the plane, so the resultant topology
  * is N nodes connecting to the plane factor.
  *
+ * NOTE: due to its nature, multiple observation can be added to the same EF,
+ * meaning we need to create a constructor PLUS an additional method
+ *  - add_observation()
+ *
  * In order to build the problem we would follow the interface specifications by FGraph
  * but we need extra methods and variables to keep track of the neighbours
  *
@@ -57,23 +61,23 @@ public:
     /**
      * Jacobians are not evaluated, just the residuals
      */
-    void evaluate_residuals() override;
+    void evaluate_residuals() override {}
     /**
      * Evaluates residuals and Jacobians
      */
-    void evaluate_jacobians() override;
-    void evaluate_chi2() override;
+    void evaluate_jacobians() override {}
+    void evaluate_chi2() override {}
 
     void print() const;
 
-    // TODO are this functions useful? maybe add some assert inside
     const Eigen::Ref<const MatX> get_obs() const
-            {assert(0 && "PlaneFactor: method should not be called");return Mat31::Zero();}
+            {assert(0 && "EigenFactorPlane:get_obs: method should not be called");return Mat31::Zero();}
     const Eigen::Ref<const MatX1> get_residual() const
-            {assert(0 && "PlaneFactor: method should not be called");return Mat31::Zero();}
+            {assert(0 && "EigenFactorPlane::get_resigual: method should not be called");return Mat31::Zero();}
     const Eigen::Ref<const MatX> get_information_matrix() const
-            {assert(0 && "PlaneFactor: method should not be called");return Mat4::Zero();}
-    const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
+            {assert(0 && "EigenFactorPlane::get_inform method should not be called");return Mat4::Zero();}
+    const Eigen::Ref<const MatX> get_jacobian() const
+            {assert(0 && "EigenFactorPlane::get_jacobian: method should not be called");return Mat61::Zero();}
 
 
     // NEW functions added to the base class factor.hpp
@@ -149,13 +153,15 @@ protected:
      */
     std::vector<std::shared_ptr<Node> > planeNodes_;
     /**
-     * The Jacobian of the plane error, the poses involved are in XXX order
+     * The Jacobian of the plane error, the poses involved.
+     * Stores the map according to the nodes indexes/identifiers.
      */
-    MatX1 J_;
+    std::unordered_map<factor_id_t, Mat61> J_;
     /**
-     * Hessian matrix, dense since it connects all poses from where plane was observed TODO order?
+     * Hessian matrix, dense since it connects all poses from where plane was observed.
+     * We store the block diagonal terms, according to the indexes of the nodes
      */
-    MatX H_;
+    std::unordered_map<factor_id_t, Mat6> H_;
     /**
      * According to our notation S = sum p*p'
      * We choose unordered map here since this is a subset of neighbours (small) and we will iterate over them
@@ -163,11 +169,11 @@ protected:
      *
      * Q = T *S *T'
      */
-    std::unordered_map<uint_t, Mat4> S_, Q_;
+    std::unordered_map<factor_id_t, Mat4> S_, Q_;
     Mat4 accumulatedQ_;//Q matrix of accumulated values for the incremental update of the error.
 
     Mat41 planeEstimation_;
-    matData_t planeError_;
+    matData_t planeError_; //this is chi2 scaled by the covariance of point measurement.
 
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen
