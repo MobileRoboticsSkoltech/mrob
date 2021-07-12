@@ -30,6 +30,10 @@ jobs:
           command: bin/test.SE3
           when: always
       - run:
+          name: "Unit test for SE3Cov class"
+          command: bin/test.SE3Cov
+          when: always
+      - run:
           name: "Run FGraph_2d"
           command: |
             python3 mrobpy/tests/FGraph_2d.py
