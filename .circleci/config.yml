@@ -31,7 +31,7 @@ jobs:
           when: always
       - run:
           name: "Unit test for SE3Cov class"
-          command: bin/test.SE3Cov
+          command: bin/test.SE3cov
           when: always
       - run:
           name: "Run FGraph_2d"
