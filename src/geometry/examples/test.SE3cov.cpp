@@ -7,7 +7,7 @@
 #include "mrob/SE3cov.hpp"
 
 using namespace std;
-
+using namespace mrob;
 
 TEST_CASE("SE3cov basic tests")
 {
