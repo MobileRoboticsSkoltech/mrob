@@ -17,7 +17,7 @@ plt.scatter(poses[:,0],poses[:,1], label='Monte Carlo',s=2)
 plt.xlim([-1.5,1.5])
 plt.ylim([-1.5,1.5])
 plt.grid()
-# plt.legend()
+
 plt.xlabel('X')
 plt.ylabel('Y')
 plt.show()
