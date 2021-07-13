@@ -22,6 +22,9 @@
 
 from mrob import mrob
 
+from pkg_resources import get_distribution
+__version__ = get_distribution('mrob').version
+
 FGraph = mrob.FGraph
 GN = mrob.GN
 LEVENBERG_MARQUARDT_ELLIP = mrob.LEVENBERG_MARQUARDT_ELLIP
