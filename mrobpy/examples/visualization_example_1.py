@@ -4,7 +4,7 @@ import numpy as np
 import mrob
 
 import utils
-from  utils import sigma_visualize, get_mc
+from  utils import sigma_visualize, get_mc  
 
 plt.figure(figsize=(10,10))
 plt.suptitle('Covariance ellipsoid visualisation v.s. \ncorresponding Monte Carlo direct sampling distribution')
