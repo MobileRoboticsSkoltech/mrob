@@ -55,8 +55,7 @@ public:
     /**
      * Creates a plane. The minimum requirements are 1 pose.
      */
-    EigenFactorPlane(const Mat4 &S, std::shared_ptr<Node> &nodeOrigin,
-            Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
+    EigenFactorPlane(Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
     ~EigenFactorPlane() override = default;
     /**
      * Jacobians are not evaluated, just the residuals
@@ -86,10 +85,38 @@ public:
      */
     Mat41 get_plane(void) {return planeEstimation_;};
     /**
-     * Add observation adds the S matrix and the time
+     * Add point: raw points are stored into an unoderred map
+     *
+     * Later, the S matrix should be calculated
+     *
+     * The alternative is adding directly S, but this offers less
+     * flexibiloity
      */
-    void add_observation(const Mat4& S, std::shared_ptr<Node> &newNode);
-    //void add_observation(const Mat4& S, time ts, SE3 initialPose); // TODO variables for these non-optimized nodes
+    void add_point(const Mat31& p, std::shared_ptr<Node> &node);
+    /**
+     * Calculates the matrix S = sum(p*p'), where p = [x,y,z,1]
+     * for all planes, as an aggregation of the outer product of all
+     * homogeneous points
+     * If reset = true, clears all information and recalculates S
+     * If reset = false (default) only calculates S if there is no calculation yet
+     */
+    void calculate_all_matrices_S(bool reset=false);
+    /**
+     * get mean point calculates the mean of the pointcloud observed at pose node id,
+     * given that S = sum p * p' =  sum ([x2 xy xz x
+     *                                    yx y2 yz y
+     *                                    zx zy z2 z
+     *                                    x   y  z 1]
+     * ser we just calculate S and return
+     */
+    Mat31 get_mean_point(factor_id_t id);
+    /**
+     *  calculates the matrix Qi = 1^T_i * Si * (1^T_i)^transp
+     *  for all planes. Since this is an iterative process on T's,
+     *  we separate the calculation of the S matrix,
+     *  and the Q matrix which rotates S
+     */
+    void calculate_all_matrices_Q();
     /**
      * Estimates the plane parameters: v = [n', d]'_{4x1}, where v is unit, (due to the Eigen solution)
      * although for standard plane estimation we could enforce unit on the normal vector n.
@@ -102,7 +129,7 @@ public:
      * The difference with the previous estimate_plane() is that we update the matrix Q for the give time
      * stamp and recalculate the solution, on constant time O(1)
      */
-    double estimate_plane_incrementally(uint_t t);
+    double estimate_plane_incrementally(factor_id_t nodeId);
     /**
      * get error: returns the error as the min eigenvalue
      */
@@ -111,31 +138,11 @@ public:
      * get error incremental: returns the error as the min eigenvalue only updating the
      * value of Q_t, at time step t. Nothing inside gets updated
      */
-    double get_error_incremental(uint_t t) const;
+    double get_error_incremental(factor_id_t nodeId) const;
     /**
-     *  calculates the matrix Qi = 1^T_i * Si * (1^T_i)^transp
-     *  for all planes. Since this is an iterative process on T's,
-     *  we separate the calculation of the S matrix,
-     *  and the Q matrix which rotates S
+     * calculate jacobian
      */
-    void calculate_all_matrices_Q();
-    /**
-     * get mean point calculates the mean of the pointcloud observed at time t,
-     * given that S = sum p * p' =  sum ([x2 xy xz x
-     *                                    yx y2 yz y
-     *                                    zx zy z2 z
-     *                                    x   y  z 1]
-     * ser we just calcualte S and return
-     */
-    //Mat31 get_mean_point(uint_t t); // XXX is this necessary?
-    /**
-     * calculate Jacobian at node nodeId, returns the Jacobian over the Eigendecomposition of Q  = V D V'
-     * as d lamda = v' * dQ * v
-     */
-    Mat61 calculate_jacobian(uint_t nodeId);
-    /**
-     * Calculate Hessian at time
-     */
+    Mat61 calculate_jacobian(factor_id_t nopeId);
 
 
 protected:
@@ -174,6 +181,10 @@ protected:
 
     Mat41 planeEstimation_;
     matData_t planeError_; //this is chi2 scaled by the covariance of point measurement.
+
+    // subset of pointcloud for the given plane
+    std::unordered_map<factor_id_t, std::vector<Mat31> > allPlanePoints_;
+    uint_t numberPoints_;
 
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen

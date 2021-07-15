@@ -30,23 +30,31 @@
 
 using namespace mrob;
 
-EigenFactorPlane::EigenFactorPlane(const Mat4 &S, std::shared_ptr<Node> &nodeOrigin,
-        Factor::robustFactorType robust_type):
+EigenFactorPlane::EigenFactorPlane(Factor::robustFactorType robust_type):
         Factor(0,0, robust_type), //Dimension zero since this is a non-parametric factor. Also we don't known how many nodes will connect, so we set the second param to 0 (not-used)
-        planeEstimation_(Mat41::Zero()),
-        planeError_(0.0)
+        planeEstimation_{Mat41::Zero()},
+        planeError_{0.0},
+        numberPoints_{0}
 {
-    planeNodes_.push_back(nodeOrigin);
-    S_.emplace(nodeOrigin->get_id(), S);//TODO ids make sense? not really
 }
 
-
-void EigenFactorPlane::add_observation(const Mat4& S, std::shared_ptr<Node> &newNode)
+void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node)
 {
-    //neighbourNodes_ contain only those node to be optimized
-    planeNodes_.push_back(newNode);
-    S_.emplace(newNode->get_id(), S);
+    // Pose has been observed, data has been initialized and we simply add point
+    auto id = node->get_id();
+    if (S_.count(id) > 0)
+    {
+        allPlanePoints_.at(id).push_back(p);
+    }
+    // If EF has not observed point from the current Node, it creates:
+    else
+    {
+        allPlanePoints_.emplace(id, std::vector<Mat31>{p});
+    }
+    numberPoints_++;
+
 }
+
 
 double EigenFactorPlane::estimate_plane()
 {
@@ -84,7 +92,7 @@ void EigenFactorPlane::calculate_all_matrices_Q()
 }
 
 
-Mat61 EigenFactorPlane::calculate_jacobian(uint_t nodeId)
+Mat61 EigenFactorPlane::calculate_jacobian(factor_id_t nodeId)
 {
     if (S_.count(nodeId) == 0) return Mat61::Zero();
     Mat61 jacobian;
