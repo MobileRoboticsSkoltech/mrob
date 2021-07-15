@@ -171,7 +171,8 @@ void init_geometry(py::module &m) {
                  py::return_value_policy::copy)
             .def("notation_transform",
                 &SE3Cov::notation_transform,
-                "Transforms covariance matrix to notation from Barfoot paper. Self-Inverse.",
-                py::return_value_policy::copy);
+                "Transforms covariance matrix to notation from Barfoot paper. Sefl-Inverse.",
+                py::return_value_policy::copy)
+            .def("__mul__", &SE3Cov::operator*, py::is_operator());
 }
 

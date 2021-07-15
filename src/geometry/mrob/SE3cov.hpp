@@ -113,6 +113,12 @@ namespace mrob
          */
         SE3Cov mul(const SE3Cov &rhs) const;
 
+        /** @brief Multiplication operator. Does pose covariance compounding.
+         *  @param[in] rhs - SE3Cov object, which corresponds to increment uncertainty.
+         *  @return SE3Cov - new updated uncertainty SE3Cov object.
+         * **/
+        SE3Cov operator*(const SE3Cov &rhs) const;
+
         /**
          * @brief Transforms covariance matrix to notation from Barfoot's papers
          * Self-inverse:

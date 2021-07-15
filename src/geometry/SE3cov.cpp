@@ -111,7 +111,13 @@ void SE3Cov::print()
 
 SE3Cov SE3Cov::mul(const SE3Cov& rhs) const 
 {
-    SE3Cov tmp(*this);
-    tmp.compound_2nd_order(rhs);
-    return tmp;
+    SE3Cov result(*this);
+    result.compound_2nd_order(rhs);
+    return result;
 }
+
+SE3Cov SE3Cov::operator*(const SE3Cov& rhs) const
+{
+    return (*this).mul(rhs);
+}
+
