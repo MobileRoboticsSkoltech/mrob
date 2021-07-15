@@ -56,7 +56,7 @@ namespace mrob
          *  @param[in] pose - SE3 oject - pose
          **/
         SE3Cov(const SE3Cov &pose);
-        Mat6 covariance_;
+        Mat6 covariance_; //!< Covariance matrix of pose uncertainty
 
         /** 
          * @brief \b cov() returns current covariance matrix state
