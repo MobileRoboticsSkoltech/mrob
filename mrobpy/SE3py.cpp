@@ -28,7 +28,7 @@
 
 #include "mrob/SE3.hpp"
 #include "mrob/SO3.hpp"
-#include "mrob/SE3Cov.hpp"
+#include "mrob/SE3cov.hpp"
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 //#include <pybind11/stl.h>
@@ -97,7 +97,8 @@ void init_geometry(py::module &m) {
                 "Calculates the translation distance. If no element is provided this is just the element norm",
                 py::arg("rhs")=SE3())
         .def("print", &SE3::print, "Prints the current SE3 element")
-        ;
+        .def("__mul__", &SE3::operator*, py::is_operator());
+;
     m.def("isSE3", &mrob::isSE3, "Returns True is the matrix is a valid transformation and False if not");
 
     py::class_<SO3>(m, "SO3")
@@ -137,7 +138,8 @@ void init_geometry(py::module &m) {
     m.def("quat_to_so3", &quat_to_so3,"Suport function from quaternion to a rotation");
     m.def("so3_to_quat", &so3_to_quat,"Suport function from rotation matrix to quaternion");
     m.def("rpy_to_so3",  &rpy_to_so3,"Suport function from roll pitch yaw to a rotation");
-        py::class_<SE3Cov, SE3>(m, "SE3Cov")
+
+    py::class_<SE3Cov, SE3>(m, "SE3Cov")
             .def(py::init<>(),
                  "Default construct a new SE3Cov object",
                  py::return_value_policy::copy)
