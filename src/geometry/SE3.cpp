@@ -297,3 +297,43 @@ bool mrob::isSE3(Mat4 T)
         return false;
     return true;
 }
+
+
+Mat4 SE3GenerativeMatrix(uint_t coordinate)
+{
+    Mat4 G = Mat4::Zero();
+    switch(coordinate)
+    {
+    case 0: //theta1
+        G(1,2) = -1.0;
+        G(2,1) = 1.0;
+        break;
+    case 1: // theta 2
+        G(0,2) = 1.0;
+        G(2,0) = -1.0;
+        break;
+    case 2: // theta 3
+        G(0,1) = -1.0;
+        G(1,0) = 1.0;
+        break;
+    case 3: // rho 1
+        G(0,3) = 1.0;
+        break;
+    case 4: // rho 2
+        G(1,3) = 1.0;
+        break;
+    case 5: // rho 3
+        G(2,3) = 1.0;
+        break;
+    }
+    return G;
+}
+
+
+
+
+
+
+
+
+

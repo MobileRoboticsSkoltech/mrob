@@ -58,14 +58,18 @@ public:
     EigenFactorPlane(Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
     ~EigenFactorPlane() override = default;
     /**
-     * Jacobians are not evaluated, just the residuals
+     * Jacobians are not evaluated, just the residuals.
+     * This function is calculating the current plane estimation
      */
-    void evaluate_residuals() override {}
+    void evaluate_residuals() override;
     /**
-     * Evaluates residuals and Jacobians
+     * Evaluates Jacobians, given the residual evaluated
      */
-    void evaluate_jacobians() override {}
-    void evaluate_chi2() override {}
+    void evaluate_jacobians() override;
+    /**
+     * Chi2 is a scaling of the plane error, now w=1
+     */
+    void evaluate_chi2() override;
 
     void print() const;
 
@@ -140,7 +144,7 @@ public:
      */
     double get_error_incremental(factor_id_t nodeId) const;
     /**
-     * calculate jacobian
+     * calculate jacobian TODO, is bot this evaluate Jacobian from factor API???
      */
     Mat61 calculate_jacobian(factor_id_t nopeId);
 

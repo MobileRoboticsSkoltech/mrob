@@ -27,6 +27,7 @@
 #include <iostream>
 #include <Eigen/Eigenvalues>
 #include "mrob/SE3.hpp"
+#include <vector>
 
 using namespace mrob;
 
@@ -36,6 +37,28 @@ EigenFactorPlane::EigenFactorPlane(Factor::robustFactorType robust_type):
         planeError_{0.0},
         numberPoints_{0}
 {
+}
+
+void EigenFactorPlane::evaluate_residuals()
+{
+    this->estimate_plane();
+}
+
+void EigenFactorPlane::evaluate_jacobians()
+{
+    // Assumes residuals evaluated beforehand
+    // for all nodes, calculate jacobian
+    for (const auto &Qi: Q_)
+    {
+        Qi.second;
+        //for( neighbournodes) TODO check ids of the local vector and the nodes ids, this can be a problme
+        //     jacobian(0) = planeEstimation_.dot(dQ*planeEstimation_);
+    }
+}
+
+void EigenFactorPlane::evaluate_chi2()
+{
+    chi2_ = planeError_;//not really an evaluation...should we do again?
 }
 
 void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node)
@@ -49,7 +72,7 @@ void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node)
     // If EF has not observed point from the current Node, it creates:
     else
     {
-        allPlanePoints_.emplace(id, std::vector<Mat31>{p});
+        allPlanePoints_.emplace(id, std::vector<Mat31>{p});//TODO test this
     }
     numberPoints_++;
 
@@ -82,83 +105,13 @@ void EigenFactorPlane::calculate_all_matrices_Q()
     for (auto &element : S_)
     {
         // Find the corresponding transformation, on this pair<id, S>
-        uint_t nodeId = element.first;
-        SE3 T;
+        factor_id_t nodeId = element.first;
+        Mat4 T = this->neighbourNodes_[nodeId]->get_state();
         // Use the corresponding matrix S
         Mat4 Q;
-        Q.noalias() =  T.T() * element.second * T.T().transpose();
+        Q.noalias() =  T * element.second * T.transpose();
         Q_.emplace(nodeId, Q);
     }
-}
-
-
-Mat61 EigenFactorPlane::calculate_jacobian(factor_id_t nodeId)
-{
-    if (S_.count(nodeId) == 0) return Mat61::Zero();
-    Mat61 jacobian;
-    // calculate dQ/dxi for the submatrix S
-    // XXX for now keep vectors S and Q and create a separate vector/map for adding optimization nodes or do not include others???
-    Mat4 dQ, Q;// = matrixQ_[];
-
-    // dQ / d xi(0) = [0
-    //               -q3
-    //                q2
-    //                 0]
-    dQ.setZero();
-    dQ.row(1) << -Q.row(2);
-    dQ.row(2) <<  Q.row(1);
-    dQ += dQ.transpose().eval();
-    jacobian(0) = planeEstimation_.dot(dQ*planeEstimation_);
-
-    // dQ / d xi(1) = [q3
-    //                 0
-    //                -q1
-    //                 0]
-    dQ.setZero();
-    dQ.row(0) <<  Q.row(2);
-    dQ.row(2) << -Q.row(0);
-    dQ += dQ.transpose().eval();
-    jacobian(1) = planeEstimation_.dot(dQ*planeEstimation_);
-
-    // dQ / d xi(2) = [-q2
-    //                 q1
-    //                 0
-    //                 0]
-    dQ.setZero();
-    dQ.row(0) << -Q.row(1);
-    dQ.row(1) <<  Q.row(0);
-    dQ += dQ.transpose().eval();
-    jacobian(2) = planeEstimation_.dot(dQ*planeEstimation_);
-
-    // dQ / d xi(3) = [q4
-    //                 0
-    //                 0
-    //                 0]
-    dQ.setZero();
-    dQ.row(0) << Q.row(3);
-    dQ += dQ.transpose().eval();
-    jacobian(3) = planeEstimation_.dot(dQ*planeEstimation_);
-
-    // dQ / d xi(4) = [0
-    //                 q4
-    //                 0
-    //                 0]
-    dQ.setZero();
-    dQ.row(1) << Q.row(3);
-    dQ += dQ.transpose().eval();
-    jacobian(4) = planeEstimation_.dot(dQ*planeEstimation_);
-
-    // dQ / d xi(5) = [0
-    //                 0
-    //                 q4
-    //                 0]
-    dQ.setZero();
-    dQ.row(2) << Q.row(3);
-    dQ += dQ.transpose().eval();
-    jacobian(5) = planeEstimation_.dot(dQ*planeEstimation_);
-
-
-    return jacobian;
 }
 
 

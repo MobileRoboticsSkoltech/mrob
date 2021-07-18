@@ -209,5 +209,11 @@ Mat61 vee6(const Mat4 &xi_hat);
 
 bool isSE3(Mat4 T);
 
+/**
+ * Returns the generative matrix given the coordinate,
+ * considering xi(0..5) = [theta(0..2), rho(3..5)]
+ */
+Mat4 SE3GenerativeMatrix(uint_t coordinate);
+
 }// end namespace
 #endif /* SE3_HPP_ */

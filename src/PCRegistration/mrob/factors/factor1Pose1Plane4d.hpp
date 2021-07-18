@@ -50,7 +50,7 @@ class Factor1Pose1Plane4d : public Factor
      */
     virtual void evaluate_residuals() override;
     /**
-     * Evaluates residuals and Jacobians
+     * Evaluates the Jacobians
      */
     virtual void evaluate_jacobians() override;
     virtual void evaluate_chi2() override;
