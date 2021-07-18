@@ -47,12 +47,41 @@ void EigenFactorPlane::evaluate_residuals()
 void EigenFactorPlane::evaluate_jacobians()
 {
     // Assumes residuals evaluated beforehand
+    J_.clear();
+    H_.clear();
     // for all nodes, calculate jacobian
-    for (const auto &Qi: Q_)
+    uint_t nodeIdLocal = 0;
+    for (auto &Qt: Q_)
     {
-        Qi.second;
-        //for( neighbournodes) TODO check ids of the local vector and the nodes ids, this can be a problme
-        //     jacobian(0) = planeEstimation_.dot(dQ*planeEstimation_);
+        Mat61 jacobian = Mat61::Zero();
+        Mat4 dQ = Mat4::Zero();
+        for (uint_t i = 0 ; i < 6; i++)
+        {
+            dQ = SE3GenerativeMatrix(i)*Qt + Qt*SE3GenerativeMatrix(i);
+            jacobian(i) = planeEstimation_.dot(dQ*planeEstimation_);
+
+        }
+        J_.push_back(jacobian);
+
+        //now calculate Hessian here
+        Mat6 hessian = Mat6::Zero();
+        Mat4 ddQ;
+        for (uint_t i =0 ; i< 6 ; ++i)
+        {
+            for (uint_t j = i ; j< 6 ; ++j)
+            {
+                ddQ.setZero();
+                ddQ = SE3GenerativeMatrix(i)*SE3GenerativeMatrix(j) + SE3GenerativeMatrix(j)*SE3GenerativeMatrix(i);
+                //compound operator *= as in a*=b (this multiplies on the right: a*=b is equivalent to a = a*b)
+                ddQ *= 0.5 * Qt;
+                ddQ += SE3GenerativeMatrix(i) * dQ;
+                ddQ += ddQ.transpose().eval();
+                hessian(i,j) = planeEstimation_.dot(ddQ*planeEstimation_);
+            }
+        }
+        H_.push_back(hessian);
+
+        nodeIdLocal++;
     }
 }
 
@@ -65,14 +94,21 @@ void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node)
 {
     // Pose has been observed, data has been initialized and we simply add point
     auto id = node->get_id();
-    if (S_.count(id) > 0)
+    if (reverseNodeIds_.count(id) > 0)
     {
-        allPlanePoints_.at(id).push_back(p);
+        uint_t localId = reverseNodeIds_[id];
+        allPlanePoints_.at(localId).push_back(p);
     }
     // If EF has not observed point from the current Node, it creates:
     else
     {
-        allPlanePoints_.emplace(id, std::vector<Mat31>{p});//TODO test this
+        allPlanePoints_.push_back(std::vector<Mat31>());
+        allPlanePoints_.back().reserve(512);
+        neighbourNodes_.push_back(node);
+        nodeIds_.push_back(id);
+        uint_t localId = allPlanePoints_.size();
+        reverseNodeIds_.emplace(id, localId);
+        // S and Q are built later, no need to create an element.
     }
     numberPoints_++;
 
@@ -81,11 +117,12 @@ void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node)
 
 double EigenFactorPlane::estimate_plane()
 {
+    calculate_all_matrices_S();
     calculate_all_matrices_Q();
     accumulatedQ_ = Mat4::Zero();
-    for (const auto &Qi: Q_)
+    for (auto &Qt: Q_)
     {
-        accumulatedQ_ += Qi.second;
+        accumulatedQ_ += Qt;
         //std::cout << Qi << std::endl;
     }
 
@@ -99,21 +136,47 @@ double EigenFactorPlane::estimate_plane()
     return planeError_;
 }
 
-void EigenFactorPlane::calculate_all_matrices_Q()
+void EigenFactorPlane::calculate_all_matrices_S(bool reset)
 {
-    Q_.clear();
-    for (auto &element : S_)
+    if (reset)
+        S_.clear();
+    if (S_.empty())
     {
-        // Find the corresponding transformation, on this pair<id, S>
-        factor_id_t nodeId = element.first;
-        Mat4 T = this->neighbourNodes_[nodeId]->get_state();
-        // Use the corresponding matrix S
-        Mat4 Q;
-        Q.noalias() =  T * element.second * T.transpose();
-        Q_.emplace(nodeId, Q);
+        for (auto &vectorPoints: allPlanePoints_)
+        {
+            Mat4 S = Mat4::Zero();
+            for (Mat31 &p : vectorPoints)
+            {
+                Mat41 pHomog;
+                pHomog << p , 1.0;
+                S += pHomog * pHomog.transpose();
+            }
+            S_.push_back(S);
+        }
     }
 }
 
+void EigenFactorPlane::calculate_all_matrices_Q()
+{
+    Q_.clear();
+    uint_t nodeIdLocal = 0;
+    for (auto &S : S_)
+    {
+        Mat4 T = this->neighbourNodes_[nodeIdLocal]->get_state();
+        // Use the corresponding matrix S
+        Mat4 Q;
+        Q.noalias() =  T * S * T.transpose();
+        Q_.push_back(Q);
+        nodeIdLocal++;
+    }
+}
+
+Mat31 EigenFactorPlane::get_mean_point(factor_id_t id)
+{
+    assert(!S_.empty() && "EigenFactorPlane::get_mean_point: S matrix empty");
+    auto localId = reverseNodeIds_.at(id);
+    return S_[localId].topRightCorner<3,1>()/S_[localId](3,3);
+}
 
 void EigenFactorPlane::print() const
 {

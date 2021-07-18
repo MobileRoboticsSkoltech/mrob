@@ -299,7 +299,7 @@ bool mrob::isSE3(Mat4 T)
 }
 
 
-Mat4 SE3GenerativeMatrix(uint_t coordinate)
+Mat4 mrob::SE3GenerativeMatrix(uint_t coordinate)
 {
     Mat4 G = Mat4::Zero();
     switch(coordinate)

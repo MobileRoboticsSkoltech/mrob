@@ -27,7 +27,7 @@
 
 
 #include "mrob/factor.hpp"
-#include <unordered_map> // used for storing matrices S, paired by node Ids (or might be pointers)
+#include <unordered_map>
 
 
 namespace mrob{
@@ -106,6 +106,13 @@ public:
      */
     void calculate_all_matrices_S(bool reset=false);
     /**
+     *  calculates the matrix Qi = 1^T_i * Si * (1^T_i)^transp
+     *  for all planes. Since this is an iterative process on T's,
+     *  we separate the calculation of the S matrix,
+     *  and the Q matrix which rotates S
+     */
+    void calculate_all_matrices_Q();
+    /**
      * get mean point calculates the mean of the pointcloud observed at pose node id,
      * given that S = sum p * p' =  sum ([x2 xy xz x
      *                                    yx y2 yz y
@@ -115,64 +122,29 @@ public:
      */
     Mat31 get_mean_point(factor_id_t id);
     /**
-     *  calculates the matrix Qi = 1^T_i * Si * (1^T_i)^transp
-     *  for all planes. Since this is an iterative process on T's,
-     *  we separate the calculation of the S matrix,
-     *  and the Q matrix which rotates S
-     */
-    void calculate_all_matrices_Q();
-    /**
      * Estimates the plane parameters: v = [n', d]'_{4x1}, where v is unit, (due to the Eigen solution)
      * although for standard plane estimation we could enforce unit on the normal vector n.
      */
     double estimate_plane();
-    /**
-     * Estimates Incremetally the plane parameters: v = [n', d]'_{4x1}, where v is unitary, (due to the SVD solution)
-     * although for standard plane estimation we could enforce unitary on the normal vector n.
-     *
-     * The difference with the previous estimate_plane() is that we update the matrix Q for the give time
-     * stamp and recalculate the solution, on constant time O(1)
-     */
-    double estimate_plane_incrementally(factor_id_t nodeId);
-    /**
-     * get error: returns the error as the min eigenvalue
-     */
-    double get_error() const {return planeError_;};
-    /**
-     * get error incremental: returns the error as the min eigenvalue only updating the
-     * value of Q_t, at time step t. Nothing inside gets updated
-     */
-    double get_error_incremental(factor_id_t nodeId) const;
-    /**
-     * calculate jacobian TODO, is bot this evaluate Jacobian from factor API???
-     */
-    Mat61 calculate_jacobian(factor_id_t nopeId);
 
 
 protected:
     /**
-     * On the base class it is declared vector<std::shared_ptr<Node> > neighbourNodes_;
-     * This is a sorted list, so the add_node function makes sure to keep the order.
-     *
-     * For planes nodes we need to keep a sorted list of nodes. While
-     * other factors connect to 1 node, 2 usually, plane factor is not bounded,
-     * so we will store a sorted container for nodes that have observed the same
-     * plane. Nodes on this list will not be optimized, but they should be related to its 2 closes nodes.
-     *
-     * For optimizaing we will use the neighbourNodes_ from the base class, and here we must preserve
-     * the order.
+     * A vector storing the ids in the FGraph of each of the poses
      */
-    std::vector<std::shared_ptr<Node> > planeNodes_;
+    std::vector<factor_id_t> nodeIds_;
+    std::unordered_map<factor_id_t, uint_t> reverseNodeIds_;
     /**
      * The Jacobian of the plane error, the poses involved.
      * Stores the map according to the nodes indexes/identifiers.
      */
-    std::unordered_map<factor_id_t, Mat61> J_;
+    std::vector<Mat61> J_;
     /**
      * Hessian matrix, dense since it connects all poses from where plane was observed.
      * We store the block diagonal terms, according to the indexes of the nodes
      */
-    std::unordered_map<factor_id_t, Mat6> H_;
+    //std::unordered_map<factor_id_t, Mat6> H_;
+    std::vector<Mat6> H_;
     /**
      * According to our notation S = sum p*p'
      * We choose unordered map here since this is a subset of neighbours (small) and we will iterate over them
@@ -180,14 +152,16 @@ protected:
      *
      * Q = T *S *T'
      */
-    std::unordered_map<factor_id_t, Mat4> S_, Q_;
+    //std::unordered_map<factor_id_t, Mat4> S_, Q_;
+    std::vector<Mat4> S_, Q_;
     Mat4 accumulatedQ_;//Q matrix of accumulated values for the incremental update of the error.
 
     Mat41 planeEstimation_;
     matData_t planeError_; //this is chi2 scaled by the covariance of point measurement.
 
     // subset of pointcloud for the given plane
-    std::unordered_map<factor_id_t, std::vector<Mat31> > allPlanePoints_;
+    //std::unordered_map<factor_id_t, std::vector<Mat31> > allPlanePoints_;
+    std::vector<std::vector<Mat31> > allPlanePoints_;
     uint_t numberPoints_;
 
 public:
