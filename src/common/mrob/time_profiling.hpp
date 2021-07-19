@@ -28,7 +28,7 @@
 
 
 namespace mrob {
-typedef std::chrono::microseconds Ttim;
+using Ttim = std::chrono::microseconds;
 
 
 /**

@@ -36,39 +36,39 @@
 namespace mrob{
 
 // data types conventions
-typedef double matData_t;
-typedef unsigned int uint_t;
-typedef std::size_t factor_id_t;
+using matData_t = double;
+using uint_t = unsigned int;
+using factor_id_t = std::size_t;
 
 // Definition of squared matrices, by default column major
-typedef Eigen::Matrix<matData_t, 1,1, Eigen::RowMajor> Mat1;
-typedef Eigen::Matrix<matData_t, 2,2, Eigen::RowMajor> Mat2;
-typedef Eigen::Matrix<matData_t, 3,3, Eigen::RowMajor> Mat3;
-typedef Eigen::Matrix<matData_t, 4,4, Eigen::RowMajor> Mat4;
-typedef Eigen::Matrix<matData_t, 5,5, Eigen::RowMajor> Mat5;
-typedef Eigen::Matrix<matData_t, 6,6, Eigen::RowMajor> Mat6;
-typedef Eigen::Matrix<matData_t, Eigen::Dynamic,Eigen::Dynamic, Eigen::RowMajor> MatX;
+using Mat1 = Eigen::Matrix<matData_t, 1,1, Eigen::RowMajor>;
+using Mat2 = Eigen::Matrix<matData_t, 2,2, Eigen::RowMajor>;
+using Mat3 = Eigen::Matrix<matData_t, 3,3, Eigen::RowMajor>;
+using Mat4 = Eigen::Matrix<matData_t, 4,4, Eigen::RowMajor>;
+using Mat5 = Eigen::Matrix<matData_t, 5,5, Eigen::RowMajor>;
+using Mat6 = Eigen::Matrix<matData_t, 6,6, Eigen::RowMajor>;
+using MatX = Eigen::Matrix<matData_t, Eigen::Dynamic,Eigen::Dynamic, Eigen::RowMajor>;
 
 //Sparse Matrices
-typedef Eigen::SparseMatrix<matData_t, Eigen::ColMajor> SMatCol;
-typedef Eigen::SparseMatrix<matData_t, Eigen::RowMajor> SMatRow;
-typedef Eigen::Triplet<matData_t> Triplet;
+using SMatCol = Eigen::SparseMatrix<matData_t, Eigen::ColMajor>;
+using SMatRow = Eigen::SparseMatrix<matData_t, Eigen::RowMajor>;
+using Triplet = Eigen::Triplet<matData_t>;
 
 // Definition of column matrices (vectors)
-typedef Eigen::Matrix<matData_t, 2,1> Mat21;
-typedef Eigen::Matrix<matData_t, 3,1> Mat31;
-typedef Eigen::Matrix<matData_t, 4,1> Mat41;
-typedef Eigen::Matrix<matData_t, 5,1> Mat51;
-typedef Eigen::Matrix<matData_t, 6,1> Mat61;
-typedef Eigen::Matrix<matData_t, Eigen::Dynamic,1> MatX1;
+using Mat21 = Eigen::Matrix<matData_t, 2,1>;
+using Mat31 = Eigen::Matrix<matData_t, 3,1>;
+using Mat41 = Eigen::Matrix<matData_t, 4,1>;
+using Mat51 = Eigen::Matrix<matData_t, 5,1>;
+using Mat61 = Eigen::Matrix<matData_t, 6,1>;
+using MatX1 = Eigen::Matrix<matData_t, Eigen::Dynamic,1>;
 
 // Definition of row matrices (vectors)
-typedef Eigen::Matrix<matData_t, 1,2> Mat12;
-typedef Eigen::Matrix<matData_t, 1,3> Mat13;
-typedef Eigen::Matrix<matData_t, 1,4> Mat14;
-typedef Eigen::Matrix<matData_t, 1,5> Mat15;
-typedef Eigen::Matrix<matData_t, 1,6> Mat16;
-typedef Eigen::Matrix<matData_t, 1,Eigen::Dynamic> Mat1X;
+using Mat12 = Eigen::Matrix<matData_t, 1,2>;
+using Mat13 = Eigen::Matrix<matData_t, 1,3>;
+using Mat14 = Eigen::Matrix<matData_t, 1,4>;
+using Mat15 = Eigen::Matrix<matData_t, 1,5>;
+using Mat16 = Eigen::Matrix<matData_t, 1,6>;
+using Mat1X = Eigen::Matrix<matData_t, 1,Eigen::Dynamic>;
 
 
 // Definition of templated-based fixed matrices using c'11 aliases
