@@ -36,7 +36,7 @@ jobs:
           when: always
       - run:
           name: "Python unit tests"
-          command: cd mrobpy && python3 -m pytest && cd ..
+          command: python3 -m pytest ./mrobpy/tests
           when: always
   build-wheel:
     docker:
