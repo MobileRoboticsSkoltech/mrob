@@ -23,3 +23,10 @@
 [build-system]
 requires = ["setuptools >= 40.8.0", "wheel", "setuptools-git-versioning >= 1.2.10"]
 build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "mrobpy"
+]

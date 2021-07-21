@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: cimg/base:stable
     environment:
-      PYTHONPATH=./lib
+      PYTHONPATH=./lib;./mrobpy
     steps:
       - checkout
       - run:
