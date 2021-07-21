@@ -36,7 +36,7 @@ jobs:
           when: always
       - run:
           name: "Python unit tests"
-          command: echo $PYTHONPATH && python3 -m pytest
+          command: echo $PYTHONPATH && echo ${CIRCLE_WORKING_DIRECTORY} && python3 -m pytest
           when: always
   build-wheel:
     docker:
