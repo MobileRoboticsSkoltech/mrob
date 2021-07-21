@@ -79,10 +79,10 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y --no-install-recommends python3-pip
             python3 -m pip install ~/project/build/wheelhouse/mrob*.whl numpy
-            python3 -m pip install pytest
+            python3 -m pip install pytest scipy matplotlib
       - run:
           name: "Python unit tests"
-          command: cd mrobpy && python3 -m pytest && cd ..
+          command: python3 -m pytest mrobpy
           when: always
   publish-github-release:
     docker:
