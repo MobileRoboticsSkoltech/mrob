@@ -40,7 +40,7 @@ void SE3Cov::compound_2nd_order(const SE3 &pose_increment, const Mat6 &increment
 
     this->T_ = this->T() * pose_increment.T();
 
-    this->covariance_ = this->cov() + adj*increment_covariance*adj.transpose();
+    this->covariance_ = SE3Cov::notation_transform(SE3Cov::notation_transform(this->cov()) + adj*SE3Cov::notation_transform(increment_covariance)*adj.transpose());
 }
 
 void SE3Cov::compound_2nd_order(const SE3Cov& pose)

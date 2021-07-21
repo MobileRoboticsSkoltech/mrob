@@ -182,7 +182,7 @@ TEST_CASE("SE3 tests")
         REQUIRE((v - tmp).norm() == Approx(0.0).margin(1e-12));
     }
 
-    SECTION("Acess inner matrix")
+    SECTION("Access inner matrix")
     {
         mrob::SE3 T;
         mrob::Mat4 gt;

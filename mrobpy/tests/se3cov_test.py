@@ -39,6 +39,15 @@ class TestSE3CovCompoundComplex:
     # monte carlo as reference
     T_gt,sigma_gt = compound_mc(pose_1, covariance_1, pose_2, covariance_2, M=100_000)
 
+    sigma_gt_2nd = np.array([
+        0.    , 0.    , 0.    , 0.    , 0.    , 0.,
+        0.    , 0.    , 0.    , 0.    , 0.    , 0.,
+        0.    , 0.    , 0.1125, 0.    , 0.005 , 0.,
+        0.    , 0.    , 0.    , 0.02  , 0.    , 0.,
+        0.    , 0.    , 0.005 , 0.    , 0.02  , 0.,
+        0.    , 0.    , 0.    , 0.    , 0.    , 0.
+    ]).reshape((6,6))
+
     def test_compound_1(self):
         cov = mrob.geometry.SE3Cov(self.pose_1, self.covariance_1)
         print('Initial pose and covariance')
@@ -52,11 +61,12 @@ class TestSE3CovCompoundComplex:
         print(cov.cov())
 
         print('Expected pose and covariance')
-        print(self.T_gt)
+        print(self.T_gt.T())
         print(self.sigma_gt)
 
-        assert(np.ndarray.all(self.sigma_gt == cov.cov()))
-        assert(np.ndarray.all(self.T_gt == cov.T()))
+        # assert(np.ndarray.all(self.sigma_gt == cov.cov()))
+        assert(np.ndarray.all(self.T_gt.T() == cov.T()))
+        assert(np.ndarray.all(cov.cov() == self.sigma_gt_2nd))
 
 
 

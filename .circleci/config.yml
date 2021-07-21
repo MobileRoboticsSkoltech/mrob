@@ -26,47 +26,16 @@ jobs:
              -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$PWD/lib \
             && cmake --build build -j $(nproc)  
       - run:
-          name: "Unit tests for SE3 and SO3"
+          name: "C++ Unit tests for SE3 and SO3 classes"
           command: bin/test.SE3
           when: always
       - run:
-          name: "Unit test for SE3Cov class"
+          name: "C++ Unit tests for SE3Cov class"
           command: bin/test.SE3cov
           when: always
       - run:
-          name: "Run FGraph_2d"
-          command: |
-            python3 mrobpy/tests/FGraph_2d.py
-          when: always
-      - run:
-          name: "Run FGraph_M3500"
-          command: |
-            python3 mrobpy/tests/FGraph_M3500.py
-          when: always
-      - run:
-          name: "Run FGraph_sphere"
-          command: |
-            python3 mrobpy/tests/FGraph_sphere.py
-          when: always
-      - run:
-          name: "Run SE3_examples"
-          command: |
-            python3 mrobpy/tests/SE3_examples.py
-          when: always
-      - run:
-          name: "Run FGraph_landmark_3d_example"
-          command: |
-            python3 mrobpy/tests/FGraph_landmark_3d_example.py
-          when: always
-      - run:
-          name: "Run FGraph_landmark_2d_example"
-          command: |
-            python3 mrobpy/tests/FGraph_landmark_2d_example.py
-          when: always
-      - run:
-          name: "Run PC_align"
-          command: |
-            python3 mrobpy/tests/PC_align.py
+          name: "Python unit tests"
+          command: cd mrobpy && python -m pytest && cd ..
           when: always
   build-wheel:
     docker:
@@ -110,39 +79,8 @@ jobs:
             sudo apt-get install -y --no-install-recommends python3-pip
             python3 -m pip install ~/project/build/wheelhouse/mrob*.whl numpy
       - run:
-          name: "Run FGraph_2d"
-          command: |
-            python3 mrobpy/tests/FGraph_2d.py
-          when: always
-      - run:
-          name: "Run FGraph_M3500"
-          command: |
-            python3 mrobpy/tests/FGraph_M3500.py
-          when: always
-      - run:
-          name: "Run FGraph_sphere"
-          command: |
-            python3 mrobpy/tests/FGraph_sphere.py
-          when: always
-      - run:
-          name: "Run SE3_examples"
-          command: |
-            python3 mrobpy/tests/SE3_examples.py
-          when: always
-      - run:
-          name: "Run FGraph_landmark_3d_example"
-          command: |
-            python3 mrobpy/tests/FGraph_landmark_3d_example.py
-          when: always
-      - run:
-          name: "Run FGraph_landmark_2d_example"
-          command: |
-            python3 mrobpy/tests/FGraph_landmark_2d_example.py
-          when: always
-      - run:
-          name: "Run PC_align"
-          command: |
-            python3 mrobpy/tests/PC_align.py
+          name: "Python unit tests"
+          command: cd mrobpy && python -m pytest && cd ..
           when: always
   publish-github-release:
     docker:

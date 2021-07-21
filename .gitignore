@@ -21,6 +21,7 @@ bin/
 .vscode
 doc/*
 __pycache__
+.*
 
 mrob
 dist/
