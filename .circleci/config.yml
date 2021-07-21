@@ -28,7 +28,7 @@ jobs:
             && cmake --build build -j $(nproc)  
       - run:
           name: "C++ Unit tests for SE3 and SO3 classes"
-          command: make test -C bin
+          command: make test -C build
           when: always
       - run:
           name: "Python unit tests"
