@@ -36,7 +36,9 @@ jobs:
           when: always
       - run:
           name: "Python unit tests"
-          command: python3 -m pytest
+          command: |
+            export PYTHONPATH=${CIRCLE_WORKING_DIRECTORY}/lib;${CIRCLE_WORKING_DIRECTORY}/mrobpy
+            && python3 -m pytest
           when: always
   build-wheel:
     docker:
