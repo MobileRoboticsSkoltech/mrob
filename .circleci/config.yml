@@ -37,7 +37,8 @@ jobs:
       - run:
           name: "Python unit tests"
           command: |
-            export PYTHONPATH=${CIRCLE_WORKING_DIRECTORY}/lib;${CIRCLE_WORKING_DIRECTORY}/mrobpy
+            echo ${PWD}
+            && export PYTHONPATH=${PWD}/lib;${PWD}/mrobpy
             && python3 -m pytest
           when: always
   build-wheel:
