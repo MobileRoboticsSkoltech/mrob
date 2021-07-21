@@ -38,7 +38,7 @@ jobs:
           name: "Python unit tests"
           command: |
             echo ${PWD}
-            && export PYTHONPATH=${PWD}/lib;${PWD}/mrobpy
+            && export PYTHONPATH="${PWD}/lib;${PWD}/mrobpy"
             && python3 -m pytest
           when: always
   build-wheel:
