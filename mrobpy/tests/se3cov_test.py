@@ -4,8 +4,8 @@ import time
 
 import pytest
 
-import examples.utils
-from examples.utils import compound_2nd, compound_4th, compound_mc
+import mrobpy.examples.utils
+from mrobpy.examples.utils import compound_2nd, compound_4th, compound_mc
 
 class TestSE3CovConstructors:
     def test_se3cov_default_constructor(self):
