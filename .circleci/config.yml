@@ -27,7 +27,7 @@ jobs:
              -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$PWD/lib \
             && cmake --build build -j $(nproc)  
       - run:
-          name: "C++ Unit tests"
+          name: "C++ unit tests"
           command: make test -C build
           when: always
       - run:

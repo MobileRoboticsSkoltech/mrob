@@ -176,5 +176,7 @@ void init_geometry(py::module &m) {
                 "Transforms covariance matrix to notation from Barfoot paper. Sefl-Inverse.",
                 py::return_value_policy::copy)
             .def("__mul__", &SE3Cov::operator*, py::is_operator());
+        m.def("curley_wedge", &mrob::curly_wedge, "Returns 6-by-6 matrix, the output of curley wedge operator.", py::return_value_policy::copy);
+
 }
 

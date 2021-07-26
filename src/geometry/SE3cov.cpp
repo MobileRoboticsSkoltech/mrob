@@ -40,7 +40,7 @@ void SE3Cov::compound_2nd_order(const SE3 &pose_increment, const Mat6 &increment
 
     this->T_ = this->T() * pose_increment.T();
 
-    this->covariance_ = SE3Cov::notation_transform(SE3Cov::notation_transform(this->cov()) + adj*SE3Cov::notation_transform(increment_covariance)*adj.transpose());
+    this->covariance_ = notation_transform(notation_transform(this->cov()) + adj*notation_transform(increment_covariance)*adj.transpose());
 }
 
 void SE3Cov::compound_2nd_order(const SE3Cov& pose)
@@ -52,7 +52,7 @@ void SE3Cov::compound_2nd_order(const SE3Cov& pose)
 void SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increment_covariance)
 {
     // moving to Barfoot notaion
-    Mat6 sigma_1 = this->notation_transform(this->cov());
+    Mat6 sigma_1 = notation_transform(this->cov());
 
     Mat6 adj = this->adj();
     Mat6 sigma_2 = adj*notation_transform(increment_covariance)*adj.transpose();
@@ -90,7 +90,7 @@ void SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increment
     1./4.*B;
 
     // moving from Barfoot covariance notation into the mrob notation
-    this->covariance_ = notation_transform(this->cov());
+    this->covariance_ = notation_transform(this->covariance_);
 
     // calculating the resulting pose
     this->T_ = this->T()*pose_increment.T();
@@ -119,5 +119,14 @@ SE3Cov SE3Cov::mul(const SE3Cov& rhs) const
 SE3Cov SE3Cov::operator*(const SE3Cov& rhs) const
 {
     return (*this).mul(rhs);
+}
+
+Mat6 mrob::curly_wedge(const Mat61& xi)
+{
+    Mat6 result(Mat6::Zero());
+    result.topLeftCorner<3,3>() = mrob::hat3(xi.head(3));
+    result.bottomRightCorner<3,3>() = mrob::hat3(xi.head(3));
+    result.topRightCorner<3,3>() = mrob::hat3(xi.tail(3));
+    return result;
 }
 

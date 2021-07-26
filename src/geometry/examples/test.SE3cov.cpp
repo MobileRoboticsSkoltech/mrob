@@ -154,10 +154,23 @@ TEST_CASE("SE3cov basic tests")
                     0.        ,  0.        ,  1.        ,  0.        ,
                     0.        ,  0.        ,  0.        ,  1.        ;
         
-        REQUIRE((uncertainty.T() - gt_pose).norm() ==Approx(0.0).margin(1e-8));
+        REQUIRE((uncertainty.T() - gt_pose).norm() == Approx(0.0).margin(1e-8));
     }
 
-    SECTION("Compaunding. 4th order")
+    SECTION("Curley wedge operator")
+    {
+        Mat61 xi;
+        xi << 1,2,3,4,5,6;
+
+        Mat6 output = curly_wedge(xi);
+        Mat6 gt(Mat6::Zero());
+
+        std::cout << output << std::endl;
+
+        REQUIRE((output - gt).norm() == Approx(0.0).margin(1e-12));
+    }
+
+    SECTION("Compounding. 4th order")
     {
         Mat61 xi;
         xi << 0,0,0,0.5,0,0;

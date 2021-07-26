@@ -131,6 +131,14 @@ namespace mrob
         static Mat6 notation_transform(const Mat6 &cov);
     };
 
+    /**
+     * @brief Curly wedge operator
+     *
+     * @param xi - input state vector
+     * @return Mat6
+     */
+    Mat6 curly_wedge(const Mat61& xi);
+
 } // end namespace
 
 #endif // SE3COV_HPP_
