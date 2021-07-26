@@ -165,7 +165,15 @@ TEST_CASE("SE3cov basic tests")
         Mat6 output = curly_wedge(xi);
         Mat6 gt(Mat6::Zero());
 
+        gt <<    0, -3,  2,  0, -6,  5,
+                 3,  0, -1,  6,  0, -4,
+                -2,  1,  0, -5,  4,  0,
+                 0,  0,  0,  0, -3,  2,
+                 0,  0,  0,  3,  0, -1,
+                 0,  0,  0, -2,  1,  0;
+
         std::cout << output << std::endl;
+        std::cout << gt << std::endl;
 
         REQUIRE((output - gt).norm() == Approx(0.0).margin(1e-12));
     }
