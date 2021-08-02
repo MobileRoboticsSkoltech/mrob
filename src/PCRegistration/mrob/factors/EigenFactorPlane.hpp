@@ -28,6 +28,7 @@
 
 #include "mrob/factor.hpp"
 #include <unordered_map>
+#include <deque>
 
 
 namespace mrob{
@@ -130,21 +131,23 @@ public:
 
 protected:
     /**
-     * A vector storing the ids in the FGraph of each of the poses
+     * A deque storing the ids in the FGraph of each of the poses
+     * This is preferred over vector due to the a priori unknown size of
+     * elements. The same applies for other structures containing matrices
      */
-    std::vector<factor_id_t> nodeIds_;
+    std::deque<factor_id_t> nodeIds_;
     std::unordered_map<factor_id_t, uint_t> reverseNodeIds_;
     /**
      * The Jacobian of the plane error, the poses involved.
      * Stores the map according to the nodes indexes/identifiers.
      */
-    std::vector<Mat61> J_;
+    std::deque<Mat61> J_;
     /**
      * Hessian matrix, dense since it connects all poses from where plane was observed.
      * We store the block diagonal terms, according to the indexes of the nodes
      */
     //std::unordered_map<factor_id_t, Mat6> H_;
-    std::vector<Mat6> H_;
+    std::deque<Mat6> H_;
     /**
      * According to our notation S = sum p*p'
      * We choose unordered map here since this is a subset of neighbours (small) and we will iterate over them
@@ -153,7 +156,7 @@ protected:
      * Q = T *S *T'
      */
     //std::unordered_map<factor_id_t, Mat4> S_, Q_;
-    std::vector<Mat4> S_, Q_;
+    std::deque<Mat4> S_, Q_;
     Mat4 accumulatedQ_;//Q matrix of accumulated values for the incremental update of the error.
 
     Mat41 planeEstimation_;
@@ -161,7 +164,7 @@ protected:
 
     // subset of pointcloud for the given plane
     //std::unordered_map<factor_id_t, std::vector<Mat31> > allPlanePoints_;
-    std::vector<std::vector<Mat31> > allPlanePoints_;
+    std::deque<std::deque<Mat31> > allPlanePoints_;
     uint_t numberPoints_;
 
 public:

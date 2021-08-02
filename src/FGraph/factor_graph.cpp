@@ -63,7 +63,7 @@ factor_id_t FGraph::add_eigen_factor(std::shared_ptr<Factor> &factor)
     {
         n->add_factor(factor);
     }
-    obsDim_ += factor->get_dim();
+    //obsDim_ += factor->get_dim();
     return factor->get_id();
 }
 
@@ -80,16 +80,21 @@ std::shared_ptr<Node>& FGraph::get_node(factor_id_t key)
 {
     // TODO key on a set or map?
     assert(key < nodes_.size() && "FGraph::get_node: incorrect key");
-    return nodes_[key];// XXX test key  again
+    return nodes_[key];
 }
 
 std::shared_ptr<Factor>& FGraph::get_factor(factor_id_t key)
 {
     // TODO key on a set or map?
-    assert(key < factors_.size() && "FGraph::get_node: incorrect key");
+    assert(key < factors_.size() && "FGraph::get_factor: incorrect key");
     return factors_[key];
 }
 
+std::shared_ptr<Factor>& FGraph::get_eigen_factor(factor_id_t key)
+{
+    assert(key < eigen_factors_.size() && "FGraph::get_eigen_factor: incorrect key");
+    return eigen_factors_[key];
+}
 
 void FGraph::print(bool completePrint) const
 {

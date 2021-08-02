@@ -43,7 +43,7 @@
 #include "mrob/factors/factor1PosePoint2Plane.hpp"
 //#include "mrob/factors/factor1PosePoint2Point.hpp"
 
-#include <Eigen/Geometry>
+//#include <Eigen/Geometry>
 
 namespace py = pybind11;
 using namespace mrob;

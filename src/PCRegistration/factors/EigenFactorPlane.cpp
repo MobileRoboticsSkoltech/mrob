@@ -102,8 +102,7 @@ void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node)
     // If EF has not observed point from the current Node, it creates:
     else
     {
-        allPlanePoints_.push_back(std::vector<Mat31>());
-        allPlanePoints_.back().reserve(512);
+        allPlanePoints_.emplace_back(std::deque<Mat31>());
         neighbourNodes_.push_back(node);
         nodeIds_.push_back(id);
         uint_t localId = allPlanePoints_.size();

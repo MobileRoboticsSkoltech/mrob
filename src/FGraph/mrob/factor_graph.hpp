@@ -93,6 +93,10 @@ public:
      * get_node returns the node given the node id key, now a position on the data structure
      */
     std::shared_ptr<Factor>& get_factor(factor_id_t key);
+    /**
+    * get_node returns the Eigen factor given the node id key, now a position on the data structure
+    */
+    std::shared_ptr<Factor>& get_eigen_factor(factor_id_t key);
     void print(bool complete = false) const;
 
 

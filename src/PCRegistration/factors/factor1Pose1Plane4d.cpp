@@ -72,6 +72,7 @@ void Factor1Pose1Plane4d::evaluate_residuals()
     Tinv_transp_ = SE3(Tx).T().transpose();
     plane_ = get_neighbour_nodes()->at(landmarkIndex)->get_state();
     Mat41 pi_local = Tinv_transp_*plane_;
+    //TODO this residual should be a cross product, dot product or triple product
     r_ = pi_local - obs_;
     // Normals must have the same direction, so we ensure this here. XXX: Temporary solution
     //if (pi_local.head(3).dot(obs_.head(3)) < 0.0)

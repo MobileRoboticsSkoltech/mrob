@@ -24,7 +24,7 @@
 
 
 /**
- * Submodule dedicated to Point Clouds Plane aligment.
+ * Submodule dedicated to Point Clouds Plane alignment.
  */
 
 #include <pybind11/pybind11.h>
