@@ -70,9 +70,12 @@ void init_PCPlanes(py::module &m)
             		"This fills in the structure for the class plane registration, ready to optimized with the synthetically created points. TODO this is a reference, not a deep copy!")
             .def("get_ground_truth_last_pose", &CreatePoints::get_ground_truth_last_pose,
                     "return SE3 of the last pose")
-            .def("get_trajectory", &CreatePoints::get_ground_truth_pose)
+            .def("get_trajectory", &CreatePoints::get_ground_truth_trajectory)
+            .def("get_number_poses", &CreatePoints::get_number_poses)
+            .def("get_number_planes", &CreatePoints::get_number_planes)
             ;
     // This class is a data structure, containing all points and calculating plane registration
+    // TODO this should be deprecated, is just maintainted for comparison with the Fgraph version
     py::class_<PlaneRegistration>(m,"PlaneRegistration")
             .def(py::init<>(),
                     "Constructor, by default empty structure")

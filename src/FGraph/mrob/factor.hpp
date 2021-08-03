@@ -77,6 +77,7 @@ class Node;
  *                      d                                    0
  */
 
+
 class Factor{
 public:
     /**
@@ -187,6 +188,13 @@ protected:
 
 };
 
+/**
+ * Abstract class EigenFactor. TODO this also break the api with node... it has to be base
+ */
+class EigenFactor : public Factor
+{
+
+};
 
 }
 

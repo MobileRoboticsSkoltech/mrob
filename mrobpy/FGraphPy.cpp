@@ -41,7 +41,9 @@
 #include "mrob/factors/factor1Pose1Plane4d.hpp"
 
 #include "mrob/factors/factor1PosePoint2Plane.hpp"
-//#include "mrob/factors/factor1PosePoint2Point.hpp"
+#include "mrob/factors/factor1PosePoint2Point.hpp"
+
+#include "mrob/factors/EigenFactorPlane.hpp"
 
 //#include <Eigen/Geometry>
 
@@ -188,7 +190,7 @@ public:
         return f->get_id();
     }
 
-    // point to plane iterative optimizations. Variants of weighted ICP usng Fgraph
+    // point to plane iterative optimizations. Variants of weighted ICP using Fgraph
     // ----------------------------------------------------
     // point to Plane factor
     factor_id_t add_factor_1pose_point2plane(const py::EigenDRef<const Mat31> z_point_x, const py::EigenDRef<const Mat31> z_point_y,
@@ -199,6 +201,37 @@ public:
         this->add_factor(f);
         return f->get_id();
     }
+    // point to point iterative optimizations. Variants of weighted ICP using Fgraph
+    // ----------------------------------------------------
+    // point to point factor
+    factor_id_t add_factor_1pose_point2point(const py::EigenDRef<const Mat31> z_point_x, const py::EigenDRef<const Mat31> z_point_y,
+                                             factor_id_t nodePoseId, const py::EigenDRef<const Mat3> obsInf)
+    {
+        auto n1 = this->get_node(nodePoseId);
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor1PosePoint2Point(z_point_x,z_point_y, n1,obsInf, robust_type_));
+        this->add_factor(f);
+        return f->get_id();
+    }
+
+
+    // Eigen factors
+    // --------------------------------------------------
+    // Eigen factor plane, it requires adding an empty structure and then each point will increase
+    // the set of points, at the given pose.
+    // NOTE: there is no need to specify pose.
+    factor_id_t add_eigen_factor_plane() //TODO add robust factor when created
+    {
+        std::shared_ptr<mrob::Factor> f(new mrob::EigenFactorPlane(robust_type_));
+        this->add_eigen_factor(f);
+        return f->get_id();
+    }
+    void eigen_factor_plane_add_point(factor_id_t planeEigenId, factor_id_t nodePoseId, const py::EigenDRef<const Mat31> point)
+    {
+        auto ef = this->get_eigen_factor(planeEigenId);
+        auto n = this->get_node(nodePoseId);//XXX should check if this is a 3D pose node...
+        ef->add_point(point, n);
+    }
+
 private:
     mrob::Factor::robustFactorType robust_type_;
 };
@@ -338,6 +371,13 @@ void init_FGraph(py::module &m)
                             py::arg("z_normal_y"),
                             py::arg("nodePoseId"),
                             py::arg("obsInf"))
+                            // point to plane registration
+            .def("add_factor_1pose_point2point", &FGraphPy::add_factor_1pose_point2point,
+                 "Factor measuring point to point distance in a registration problem",
+                 py::arg("z_point_x"),
+                 py::arg("z_point_y"),
+                 py::arg("nodePoseId"),
+                 py::arg("obsInf"))
             ;
 
 }

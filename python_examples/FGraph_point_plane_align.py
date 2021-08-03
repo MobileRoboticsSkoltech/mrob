@@ -30,13 +30,10 @@ def pcd_1(X, color, T = []):
 	pcd.paint_uniform_color(color)
 	return pcd
 
-def vis_her(X, Y, T = []):
+def vis_her(X, Y, T = np.identity(4)):
     blue = np.array([0,0,1], dtype='float64')
     red = np.array([1,0,0], dtype='float64')
-    if T!=[]:
-        open3d.visualization.draw_geometries([pcd_1(X,red,T), pcd_1(Y,blue)])
-    else:
-        open3d.visualization.draw_geometries([pcd_1(X,red), pcd_1(Y,blue)])
+    open3d.visualization.draw_geometries([pcd_1(X,red,T), pcd_1(Y,blue)])
 
 def vis_arr(X):
 	pcd = open3d.PointCloud()
@@ -70,6 +67,18 @@ for i in range(N_points):
                                        nodePoseId = n1,
                                        obsInf = W)
 
+# Solve the problem for the potint to point
+graph_p2p = mrob.FGraph()
+W = np.identity(3)
+print('W point2point = ', W)
+n1 = graph_p2p.add_node_pose_3d(mrob.geometry.SE3())
+for i in range(N_points):
+    graph_p2p.add_factor_1pose_point2point(z_point_x = X[i],
+                                       z_point_y = centroids[ids[i]], #Y[i],
+                                       nodePoseId = n1,
+                                       obsInf = W)
+
+
 #graph.print(True)
 print('Current state of the graph: chi2 = ' , graph.chi2() )
 start = time.time()
@@ -86,10 +95,28 @@ print('Error in poses rotation= ', T.distance_rotation(Testimated), ', distance 
 vis_her(X,Y,Testimated.T())
 
 
+print('Current state of the graph point2point: chi2 = ' , graph_p2p.chi2() )
+start = time.time()
+#XXX initial ideal lambda is around 1e-1, vs the default 1e-5, so many more iterations are needed.
+graph_p2p.solve(mrob.LM, 30)
+end = time.time()
+print(', chi2 = ', graph_p2p.chi2() , ', time on calculation [s] = ', 1e0*(end - start))
+results = graph_p2p.get_estimated_state()
 
-L = graph.get_information_matrix().todense()
-D, U = np.linalg.eig(L)
-print(D)
-print(U)
+print(results)
+Testimated = mrob.geometry.SE3(results[0])
+# initial visualization
+print('Error in poses rotation= ', T.distance_rotation(Testimated), ', distance trans = ', T.distance_trans(Testimated))
+vis_her(X,Y,Testimated.T())
+
+
+
+
+
+
+#L = graph.get_information_matrix().todense()
+#D, U = np.linalg.eig(L)
+#print(D)
+#print(U)
 
 

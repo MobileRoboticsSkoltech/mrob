@@ -54,7 +54,7 @@ factor_id_t FGraph::add_factor(std::shared_ptr<Factor> &factor)
     return factor->get_id();
 }
 
-factor_id_t FGraph::add_eigen_factor(std::shared_ptr<Factor> &factor)
+factor_id_t FGraph::add_eigen_factor(std::shared_ptr<EigenFactor> &factor)
 {
     factor->set_id(eigen_factors_.size());
     eigen_factors_.push_back(factor);
@@ -90,7 +90,7 @@ std::shared_ptr<Factor>& FGraph::get_factor(factor_id_t key)
     return factors_[key];
 }
 
-std::shared_ptr<Factor>& FGraph::get_eigen_factor(factor_id_t key)
+std::shared_ptr<EigenFactor>& FGraph::get_eigen_factor(factor_id_t key)
 {
     assert(key < eigen_factors_.size() && "FGraph::get_eigen_factor: incorrect key");
     return eigen_factors_[key];

@@ -15,21 +15,17 @@ print('X = \n', X,'\n T = \n', T.T(),'\n Y =\n', Y)
 
 
 
-def pcd_1(X, color, T = []):
-	pcd = open3d.geometry.PointCloud()
-	pcd.points = open3d.utility.Vector3dVector(X)
-	if T!=[]:
-	    pcd.transform(T)
-	pcd.paint_uniform_color(color)
-	return pcd
+def pcd_1(X, color, T = np.identity(4)):
+    pcd = open3d.geometry.PointCloud()
+    pcd.points = open3d.utility.Vector3dVector(X)
+    pcd.transform(T)
+    pcd.paint_uniform_color(color)
+    return pcd
 
-def vis_her(X, Y, T = []):
+def vis_her(X, Y, T = np.identity(4)):
     blue = np.array([0,0,1], dtype='float64')
     red = np.array([1,0,0], dtype='float64')
-    if T!=[]:
-        open3d.visualization.draw_geometries([pcd_1(X,red), pcd_1(Y,blue, T)])
-    else:
-        open3d.visualization.draw_geometries([pcd_1(X,red), pcd_1(Y,blue)])
+    open3d.visualization.draw_geometries([pcd_1(X,red), pcd_1(Y,blue, T)])
 
 def vis_arr(X):
 	pcd = open3d.PointCloud()

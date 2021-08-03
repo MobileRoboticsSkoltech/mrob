@@ -95,7 +95,8 @@ public:
      * Later, the S matrix should be calculated
      *
      * The alternative is adding directly S, but this offers less
-     * flexibiloity
+     * flexibiloity.
+     * XXX adding one by one might be inefficient
      */
     void add_point(const Mat31& p, std::shared_ptr<Node> &node);
     /**

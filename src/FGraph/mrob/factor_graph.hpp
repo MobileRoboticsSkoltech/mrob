@@ -78,7 +78,7 @@ public:
      * and therefore it requires a different processing, apart from the
      * standard residual factors from above.
      */
-    factor_id_t add_eigen_factor(std::shared_ptr<Factor> &factor);
+    factor_id_t add_eigen_factor(std::shared_ptr<EigenFactor> &factor);
     /**
       * Adds a node if it was not already on the set.
       */
@@ -96,7 +96,7 @@ public:
     /**
     * get_node returns the Eigen factor given the node id key, now a position on the data structure
     */
-    std::shared_ptr<Factor>& get_eigen_factor(factor_id_t key);
+    std::shared_ptr<EigenFactor>& get_eigen_factor(factor_id_t key);
     void print(bool complete = false) const;
 
 
@@ -130,7 +130,7 @@ protected:
     std::deque<std::shared_ptr<Factor> > factors_; // no specific order needed
 
     // This requires a special list for the factors
-    std::deque<std::shared_ptr<Factor> > eigen_factors_;
+    std::deque<std::shared_ptr<EigenFactor> > eigen_factors_;
 
     /**
      * Total accumulated dimensions on both the state (nodes)

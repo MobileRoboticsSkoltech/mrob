@@ -92,6 +92,9 @@ public:
     /**
      * Fill the PlaneRegistration class with planes calculated here (reset)
      * and a new initial trajectory set to I's
+     *
+     * This function should be deprecated after PlaneResgitration is no longer used.
+     * Instead, we directly access point here and create a FGraph
      */
     void create_plane_registration(PlaneRegistration& planeReg);
 
@@ -135,7 +138,7 @@ protected:
 
     // Generation of planes
     std::vector<SE3> planePoses_;
-    std::vector<std::pair<uint_t, std::shared_ptr<Plane> >> planes_;
+    std::vector<std::pair<uint_t, std::shared_ptr<Plane> >> planes_;//TODO this should be removed...
 
 };
 
