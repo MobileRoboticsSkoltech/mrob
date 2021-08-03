@@ -80,6 +80,4 @@ void NodePose3d::print() const
     std::cout << "Printing NodePose3d: " << id_
         << ", state = \n" << state_.ln_vee() << ",\n SE3 matrix: \n";
     state_.print();
-    std::cout  <<  "\nand neighbour factors " << neighbourFactors_.size()
-        << std::endl;
 }

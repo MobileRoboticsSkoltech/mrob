@@ -63,6 +63,4 @@ void NodeLandmark3d::print() const
 {
     std::cout << "Printing NodeLandmark3d: " << id_
         << ", state = \n" << state_;
-    std::cout  <<  "\nand neighbour factors " << neighbourFactors_.size()
-        << std::endl;
 }

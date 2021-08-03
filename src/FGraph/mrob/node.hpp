@@ -33,15 +33,15 @@
 
 namespace mrob{
 
-class Factor;
 
 /**
  * Node class is an abstract class for creating future nodes. Pure
  * abstract methods on get and set dimension
  * is just a reminder that this is an Abstract class
  *
- * Node class keeps track of all the neighbouring factors.
- * Destructor takes care of the neighbour factors included.
+ * Node does not track the factors associated to it, it just contains
+ * the state variables and allows to update its value.
+ * (whereas before we kept track of factors in an unnecessary complex solution).
  *
  * States are indicated as references to MatX matrices, since
  * it can be either a block vector or a matrix (transformation matrix)
@@ -55,7 +55,7 @@ class Factor;
 
 class Node{
   public:
-    Node(uint_t dim, uint_t potNumberFactors = 5);
+    Node(uint_t dim);
     virtual ~Node();
     /**
      * The update function, given any block vector it updates
@@ -102,22 +102,8 @@ class Node{
     factor_id_t get_id() const {return id_;}
     void set_id(factor_id_t id) {id_ = id;}
     factor_id_t get_dim(void) const {return dim_;}
-    /**
-     * Adds a factor to the list of factors connected to this node.
-     */
-    virtual bool add_factor(std::shared_ptr<Factor> &factor);
-    /**
-     * This function is very inefficient: it is an exhaustive search
-     * so use only when necessary.
-     */
-    virtual bool rm_factor(std::shared_ptr<Factor> &factor);
-    void clear() {neighbourFactors_.clear();}
-    const std::vector<std::shared_ptr<Factor> >*
-            get_neighbour_factors(void) const {return &neighbourFactors_;}
 
   protected:
-    // no oder needed here
-    std::vector<std::shared_ptr<Factor> > neighbourFactors_;
     factor_id_t id_;
     uint_t dim_;
     /**

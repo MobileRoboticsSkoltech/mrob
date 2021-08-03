@@ -7,5 +7,6 @@ TARGET_LINK_LIBRARIES(example_FGraph_3d_example FGraph)
 ADD_EXECUTABLE(example_FGraph_3d_ladmark_example  example_solver_3d_landmarks.cpp)
 TARGET_LINK_LIBRARIES(example_FGraph_3d_ladmark_example FGraph)
 
-ADD_EXECUTABLE(example_FGraph_dense_3d  example_solver_dense_3d.cpp)
-TARGET_LINK_LIBRARIES(example_FGraph_dense_3d FGraph common)
+# TODO deprecated, remove all the related files
+#ADD_EXECUTABLE(example_FGraph_dense_3d  example_solver_dense_3d.cpp)
+#TARGET_LINK_LIBRARIES(example_FGraph_dense_3d FGraph common)

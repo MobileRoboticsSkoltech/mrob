@@ -63,6 +63,5 @@ void NodePose2d::print() const
 {
     std::cout << "Printing NodePose2d: " << id_
               << ", state = \n" << state_
-              <<  "\nand neighbour factors " << neighbourFactors_.size()
               << std::endl;
 }

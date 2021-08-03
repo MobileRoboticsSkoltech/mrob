@@ -55,7 +55,5 @@ void NodePlane4d::update_from_auxiliary(const Eigen::Ref<const MatX1> &dx)
 void NodePlane4d::print() const
 {
     std::cout << "Printing NodePlane4d: " << id_
-        << ", state = \n" << state_ << ",\n";
-    std::cout  <<  "and neighbour factors " << neighbourFactors_.size()
-        << std::endl;
+        << ", state = \n" << state_ << std::endl;
 }

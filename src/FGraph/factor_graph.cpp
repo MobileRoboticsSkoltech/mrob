@@ -33,9 +33,6 @@ FGraph::FGraph() :
 }
 FGraph::~FGraph()
 {
-    // clear every node's list of neigbours factors
-    for (auto &&n: nodes_)
-        n->clear();
     factors_.clear();
     nodes_.clear();
     eigen_factors_.clear();
@@ -44,12 +41,7 @@ FGraph::~FGraph()
 factor_id_t FGraph::add_factor(std::shared_ptr<Factor> &factor)
 {
 	factor->set_id(factors_.size());
-	factors_.push_back(factor);
-    auto *list = factor->get_neighbour_nodes();
-    for( auto &&n: *list)
-    {
-        n->add_factor(factor);
-    }
+	factors_.emplace_back(factor);
     obsDim_ += factor->get_dim();
     return factor->get_id();
 }
@@ -57,12 +49,7 @@ factor_id_t FGraph::add_factor(std::shared_ptr<Factor> &factor)
 factor_id_t FGraph::add_eigen_factor(std::shared_ptr<EigenFactor> &factor)
 {
     factor->set_id(eigen_factors_.size());
-    eigen_factors_.push_back(factor);
-    auto *list = factor->get_neighbour_nodes();
-    for( auto &&n: *list)
-    {
-        n->add_factor(factor);
-    }
+    eigen_factors_.emplace_back(factor);
     //obsDim_ += factor->get_dim();
     return factor->get_id();
 }
@@ -78,7 +65,6 @@ factor_id_t FGraph::add_node(std::shared_ptr<Node> &node)
 
 std::shared_ptr<Node>& FGraph::get_node(factor_id_t key)
 {
-    // TODO key on a set or map?
     assert(key < nodes_.size() && "FGraph::get_node: incorrect key");
     return nodes_[key];
 }
