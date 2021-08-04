@@ -32,7 +32,7 @@
 using namespace mrob;
 
 EigenFactorPlane::EigenFactorPlane(Factor::robustFactorType robust_type):
-        Factor(0,0, robust_type), //Dimension zero since this is a non-parametric factor. Also we don't known how many nodes will connect, so we set the second param to 0 (not-used)
+        EigenFactor(robust_type),
         planeEstimation_{Mat41::Zero()},
         planeError_{0.0},
         numberPoints_{0}

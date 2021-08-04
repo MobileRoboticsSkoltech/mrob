@@ -221,7 +221,7 @@ public:
     // NOTE: there is no need to specify pose.
     factor_id_t add_eigen_factor_plane() //TODO add robust factor when created
     {
-        std::shared_ptr<mrob::Factor> f(new mrob::EigenFactorPlane(robust_type_));
+        std::shared_ptr<mrob::EigenFactor> f(new mrob::EigenFactorPlane(robust_type_));
         this->add_eigen_factor(f);
         return f->get_id();
     }
@@ -378,6 +378,14 @@ void init_FGraph(py::module &m)
                  py::arg("z_point_y"),
                  py::arg("nodePoseId"),
                  py::arg("obsInf"))
+            // -----------------------------------------------------------
+            // Eigen Factors
+            .def("add_eigen_factor_plane", &FGraphPy::add_eigen_factor_plane)
+            .def("eigen_factor_plane_add_point", &FGraphPy::eigen_factor_plane_add_point,
+                    "Adds a point given a node id and the EF it belongs to.",
+                    py::arg("planeEigenId"),
+                    py::arg("nodePoseId"),
+                    py::arg("point"))
             ;
 
 }

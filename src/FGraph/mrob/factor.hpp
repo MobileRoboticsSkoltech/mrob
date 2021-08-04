@@ -189,10 +189,16 @@ protected:
 };
 
 /**
- * Abstract class EigenFactor. TODO this also break the api with node... it has to be base
+ * Abstract class EigenFactor. This is a factor with extra methods than Factor
+ * which requires a new base class
  */
 class EigenFactor : public Factor
 {
+public:
+    EigenFactor(robustFactorType factor_type = QUADRATIC, uint_t potNumberNodes = 5);
+    virtual ~EigenFactor() = default;
+    virtual const Eigen::Ref<const MatX1> get_state() const = 0;
+    virtual void add_point(const Mat31& p, std::shared_ptr<Node> &node) = 0;
 
 };
 

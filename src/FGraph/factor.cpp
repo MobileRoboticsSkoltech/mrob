@@ -71,3 +71,10 @@ matData_t Factor::evaluate_robust_weight(matData_t u, matData_t params)
     }
     return robust_weight_;
 }
+
+EigenFactor::EigenFactor(robustFactorType factor_type, uint_t potNumberNodes):
+        Factor(0,0,factor_type, potNumberNodes)
+{
+    //Dimension zero since this is a non-parametric factor.
+    //Also we don't known how many nodes will connect, so we set the second param to 0 (not-used)
+}

@@ -51,7 +51,7 @@ namespace mrob{
  * This class assumes that matrices S = sum p*p' are calculated before since they are directly inputs
  * XXX should we store all points?
  */
-class EigenFactorPlane: public Factor{
+class EigenFactorPlane: public EigenFactor{
 public:
     /**
      * Creates a plane. The minimum requirements are 1 pose.
@@ -88,17 +88,35 @@ public:
     /**
      * get plane returns the current planeEstimation
      */
-    Mat41 get_plane(void) {return planeEstimation_;};
+    virtual const Eigen::Ref<const MatX1> get_state(void) const override
+                {return planeEstimation_;}
     /**
      * Add point: raw points are stored into an unoderred map
      *
      * Later, the S matrix should be calculated
      *
      * The alternative is adding directly S, but this offers less
-     * flexibiloity.
+     * flexibility.
      * XXX adding one by one might be inefficient
      */
-    void add_point(const Mat31& p, std::shared_ptr<Node> &node);
+    virtual void add_point(const Mat31& p, std::shared_ptr<Node> &node) override;
+    /**
+     * get mean point calculates the mean of the pointcloud observed at pose node id,
+     * given that S = sum p * p' =  sum ([x2 xy xz x
+     *                                    yx y2 yz y
+     *                                    zx zy z2 z
+     *                                    x   y  z 1]
+     * ser we just calculate S and return
+     */
+    Mat31 get_mean_point(factor_id_t id);
+
+
+protected:
+    /**
+     * Estimates the plane parameters: v = [n', d]'_{4x1}, where v is unit, (due to the Eigen solution)
+     * although for standard plane estimation we could enforce unit on the normal vector n.
+     */
+    double estimate_plane();
     /**
      * Calculates the matrix S = sum(p*p'), where p = [x,y,z,1]
      * for all planes, as an aggregation of the outer product of all
@@ -114,23 +132,6 @@ public:
      *  and the Q matrix which rotates S
      */
     void calculate_all_matrices_Q();
-    /**
-     * get mean point calculates the mean of the pointcloud observed at pose node id,
-     * given that S = sum p * p' =  sum ([x2 xy xz x
-     *                                    yx y2 yz y
-     *                                    zx zy z2 z
-     *                                    x   y  z 1]
-     * ser we just calculate S and return
-     */
-    Mat31 get_mean_point(factor_id_t id);
-    /**
-     * Estimates the plane parameters: v = [n', d]'_{4x1}, where v is unit, (due to the Eigen solution)
-     * although for standard plane estimation we could enforce unit on the normal vector n.
-     */
-    double estimate_plane();
-
-
-protected:
     /**
      * A deque storing the ids in the FGraph of each of the poses
      * This is preferred over vector due to the a priori unknown size of
