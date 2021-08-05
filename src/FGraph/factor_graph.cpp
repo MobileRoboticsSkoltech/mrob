@@ -50,7 +50,6 @@ factor_id_t FGraph::add_eigen_factor(std::shared_ptr<EigenFactor> &factor)
 {
     factor->set_id(eigen_factors_.size());
     eigen_factors_.emplace_back(factor);
-    //obsDim_ += factor->get_dim();
     return factor->get_id();
 }
 
@@ -58,7 +57,7 @@ factor_id_t FGraph::add_eigen_factor(std::shared_ptr<EigenFactor> &factor)
 factor_id_t FGraph::add_node(std::shared_ptr<Node> &node)
 {
 	node->set_id(nodes_.size());
-	nodes_.push_back(node);
+	nodes_.emplace_back(node);
 	stateDim_ += node->get_dim();
 	return node->get_id();
 }
@@ -85,14 +84,17 @@ std::shared_ptr<EigenFactor>& FGraph::get_eigen_factor(factor_id_t key)
 void FGraph::print(bool completePrint) const
 {
     std::cout << "Status of graph: " <<
-            nodes_.size()  << "Nodes and " <<
-            factors_.size() << "Factors." << std::endl;
+            " Nodes = " << nodes_.size()  <<
+            ", Factors = " << factors_.size() <<
+            ", Eigen Factors = " << eigen_factors_.size() << std::endl;
 
     if(completePrint)
     {
         for (auto &&n : nodes_)
             n->print();
         for (auto &&f : factors_)
+            f->print();
+        for (auto &&f : eigen_factors_)
             f->print();
     }
 }

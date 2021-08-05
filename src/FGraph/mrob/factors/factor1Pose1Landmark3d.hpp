@@ -81,10 +81,10 @@ class Factor1Pose1Landmark3d : public Factor
 
     void print() const;
 
-    const Eigen::Ref<const MatX> get_obs() const {return obs_;};
-    const Eigen::Ref<const MatX1> get_residual() const {return r_;};
-    const Eigen::Ref<const MatX> get_information_matrix() const {return W_;};
-    const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
+    MatRefConst get_obs() const {return obs_;};
+    VectRefConst get_residual() const {return r_;};
+    MatRefConst get_information_matrix() const {return W_;};
+    MatRefConst get_jacobian([[maybe_unused]] mrob::factor_id_t id = 0) const {return J_;};
 
   protected:
     Mat31 obs_, r_, landmark_;

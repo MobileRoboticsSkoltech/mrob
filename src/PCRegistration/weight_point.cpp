@@ -30,8 +30,8 @@
 
 using namespace mrob;
 
-int PCRegistration::weighted_point(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
-           const Eigen::Ref<const MatX1> weight,  SE3 &T, double tol)
+int PCRegistration::weighted_point(MatRefConst X, MatRefConst Y,
+                                   VectRefConst weight,  SE3 &T, double tol)
 {
     assert(X.cols() == 3  && "PCRegistration::Gicp: Incorrect sizing, we expect Nx3");
     assert(X.rows() >= 3  && "PCRegistration::Gicp: Incorrect sizing, we expect at least 3 correspondences (not aligned)");

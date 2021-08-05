@@ -40,12 +40,12 @@ class NodeLandmark3d : public Node
     //NodePose3d(const SE3 &initial_T);
     virtual ~NodeLandmark3d()  override = default;
 
-    virtual void update(const Eigen::Ref<const MatX1> &dx);
-    virtual void update_from_auxiliary(const Eigen::Ref<const MatX1> &dx);
-    virtual void set_state(const Eigen::Ref<const MatX> &x);
-    virtual void set_auxiliary_state(const Eigen::Ref<const MatX> &x);
-    virtual const Eigen::Ref<const MatX> get_state() const {return state_;};
-    virtual const Eigen::Ref<const MatX> get_auxiliary_state() const {return auxiliaryState_;};
+    void update(VectRefConst &dx) override;
+    void update_from_auxiliary(VectRefConst &dx) override;
+    void set_state(MatRefConst &x) override;
+    void set_auxiliary_state(MatRefConst &x) override;
+    MatRefConst get_state() const override {return state_;}
+    MatRefConst get_auxiliary_state() const override {return auxiliaryState_;}
     void print() const;
 
   protected:

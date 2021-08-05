@@ -44,7 +44,7 @@ NodePose3d::NodePose3d(const SE3 &initial_x) :
 }
 
 
-void NodePose3d::update(const Eigen::Ref<const MatX1> &dx)
+void NodePose3d::update(VectRefConst &dx)
 {
     Mat61 dxf = dx;
 
@@ -55,21 +55,21 @@ void NodePose3d::update(const Eigen::Ref<const MatX1> &dx)
     state_.regenerate();
 }
 
-void NodePose3d::update_from_auxiliary(const Eigen::Ref<const MatX1> &dx)
+void NodePose3d::update_from_auxiliary(VectRefConst &dx)
 {
     Mat61 dxf = dx;
     state_ = auxiliaryState_;//we update from the auxiliary state
     state_.update_lhs(dxf);
 }
 
-void NodePose3d::set_state(const Eigen::Ref<const MatX> &x)
+void NodePose3d::set_state(MatRefConst &x)
 {
 	// casting is necessary for SE3 constructor, it does not handle a ref TODO
 	Mat4 newState = x;
     state_ = SE3(newState);
 }
 
-void NodePose3d::set_auxiliary_state(const Eigen::Ref<const MatX> &x)
+void NodePose3d::set_auxiliary_state(MatRefConst &x)
 {
 	Mat4 newState = x;
     auxiliaryState_ = SE3(newState);

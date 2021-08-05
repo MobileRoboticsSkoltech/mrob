@@ -58,10 +58,10 @@ class Factor1Pose3d : public Factor
 
     void print() const;
 
-    const Eigen::Ref<const MatX> get_obs() const {return Tobs_.T();};
-    const Eigen::Ref<const MatX1> get_residual() const {return r_;};
-    const Eigen::Ref<const MatX> get_information_matrix() const {return W_;};
-    const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
+    MatRefConst get_obs() const {return Tobs_.T();};
+    VectRefConst get_residual() const {return r_;};
+    MatRefConst get_information_matrix() const {return W_;};
+    MatRefConst get_jacobian([[maybe_unused]] mrob::factor_id_t id = 0) const {return J_;};
 
 
   protected:

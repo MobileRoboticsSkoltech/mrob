@@ -61,10 +61,10 @@ namespace mrob{
         void evaluate_jacobians() override;
         void evaluate_chi2() override;
 
-        const Eigen::Ref<const MatX> get_obs() const override {return obs_;};
-        const Eigen::Ref<const MatX1> get_residual() const override {return r_;};
-        const Eigen::Ref<const MatX> get_information_matrix() const override {return W_;};
-        const Eigen::Ref<const MatX> get_jacobian() const override {return J_;};
+        MatRefConst get_obs() const override {return obs_;};
+        VectRefConst get_residual() const override {return r_;};
+        MatRefConst get_information_matrix() const override {return W_;};
+        MatRefConst get_jacobian([[maybe_unused]]mrob::factor_id_t id = 0) const override {return J_;};
         void print() const override;
 
     protected:

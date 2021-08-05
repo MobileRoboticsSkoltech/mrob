@@ -50,13 +50,13 @@ class NodePlane4d : public Node
      * pi'= clamped(pi + dx)
      *
      */
-    virtual void update(const Eigen::Ref<const MatX1> &dx) override;
-    virtual void update_from_auxiliary(const Eigen::Ref<const MatX1> &dx) override;
-    virtual void set_state(const Eigen::Ref<const MatX> &x) override {state_ = x;};
-    virtual void set_auxiliary_state(const Eigen::Ref<const MatX> &x) override {auxiliaryState_ = x;};
-    virtual const Eigen::Ref<const MatX> get_state() const override {return state_;};
-    virtual const Eigen::Ref<const MatX> get_auxiliary_state() const override {return auxiliaryState_;};
-    virtual void print() const override;
+    void update(VectRefConst &dx) override;
+    void update_from_auxiliary(VectRefConst &dx) override;
+    void set_state(MatRefConst &x) override {state_ = x;};
+    void set_auxiliary_state(MatRefConst &x) override {auxiliaryState_ = x;};
+    MatRefConst get_state() const override {return state_;};
+    MatRefConst get_auxiliary_state() const override {return auxiliaryState_;};
+    void print() const override;
 
   protected:
     Mat41 state_;

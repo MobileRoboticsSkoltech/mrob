@@ -90,7 +90,7 @@ void EigenFactorPlane::evaluate_chi2()
     chi2_ = planeError_;//not really an evaluation...should we do again?
 }
 
-void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node)
+void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node, matData_t &W)
 {
     // Pose has been observed, data has been initialized and we simply add point
     auto id = node->get_id();
@@ -108,6 +108,7 @@ void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node)
         uint_t localId = allPlanePoints_.size();
         reverseNodeIds_.emplace(id, localId);
         // S and Q are built later, no need to create an element.
+        (void)W;//TODO use information on each point, error
     }
     numberPoints_++;
 
@@ -179,5 +180,14 @@ Mat31 EigenFactorPlane::get_mean_point(factor_id_t id)
 
 void EigenFactorPlane::print() const
 {
-    std::cout << "Plane Eigen Factor" <<std::endl;
+    std::cout << "Plane Eigen Factor " <<  this->get_id()
+              << " current plane estimated: " << planeEstimation_.transpose() << std::endl;
+}
+
+
+MatRefConst EigenFactorPlane::get_jacobian(mrob::factor_id_t id) const
+{
+    assert(reverseNodeIds.count(id)   && "EigenFactorPlane::get_jacobian: element not found");
+    uint_t localId = reverseNodeIds_.at(id);
+    return J_.at(localId);
 }

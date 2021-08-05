@@ -29,13 +29,14 @@
 #include "mrob/factor.hpp"
 #include <unordered_map>
 #include <deque>
+#include <Eigen/StdVector>
 
 
 namespace mrob{
 
 /**
  * Eigen factor Plane is a vertex that complies with the Fgraph standards
- * and inherits from base factor.hpp
+ * and inherits from base EigenFactor.hpp
  *
  * The Plane factor connects different poses that have observed the same geometric entity.
  * It is not required an explicit parametrization of the plane, so the resultant topology
@@ -43,7 +44,7 @@ namespace mrob{
  *
  * NOTE: due to its nature, multiple observation can be added to the same EF,
  * meaning we need to create a constructor PLUS an additional method
- *  - add_observation()
+ *  - add_point()
  *
  * In order to build the problem we would follow the interface specifications by FGraph
  * but we need extra methods and variables to keep track of the neighbours
@@ -54,7 +55,8 @@ namespace mrob{
 class EigenFactorPlane: public EigenFactor{
 public:
     /**
-     * Creates a plane. The minimum requirements are 1 pose.
+     * Creates an Eigen Factor plane. The minimum requirements are 1 pose, which is not required
+     * at this stage, but will be introduced when we add points/Q matrix.
      */
     EigenFactorPlane(Factor::robustFactorType robust_type = Factor::robustFactorType::QUADRATIC);
     ~EigenFactorPlane() override = default;
@@ -65,30 +67,36 @@ public:
     void evaluate_residuals() override;
     /**
      * Evaluates Jacobians, given the residual evaluated
+     * It also evaluated the Hessians
      */
     void evaluate_jacobians() override;
     /**
-     * Chi2 is a scaling of the plane error, now w=1
+     * Chi2 is a scaling of the plane error
      */
     void evaluate_chi2() override;
 
     void print() const;
 
-    const Eigen::Ref<const MatX> get_obs() const
+    MatRefConst get_obs() const
             {assert(0 && "EigenFactorPlane:get_obs: method should not be called");return Mat31::Zero();}
-    const Eigen::Ref<const MatX1> get_residual() const
+    VectRefConst get_residual() const
             {assert(0 && "EigenFactorPlane::get_resigual: method should not be called");return Mat31::Zero();}
-    const Eigen::Ref<const MatX> get_information_matrix() const
+    MatRefConst get_information_matrix() const
             {assert(0 && "EigenFactorPlane::get_inform method should not be called");return Mat4::Zero();}
-    const Eigen::Ref<const MatX> get_jacobian() const
-            {assert(0 && "EigenFactorPlane::get_jacobian: method should not be called");return Mat61::Zero();}
+
+    /**
+     * get jacobian returns the jacobian corresponding to the given node id.
+     * @return
+     */
+    MatRefConst get_jacobian([[maybe_unused]] mrob::factor_id_t id = 0) const override;
 
 
     // NEW functions added to the base class factor.hpp
     /**
-     * get plane returns the current planeEstimation
+     * get current state of the Eigen Factor, in this case,
+     * a plane is returned as the current planeEstimation
      */
-    virtual const Eigen::Ref<const MatX1> get_state(void) const override
+    VectRefConst get_state(void) const override
                 {return planeEstimation_;}
     /**
      * Add point: raw points are stored into an unoderred map
@@ -99,7 +107,7 @@ public:
      * flexibility.
      * XXX adding one by one might be inefficient
      */
-    virtual void add_point(const Mat31& p, std::shared_ptr<Node> &node) override;
+    void add_point(const Mat31& p, std::shared_ptr<Node> &node, matData_t &W) override;
     /**
      * get mean point calculates the mean of the pointcloud observed at pose node id,
      * given that S = sum p * p' =  sum ([x2 xy xz x

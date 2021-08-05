@@ -77,7 +77,10 @@ using Vect = Eigen::Matrix<matData_t, D,1, Eigen::RowMajor>;
 template<int Rw,int Col>
 using Mat = Eigen::Matrix<matData_t, Rw, Col, Eigen::RowMajor>;
 
-
+// Definition of Ref Eigen
+//we might need this for aligment requirements: Eigen::Ref<const MatX1, Eigen::AlignmentType::Aligned16>
+using VectRefConst = const Eigen::Ref<const MatX1>;
+using MatRefConst = const Eigen::Ref<const MatX>;
 
 }//end of namespace
 

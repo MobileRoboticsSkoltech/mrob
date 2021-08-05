@@ -36,25 +36,25 @@ NodeLandmark3d::NodeLandmark3d(const Mat31 &initial_x) :
 }
 
 
-void NodeLandmark3d::update(const Eigen::Ref<const MatX1> &dx)
+void NodeLandmark3d::update(VectRefConst &dx)
 {
     Mat31 dxf = dx;//XXX cast is necessary?
     state_ += dxf;
 }
 
-void NodeLandmark3d::update_from_auxiliary(const Eigen::Ref<const MatX1> &dx)
+void NodeLandmark3d::update_from_auxiliary(VectRefConst &dx)
 {
     Mat31 dxf = dx;
     state_ = auxiliaryState_ + dxf;
 }
 
-void NodeLandmark3d::set_state(const Eigen::Ref<const MatX> &x)
+void NodeLandmark3d::set_state(MatRefConst &x)
 {
 	// cast is done by Eigen
     state_ = x;
 }
 
-void NodeLandmark3d::set_auxiliary_state(const Eigen::Ref<const MatX> &x)
+void NodeLandmark3d::set_auxiliary_state(MatRefConst &x)
 {
     auxiliaryState_ = x;
 }

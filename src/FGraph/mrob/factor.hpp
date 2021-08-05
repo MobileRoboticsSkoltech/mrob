@@ -120,18 +120,22 @@ public:
      * doing the conversion with minimal temporary artifacts
      * Observation can be a 3d point, a 3d pose (transformation 4x4), etc.
      */
-    virtual const Eigen::Ref<const MatX> get_obs() const = 0;
+    virtual MatRefConst get_obs() const = 0;
     /**
      * Residual will always be a block vector
      */
-    virtual const Eigen::Ref<const MatX1> get_residual() const = 0;
-    virtual const Eigen::Ref<const MatX> get_information_matrix() const = 0;
+    virtual VectRefConst get_residual() const = 0;
+    virtual MatRefConst get_information_matrix() const = 0;
     /**
      * get_jacobian returns a block matrices stacking all the Jacobians on the factor.
-     * The convention is that Jacobians corresponding to
+     * The convention is that Jacobians corresponding to.
+     *
+     * The input value is in case that Jacobian supports accessing a particular Jacobian
+     * of a node. For most factors (include 1-2 nodes) this option is not available
+     * Mostly only for EigenFactors whose number of connected nodes is unbounded
      *
      */
-    virtual const Eigen::Ref<const MatX> get_jacobian() const = 0;
+    virtual MatRefConst get_jacobian([[maybe_unused]] mrob::factor_id_t id = 0) const = 0;
 
 
     factor_id_t get_id() const {return id_;}
@@ -190,15 +194,35 @@ protected:
 
 /**
  * Abstract class EigenFactor. This is a factor with extra methods than Factor
- * which requires a new base class
+ * which requires a new base abstract class.
+ *
+ * The Eigen factor connects different poses that have observed the same geometric entity.
+ * It is not required an explicit parametrization of the current state, which is a geometric entity
+ * estimated a priory on each iteration, e.g. a plane. The resultant topology
+ * is N nodes connecting to the eigen factor.
+ *
+ * Hence, the new method get state, for instance a plane, but this state is outside the FGraph optimization, that
+ * is why we can consider this approach non-parametric
+ *  - get_state()
+ *
+ * NOTE: due to its nature, multiple observation can be added to the same EF,
+ * meaning we need to create a constructor PLUS an additional method
+ *  - add_point()
+ *
+ * In order to build the problem we would follow the interface specifications by FGraph
+ * but we need extra methods and variables to keep track of the neighbours. For instance, we need
+ * to get Jacobians and Hessian matrices
+ *
+ * This class assumes that matrices S = sum p*p' are calculated before since they are directly inputs
+ * XXX should we store all points?
  */
 class EigenFactor : public Factor
 {
 public:
     EigenFactor(robustFactorType factor_type = QUADRATIC, uint_t potNumberNodes = 5);
     virtual ~EigenFactor() = default;
-    virtual const Eigen::Ref<const MatX1> get_state() const = 0;
-    virtual void add_point(const Mat31& p, std::shared_ptr<Node> &node) = 0;
+    virtual VectRefConst get_state() const = 0;
+    virtual void add_point(const Mat31& p, std::shared_ptr<Node> &node, mrob::matData_t &W) = 0;
 
 };
 

@@ -26,9 +26,9 @@
 
 using namespace mrob;
 
-Mat41 estimate_plane_centered(const Eigen::Ref<const MatX> X);
+Mat41 estimate_plane_centered(MatRefConst X);
 
-Mat41 mrob::estimate_plane(const Eigen::Ref<const MatX> X)
+Mat41 mrob::estimate_plane(MatRefConst X)
 {
     // Initialization
     assert(X.cols() == 3  && "Estimate_plane: Incorrect sizing, we expect Nx3");
@@ -39,7 +39,7 @@ Mat41 mrob::estimate_plane(const Eigen::Ref<const MatX> X)
 }
 
 //local function, we also will test the homogeneous plane estimation
-Mat41 estimate_plane_centered(const Eigen::Ref<const MatX> X)
+Mat41 estimate_plane_centered(MatRefConst X)
 {
     uint_t N = X.rows();
     // Calculate center of points:
@@ -67,14 +67,14 @@ Mat41 estimate_plane_centered(const Eigen::Ref<const MatX> X)
 
 
 
-Mat31 mrob::estimate_normal(const Eigen::Ref<const MatX> X)
+Mat31 mrob::estimate_normal(MatRefConst X)
 {
     Mat41 res = estimate_plane(X);
     return res.head(3);
 }
 
 
-Mat31 mrob::estimate_centroid(const Eigen::Ref<const MatX> X)
+Mat31 mrob::estimate_centroid(MatRefConst X)
 {
     // Initialization
     assert(X.cols() == 3  && "Estimate_centroid: Incorrect sizing, we expect Nx3");

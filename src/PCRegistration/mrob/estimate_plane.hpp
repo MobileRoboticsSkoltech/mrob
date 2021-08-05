@@ -37,7 +37,7 @@ namespace mrob{
  * For now this is a unique function, TODO: add more methods here
  */
 
-Mat41 estimate_plane(const Eigen::Ref<const MatX> X);
+Mat41 estimate_plane(MatRefConst X);
 
 
 /**
@@ -47,7 +47,7 @@ Mat41 estimate_plane(const Eigen::Ref<const MatX> X);
  *
  */
 
-Mat31 estimate_normal(const Eigen::Ref<const MatX> X);
+Mat31 estimate_normal(MatRefConst X);
 
 
 /**
@@ -57,7 +57,7 @@ Mat31 estimate_normal(const Eigen::Ref<const MatX> X);
  *
  */
 
-Mat31 estimate_centroid(const Eigen::Ref<const MatX> X);
+Mat31 estimate_centroid(MatRefConst X);
 
 
 }

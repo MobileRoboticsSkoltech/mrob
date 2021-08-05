@@ -66,38 +66,32 @@ class Node{
      * a fixed block matrix, and this virtual function will handle
      * it nicely.
      */
-    virtual void update(const Eigen::Ref<const MatX1> &dx) = 0;
+    virtual void update(VectRefConst &dx) = 0;
     /**
      * Updates *FROM* the auxiliary state the principal state.
      */
-    virtual void update_from_auxiliary(const Eigen::Ref<const MatX1> &dx) = 0;
+    virtual void update_from_auxiliary(VectRefConst &dx) = 0;
     /**
      * At run time sets the new value of the estate and auxiliary to be x
      *
      */
-    virtual void set_state(const Eigen::Ref<const MatX> &x) = 0;
+    virtual void set_state(MatRefConst &x) = 0;
     /**
      * New auxiliary state set
      */
-    virtual void set_auxiliary_state(const Eigen::Ref<const MatX> &x) = 0;
+    virtual void set_auxiliary_state(MatRefConst &x) = 0;
     /**
      * Declared as a dynamic matrix reference to allow any size to be returned.
      * At run time returns a Reference to a fixed size matrix and provide
      * it as an argument for the getState function, no need to be dynamic,
      * as long as the dimension is correctly set
      */
-    virtual const Eigen::Ref<const MatX> get_state() const = 0;
-    /**
-     * returns the state Transformation, equivalent to state
-     * but direcly the matrix representing the rotation or RBT
-     TODO to remove, states could be considered matrices with new api
-     */
-    //virtual const Eigen::Ref<const MatX> get_stateT() const = 0;
+    virtual const MatRefConst get_state() const = 0;
     /**
      * Returns a matrix to the last auxiliary state. This data structure is for the incre-
      * metal implementation, or for error evaluation
      */
-    virtual const Eigen::Ref<const MatX> get_auxiliary_state() const = 0;
+    virtual MatRefConst get_auxiliary_state() const = 0;
     virtual void print() const {}
     factor_id_t get_id() const {return id_;}
     void set_id(factor_id_t id) {id_ = id;}

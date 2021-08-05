@@ -40,13 +40,13 @@ NodePlane4d::NodePlane4d(const Mat41 &initial_x):
 
 
 
-void NodePlane4d::update(const Eigen::Ref<const MatX1> &dx)
+void NodePlane4d::update(VectRefConst &dx)
 {
     state_ += dx;
     state_.head(3).normalize();
 }
 
-void NodePlane4d::update_from_auxiliary(const Eigen::Ref<const MatX1> &dx)
+void NodePlane4d::update_from_auxiliary(VectRefConst &dx)
 {
     state_ = auxiliaryState_ + dx;
     state_.head(3).normalize();

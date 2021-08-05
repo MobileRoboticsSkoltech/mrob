@@ -30,8 +30,8 @@
 
 using namespace mrob;
 
-int PCRegistration::gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
-           const Eigen::Ref<const MatX> covX, const Eigen::Ref<const MatX> covY, SE3 &T, double tol)
+int PCRegistration::gicp(MatRefConst X, MatRefConst Y,
+           MatRefConst covX, MatRefConst covY, SE3 &T, double tol)
 {
     assert(X.cols() == 3  && "PCRegistration::Gicp: Incorrect sizing, we expect Nx3");
     assert(X.rows() >= 3  && "PCRegistration::Gicp: Incorrect sizing, we expect at least 3 correspondences (not aligned)");

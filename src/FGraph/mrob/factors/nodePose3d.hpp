@@ -50,12 +50,12 @@ class NodePose3d : public Node
      * T'=exp(dxi^)*T
      * x'=vee(ln(T'))
      */
-    virtual void update(const Eigen::Ref<const MatX1> &dx);
-    virtual void update_from_auxiliary(const Eigen::Ref<const MatX1> &dx);
-    virtual void set_state(const Eigen::Ref<const MatX> &x);
-    virtual void set_auxiliary_state(const Eigen::Ref<const MatX> &x);
-    virtual const Eigen::Ref<const MatX> get_state() const {return state_.T();};
-    virtual const Eigen::Ref<const MatX> get_auxiliary_state() const {return auxiliaryState_.T();};
+    virtual void update(VectRefConst &dx);
+    virtual void update_from_auxiliary(VectRefConst &dx);
+    virtual void set_state(MatRefConst &x);
+    virtual void set_auxiliary_state(MatRefConst &x);
+    virtual MatRefConst get_state() const {return state_.T();};
+    virtual MatRefConst get_auxiliary_state() const {return auxiliaryState_.T();};
     void print() const;
 
   protected:

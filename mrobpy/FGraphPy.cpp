@@ -225,11 +225,11 @@ public:
         this->add_eigen_factor(f);
         return f->get_id();
     }
-    void eigen_factor_plane_add_point(factor_id_t planeEigenId, factor_id_t nodePoseId, const py::EigenDRef<const Mat31> point)
+    void eigen_factor_plane_add_point(factor_id_t planeEigenId, factor_id_t nodePoseId, const py::EigenDRef<const Mat31> point, matData_t &W)
     {
         auto ef = this->get_eigen_factor(planeEigenId);
         auto n = this->get_node(nodePoseId);//XXX should check if this is a 3D pose node...
-        ef->add_point(point, n);
+        ef->add_point(point, n, W);
     }
 
 private:
@@ -385,7 +385,8 @@ void init_FGraph(py::module &m)
                     "Adds a point given a node id and the EF it belongs to.",
                     py::arg("planeEigenId"),
                     py::arg("nodePoseId"),
-                    py::arg("point"))
+                    py::arg("point"),
+                    py::arg("W"))
             ;
 
 }

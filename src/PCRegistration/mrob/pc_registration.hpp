@@ -52,7 +52,7 @@ namespace PCRegistration{
  *
  *  Returns 0 if failed and 1 if a correct solution was found
  */
-int arun(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y, SE3 &T);
+int arun(MatRefConst X, MatRefConst Y, SE3 &T);
 
 
 
@@ -73,8 +73,8 @@ int arun(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y, SE3 &T)
  *
  * Returns the number of iterations until convergence
  */
-int gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
-        const Eigen::Ref<const MatX> covX, const Eigen::Ref<const MatX> covY, SE3 &T, double tol = 1e-4);
+int gicp(MatRefConst X, MatRefConst Y,
+        MatRefConst covX, MatRefConst covY, SE3 &T, double tol = 1e-4);
 
 
 /**
@@ -92,8 +92,8 @@ int gicp(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
  *
  * Returns the number of iterations until convergence
  */
-int weighted_point(const Eigen::Ref<const MatX> X, const Eigen::Ref<const MatX> Y,
-        const Eigen::Ref<const MatX1> w, SE3 &T, double tol = 1e-4);
+int weighted_point(MatRefConst X, MatRefConst Y,
+                   VectRefConst w, SE3 &T, double tol = 1e-4);
 
 
 }}//namespace

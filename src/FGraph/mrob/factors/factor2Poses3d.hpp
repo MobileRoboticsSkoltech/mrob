@@ -83,7 +83,7 @@ class Factor2Poses3d : public Factor
     /**
      * Jacobians are not evaluated, just the residuals
      */
-    virtual void evaluate_residuals() override;
+    void evaluate_residuals() override;
     /**
      * Evaluates residuals and Jacobians
      */
@@ -92,10 +92,10 @@ class Factor2Poses3d : public Factor
 
     virtual void print() const;
 
-    virtual const Eigen::Ref<const MatX> get_obs() const {return Tobs_.T();};
-    virtual const Eigen::Ref<const MatX1> get_residual() const {return r_;};
-    virtual const Eigen::Ref<const MatX> get_information_matrix() const {return W_;};
-    virtual const Eigen::Ref<const MatX> get_jacobian() const {return J_;};
+    MatRefConst get_obs() const override {return Tobs_.T();}
+    VectRefConst get_residual() const override {return r_;}
+    MatRefConst get_information_matrix() const override {return W_;}
+    MatRefConst get_jacobian([[maybe_unused]]factor_id_t id = 0) const override {return J_;}
 
   protected:
     // The Jacobians' correspondant nodes are ordered on the vector<Node>
