@@ -36,7 +36,7 @@ Mat6 SE3Cov::notation_transform(const Mat6& covariance)
 
 void SE3Cov::compound_2nd_order(const SE3 &pose_increment, const Mat6 &increment_covariance)
 {
-    Mat6 adj = this->adj();
+    Mat6 adj = this->inv().adj();
 
     this->T_ = this->T() * pose_increment.T();
 
