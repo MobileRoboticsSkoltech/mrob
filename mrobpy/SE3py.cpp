@@ -177,6 +177,7 @@ void init_geometry(py::module &m) {
                 py::return_value_policy::copy)
             .def("__mul__", &SE3Cov::operator*, py::is_operator());
         m.def("curley_wedge", &mrob::curly_wedge, "Returns 6-by-6 matrix, the output of curley wedge operator.", py::return_value_policy::copy);
+        m.def("curley_wedge_barfoot", &mrob::curly_wedge_barfoot, "Returns 6-by-6 matrix, the output of curley wedge operator. convention xi = [pho, theta]", py::return_value_policy::copy);
 
 }
 

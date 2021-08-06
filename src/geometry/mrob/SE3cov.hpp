@@ -56,9 +56,7 @@ namespace mrob
          *  @param[in] pose - SE3 oject - pose
          **/
         SE3Cov(const SE3Cov &pose);
-        Mat6 covariance_; //!< Covariance matrix of pose uncertainty
-
-        /** 
+        /**
          * @brief \b cov() returns current covariance matrix state
          * @return Mat6 - uncertainty covariance matrix
          * **/
@@ -129,6 +127,14 @@ namespace mrob
          * @return Mat6 - covariance matrix with permuted blocks.
          */
         static Mat6 notation_transform(const Mat6 &cov);
+
+    protected:
+        /**
+         * @brief This is the 6x6 covariance matrix of the current pose.
+         * Convention is [theta  tr  ]
+         *               [ rt    rho].
+         */
+        Mat6 covariance_; //!< Covariance matrix of pose uncertainty
     };
 
     /**
@@ -138,6 +144,8 @@ namespace mrob
      * @return Mat6
      */
     Mat6 curly_wedge(const Mat61& xi);
+    // TODO  delete me once testing is done
+    Mat6 curly_wedge_barfoot(const Mat61& xi);
 
 } // end namespace
 

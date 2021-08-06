@@ -36,11 +36,10 @@ Mat6 SE3Cov::notation_transform(const Mat6& covariance)
 
 void SE3Cov::compound_2nd_order(const SE3 &pose_increment, const Mat6 &increment_covariance)
 {
+    // Gonzalo: I think this method should return a copy and not modify itself, same as in SE3
     Mat6 adj = this->adj();
-
-    this->T_ = this->T() * pose_increment.T();
-
-    this->covariance_ = notation_transform(notation_transform(this->cov()) + adj*notation_transform(increment_covariance)*adj.transpose());
+    this->T_ = SE3::mul(pose_increment).T();
+    this->covariance_ = covariance_ + adj*increment_covariance*adj.transpose();
 }
 
 void SE3Cov::compound_2nd_order(const SE3Cov& pose)
@@ -51,46 +50,51 @@ void SE3Cov::compound_2nd_order(const SE3Cov& pose)
 
 void SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increment_covariance)
 {
-    // moving to Barfoot notaion
-    Mat6 sigma_1 = notation_transform(this->cov());
+    Mat6 sigma_1 = covariance_;
 
     Mat6 adj = this->adj();
-    Mat6 sigma_2 = adj*notation_transform(increment_covariance)*adj.transpose();
+    Mat6 sigma_2 = adj*increment_covariance*adj.transpose();
  
-    //Calculating the covariance update according to the Barfoot article
+    //Calculating the covariance update, correction to the mrob convention xi = [theta, rho]
     Mat6 A_1(Mat6::Zero());
-    A_1.topLeftCorner<3,3>() = brackets(sigma_1.bottomRightCorner<3,3>());
-    A_1.topRightCorner<3,3>() = brackets(sigma_1.topRightCorner<3,3>() + sigma_1.bottomLeftCorner<3,3>());
+    Mat3 sigma_1_tt = sigma_1.topLeftCorner<3,3>();//theta t (instead of phi)
+    Mat3 sigma_1_rr = sigma_1.bottomRightCorner<3,3>();
+    Mat3 sigma_1_rt = sigma_1.bottomLeftCorner<3,3>();
+    Mat3 sigma_1_tr = sigma_1.topRightCorner<3,3>();
+    A_1.topLeftCorner<3,3>() = brackets(sigma_1_tt);
+    A_1.bottomLeftCorner<3,3>() = brackets(sigma_1_rt + sigma_1_tr);
     A_1.bottomRightCorner<3,3>() = A_1.topLeftCorner<3,3>();
 
     Mat6 A_2(Mat6::Zero());
-    A_2.topLeftCorner<3,3>() = brackets(sigma_2.bottomRightCorner<3,3>());
-    A_2.topRightCorner<3,3>() = brackets(sigma_2.topRightCorner<3,3>() + sigma_2.bottomLeftCorner<3,3>());
+    Mat3 sigma_2_tt = sigma_2.topLeftCorner<3,3>();
+    Mat3 sigma_2_rr = sigma_2.bottomRightCorner<3,3>();
+    Mat3 sigma_2_rt = sigma_2.bottomLeftCorner<3,3>();
+    Mat3 sigma_2_tr = sigma_2.topRightCorner<3,3>();
+    A_2.topLeftCorner<3,3>() = brackets(sigma_2_tt);
+    A_2.bottomLeftCorner<3,3>() = brackets(sigma_2_rt + sigma_2_rt);
     A_2.bottomRightCorner<3,3>() = A_2.topLeftCorner<3,3>();
 
     Mat6 B(Mat6::Zero());
 
-    Mat3 B_rho_rho = brackets(sigma_1.bottomRightCorner<3,3>(),sigma_2.topLeftCorner<3,3>()) + 
-                brackets(sigma_1.bottomLeftCorner<3,3>(),sigma_2.topRightCorner<3,3>()) +
-                brackets(sigma_1.topRightCorner<3,3>(), sigma_2.bottomLeftCorner<3,3>()) +
-                brackets(sigma_1.topLeftCorner<3,3>(), sigma_2.bottomRightCorner<3,3>());
+    Mat3 B_rho_rho = brackets(sigma_1_tt,sigma_2_rr) +
+                     brackets(sigma_1_tr,sigma_2_rt) +
+                     brackets(sigma_1_rt, sigma_2_tr) +
+                     brackets(sigma_1_rr, sigma_2_tt);
 
-    Mat3 B_rho_phi = brackets(sigma_1.bottomRightCorner<3,3>(), sigma_2.bottomLeftCorner<3,3>()) +
-                brackets(sigma_1.bottomLeftCorner<3,3>(), sigma_2.bottomRightCorner<3,3>());
+    Mat3 B_rho_phi = brackets(sigma_1_tt, sigma_2_tr) +
+                     brackets(sigma_1_rt, sigma_2_tt);// This is a mistake in Barfoots p.265,
 
-    Mat3 B_phi_phi = brackets(sigma_1.bottomRightCorner<3,3>(), sigma_2.bottomRightCorner<3,3>());
+    Mat3 B_phi_phi = brackets(sigma_1_tt, sigma_2_tt);
 
-    B.topLeftCorner<3,3>() = B_rho_rho;
-    B.topRightCorner<3,3>() = B_rho_phi;
-    B.bottomLeftCorner<3,3>() = B_rho_phi.transpose();
-    B.bottomRightCorner<3,3>() = B_phi_phi;
+    B.topLeftCorner<3,3>() = B_phi_phi;
+    B.topRightCorner<3,3>() = B_rho_phi.transpose();
+    B.bottomLeftCorner<3,3>() = B_rho_phi;
+    B.bottomRightCorner<3,3>() = B_rho_rho;
 
     this->covariance_ = sigma_1 + sigma_2 + 
-    1./12.*(A_1*sigma_2 + sigma_2*A_1.transpose() + A_2*sigma_1 + sigma_1*A_2.transpose())+
-    1./4.*B;
+                        1./12.*(A_1*sigma_2 + sigma_2*A_1.transpose() + A_2*sigma_1 + sigma_1*A_2.transpose())+
+                        1./4.*B;
 
-    // moving from Barfoot covariance notation into the mrob notation
-    this->covariance_ = notation_transform(this->covariance_);
 
     // calculating the resulting pose
     this->T_ = this->T()*pose_increment.T();
@@ -126,7 +130,15 @@ Mat6 mrob::curly_wedge(const Mat61& xi)
     Mat6 result(Mat6::Zero());
     result.topLeftCorner<3,3>() = mrob::hat3(xi.head(3));
     result.bottomRightCorner<3,3>() = mrob::hat3(xi.head(3));
-    result.topRightCorner<3,3>() = mrob::hat3(xi.tail(3));
+    result.bottomLeftCorner<3,3>() = mrob::hat3(xi.tail(3));
     return result;
 }
 
+Mat6 mrob::curly_wedge_barfoot(const Mat61& xi)
+{
+    Mat6 result(Mat6::Zero());
+    result.topLeftCorner<3,3>() = mrob::hat3(xi.tail(3));
+    result.bottomRightCorner<3,3>() = mrob::hat3(xi.tail(3));
+    result.topRightCorner<3,3>() = mrob::hat3(xi.head(3));
+    return result;
+}
