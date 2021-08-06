@@ -258,7 +258,6 @@ TEST_CASE("SE3 tests")
 
         // checking that both parts of equality are equal
         REQUIRE((T_exp.T() - tmp_pose.T()).norm() == Approx(0.0).margin(1e-12));
-
     }
 
     SECTION("Testing subblock metrixes")
