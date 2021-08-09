@@ -31,4 +31,11 @@ graph = mrob.FGraph()
 
 ef1 = graph.add_eigen_factor_plane()
 print(ef1)
+n1 = graph.add_node_pose_3d(mrob.geometry.SE3())
+p = np.array([1,2,-3])
+graph.eigen_factor_plane_add_point(planeEigenId = ef1,
+                                   nodePoseId = n1,
+                                   point = p,
+                                   W = 1.0)
+
 graph.print(True)
