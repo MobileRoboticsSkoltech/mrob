@@ -28,6 +28,7 @@
 #include <Eigen/Core>
 //#include <Eigen/LU> // for inverse and determinant
 #include <Eigen/Sparse>
+#include <Eigen/StdVector>
 
 #define EIGEN_DEFAULT_TO_ROW_MAJOR
 

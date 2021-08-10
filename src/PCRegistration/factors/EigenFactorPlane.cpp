@@ -27,7 +27,6 @@
 #include <iostream>
 #include <Eigen/Eigenvalues>
 #include "mrob/SE3.hpp"
-#include <vector>
 
 using namespace mrob;
 
@@ -98,17 +97,19 @@ void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node, ma
     {
         uint_t localId = reverseNodeIds_[id];
         allPlanePoints_.at(localId).push_back(p);
+        allPointsInformation_.at(localId).push_back(W);
     }
     // If EF has not observed point from the current Node, it creates:
     else
     {
-        allPlanePoints_.emplace_back(std::deque<Mat31>());
+        std::cout << "creating new entry " << id;
+        allPlanePoints_.emplace_back(std::deque<Mat31, Eigen::aligned_allocator<Mat31>>());
+        allPointsInformation_.emplace_back(std::deque<matData_t>());
         neighbourNodes_.push_back(node);
         nodeIds_.push_back(id);
-        uint_t localId = allPlanePoints_.size();
+        uint_t localId = allPlanePoints_.size()-1;
         reverseNodeIds_.emplace(id, localId);
         // S and Q are built later, no need to create an element.
-        (void)W;//TODO use information on each point, error
     }
     numberPoints_++;
 

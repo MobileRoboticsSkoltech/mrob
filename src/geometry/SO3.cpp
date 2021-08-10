@@ -277,7 +277,7 @@ void SO3::print_lie(void) const
     std::cout << w << std::endl;
 }
 
-bool mrob::isSO3(Mat3 R)
+bool mrob::isSO3(const Mat3 &R)
 {
     matData_t det = R.determinant();
     if (det  < 0)

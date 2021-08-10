@@ -161,7 +161,7 @@ Mat3 hat3(const Mat31 &w);
  */
 Mat31 vee3(const Mat3 &w_hat);
 
-bool isSO3(Mat3 R);
+bool isSO3(const Mat3 &R);
 
 
 /**

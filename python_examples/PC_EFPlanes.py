@@ -18,22 +18,24 @@ def draw_planes(synthetic,traj=[]):
         pcds.append(pc)
     open3d.visualization.draw_geometries(pcds)
 
-points = 2000
-planes = 4
-poses = 3
+points = 20
+planes = 1
+poses = 1
 
-synthetic_points = mrob.registration.CreatePoints(points,planes,poses, 0.05, 0.1) #point noise, bias noise
-T_gt = synthetic_points.get_ground_truth_last_pose()
+synthetic = mrob.registration.CreatePoints(points,planes,poses, 0.05, 0.1) #point noise, bias noise
+T_gt = synthetic.get_ground_truth_last_pose()
 T_gt.print()
-draw_planes(synthetic_points, synthetic_points.get_trajectory())
+#draw_planes(synthetic, synthetic.get_trajectory())
 
 graph = mrob.FGraph()
-
 ef1 = graph.add_eigen_factor_plane()
 print(ef1)
 n1 = graph.add_node_pose_3d(mrob.geometry.SE3())
-p = np.array([1,2,-3])
-graph.eigen_factor_plane_add_point(planeEigenId = ef1,
+print('node = ', n1)
+points = synthetic.get_point_cloud(0)
+for p in points:
+    print(p)
+    graph.eigen_factor_plane_add_point(planeEigenId = ef1,
                                    nodePoseId = n1,
                                    point = p,
                                    W = 1.0)

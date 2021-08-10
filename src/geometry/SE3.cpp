@@ -43,13 +43,13 @@ SE3::SE3(const Mat61 &xi) : T_(Mat4::Identity())
 SE3::SE3(const SE3 &T): T_(T.T())
 {
 }
-SE3::SE3(const SO3 &R, const Mat31 t)
+SE3::SE3(const SO3 &R, const Mat31 &t)
 {
     T_  << R.R(), t,
            0,0,0,1;
 }
 
-SE3::SE3(const Mat3 &R, const Mat31 t)
+SE3::SE3(const Mat3 &R, const Mat31 &t)
 {
     T_  << R, t,
            0,0,0,1;
@@ -287,7 +287,7 @@ void SE3::regenerate()
     this->exp(xi_hat);
 }
 
-bool mrob::isSE3(Mat4 T)
+bool mrob::isSE3(const Mat4 &T)
 {
     if (!isSO3(T.topLeftCorner<3,3>()) )
         return false;
@@ -301,6 +301,7 @@ bool mrob::isSE3(Mat4 T)
 
 Mat4 mrob::SE3GenerativeMatrix(uint_t coordinate)
 {
+    // TODO this should be better be a global variable...
     Mat4 G = Mat4::Zero();
     switch(coordinate)
     {

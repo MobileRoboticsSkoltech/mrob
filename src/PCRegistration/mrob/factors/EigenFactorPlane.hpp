@@ -151,13 +151,12 @@ protected:
      * The Jacobian of the plane error, the poses involved.
      * Stores the map according to the nodes indexes/identifiers.
      */
-    std::deque<Mat61> J_;
+    std::deque<Mat61, Eigen::aligned_allocator<Mat61>> J_;
     /**
      * Hessian matrix, dense since it connects all poses from where plane was observed.
      * We store the block diagonal terms, according to the indexes of the nodes
      */
-    //std::unordered_map<factor_id_t, Mat6> H_;
-    std::deque<Mat6> H_;
+    std::deque<Mat6, Eigen::aligned_allocator<Mat6>> H_;
     /**
      * According to our notation S = sum p*p'
      * We choose unordered map here since this is a subset of neighbours (small) and we will iterate over them
@@ -165,8 +164,7 @@ protected:
      *
      * Q = T *S *T'
      */
-    //std::unordered_map<factor_id_t, Mat4> S_, Q_;
-    std::deque<Mat4> S_, Q_;
+    std::deque<Mat4, Eigen::aligned_allocator<Mat4>> S_, Q_;
     Mat4 accumulatedQ_;//Q matrix of accumulated values for the incremental update of the error.
 
     Mat41 planeEstimation_;
@@ -174,7 +172,8 @@ protected:
 
     // subset of pointcloud for the given plane
     //std::unordered_map<factor_id_t, std::vector<Mat31> > allPlanePoints_;
-    std::deque<std::deque<Mat31> > allPlanePoints_;
+    std::deque<std::deque<Mat31, Eigen::aligned_allocator<Mat31>> > allPlanePoints_;
+    std::deque<std::deque<matData_t> > allPointsInformation_;
     uint_t numberPoints_;
 
 public:

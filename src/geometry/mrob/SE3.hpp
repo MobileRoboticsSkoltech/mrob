@@ -66,11 +66,11 @@ public:
     /**
      * Constructor, requires the Rotation in SO3 and translation
      */
-    SE3(const SO3 &R, const Mat31 t);
+    SE3(const SO3 &R, const Mat31 &t);
     /**
      * Constructor, requires the Rotation as a 3x3 matrix and translation
      */
-    SE3(const Mat3 &R, const Mat31 t);
+    SE3(const Mat3 &R, const Mat31 &t);
     /**
      * This constructor allows to construct from Eigen expressions
      * Eigen suggestion: TopicCustomizingEigen.html
@@ -207,7 +207,7 @@ Mat4 hat6(const Mat61 &xi);
  */
 Mat61 vee6(const Mat4 &xi_hat);
 
-bool isSE3(Mat4 T);
+bool isSE3(const Mat4 &T);
 
 /**
  * Returns the generative matrix given the coordinate,
