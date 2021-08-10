@@ -188,7 +188,7 @@ void EigenFactorPlane::print() const
 
 MatRefConst EigenFactorPlane::get_jacobian(mrob::factor_id_t id) const
 {
-    assert(reverseNodeIds.count(id)   && "EigenFactorPlane::get_jacobian: element not found");
+    assert(reverseNodeIds_.count(id)   && "EigenFactorPlane::get_jacobian: element not found");
     uint_t localId = reverseNodeIds_.at(id);
     return J_.at(localId);
 }
