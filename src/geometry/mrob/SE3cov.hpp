@@ -69,7 +69,7 @@ namespace mrob
          * @param[in] pose - SE3Cov object: incremental pose + increment uncertainty
          * @return void
          **/
-        void compound_2nd_order(const SE3Cov &pose);
+        SE3Cov compound_2nd_order(const SE3Cov &pose) const;
 
         /** 
          * @brief SE3 pose uncertainty compounding of the second order.
@@ -79,7 +79,7 @@ namespace mrob
          * @param[in] cov - increment uncertainty.
          * @return void
          **/
-        void compound_2nd_order(const SE3 &pose, const Mat6 &cov); // does right hand side update
+        SE3Cov compound_2nd_order(const SE3 &pose, const Mat6 &cov) const; // does right hand side update
 
         /**
          * @brief SE3pose uncertainy compounding of the fourth order.
@@ -88,7 +88,7 @@ namespace mrob
          * @param[in] pose - SE3Cov object with incremental pose and increment uncertainty.
          * @return void
          */
-        void compound_4th_order(const SE3Cov &pose);
+        SE3Cov compound_4th_order(const SE3Cov &pose) const;
 
         /**
          * @brief SE3pose uncertainy compounding of the fourth order.
@@ -98,7 +98,7 @@ namespace mrob
          * @param[in] cov - increment uncertainty.
          * @return void
          */
-        void compound_4th_order(const SE3 &pose, const Mat6 &cov);
+        SE3Cov compound_4th_order(const SE3 &pose, const Mat6 &cov) const;
 
         /** @brief Prints current state of pose and covariance.
          * @return void
@@ -117,17 +117,6 @@ namespace mrob
          * **/
         SE3Cov operator*(const SE3Cov &rhs) const;
 
-        /**
-         * @brief Transforms covariance matrix to notation from Barfoot's papers
-         * Self-inverse:
-         * \code
-         * transform_notation(transform_notation(cov)) = cov
-         * \endcode
-         * @param[in] cov - covariance matrix;
-         * @return Mat6 - covariance matrix with permuted blocks.
-         */
-        static Mat6 notation_transform(const Mat6 &cov);
-
     protected:
         /**
          * @brief This is the 6x6 covariance matrix of the current pose.
@@ -144,8 +133,6 @@ namespace mrob
      * @return Mat6
      */
     Mat6 curly_wedge(const Mat61& xi);
-    // TODO  delete me once testing is done
-    Mat6 curly_wedge_barfoot(const Mat61& xi);
 
 } // end namespace
 

@@ -24,31 +24,21 @@ Mat6 SE3Cov::cov(void) const
     return this->covariance_;
 }
 
-Mat6 SE3Cov::notation_transform(const Mat6& covariance)
-{
-    Mat6 result(Mat6::Zero());
-    result.topLeftCorner<3,3>() = covariance.bottomRightCorner<3,3>();
-    result.bottomRightCorner<3,3>() = covariance.topLeftCorner<3,3>();
-    result.topRightCorner<3,3>() = covariance.bottomLeftCorner<3,3>();
-    result.bottomLeftCorner<3,3>() = covariance.topRightCorner<3,3>();
-    return result;
-}
 
-void SE3Cov::compound_2nd_order(const SE3 &pose_increment, const Mat6 &increment_covariance)
+SE3Cov SE3Cov::compound_2nd_order(const SE3 &pose_increment, const Mat6 &increment_covariance) const
 {
     // Gonzalo: I think this method should return a copy and not modify itself, same as in SE3
     Mat6 adj = this->adj();
-    this->T_ = SE3::mul(pose_increment).T();
-    this->covariance_ = covariance_ + adj*increment_covariance*adj.transpose();
+    return SE3Cov(SE3::mul(pose_increment), covariance_ + adj*increment_covariance*adj.transpose());
 }
 
-void SE3Cov::compound_2nd_order(const SE3Cov& pose)
+SE3Cov SE3Cov::compound_2nd_order(const SE3Cov& pose) const
 {
-    compound_2nd_order((const SE3)pose, pose.cov());
+    return compound_2nd_order((const SE3)pose, pose.cov());
 }
 
 
-void SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increment_covariance)
+SE3Cov SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increment_covariance) const
 {
     Mat6 sigma_1 = covariance_;
 
@@ -65,14 +55,18 @@ void SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increment
     A_1.bottomLeftCorner<3,3>() = brackets(sigma_1_rt + sigma_1_tr);
     A_1.bottomRightCorner<3,3>() = A_1.topLeftCorner<3,3>();
 
+    std::cout << A_1 << std::endl;
+
     Mat6 A_2(Mat6::Zero());
     Mat3 sigma_2_tt = sigma_2.topLeftCorner<3,3>();
     Mat3 sigma_2_rr = sigma_2.bottomRightCorner<3,3>();
     Mat3 sigma_2_rt = sigma_2.bottomLeftCorner<3,3>();
     Mat3 sigma_2_tr = sigma_2.topRightCorner<3,3>();
     A_2.topLeftCorner<3,3>() = brackets(sigma_2_tt);
-    A_2.bottomLeftCorner<3,3>() = brackets(sigma_2_rt + sigma_2_rt);
+    A_2.bottomLeftCorner<3,3>() = brackets(sigma_2_rt + sigma_2_rt.transpose());
     A_2.bottomRightCorner<3,3>() = A_2.topLeftCorner<3,3>();
+
+    std::cout << A_2 << std::endl;
 
     Mat6 B(Mat6::Zero());
 
@@ -82,7 +76,7 @@ void SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increment
                      brackets(sigma_1_rr, sigma_2_tt);
 
     Mat3 B_rho_phi = brackets(sigma_1_tt, sigma_2_tr) +
-                     brackets(sigma_1_rt, sigma_2_tt);// This is a mistake in Barfoots p.265,
+                     brackets(sigma_1_rt, sigma_2_tt);// There is a mistake in Barfoots p.265,
 
     Mat3 B_phi_phi = brackets(sigma_1_tt, sigma_2_tt);
 
@@ -91,18 +85,20 @@ void SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increment
     B.bottomLeftCorner<3,3>() = B_rho_phi;
     B.bottomRightCorner<3,3>() = B_rho_rho;
 
-    this->covariance_ = sigma_1 + sigma_2 + 
+    std::cout << B << std::endl;
+
+    Mat6 tmp_cov = sigma_1 + sigma_2 +
                         1./12.*(A_1*sigma_2 + sigma_2*A_1.transpose() + A_2*sigma_1 + sigma_1*A_2.transpose())+
                         1./4.*B;
 
 
     // calculating the resulting pose
-    this->T_ = this->T()*pose_increment.T();
+    return SE3Cov(SE3::mul(pose_increment), tmp_cov);
 }
 
-void SE3Cov::compound_4th_order(const SE3Cov& pose)
+SE3Cov SE3Cov::compound_4th_order(const SE3Cov& pose) const
 {
-    compound_4th_order((const SE3)pose, pose.cov());
+    return compound_4th_order((const SE3)pose, pose.cov());
 }
 
 void SE3Cov::print()
@@ -131,14 +127,5 @@ Mat6 mrob::curly_wedge(const Mat61& xi)
     result.topLeftCorner<3,3>() = mrob::hat3(xi.head(3));
     result.bottomRightCorner<3,3>() = mrob::hat3(xi.head(3));
     result.bottomLeftCorner<3,3>() = mrob::hat3(xi.tail(3));
-    return result;
-}
-
-Mat6 mrob::curly_wedge_barfoot(const Mat61& xi)
-{
-    Mat6 result(Mat6::Zero());
-    result.topLeftCorner<3,3>() = mrob::hat3(xi.tail(3));
-    result.bottomRightCorner<3,3>() = mrob::hat3(xi.tail(3));
-    result.topRightCorner<3,3>() = mrob::hat3(xi.head(3));
     return result;
 }

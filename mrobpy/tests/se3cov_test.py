@@ -72,38 +72,38 @@ class TestSE3CovCompoundComplex:
 
 class TestSE3CovCompoundSimple:
     # initial pose and covariance
-    xi_1 = np.array([0, 0, 0, 0, 0, 0])
+    xi_1 = np.array([0,0,0,0.5,0,0])
     pose_1 = mrob.geometry.SE3(xi_1)
-    covariance_1 = np.diag([0.1, 0.1, 0.1, 0.2, 0.2, 0.2])
+    covariance_1 = np.diag([0,0,0.01,0.01,0.01,0])
 
     #incremental pose and covariance
-    xi_2 = np.array([0,0,0,1.0,0,0])
+    xi_2 = np.array([0,0,1.5,1.0,0,0])
     pose_2 = mrob.geometry.SE3(xi_2)
-    covariance_2 = np.diag([0,0,0,0.5,0,0])
+    covariance_2 = np.diag([0,0,0.1,0.01,0.01,0])
 
     # expected pose matrix
-    gt_pose = np.array(
-            [[1, 0, 0, 1],
-            [0, 1, 0, 0],
-            [0, 0, 1, 0],
-            [0, 0, 0, 1]], dtype='float64')
+    gt_pose = np.array([
+        [ 0.070737201667703 , -0.9974949866040546,  0.,  1.1649966577360362],
+        [ 0.9974949866040546,  0.070737201667703 ,  0.,  0.6195085322215313],
+        [ 0.                ,  0.                ,  1.,  0.                ],
+        [ 0.                ,  0.                ,  0.,  1.                ]], dtype='float64')
 
     # expected covariance matrix after 2nd order
-    gt_covariance_2nd = np.array(
-            [[0.1, 0., 0.,  0.,  0.,  0. ],
-            [0.,  0.1, 0.,  0.,  0.,  0. ],
-            [0.,  0.,  0.1, 0.,  0.,  0. ],
-            [0.,  0.,  0.,  0.7, 0.,  0. ],
-            [0.,  0.,  0.,  0.,  0.2, 0. ],
-            [0.,  0.,  0.,  0.,  0.,  0.2]])
+    gt_covariance_2nd = np.array([
+        [ 0.   ,  0.   ,  0.   ,  0.   ,  0.   ,  0.   ],
+        [ 0.   ,  0.   ,  0.   ,  0.   ,  0.   ,  0.   ],
+        [ 0.   ,  0.   ,  0.11 ,  0.   , -0.05 ,  0.   ],
+        [ 0.   ,  0.   ,  0.   ,  0.02 ,  0.   ,  0.   ],
+        [ 0.   ,  0.   , -0.05 ,  0.   ,  0.045,  0.   ],
+        [ 0.   ,  0.   ,  0.   ,  0.   ,  0.   ,  0.   ]])
 
-    gt_covariance_4th = np.array(
-            [[0.1, 0. , 0. , 0.        , 0.    , 0.    ],
-             [0. , 0.1, 0. , 0.        , 0.    , 0.    ],
-             [0. , 0. , 0.1, 0.        , 0.    , 0.    ],
-             [0. , 0. , 0. , 0.68333333, 0.    , 0.    ],
-             [0. , 0. , 0. , 0.        , 0.2125, 0.    ],
-             [0. , 0. , 0. , 0.        , 0.    , 0.2125]])
+    gt_covariance_4th = np.array([
+        [ 0.,  0.,  0.  ,  0.                ,  0.     ,  0.],
+        [ 0.,  0.,  0.  ,  0.                ,  0.     ,  0.],
+        [ 0.,  0.,  0.11,  0.                , -0.05   ,  0.],
+        [ 0.,  0.,  0.  ,  0.0201541666666667,  0.     ,  0.],
+        [ 0.,  0., -0.05,  0.                ,  0.04505,  0.],
+        [ 0.,  0.,  0.  ,  0.                ,  0.     ,  0.]])
 
     def test_mul_operator(self):
         c1 = mrob.geometry.SE3Cov(self.pose_1, self.covariance_1)

@@ -153,16 +153,16 @@ void init_geometry(py::module &m) {
                  "returns current covariance matrix state",
                  py::return_value_policy::copy)
             .def("compound_2nd_order",
-                 static_cast<void (SE3Cov::*)(const SE3Cov &)>(&SE3Cov::compound_2nd_order),
+                 py::overload_cast<const SE3Cov &>(&SE3Cov::compound_2nd_order, py::const_),
                  "Pose uncertainty compounding of the second order.")
             .def("compound_2nd_order",
-                 static_cast<void (SE3Cov::*)(const SE3 &, const Mat6 &)>(&SE3Cov::compound_2nd_order),
+                 py::overload_cast<const SE3 &, const Mat6 &>(&SE3Cov::compound_2nd_order, py::const_),
                  "Pose uncertainty compounding of the second order.")
             .def("compound_4th_order",
-                 static_cast<void (SE3Cov::*)(const SE3Cov &)>(&SE3Cov::compound_4th_order),
+                 py::overload_cast<const SE3Cov &>(&SE3Cov::compound_4th_order, py::const_),
                  "SE3pose uncertainy compounding of the fourth order.")
             .def("compound_4th_order",
-                 static_cast<void (SE3Cov::*)(const SE3 &, const Mat6 &)>(&SE3Cov::compound_4th_order),
+                 py::overload_cast<const SE3 &, const Mat6 &>(&SE3Cov::compound_4th_order, py::const_),
                  "SE3pose uncertainy compounding of the fourth order.")
             .def("print",
                  &SE3Cov::print,
@@ -171,13 +171,7 @@ void init_geometry(py::module &m) {
                  &SE3Cov::mul,
                  "Multiplication method mul() as an interface for compounding.",
                  py::return_value_policy::copy)
-            .def("notation_transform",
-                &SE3Cov::notation_transform,
-                "Transforms covariance matrix to notation from Barfoot paper. Sefl-Inverse.",
-                py::return_value_policy::copy)
             .def("__mul__", &SE3Cov::operator*, py::is_operator());
         m.def("curley_wedge", &mrob::curly_wedge, "Returns 6-by-6 matrix, the output of curley wedge operator.", py::return_value_policy::copy);
-        m.def("curley_wedge_barfoot", &mrob::curly_wedge_barfoot, "Returns 6-by-6 matrix, the output of curley wedge operator. convention xi = [pho, theta]", py::return_value_policy::copy);
-
 }
 
