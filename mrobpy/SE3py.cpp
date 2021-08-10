@@ -167,10 +167,10 @@ void init_geometry(py::module &m) {
             .def("print",
                  &SE3Cov::print,
                  "Prints current state of pose and covariance.")
-            .def("mul",
-                 &SE3Cov::mul,
-                 "Multiplication method mul() as an interface for compounding.",
-                 py::return_value_policy::copy)
+        //     .def("mul",
+        //          &SE3Cov::mul,
+        //          "Multiplication method mul() as an interface for compounding.",
+        //          py::return_value_policy::copy)
             .def("__mul__", &SE3Cov::operator*, py::is_operator());
         m.def("curley_wedge", &mrob::curly_wedge, "Returns 6-by-6 matrix, the output of curley wedge operator.", py::return_value_policy::copy);
 }

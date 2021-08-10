@@ -109,13 +109,13 @@ class TestSE3CovCompoundSimple:
         c1 = mrob.geometry.SE3Cov(self.pose_1, self.covariance_1)
         c2 = mrob.geometry.SE3Cov(self.pose_2, self.covariance_2)
 
-        c3 = c1*c2 # mul operator corresponds to 2nd order compound
+        # c3 = c1.__mul__(c2) # mul operator corresponds to 2nd order compound
 
-        print(c3.T())
-        print(c3.cov())
+        # print(c3.T())
+        # print(c3.cov())
 
-        # assert(np.ndarray.all(c3.T() == self.gt_pose))
-        # assert(np.ndarray.all(c3.cov() == self.gt_covariance_2nd))
+        # assert(np.ndarray.all(np.isclose(c3.T(),self.gt_pose,atol=1e-10)))
+        # assert(np.ndarray.all(np.isclose(c3.cov(),self.gt_covariance_2nd,atol=1e-10)))
 
     def test_compound_1(self):
         cov = mrob.geometry.SE3Cov(self.pose_1, self.covariance_1)
@@ -129,8 +129,8 @@ class TestSE3CovCompoundSimple:
         print(new_cov.T())
         print(new_cov.cov())
 
-        # assert(np.ndarray.all(self.gt_covariance_2nd == new_cov.cov()))
-        # assert(np.ndarray.all(self.gt_pose == new_cov.T()))
+        assert(np.ndarray.all(np.isclose(self.gt_covariance_2nd, new_cov.cov(),atol=1e-10)))
+        assert(np.ndarray.all(np.isclose(self.gt_pose,new_cov.T(),atol=1e-10)))
 
     def test_compound_2(self):
         cov = mrob.geometry.SE3Cov(self.pose_1, self.covariance_1)
@@ -151,8 +151,8 @@ class TestSE3CovCompoundSimple:
 
         print("Diff norm", np.linalg.norm((new_cov.cov() - self.gt_covariance_4th)))
 
-        # assert(np.ndarray.all(self.gt_pose == new_cov.T()))
-        # assert(np.ndarray.all(np.isclose(self.gt_covariance_4th,new_cov.cov(),atol=1e-10)))
+        assert(np.ndarray.all(np.isclose(self.gt_pose,new_cov.T(),atol=1e-10)))
+        assert(np.ndarray.all(np.isclose(self.gt_covariance_4th,new_cov.cov(),atol=1e-10)))
 
 class TestSE3covTimeBenchmarks:
     def test_time_benchmark_1(self):

@@ -109,16 +109,9 @@ void SE3Cov::print()
     std::cout << this->cov() << std::endl;
 }
 
-SE3Cov SE3Cov::mul(const SE3Cov& rhs) const 
-{
-    SE3Cov result(*this);
-    result.compound_2nd_order(rhs);
-    return result;
-}
-
 SE3Cov SE3Cov::operator*(const SE3Cov& rhs) const
 {
-    return (*this).mul(rhs);
+    return SE3Cov::compound_2nd_order(rhs);
 }
 
 Mat6 mrob::curly_wedge(const Mat61& xi)

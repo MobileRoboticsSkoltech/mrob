@@ -105,12 +105,6 @@ namespace mrob
          **/
         void print();
 
-        /** @brief Multiplication method \b mul as an interface for compounding.
-         *  @param[in] rhs - SE3Cov object that corresponds to increment.
-         *  @return SE3Cov - new updated uncertainty SE3Cov object.
-         */
-        SE3Cov mul(const SE3Cov &rhs) const;
-
         /** @brief Multiplication operator. Does pose covariance compounding.
          *  @param[in] rhs - SE3Cov object, which corresponds to increment uncertainty.
          *  @return SE3Cov - new updated uncertainty SE3Cov object.
