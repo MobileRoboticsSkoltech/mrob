@@ -49,7 +49,7 @@ def cholesky(sigma):
     # returning resulting factor
     return LL
 
-def get_mc(T, sigma, mean=[0,0,0,0,0,0], N = 100_000):
+def get_mc(T, sigma, mean=[0,0,0,0,0,0], N = 100000):
 
     norm_var = scipy.stats.multivariate_normal(mean,sigma,allow_singular=True)
 
@@ -323,7 +323,7 @@ def sigma_visualize(T, sigma, N=100, K=[1,1], label="", color=None, ax = None):
 #     ax.xlabel("X")
 #     ax.ylabel("Y")
 
-def compound_mc(T_1, sigma_1, T_2, sigma_2, M = 10_000):
+def compound_mc(T_1, sigma_1, T_2, sigma_2, M = 10000):
 
     # generating distributions
     p1, xi1 = get_mc(T_1, sigma_1, N=M)
