@@ -54,8 +54,6 @@ SE3Cov SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increme
     A_1.bottomLeftCorner<3,3>() = brackets(sigma_1_rt + sigma_1_tr);
     A_1.bottomRightCorner<3,3>() = A_1.topLeftCorner<3,3>();
 
-    std::cout << A_1 << std::endl;
-
     Mat6 A_2(Mat6::Zero());
     Mat3 sigma_2_tt = sigma_2.topLeftCorner<3,3>();
     Mat3 sigma_2_rr = sigma_2.bottomRightCorner<3,3>();
@@ -64,8 +62,6 @@ SE3Cov SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increme
     A_2.topLeftCorner<3,3>() = brackets(sigma_2_tt);
     A_2.bottomLeftCorner<3,3>() = brackets(sigma_2_rt + sigma_2_rt.transpose());
     A_2.bottomRightCorner<3,3>() = A_2.topLeftCorner<3,3>();
-
-    std::cout << A_2 << std::endl;
 
     Mat6 B(Mat6::Zero());
 
@@ -83,8 +79,6 @@ SE3Cov SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increme
     B.topRightCorner<3,3>() = B_rho_phi.transpose();
     B.bottomLeftCorner<3,3>() = B_rho_phi;
     B.bottomRightCorner<3,3>() = B_rho_rho;
-
-    std::cout << B << std::endl;
 
     Mat6 tmp_cov = sigma_1 + sigma_2 +
                         1./12.*(A_1*sigma_2 + sigma_2*A_1.transpose() + A_2*sigma_1 + sigma_1*A_2.transpose())+
