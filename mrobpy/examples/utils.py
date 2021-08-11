@@ -6,6 +6,12 @@ import scipy
 import scipy.stats
 
 import matplotlib
+
+from sys import platform
+
+if platform == "darwin":
+    matplotlib.use('PS')
+
 import matplotlib.pyplot as plt
 
 
