@@ -35,9 +35,6 @@ class TestSE3CovCompoundGeneralCase:
     xi_2 = np.array([-1,0.2,-1.5,-1.0,-10,-4])
     pose_2 = mrob.geometry.SE3(xi_2)
     covariance_2 = np.diag([0.1,0.1,0.2,0.01,0.01,0.1])
-    
-    # monte carlo as reference
-    # T_gt,sigma_gt = compound_mc(pose_1, covariance_1, pose_2, covariance_2, M=100_000)
 
     gt_pose = np.array([[-0.7079330997016517  , -0.6837823830436842  ,  0.17683998129922926 , -0.6167626040635867  ],
        [-0.7051530118471613  ,  0.6984259413063296  , -0.12231285457074748 , -7.846417457327979   ],
@@ -182,7 +179,7 @@ class TestSE3CovCompoundSimpleCase:
 class TestSE3covTimeBenchmarks:
     def test_time_benchmark_2nd_order(self):
         print('Second order compound time benchmark')
-        cycles = 1_000_00
+        cycles = 100000
 
         start_time = time.time()
 
@@ -218,7 +215,7 @@ class TestSE3covTimeBenchmarks:
 
     def test_time_benchmark_4th_order(self):
         print('Fourth order compound time benchmark')
-        cycles = 1_000_0
+        cycles = 10000
 
         start_time = time.time()
 
