@@ -111,8 +111,6 @@ def get_circumference(T,sigma,N,K=1, index_1=-1, index_2=-1, A=None):
 
     return pts
 
-
-
 def sigma_visualize_3d(T, sigma, N=100, K=1):
     N = 100
 
@@ -225,7 +223,7 @@ def sigma_visualize(T, sigma, N=100, K=[1,1], label="", color=None, ax = None):
         poses = poses.reshape((-1,3))
 
         ax.plot(poses[4:,0],poses[4:,1], label="{}-sigma x & y".format(k), color=color)
-    
+
         for i in range(len(labels)):
 #             ax.annotate(labels[i],xy = (poses[i,0],poses[i,1]), xytext = (poses[i,0]+0.01,poses[i,1]+0.01))
             ax.plot(poses[i,0],poses[i,1],'x',color=color)
@@ -341,11 +339,8 @@ def compound_mc(T_1, sigma_1, T_2, sigma_2, M = 10_000):
 
     for i in range(xi1.shape[0]):
 
-        T_r = mrob.geometry.SE3(T_2)
-        T_r.update_lhs(np.array(xi2[i]))
-
-        T_l = mrob.geometry.SE3(T_1)
-        T_l.update_lhs(np.array(xi1[i]))
+        T_r = mrob.geometry.SE3(xi2[i])
+        T_l = mrob.geometry.SE3(xi1[i])
 
         T_m = T_l.mul(T_r)
 
@@ -373,42 +368,15 @@ def sigma_permute(sigma):
 
     return s
 
-
-def compound_mc(T_1, sigma_1, T_2, sigma_2, M = 10_000):
-
-    # generating distributions
-    p1, xi1 = get_mc(T_1, sigma_1, N=M)
-
-    p2, xi2 = get_mc(T_2, sigma_2, N=M)
-
-    # mean pose
-    T = T_1.mul(T_2)
-
-    sigma_mc = np.zeros_like(sigma_1)
-
-    xi_m = []
-
-    for i in range(xi1.shape[0]):
-
-        T_r = mrob.geometry.SE3(T_2)
-        T_r.update_lhs(np.array(xi2[i]))
-
-        T_l = mrob.geometry.SE3(T_1)
-        T_l.update_lhs(np.array(xi1[i]))
-
-        T_m = T_l.mul(T_r)
-
-        xi_m.append(T_m.mul(T.inv()).Ln())
-
-    # calculating cavirance of xi points coordinates
-    sigma_mc = np.cov(np.array(xi_m).transpose())
-    return T, sigma_mc
-
 def compound_2nd(T_1, sigma_1, T_2, sigma_2):
     T = T_1.mul(T_2)
-    T_1_adj = T_1.adj()
-    sigma_2_ = T_1_adj@sigma_2@T_1_adj.transpose()
-    sigma = sigma_1 + sigma_2_
+    T_1_adj = sigma_permute(T_1.adj())
+
+    sigma_2_ = T_1_adj@sigma_permute(sigma_2)@T_1_adj.transpose()
+
+    sigma = sigma_permute(sigma_1) + sigma_2_
+    sigma = sigma_permute(sigma)
+
     return T, sigma
 
 def op1(A):
@@ -418,22 +386,19 @@ def op2(A,B):
     return op1(A)@op1(B) + op1(B@A)
 
 def compound_4th(T_1, sigma_1, T_2, sigma_2):
-
-
     # applying 2nd order to get part of 4th order decomposition
     T, sigma = compound_2nd(T_1, sigma_1, T_2, sigma_2)
 
-    T_1_adj = T_1.adj()
+    T_1_adj = sigma_permute(T_1.adj())
 
-    _sigma_2 = T_1_adj @ sigma_2 @ T_1_adj.transpose()
+    _sigma_2 = T_1_adj @ sigma_permute(sigma_2) @ T_1_adj.transpose()
 
     # map all sigma into [rho, phi] order
     tmp = sigma_permute(sigma)
     s1 = sigma_permute(sigma_1)
-    s2 = sigma_permute(_sigma_2)
+    s2 = _sigma_2
 
     # using equations from reference paper
-
     sigma_1_rho_rho = s1[:3, :3]
     sigma_1_rho_phi = s1[:3, 3:]
     sigma_1_phi_phi = s1[3:, 3:]
@@ -453,12 +418,12 @@ def compound_4th(T_1, sigma_1, T_2, sigma_2):
     _A_2[3:, 3:] = op1(_sigma_2_phi_phi)
 
     B_rho_rho = op2(sigma_1_phi_phi, _sigma_2_rho_rho) + \
-        op2(sigma_1_rho_phi.transpose(), _sigma_2_rho_phi) + \
-        op2(sigma_1_rho_phi,_sigma_2_rho_phi.transpose()) + \
-        op2(sigma_1_rho_rho, _sigma_2_phi_phi)
+                op2(sigma_1_rho_phi.transpose(), _sigma_2_rho_phi) + \
+                op2(sigma_1_rho_phi,_sigma_2_rho_phi.transpose()) + \
+                op2(sigma_1_rho_rho, _sigma_2_phi_phi)
 
     B_rho_phi = op2(sigma_1_phi_phi,_sigma_2_rho_phi.transpose()) + \
-        op2(sigma_1_rho_phi.transpose(),_sigma_2_phi_phi)
+                op2(sigma_1_rho_phi,_sigma_2_phi_phi) # there was an error in Barfoot's paper and book
 
     B_phi_phi = op2(sigma_1_phi_phi, _sigma_2_phi_phi)
 
