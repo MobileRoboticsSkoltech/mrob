@@ -13,7 +13,6 @@ TEST_CASE("SE3cov basic tests")
 {
     SECTION("SE3Cov constructor with default arguments")
     {
-        // TODO fix Constructor with default arguments. for some reason there is a linking error when calling constructor with efault arguments: mrob::SE3Cov cov;
         mrob::SE3Cov cov;
         REQUIRE((cov.T() - Mat4::Identity()).norm() == Approx(0.0).margin(1e-12));
         REQUIRE((cov.cov() - Mat6::Identity()).norm() == Approx(0.0).margin(1e-12));
@@ -148,7 +147,7 @@ TEST_CASE("SE3cov basic tests")
         REQUIRE((new_uncertainty.cov() - gt_cov).norm() == Approx(0.0).margin(1e-12));
     }
 
-    SECTION("Compounding. 2nd order. Difficult case")
+    SECTION("Compounding. 2nd order. General case")
     {
         Mat61 xi;
         xi << 1,2,-1,0.5,-1,3;
@@ -181,7 +180,87 @@ TEST_CASE("SE3cov basic tests")
                     -0.7051530118471613,  0.6984259413063296, -0.1223128545707475, -7.846417457327979 ,
                     -0.0398742552242469, -0.2112885636977738, -0.9766100483923171,  8.341550757437583 ,
                      0.                ,  0.                ,  0.                ,  1.                ;
-        
+
         REQUIRE((new_uncertainty.T() - gt_pose).norm() == Approx(0.0).margin(1e-12));
+    }
+
+
+    SECTION("Compounding. 4th order. General case")
+    {
+        Mat61 xi;
+        xi << 1,2,-1,0.5,-1,3;
+        mrob::SE3 T(xi);
+        Mat6 cov(Mat6::Zero());
+        cov.diagonal() << 0.01,0.02,0.03,0.01,0.05,1;
+
+        mrob::SE3Cov uncertainty(T, cov);
+
+        xi << -1,0.2,-1.5,-1.0,-10,-4;
+        mrob::SE3 pose_increment(xi);
+
+        Mat6 increment_covariance(Mat6::Zero());
+        increment_covariance.diagonal() << 0.1,0.1,0.2,0.01,0.01,0.1;
+
+        mrob::SE3Cov new_uncertainty = uncertainty.compound_4th_order(pose_increment, increment_covariance);
+
+        Mat6 gt_cov(Mat6::Zero());
+        gt_cov <<   0.11564860714102614 , -0.01898674488142607 , -0.0106470419401024  ,  0.039528383578574314,  0.09062102246996999 ,  0.23229267256299657 ,
+                    -0.01898674488142607 ,  0.1915211696615563  ,  0.04022354792742576 , -0.22483440388338105 , -0.056250508369940895,  0.13441597165910535 ,
+                    -0.010647041940102396,  0.04022354792742576 ,  0.15151142678698273 , -0.3237690146623021  , -0.13630973777653121 ,  0.016702545778983537,
+                    0.039528383578574314, -0.22483440388338102 , -0.32376901466230207 ,  1.0144673094022802  ,  0.3530100712508114  , -0.14929818437639442 ,
+                    0.09062102246996998 , -0.0562505083699409  , -0.13630973777653121 ,  0.35301007125081146 ,  0.36755707836164986 ,  0.19404132162170293 ,
+                    0.23229267256299657 ,  0.13441597165910535 ,  0.016702545778983547, -0.14929818437639444 ,  0.19404132162170293 ,  1.6873818729288543 ;
+
+        REQUIRE((new_uncertainty.cov() - gt_cov).norm() == Approx(0.0).margin(1e-12));
+
+        Mat4 gt_pose(Mat4::Zero());
+        gt_pose <<  -0.7079330997016517, -0.6837823830436842,  0.1768399812992293, -0.6167626040635867,
+                    -0.7051530118471613,  0.6984259413063296, -0.1223128545707475, -7.846417457327979 ,
+                    -0.0398742552242469, -0.2112885636977738, -0.9766100483923171,  8.341550757437583 ,
+                     0.                ,  0.                ,  0.                ,  1.                ;
+
+        REQUIRE((new_uncertainty.T() - gt_pose).norm() == Approx(0.0).margin(1e-12));
+    }
+
+    SECTION("SE3Cov Compounding. Time benchmark")
+    {
+        Mat61 xi;
+        xi << 1,2,-1,0.5,-1,3;
+        mrob::SE3 T(xi);
+        Mat6 cov(Mat6::Zero());
+        cov.diagonal() << 0.01,0.02,0.03,0.01,0.05,1;
+
+        xi << -1,0.2,-1.5,-1.0,-10,-4;
+        mrob::SE3 pose_increment(xi);
+
+        Mat6 increment_covariance(Mat6::Zero());
+        increment_covariance.diagonal() << 0.1,0.1,0.2,0.01,0.01,0.1;
+
+        mrob::SE3Cov uncertainty(T, cov);
+
+        int n_cycles = 10000;
+
+        std::cout << "Measuring the time for 2nd order compounding:" << std::endl;
+        auto start = std::chrono::system_clock::now();
+        for (int i = 0; i < n_cycles; i++)
+        {
+            uncertainty.compound_2nd_order(pose_increment, increment_covariance);
+        }
+        auto end = std::chrono::system_clock::now();
+        auto elapsed_2nd = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        std::cout << n_cycles << " cycles : " << elapsed_2nd.count() << "ms" << std::endl;
+        std::cout << "1 cycle of 2nd order: " << 1.*elapsed_2nd.count()/n_cycles << "ms" << std::endl;
+
+        std::cout << "Measuring the time for 4th order compounding:" << std::endl;
+        start = std::chrono::system_clock::now();
+        for (int i = 0; i < n_cycles; i++)
+        {
+            uncertainty.compound_2nd_order(pose_increment, increment_covariance);
+        }
+        end = std::chrono::system_clock::now();
+        auto elapsed_4th = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        std::cout << n_cycles << " cycles : " << elapsed_4th.count() << "ms" << std::endl;
+
+        std::cout << "1 cycle of 4th order: " << 1.*elapsed_4th.count()/n_cycles << "ms" << std::endl;
     }
 }
