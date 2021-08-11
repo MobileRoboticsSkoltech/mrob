@@ -74,14 +74,14 @@ namespace mrob
          * @brief SE3 pose uncertainty compounding of the second order.
          * @param[in] pose - pose increment;
          * @param[in] cov - increment uncertainty.
-         * @return void
+         * @return SE3Cov object with updated uncertainty and pose.
          **/
         SE3Cov compound_2nd_order(const SE3 &pose, const Mat6 &cov) const; // does right hand side update
 
         /**
          * @brief SE3pose uncertainy compounding of the fourth order.
          * @param[in] pose - SE3Cov object with incremental pose and increment uncertainty.
-         * @return void
+         * @return SE3Cov object with updated uncertainty and pose.
          */
         SE3Cov compound_4th_order(const SE3Cov &pose) const;
 
@@ -89,12 +89,12 @@ namespace mrob
          * @brief SE3pose uncertainy compounding of the fourth order.
          * @param[in] pose - pose increment;
          * @param[in] cov - increment uncertainty.
-         * @return void
+         * @return SE3Cov object with updated uncertainty and pose.
          */
         SE3Cov compound_4th_order(const SE3 &pose, const Mat6 &cov) const;
 
         /** @brief Prints current state of pose and covariance.
-         * @return void
+         * @return SE3Cov object with updated uncertainty and pose.
          **/
         void print();
 
