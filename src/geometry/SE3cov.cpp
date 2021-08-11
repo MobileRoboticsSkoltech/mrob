@@ -27,7 +27,6 @@ Mat6 SE3Cov::cov(void) const
 
 SE3Cov SE3Cov::compound_2nd_order(const SE3 &pose_increment, const Mat6 &increment_covariance) const
 {
-    // Gonzalo: I think this method should return a copy and not modify itself, same as in SE3
     Mat6 adj = this->adj();
     return SE3Cov(SE3::mul(pose_increment), covariance_ + adj*increment_covariance*adj.transpose());
 }

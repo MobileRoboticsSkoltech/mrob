@@ -31,7 +31,8 @@
  * @brief Class \b SE3Cov for Special eualidean group poses compounding.
  * Class \b SE3Cov inherits properties of \b SE3 class and containes additional attribute
  * \a covariance_ to store the corresponding uncertainty. Beside that, \b SE3Cov has two 
- * compounding methods of different order.
+ * compounding methods of different order. Implemented according to the paper:
+ * @url: http://ncfrn.mcgill.ca/members/pubs/barfoot_tro14.pdf
  **/
 namespace mrob
 {
@@ -64,8 +65,6 @@ namespace mrob
 
         /** 
          * @brief SE3 pose uncertainty compounding of the second order.
-         * Implemented according to the paper:
-         * @url: http:// #TODO
          * @param[in] pose - SE3Cov object: incremental pose + increment uncertainty
          * @return void
          **/
@@ -73,8 +72,6 @@ namespace mrob
 
         /** 
          * @brief SE3 pose uncertainty compounding of the second order.
-         * Implemented according to the paper:
-         * @url: http:// #TODO
          * @param[in] pose - pose increment;
          * @param[in] cov - increment uncertainty.
          * @return void
@@ -83,8 +80,6 @@ namespace mrob
 
         /**
          * @brief SE3pose uncertainy compounding of the fourth order.
-         * Implemented according to the paper:
-         * @url: http:// #TODO
          * @param[in] pose - SE3Cov object with incremental pose and increment uncertainty.
          * @return void
          */
@@ -92,8 +87,6 @@ namespace mrob
 
         /**
          * @brief SE3pose uncertainy compounding of the fourth order.
-         * Implemented according to the paper:
-         * @url: http:// #TODO
          * @param[in] pose - pose increment;
          * @param[in] cov - increment uncertainty.
          * @return void
@@ -114,8 +107,17 @@ namespace mrob
     protected:
         /**
          * @brief This is the 6x6 covariance matrix of the current pose.
-         * Convention is [theta  tr  ]
-         *               [ rt    rho].
+         * Convention is \f$\xi = (\theta, \rho)\f$, where \f$\theta\f$ are the orientation angles,
+         * and \f$\rho\f$ is the position vector.
+         * 
+         * \f[
+         * \Sigma = E[\xi\cdot\xi^T] = \left[\begin{array}{cc}
+         * \Sigma_{\theta \theta} & \Sigma_{\theta \rho} \\
+         * \Sigma_{\rho \theta} & \Sigma_{\rho \rho}\\
+         * \end{array}
+         * \right]
+         * \f]
+         * 
          */
         Mat6 covariance_; //!< Covariance matrix of pose uncertainty
     };
