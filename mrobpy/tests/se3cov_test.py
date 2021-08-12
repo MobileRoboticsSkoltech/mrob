@@ -179,7 +179,7 @@ class TestSE3CovCompoundSimpleCase:
 class TestSE3covTimeBenchmarks:
     def test_time_benchmark_2nd_order(self):
         print('Second order compound time benchmark')
-        cycles = 100000
+        cycles = 10000
 
         start_time = time.time()
 
@@ -248,4 +248,3 @@ class TestSE3covTimeBenchmarks:
         print("Pure python time / c++ bindings time = %s" % (time_pure_python/time_cpp_bindings))
 
         assert(time_pure_python > time_cpp_bindings )
-
