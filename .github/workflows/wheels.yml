@@ -48,7 +48,7 @@ jobs:
 
       - name: Install mrob & numpy
         run: |
-          python3 -m pip install ./artifact/mrob*.whl numpy pytest scipy matplotlib
+          python3 -m pip install ./artifact/mrob*.whl numpy pytest
 
       - name: "Python unit tests"
         run: |
