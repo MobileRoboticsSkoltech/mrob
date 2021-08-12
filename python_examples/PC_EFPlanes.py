@@ -18,25 +18,35 @@ def draw_planes(synthetic,traj=[]):
         pcds.append(pc)
     open3d.visualization.draw_geometries(pcds)
 
-points = 20
-planes = 1
-poses = 1
+N_points = 10
+N_planes = 2
+N_poses = 2
 
-synthetic = mrob.registration.CreatePoints(points,planes,poses, 0.05, 0.1) #point noise, bias noise
+synthetic = mrob.registration.CreatePoints(N_points,N_planes,N_poses, 0.05, 0.1) #point noise, bias noise
 T_gt = synthetic.get_ground_truth_last_pose()
 T_gt.print()
 #draw_planes(synthetic, synthetic.get_trajectory())
 
 graph = mrob.FGraph()
-ef1 = graph.add_eigen_factor_plane()
-print(ef1)
-n1 = graph.add_node_pose_3d(mrob.geometry.SE3())
-print('node = ', n1)
-points = synthetic.get_point_cloud(0)
-for p in points:
-    print(p)
-    graph.eigen_factor_plane_add_point(planeEigenId = ef1,
-                                   nodePoseId = n1,
+
+for t in range(N_planes):
+    ef1 = graph.add_eigen_factor_plane()
+    # It is an ordered progression 0:N-1, no need for dict
+    print('EFactor id = ', ef1)
+
+for t in range(N_poses):
+    n1 = graph.add_node_pose_3d(mrob.geometry.SE3())
+    # It is an ordered progression 0:N-1, no need for dict
+    print('Pose node id = ', n1)
+
+for t in range(N_poses):
+    print('Processing pose ', t)
+    points = synthetic.get_point_cloud(t)
+    indexes = synthetic.get_point_plane_ids(t)
+    for p,i in zip(points,indexes):
+        print('point ', p, 'index ', i)
+        graph.eigen_factor_plane_add_point(planeEigenId = ef1,
+                                   nodePoseId = t,
                                    point = p,
                                    W = 1.0)
 
