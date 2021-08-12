@@ -9,8 +9,7 @@ import matplotlib.pyplot as plt
 
 import mrob
 
-import utils
-from  utils import compound_mc
+from  test_utils import compound_mc
 
 M = 100000
 err_1 = []

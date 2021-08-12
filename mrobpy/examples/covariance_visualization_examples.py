@@ -6,8 +6,9 @@ import pandas as pd
 
 import mrob
 
-import utils
-from  utils import sigma_visualize, get_mc, compound_mc, compound_2nd, compound_4th, sigma_visualize_3d
+# import utils
+from  vis_utils import sigma_visualize, sigma_visualize_3d
+from test_utils import get_mc, compound_mc
 
 # EXAMPLE #1
 #================================================================
@@ -18,7 +19,6 @@ mean = np.array([0,0,0,0,0,0])
 poses, xi = get_mc(mrob.geometry.SE3([0,0,0,1,0,0]), sigma, mean,N=1_000_0)
 sigma_visualize(mrob.geometry.SE3([0,0,0,1,0,0]), sigma=sigma,N = 100, K=[3], color='red')
 plt.scatter(poses[:,0],poses[:,1], label='Monte Carlo',s=2)
-
 plt.xlim([-1.5,1.5])
 plt.ylim([-1.5,1.5])
 plt.grid()
