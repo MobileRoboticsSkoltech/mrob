@@ -284,4 +284,54 @@ TEST_CASE("SE3cov basic tests")
 
         REQUIRE((cov.mul(increment_cov).cov() - cov.compound_2nd_order(increment_cov).cov()).norm() == Approx(0.0).margin(1e-12));
     }
+
+    // SECTION("Type cast time benchmark test")
+    // {
+    //     Mat61 xi;
+    //     xi << 1,2,-1,0.5,-1,3;
+    //     mrob::SE3 T(xi);
+    //     Mat6 cov(Mat6::Zero());
+    //     cov.diagonal() << 0.01,0.02,0.03,0.01,0.05,1;
+
+    //     xi << -1,0.2,-1.5,-1.0,-10,-4;
+    //     mrob::SE3 pose_increment(xi);
+
+    //     Mat6 increment_covariance(Mat6::Zero());
+    //     increment_covariance.diagonal() << 0.1,0.1,0.2,0.01,0.01,0.1;
+
+    //     mrob::SE3Cov uncertainty(T, cov);
+
+    //     mrob::SE3Cov tmp_cov(pose_increment, increment_covariance);
+    //     int n_cycles = 100000;
+
+    //     std::cout << "Measuring the time for (const SE3):" << std::endl;
+    //     auto start = std::chrono::system_clock::now();
+    //     for (int i = 0; i < n_cycles; i++)
+    //     {
+    //         uncertainty.compound_2nd_order((const SE3)tmp_cov,tmp_cov.cov());
+    //     }
+    //     auto end = std::chrono::system_clock::now();
+    //     auto elapsed_1 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    //     std::cout << n_cycles << " cycles : " << elapsed_1.count() << "ms" << std::endl;
+
+    //     std::cout << "Measuring the time for static_cast:" << std::endl;
+    //     start = std::chrono::system_clock::now();
+    //     for (int i = 0; i < n_cycles; i++)
+    //     {
+    //         uncertainty.compound_2nd_order(static_cast<SE3>(tmp_cov),tmp_cov.cov());
+    //     }
+    //     end = std::chrono::system_clock::now();
+    //     auto elapsed_2 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    //     std::cout << n_cycles << " cycles : " << elapsed_2.count() << "ms" << std::endl;
+
+    //     std::cout << "Measuring the time for SE3():" << std::endl;
+    //     start = std::chrono::system_clock::now();
+    //     for (int i = 0; i < n_cycles; i++)
+    //     {
+    //         uncertainty.compound_2nd_order(SE3(tmp_cov),tmp_cov.cov());
+    //     }
+    //     end = std::chrono::system_clock::now();
+    //     auto elapsed_3 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    //     std::cout << n_cycles << " cycles : " << elapsed_3.count() << "ms" << std::endl;
+    // }
 }

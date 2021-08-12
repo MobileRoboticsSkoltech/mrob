@@ -33,7 +33,7 @@ SE3Cov SE3Cov::compound_2nd_order(const SE3 &pose_increment, const Mat6 &increme
 
 SE3Cov SE3Cov::compound_2nd_order(const SE3Cov& pose) const
 {
-    return compound_2nd_order((const SE3)pose, pose.cov());
+    return compound_2nd_order(SE3(pose), pose.cov());
 }
 
 
@@ -91,7 +91,7 @@ SE3Cov SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increme
 
 SE3Cov SE3Cov::compound_4th_order(const SE3Cov& pose) const
 {
-    return compound_4th_order((const SE3)pose, pose.cov());
+    return compound_4th_order(SE3(pose), pose.cov());
 }
 
 void SE3Cov::print()
