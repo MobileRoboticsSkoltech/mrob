@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-import mrobpy.examples.utils
+# import mrobpy.examples.utils
 from mrobpy.examples.utils import compound_2nd, compound_4th, compound_mc
 
 class TestSE3CovConstructors:
