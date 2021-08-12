@@ -4,8 +4,7 @@ import time
 
 import pytest
 
-# import mrobpy.examples.utils
-from mrobpy.examples.utils import compound_2nd, compound_4th, compound_mc
+from mrobpy.examples.utils import compound_2nd, compound_4th
 
 class TestSE3CovConstructors:
     def test_se3cov_default_constructor(self):
@@ -92,8 +91,6 @@ class TestSE3CovCompoundGeneralCase:
 
         assert(np.ndarray.all(np.isclose(self.gt_pose, new_cov.T(),atol=1e-10)))
         assert(np.ndarray.all(np.isclose(new_cov.cov(), self.sigma_gt_4th,atol=1e-10)))
-
-
 
 class TestSE3CovCompoundSimpleCase:
     # initial pose and covariance
