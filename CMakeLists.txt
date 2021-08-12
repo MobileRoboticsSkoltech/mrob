@@ -64,6 +64,5 @@ ADD_SUBDIRECTORY(./src/PCRegistration)
 
 IF(NOT ANDROID)
     ADD_SUBDIRECTORY(./external/pybind11)
-    ADD_SUBDIRECTORY(./external/Catch2)
     ADD_SUBDIRECTORY(./mrobpy)
 ENDIF(NOT ANDROID)
