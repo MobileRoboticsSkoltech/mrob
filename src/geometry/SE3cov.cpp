@@ -27,8 +27,8 @@ Mat6 SE3Cov::cov(void) const
 
 SE3Cov SE3Cov::compound_2nd_order(const SE3 &pose_increment, const Mat6 &increment_covariance) const
 {
-    Mat6 adj = this->adj();
-    return SE3Cov(SE3::mul(pose_increment), covariance_ + adj*increment_covariance*adj.transpose());
+    Mat6 adj = this->SE3::adj();
+    return SE3Cov(this->SE3::mul(pose_increment), covariance_ + adj*increment_covariance*adj.transpose());
 }
 
 SE3Cov SE3Cov::compound_2nd_order(const SE3Cov& pose) const
@@ -41,7 +41,7 @@ SE3Cov SE3Cov::compound_4th_order(const SE3 &pose_increment, const Mat6 &increme
 {
     Mat6 sigma_1 = covariance_;
 
-    Mat6 adj = this->adj();
+    Mat6 adj = this->SE3::adj();
     Mat6 sigma_2 = adj*increment_covariance*adj.transpose();
  
     //Calculating the covariance update, correction to the mrob convention xi = [theta, rho]
@@ -100,6 +100,11 @@ void SE3Cov::print()
     std::cout << this->T_ << std::endl;
     std::cout << "Covariance:" << std::endl;
     std::cout << this->cov() << std::endl;
+}
+
+SE3Cov SE3Cov::mul(const SE3Cov& rhs) const
+{
+    return this->compound_2nd_order(rhs);
 }
 
 SE3Cov SE3Cov::operator*(const SE3Cov& rhs) const

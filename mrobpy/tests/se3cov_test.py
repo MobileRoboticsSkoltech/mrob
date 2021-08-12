@@ -245,3 +245,19 @@ class TestSE3covTimeBenchmarks:
         print("Pure python time / c++ bindings time = %s" % (time_pure_python/time_cpp_bindings))
 
         assert(time_pure_python > time_cpp_bindings )
+
+class TestSE3CovMulOperator:
+    # initial pose and covariance
+    xi_1 = np.array([1,2,-1,0.5,-1,3])
+    pose_1 = mrob.geometry.SE3(xi_1)
+    covariance_1 = np.diag([0.01,0.02,0.03,0.01,0.05,1])
+
+    xi_2 = np.array([-1,0.2,-1.5,-1.0,-10,-4])
+    pose_2 = mrob.geometry.SE3(xi_2)
+    covariance_2 = np.diag([0.1,0.1,0.2,0.01,0.01,0.1])
+
+    def test_mul_operator(self):
+        cov_1 = mrob.geometry.SE3Cov(self.pose_1, self.covariance_1)
+        cov_2 = mrob.geometry.SE3Cov(self.pose_2, self.covariance_2)
+
+        assert(np.ndarray.all(np.isclose((cov_1.mul(cov_2)).cov(),(cov_1.compound_2nd_order(cov_2)).cov(),atol=1e-10)))

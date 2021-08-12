@@ -263,4 +263,25 @@ TEST_CASE("SE3cov basic tests")
 
         std::cout << "1 cycle of 4th order: " << 1.*elapsed_4th.count()/n_cycles << "ms" << std::endl;
     }
+
+    SECTION("mul() operator test")
+    {
+        Mat61 xi;
+        xi << 1,2,-1,0.5,-1,3;
+        mrob::SE3 T(xi);
+        Mat6 sigma(Mat6::Zero());
+        sigma.diagonal() << 0.01,0.02,0.03,0.01,0.05,1;
+
+        mrob::SE3Cov cov(T, sigma);
+
+        xi << -1,0.2,-1.5,-1.0,-10,-4;
+        mrob::SE3 pose_increment(xi);
+
+        Mat6 increment_sigma(Mat6::Zero());
+        increment_sigma.diagonal() << 0.1,0.1,0.2,0.01,0.01,0.1;
+
+        mrob::SE3Cov increment_cov(pose_increment, increment_sigma);
+
+        REQUIRE((cov.mul(increment_cov).cov() - cov.compound_2nd_order(increment_cov).cov()).norm() == Approx(0.0).margin(1e-12));
+    }
 }
