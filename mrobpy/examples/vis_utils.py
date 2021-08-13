@@ -1,6 +1,9 @@
 import numpy as np
+import pandas as pd
+
 import mrob
 
+from test_utils import get_mc
 
 from sys import platform
 
@@ -302,3 +305,27 @@ def sigma_visualize(T, sigma, N=100, K=[1,1], label="", color=None, ax = None):
         poses = poses.reshape((-1,3))
 
         ax.plot(poses[:,0],poses[:,1],color=color)
+
+
+def ellipsoid_wireframe_df(T,sigma,N = 100, K = 1):
+    axes, circumferences = sigma_visualize_3d(T=T,sigma=sigma,N = N, K = K)
+
+    df = pd.DataFrame(columns=['x','y','z'])
+
+    for key,val in axes.items():
+        tmp = pd.DataFrame(val,columns=['x','y','z'])
+        tmp['label'] = key
+        df = pd.concat([df,tmp])
+
+    for key,val in circumferences.items():
+        tmp = pd.DataFrame(val,columns=['x','y','z'])
+        tmp['label'] = key
+        df = pd.concat([df,tmp])
+    return df
+
+def mc_pointcloud_df(T, sigma, mean=np.zeros(6),N=100):
+    poses, xi = get_mc(T=T, sigma=sigma, mean=mean,N=N)
+
+    particles = pd.DataFrame(poses, columns=['x','y','z'])
+
+    return particles
