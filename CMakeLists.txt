@@ -12,6 +12,8 @@ IF (NOT CMAKE_BUILD_TYPE)
  SET(CMAKE_BUILD_TYPE "Release") 
 ENDIF (NOT CMAKE_BUILD_TYPE)
 
+MESSAGE(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
 SET(CMAKE_CXX_STANDARD 14)
 SET(CMAKE_CXX_EXTENSIONS ON)
 
@@ -33,7 +35,7 @@ ELSE(ANDROID)
     enable_testing()
 ENDIF(ANDROID)
 
-MESSAGE(STATUS "Build Tests ${BUILD_TESTING}")
+MESSAGE(STATUS "Build Tests: ${BUILD_TESTING}")
 
 # ===================================================================
 INCLUDE_DIRECTORIES(SYSTEM ./external/Eigen)
