@@ -255,7 +255,7 @@ TEST_CASE("SE3cov basic tests")
         start = std::chrono::system_clock::now();
         for (int i = 0; i < n_cycles; i++)
         {
-            uncertainty.compound_2nd_order(pose_increment, increment_covariance);
+            uncertainty.compound_4th_order(pose_increment, increment_covariance);
         }
         end = std::chrono::system_clock::now();
         auto elapsed_4th = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
@@ -302,7 +302,7 @@ TEST_CASE("SE3cov basic tests")
     //     mrob::SE3Cov uncertainty(T, cov);
 
     //     mrob::SE3Cov tmp_cov(pose_increment, increment_covariance);
-    //     int n_cycles = 100000;
+    //     int n_cycles = 10000;
 
     //     std::cout << "Measuring the time for (const SE3):" << std::endl;
     //     auto start = std::chrono::system_clock::now();
@@ -333,5 +333,16 @@ TEST_CASE("SE3cov basic tests")
     //     end = std::chrono::system_clock::now();
     //     auto elapsed_3 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     //     std::cout << n_cycles << " cycles : " << elapsed_3.count() << "ms" << std::endl;
+
+
+    //     std::cout << "Measuring the time for compiler cast:" << std::endl;
+    //     start = std::chrono::system_clock::now();
+    //     for (int i = 0; i < n_cycles; i++)
+    //     {
+    //         uncertainty.compound_2nd_order(tmp_cov,tmp_cov.cov());
+    //     }
+    //     end = std::chrono::system_clock::now();
+    //     auto elapsed_4 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    //     std::cout << n_cycles << " cycles : " << elapsed_4.count() << "ms" << std::endl;
     // }
 }
