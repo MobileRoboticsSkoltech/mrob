@@ -102,13 +102,14 @@ void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node, ma
     // If EF has not observed point from the current Node, it creates:
     else
     {
-        std::cout << "creating new entry " << id;
         allPlanePoints_.emplace_back(std::deque<Mat31, Eigen::aligned_allocator<Mat31>>());
         allPointsInformation_.emplace_back(std::deque<matData_t>());
         neighbourNodes_.push_back(node);
         nodeIds_.push_back(id);
         uint_t localId = allPlanePoints_.size()-1;
         reverseNodeIds_.emplace(id, localId);
+        allPlanePoints_.at(localId).push_back(p);
+        allPointsInformation_.at(localId).push_back(W);
         // S and Q are built later, no need to create an element.
     }
     numberPoints_++;
@@ -183,6 +184,21 @@ void EigenFactorPlane::print() const
 {
     std::cout << "Plane Eigen Factor " <<  this->get_id()
               << " current plane estimated: " << planeEstimation_.transpose() << std::endl;
+    for(auto id : nodeIds_)
+        std::cout << "Node ids = "  << id << ", and its reverse in EF = "
+                  << reverseNodeIds_.at(id) << std::endl;
+    for(auto &pc: allPlanePoints_ )
+    {
+        std::cout << "new pose: \n";
+        for (auto &p : pc)
+            std::cout << "point = " << p.transpose() <<std::endl;
+    }
+    std::cout << "Plotting S \n";
+    for(auto &S: S_)
+        std::cout << S << std::endl;
+    std::cout << "Plotting Jacobians \n";
+    for(auto &J: J_)
+        std::cout << J.transpose() << std::endl;
 }
 
 

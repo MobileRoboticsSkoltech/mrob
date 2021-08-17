@@ -18,7 +18,7 @@ def draw_planes(synthetic,traj=[]):
         pcds.append(pc)
     open3d.visualization.draw_geometries(pcds)
 
-N_points = 10
+N_points = 5
 N_planes = 2
 N_poses = 2
 
