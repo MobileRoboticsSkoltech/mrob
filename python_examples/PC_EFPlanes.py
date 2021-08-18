@@ -45,9 +45,10 @@ for t in range(N_poses):
     indexes = synthetic.get_point_plane_ids(t)
     for p,i in zip(points,indexes):
         print('point ', p, 'index ', i)
-        graph.eigen_factor_plane_add_point(planeEigenId = ef1,
+        graph.eigen_factor_plane_add_point(planeEigenId = i,
                                    nodePoseId = t,
                                    point = p,
                                    W = 1.0)
 
+graph.solve(mrob.LM)
 graph.print(True)

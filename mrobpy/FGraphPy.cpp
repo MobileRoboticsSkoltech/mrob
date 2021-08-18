@@ -241,6 +241,7 @@ void init_FGraph(py::module &m)
     py::enum_<FGraphSolve::optimMethod>(m, "FGraph.optimMethod")
         .value("GN", FGraphSolve::optimMethod::GN)
         .value("LM", FGraphSolve::optimMethod::LM)
+        .value("LM_ELLIPS", FGraphSolve::optimMethod::LM_ELLIPS)
         .export_values()
         ;
     py::enum_<Factor::robustFactorType>(m, "FGraph.robutsFactorType")

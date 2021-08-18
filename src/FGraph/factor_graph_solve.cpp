@@ -60,6 +60,7 @@ void FGraphSolve::solve(optimMethod method, uint_t maxIters, matData_t lambda, m
     lambda_ = lambda;
     solutionTolerance_ = solutionTolerance;
     time_profiles_.reset();
+    optimMethod_ = method;
 
     // Optimization
     switch(method)
@@ -69,6 +70,7 @@ void FGraphSolve::solve(optimMethod method, uint_t maxIters, matData_t lambda, m
         this->update_nodes();
         break;
       case LM:
+      case LM_ELLIPS:
         this->optimize_levenberg_marquardt(maxIters);
         break;
       default:
@@ -77,7 +79,7 @@ void FGraphSolve::solve(optimMethod method, uint_t maxIters, matData_t lambda, m
 
 
 
-
+    // TODO add variable verbose to output times
     if (0)
         time_profiles_.print();
 }
@@ -123,8 +125,12 @@ void FGraphSolve::optimize_gauss_newton(bool useLambda)
     if (useLambda)
     {
         for (uint_t n = 0 ; n < N_; ++n)
-            L_.coeffRef(n,n) = lambda_ + diagL_(n);//Circunference =>  diagL_(n) + lambda_
-            //L_.coeffRef(n,n) = (1.0 + lambda_)*diagL_(n);//Elipsoid, for circunference =>  diagL_(n) + lambda.
+        {
+            if (optimMethod_ == LM)
+                L_.coeffRef(n,n) = lambda_ + diagL_(n);//Spherical
+            else
+                L_.coeffRef(n,n) = (1.0 + lambda_)*diagL_(n);//Elipsoid
+        }
     }
     cholesky.compute(L_);
     time_profiles_.stop("Gauss Newton create Cholesky");

@@ -85,7 +85,7 @@ public:
      *  - Gauss Newton
      *  - Levenberg Marquardt (trust-region-like for lambda adjustment) TODO LM elliptical?
      */
-    enum optimMethod{GN=0, LM};
+    enum optimMethod{GN=0, LM, LM_ELLIPS};
 
     FGraphSolve(matrixMethod method = ADJ);
     virtual ~FGraphSolve();
@@ -217,6 +217,7 @@ protected:
 
     // Variables for solving the FGraph
     matrixMethod matrixMethod_;
+    optimMethod optimMethod_;
 
     uint_t N_; // total number of state variables
     uint_t M_; // total number of observation variables
