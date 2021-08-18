@@ -106,6 +106,8 @@ void FGraphSolve::build_problem(bool useLambda)
         assert(0 && "FGraphSolve: method not implemented");
     }
 
+    // 1.3) (Optional) Eigen Factors
+
     // Structure for LM and dampening GN-based methods
     if (useLambda)
     {
@@ -212,6 +214,8 @@ uint_t FGraphSolve::optimize_levenberg_marquardt(uint_t maxIters)
 
 void FGraphSolve::build_adjacency()
 {
+    // Check for consistency. With 0 observations the problem cannot be built.
+    assert(obsDim_ >0 && "FGraphSolve::build_adjacency: Zeros observations, at least add one anchor factor");
     // 0) resize properly matrices (if needed)
     r_.resize(obsDim_,1);//dense vector TODO is it better to reserve and push_back??
     A_.resize(obsDim_, stateDim_);//Sparse matrix clear data
@@ -220,22 +224,24 @@ void FGraphSolve::build_adjacency()
     // 1) create the vector's structures
     std::deque<std::shared_ptr<Factor> >* factors;
     std::deque<std::shared_ptr<Node> >* nodes;
-    // TODO: optimizing subgraph is not an option now, but we maintain generality
+    // TODO: optimizing subgraph is not an option now, but we maintain generality.
     factors = &factors_;
     nodes = &nodes_;
 
     // 2) vector structure to bookkeep the starting Nodes indices inside A
 
     // 2.2) Node indexes bookeept
-    std::vector<uint_t> indNodesMatrix;
-    indNodesMatrix.reserve(nodes->size());
+    indNodesMatrix_.clear();
+    indNodesMatrix_.reserve(nodes->size());
 
+    // XXX: this structure ONLY works because we use all nodes. If we were using a subset of them (l227)
+    // Then this ordered approach for ids {0,..,N} would not work!
     N_ = 0;
     for (size_t i = 0; i < nodes->size(); ++i)
     {
         // calculate the indices to access
         uint_t dim = (*nodes)[i]->get_dim();
-        indNodesMatrix.push_back(N_);
+        indNodesMatrix_.push_back(N_);
         N_ += dim;
 
     }
@@ -296,7 +302,7 @@ void FGraphSolve::build_adjacency()
                 {
                     // order according to the permutation vector
                     uint_t iRow = indFactorsMatrix[i] + l;
-                    uint_t iCol = indNodesMatrix[indNode] + k;
+                    uint_t iCol = indNodesMatrix_[indNode] + k;
                     // This is an ordered insertion
                     A_.insert(iRow,iCol) = f->get_jacobian()(l, k + totalK);
                 }
@@ -336,6 +342,32 @@ void FGraphSolve::build_info_adjacency()
      */
     L_ = (A_.transpose() * W_.selfadjointView<Eigen::Upper>() * A_);
     b_ = A_.transpose() * W_.selfadjointView<Eigen::Upper>() * r_;
+}
+
+
+void FGraphSolve::build_info_EF()
+{
+    // create new sparse empty matrix. Note, adding elements to L_ can be more expensive...
+    SMatRow hessian;
+    hessian.resize(stateDim_,stateDim_);
+    // TODO create triplets for the new matrix, the problem is we dont know which block are from a pose EF and which ones not...
+
+    // It assumes L_ has been created, and requires at least 1 observation (achnor)
+    for (uint_t i = 0; i < eigen_factors_.size(); ++i)
+    {
+        auto f = eigen_factors_[i];
+        auto neighNodes = f->get_neighbour_nodes();
+        for (auto node : *neighNodes)
+        {
+            uint_t indNode = node->get_id();
+            // Updating Jacobian, b should has been previously calculated
+            Mat61 J = f->get_jacobian(indNode);
+            b_.block<6,1>(indNodesMatrix_[indNode],0) += J;//TODO robust weight would go here
+
+            // Updating the Hessian
+            Mat6 H = f->get_hessian(indNode);
+        }
+    }
 }
 
 matData_t FGraphSolve::chi2(bool evaluateResidualsFlag)

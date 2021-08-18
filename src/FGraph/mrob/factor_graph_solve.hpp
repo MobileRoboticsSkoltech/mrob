@@ -165,6 +165,12 @@ protected:
      * The residuals are also calculated as b = A^T * W *r
      */
     void build_info_adjacency();
+    /**
+     * Builds the information matrix directly from Eigen Factors.
+     * It follows a different approach than build adjacency, it will only create
+     * a Hessian and Jacobian when at least one EF is present.
+     */
+    void build_info_EF();
     void build_schur(); // TODO
 
     /**
@@ -218,6 +224,9 @@ protected:
     // Variables for solving the FGraph
     matrixMethod matrixMethod_;
     optimMethod optimMethod_;
+
+    // Indexes of nodes in the information matrix. NOTE: it requires all nodes (not a subset)
+    std::vector<uint_t> indNodesMatrix_;
 
     uint_t N_; // total number of state variables
     uint_t M_; // total number of observation variables

@@ -89,6 +89,11 @@ public:
      * @return
      */
     MatRefConst get_jacobian([[maybe_unused]] mrob::factor_id_t id = 0) const override;
+    /**
+     * get hessian returns the Hassian corresponding to the given node id.
+     * @return
+     */
+    MatRefConst get_hessian(mrob::factor_id_t id = 0) const override;
 
 
     // NEW functions added to the base class factor.hpp

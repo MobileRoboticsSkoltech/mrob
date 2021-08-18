@@ -151,7 +151,7 @@ void EigenFactorPlane::calculate_all_matrices_S(bool reset)
             {
                 Mat41 pHomog;
                 pHomog << p , 1.0;
-                S += pHomog * pHomog.transpose();
+                S += pHomog * pHomog.transpose();//TODO add coeficient W here...
             }
             S_.push_back(S);
         }
@@ -208,3 +208,11 @@ MatRefConst EigenFactorPlane::get_jacobian(mrob::factor_id_t id) const
     uint_t localId = reverseNodeIds_.at(id);
     return J_.at(localId);
 }
+
+MatRefConst EigenFactorPlane::get_hessian(mrob::factor_id_t id) const
+{
+    assert(reverseNodeIds_.count(id)   && "EigenFactorPlane::get_hessian: element not found");
+    uint_t localId = reverseNodeIds_.at(id);
+    return H_.at(localId);
+}
+
