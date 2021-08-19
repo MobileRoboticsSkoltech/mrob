@@ -26,7 +26,7 @@
 using namespace mrob;
 
 Node::Node(uint_t dim):
-		 id_(0), dim_(dim)
+		 id_(0), dim_(dim), isConnected2EF_(false)
 {
 }
 

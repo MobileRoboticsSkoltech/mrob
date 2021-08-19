@@ -61,7 +61,7 @@ void TimeProfiling::print()
 
     std::cout << "\nTime profile for " << sum/1e3 << " [ms]: ";
     for (auto &&t : time_profiles_)
-        std::cout << t.first << " = " << t.second/sum *100 << "%, ";
+        std::cout << t.first << " = " << t.second/sum *100 << "%,\n";
     std::cout << "\n";
 }
 

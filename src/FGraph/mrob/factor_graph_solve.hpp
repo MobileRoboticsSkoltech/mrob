@@ -78,6 +78,7 @@ class FGraphSolve: public FGraph
 public:
     /**
      * This enums all matrix building methods available
+     * For now we only do build adjacency
      */
     enum matrixMethod{ADJ=0, SCHUR};
     /**
@@ -118,16 +119,20 @@ public:
 
     /**
      * Returns a copy to the information matrix.
+     * pybind does not allow to pass by reference, so there is a copy anyway
+     * CHeck out more here: https://pybind11.readthedocs.io/en/stable/advanced/cast/eigen.html
      * TODO If true, it re-evaluates the problem
      */
     SMatCol get_information_matrix() { return L_;}
     /**
-     * Returns a copy to the information matrix.
+     * Returns a copy to the Adjacency matrix.
+     * There is a conversion (implies copy) from Row to Col-convention (which is what np.array needs)
      * TODO If true, it re-evaluates the problem
      */
     SMatCol get_adjacency_matrix() { return A_;}
     /**
      * Returns a copy to the W matrix.
+     * There is a conversion (implies copy) from Row to Col-convention (which is what np.array needs)
      * TODO If true, it re-evaluates the problem
      */
     SMatCol get_W_matrix() { return W_;}
@@ -231,11 +236,11 @@ protected:
     uint_t N_; // total number of state variables
     uint_t M_; // total number of observation variables
 
-    SMatRow A_; //Adjacency matrix, as a Row sparse matrix
+    SMatRow A_; //Adjacency matrix, as a Row sparse matrix. The reason is for filling in row-fashion for each factor
     SMatRow W_; //A block diagonal information matrix. For types Adjacency it calculates its block transposed squared root
     MatX1 r_; // Residuals as given by the factors
 
-    SMatCol L_; //Information matrix
+    SMatCol L_; //Information matrix. For Eigen Cholesky AMD Ordering it is necessary Col convetion for compilation.
     MatX1 b_; // Post-processed residuals, A'*W*r
 
     // Correction deltas
@@ -245,6 +250,11 @@ protected:
     matData_t lambda_; // current value of lambda
     matData_t solutionTolerance_;
     MatX1 diagL_; //diagonal matrix (vector) of L to update it efficiently
+
+
+    // Methods for handling Eigen factors. If not used, no problem
+    SMatCol hessianEF_;
+    MatX1 gradientEF_;
 
     // time profiling
     TimeProfiling time_profiles_;

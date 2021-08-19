@@ -62,7 +62,7 @@ void EigenFactorPlane::evaluate_jacobians()
         }
         J_.push_back(jacobian);
 
-        //now calculate Hessian here
+        //now calculate Hessian here. Upper triangular view
         Mat6 hessian = Mat6::Zero();
         Mat4 ddQ;
         for (uint_t i =0 ; i< 6 ; ++i)
@@ -105,6 +105,7 @@ void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node, ma
         allPlanePoints_.emplace_back(std::deque<Mat31, Eigen::aligned_allocator<Mat31>>());
         allPointsInformation_.emplace_back(std::deque<matData_t>());
         neighbourNodes_.push_back(node);
+        node->set_connected_to_EF(true);//This function is required to properly build the L matrix
         nodeIds_.push_back(id);
         uint_t localId = allPlanePoints_.size()-1;
         reverseNodeIds_.emplace(id, localId);
@@ -125,7 +126,6 @@ double EigenFactorPlane::estimate_plane()
     for (auto &Qt: Q_)
     {
         accumulatedQ_ += Qt;
-        //std::cout << Qi << std::endl;
     }
 
     // Only needs Lower View from Q (https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html)
@@ -146,6 +146,7 @@ void EigenFactorPlane::calculate_all_matrices_S(bool reset)
     {
         for (auto &vectorPoints: allPlanePoints_)
         {
+            std::cout << "So we are here in S's\n";
             Mat4 S = Mat4::Zero();
             for (Mat31 &p : vectorPoints)
             {
@@ -187,12 +188,12 @@ void EigenFactorPlane::print() const
     for(auto id : nodeIds_)
         std::cout << "Node ids = "  << id << ", and its reverse in EF = "
                   << reverseNodeIds_.at(id) << std::endl;
-    for(auto &pc: allPlanePoints_ )
+    /*for(auto &pc: allPlanePoints_ )
     {
         std::cout << "new pose: \n";
         for (auto &p : pc)
             std::cout << "point = " << p.transpose() <<std::endl;
-    }
+    }*/
     std::cout << "Plotting S \n";
     for(auto &S: S_)
         std::cout << S << std::endl;

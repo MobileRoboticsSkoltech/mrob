@@ -5,7 +5,8 @@ import open3d
 
 def draw_planes(synthetic,traj=[]):
     pcds = []
-    for i in range(synthetic.get_number_poses()):
+    poses = synthetic.get_number_poses()
+    for i in range(poses):
         pc = open3d.geometry.PointCloud()
         pc.points = open3d.utility.Vector3dVector(np.array(synthetic.get_point_cloud(i)))
         s = i/poses
@@ -18,14 +19,14 @@ def draw_planes(synthetic,traj=[]):
         pcds.append(pc)
     open3d.visualization.draw_geometries(pcds)
 
-N_points = 5
-N_planes = 2
+N_points = 500
+N_planes = 3
 N_poses = 2
 
 synthetic = mrob.registration.CreatePoints(N_points,N_planes,N_poses, 0.05, 0.1) #point noise, bias noise
 T_gt = synthetic.get_ground_truth_last_pose()
 T_gt.print()
-#draw_planes(synthetic, synthetic.get_trajectory())
+draw_planes(synthetic)
 
 graph = mrob.FGraph()
 
@@ -39,16 +40,26 @@ for t in range(N_poses):
     # It is an ordered progression 0:N-1, no need for dict
     print('Pose node id = ', n1)
 
+graph.add_factor_1pose_3d(mrob.geometry.SE3(),0,1e9*np.identity(6))
+
 for t in range(N_poses):
     print('Processing pose ', t)
     points = synthetic.get_point_cloud(t)
     indexes = synthetic.get_point_plane_ids(t)
-    for p,i in zip(points,indexes):
-        print('point ', p, 'index ', i)
+    for p,i in zip(points,indexes):     
+        #print('point ', p, 'index ', i)
         graph.eigen_factor_plane_add_point(planeEigenId = i,
                                    nodePoseId = t,
                                    point = p,
                                    W = 1.0)
 
-graph.solve(mrob.LM)
+# Does it require a better initialization?? with median?
+graph.solve(mrob.LM_ELLIPS,3)
+if 0:
+    import matplotlib.pyplot as plt
+    L = graph.get_information_matrix()
+    plt.spy(L, marker='o', markersize=5)
+    plt.title('Information matrix $\Lambda$')
+    plt.show()
+draw_planes(synthetic, graph.get_estimated_state())
 graph.print(True)

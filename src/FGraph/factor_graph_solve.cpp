@@ -80,7 +80,7 @@ void FGraphSolve::solve(optimMethod method, uint_t maxIters, matData_t lambda, m
 
 
     // TODO add variable verbose to output times
-    if (0)
+    if (1)
         time_profiles_.print();
 }
 
@@ -92,6 +92,13 @@ void FGraphSolve::build_problem(bool useLambda)
     time_profiles_.start();
     this->build_adjacency();
     time_profiles_.stop("Adjacency");
+
+    if (eigen_factors_.size()>0)
+    {
+        time_profiles_.start();
+        this->build_info_EF();
+        time_profiles_.stop("EFs Jacobian and Hessian");
+    }
 
     // 1.2) builds specifically the information
     switch(matrixMethod_)
@@ -216,9 +223,12 @@ void FGraphSolve::build_adjacency()
 {
     // Check for consistency. With 0 observations the problem cannot be built.
     assert(obsDim_ >0 && "FGraphSolve::build_adjacency: Zeros observations, at least add one anchor factor");
+    if (obsDim_ == 0)
+        return;
+
     // 0) resize properly matrices (if needed)
     r_.resize(obsDim_,1);//dense vector TODO is it better to reserve and push_back??
-    A_.resize(obsDim_, stateDim_);//Sparse matrix clear data
+    A_.resize(obsDim_, stateDim_);//Sparse matrix clears data, but keeps the prev reserved space
     W_.resize(obsDim_, obsDim_);//TODO should we reinitialize this all the time? an incremental should be fairly easy
 
     // 1) create the vector's structures
@@ -243,7 +253,6 @@ void FGraphSolve::build_adjacency()
         uint_t dim = (*nodes)[i]->get_dim();
         indNodesMatrix_.push_back(N_);
         N_ += dim;
-
     }
     assert(N_ == stateDim_ && "FGraphSolve::buildAdjacency: State Dimensions are not coincident\n");
 
@@ -342,32 +351,59 @@ void FGraphSolve::build_info_adjacency()
      */
     L_ = (A_.transpose() * W_.selfadjointView<Eigen::Upper>() * A_);
     b_ = A_.transpose() * W_.selfadjointView<Eigen::Upper>() * r_;
+
+    // If any EF, we should combine both solutions
+    if (eigen_factors_.size() > 0 )
+    {
+        std::cout << "Adding EF's\n";
+        L_ += hessianEF_.selfadjointView<Eigen::Upper>();
+        b_ += gradientEF_;
+    }
 }
 
 
 void FGraphSolve::build_info_EF()
 {
-    // create new sparse empty matrix. Note, adding elements to L_ can be more expensive...
-    SMatRow hessian;
-    hessian.resize(stateDim_,stateDim_);
-    // TODO create triplets for the new matrix, the problem is we dont know which block are from a pose EF and which ones not...
-
+    gradientEF_.resize(stateDim_,1);
+    gradientEF_.setZero();
+    std::vector<Triplet> hessianData;
+    // XXX if EF ever connected a node that is not 6D, then this will not hold.
+    hessianData.reserve(eigen_factors_.size()*21);//For each EF we reserve the uppder triangular view => 6+5+..+1  = 21
     // It assumes L_ has been created, and requires at least 1 observation (achnor)
-    for (uint_t i = 0; i < eigen_factors_.size(); ++i)
+    for (size_t id = 0; id < eigen_factors_.size(); ++id)
     {
-        auto f = eigen_factors_[i];
+        auto f = eigen_factors_[id];
+        f->evaluate_residuals();
+        f->evaluate_jacobians();//and Hessian
+        f->evaluate_chi2();
         auto neighNodes = f->get_neighbour_nodes();
         for (auto node : *neighNodes)
         {
             uint_t indNode = node->get_id();
             // Updating Jacobian, b should has been previously calculated
             Mat61 J = f->get_jacobian(indNode);
-            b_.block<6,1>(indNodesMatrix_[indNode],0) += J;//TODO robust weight would go here
+            gradientEF_.block<6,1>(indNodesMatrix_[indNode],0) += J;//TODO robust weight would go here
+            std::cout << "Jacobian = " << J.transpose() << std::endl;
 
             // Updating the Hessian
             Mat6 H = f->get_hessian(indNode);
+            std::cout << "Hessian = " << H << std::endl;
+            uint_t startingIndex = indNodesMatrix_[indNode];//XXX this should be change (someday) to a proper table for any ordering
+            // XXX if EF ever connected a node that is not 6D, then this will not hold.
+            for (uint_t i = 0; i < 6; i++)
+            {
+                for (uint_t j = i; j<6; j++)
+                {
+                    // convert the hessian to triplets
+                    hessianData.emplace_back(Triplet(startingIndex+ i, startingIndex+ j, H(i,j)));
+                }
+            }
         }
     }
+
+    // create a Upper-view sparse matrix from the triplets:
+    hessianEF_.resize(stateDim_,stateDim_);
+    hessianEF_.setFromTriplets(hessianData.begin(), hessianData.end());
 }
 
 matData_t FGraphSolve::chi2(bool evaluateResidualsFlag)
@@ -382,6 +418,16 @@ matData_t FGraphSolve::chi2(bool evaluateResidualsFlag)
             f->evaluate_chi2();
         }
         totalChi2 += f->get_chi2();
+    }
+
+    for (auto &ef : eigen_factors_)
+    {
+        if (evaluateResidualsFlag)
+        {
+            ef->evaluate_residuals();
+            ef->evaluate_chi2();
+        }
+        totalChi2 += ef->get_chi2();
     }
     return totalChi2;
 }

@@ -97,6 +97,15 @@ class Node{
     void set_id(factor_id_t id) {id_ = id;}
     factor_id_t get_dim(void) const {return dim_;}
 
+    /**
+     * Methods for interacting with Eigen factors, a special kind of factors.
+     * This bool variable and its associated methods will make easier the
+     * construction of the matrix
+     * TODO not used right now, but it could to improve efficiency.
+     */
+     bool is_connected_to_EF() const {return isConnected2EF_;}
+     void set_connected_to_EF(bool state = true) {isConnected2EF_ = state;}
+
   protected:
     factor_id_t id_;
     uint_t dim_;
@@ -110,6 +119,9 @@ class Node{
      *      Mat61 x_;
      * or   SE3 T_; (for transformations)
      */
+     // This variable is to know if there is an Eigen Factor connected to this node. The alternative
+     // is a list of factors connected, but removed this option since it was not really necessary.
+     bool isConnected2EF_;
 };
 
 /**
