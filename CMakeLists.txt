@@ -12,6 +12,8 @@ IF (NOT CMAKE_BUILD_TYPE)
  SET(CMAKE_BUILD_TYPE "Release") 
 ENDIF (NOT CMAKE_BUILD_TYPE)
 
+MESSAGE(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
 SET(CMAKE_CXX_STANDARD 14)
 SET(CMAKE_CXX_EXTENSIONS ON)
 
@@ -30,9 +32,10 @@ IF(ANDROID)
     SET(BUILD_TESTING OFF)
 ELSE(ANDROID)
     SET(BUILD_TESTING ON)
+    enable_testing()
 ENDIF(ANDROID)
 
-MESSAGE(STATUS "Build Tests ${BUILD_TESTING}")
+MESSAGE(STATUS "Build Tests: ${BUILD_TESTING}")
 
 # ===================================================================
 INCLUDE_DIRECTORIES(SYSTEM ./external/Eigen)
@@ -63,6 +66,5 @@ ADD_SUBDIRECTORY(./src/PCRegistration)
 
 IF(NOT ANDROID)
     ADD_SUBDIRECTORY(./external/pybind11)
-    ADD_SUBDIRECTORY(./external/Catch2)
     ADD_SUBDIRECTORY(./mrobpy)
 ENDIF(NOT ANDROID)

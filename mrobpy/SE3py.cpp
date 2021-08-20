@@ -28,6 +28,7 @@
 
 #include "mrob/SE3.hpp"
 #include "mrob/SO3.hpp"
+#include "mrob/SE3cov.hpp"
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 //#include <pybind11/stl.h>
@@ -61,7 +62,7 @@ void init_geometry(py::module &m) {
         .def("t", &SE3::t,
                 "Outputs the translation array 3D component of the RBT",
                 py::return_value_policy::copy)
-        .def("mul", &SE3::mul,
+        .def("mul", py::overload_cast<const SE3&>(&SE3::mul, py::const_),
                 "multiplies the current SE3 object by a second element. The order is: the right hand side of the current object times the second object",
                 py::return_value_policy::copy)
         .def("update", &SE3::update_lhs,
@@ -96,7 +97,8 @@ void init_geometry(py::module &m) {
                 "Calculates the translation distance. If no element is provided this is just the element norm",
                 py::arg("rhs")=SE3())
         .def("print", &SE3::print, "Prints the current SE3 element")
-        ;
+        .def("__mul__", &SE3::operator*, py::is_operator());
+;
     m.def("isSE3", &mrob::isSE3, "Returns True is the matrix is a valid transformation and False if not");
 
     py::class_<SO3>(m, "SO3")
@@ -129,6 +131,8 @@ void init_geometry(py::module &m) {
                 "Calculates the distance between rotation matrices as ||Ln(R'*R_i)||")
         .def("print", &SO3::print, "Prints current information of the rotation")
         ;
+    m.def("isSO3", &mrob::isSO3, "Returns True is the matrix is a valid rotation and False if not");
+
     m.def("hat3", &mrob::hat3, "Returns a skew symmetric matrix 3x3 from a 3-vector", py::return_value_policy::copy);
     m.def("hat6", &mrob::hat6, "Returns a Lie algebra matrix 4x4 from a 6-vector", py::return_value_policy::copy);
 
@@ -136,5 +140,40 @@ void init_geometry(py::module &m) {
     m.def("quat_to_so3", &quat_to_so3,"Suport function from quaternion to a rotation");
     m.def("so3_to_quat", &so3_to_quat,"Suport function from rotation matrix to quaternion");
     m.def("rpy_to_so3",  &rpy_to_so3,"Suport function from roll pitch yaw to a rotation");
+
+    py::class_<SE3Cov, SE3>(m, "SE3Cov")
+            .def(py::init<>(),
+                 "Default construct a new SE3Cov object",
+                 py::return_value_policy::copy)
+            .def(py::init<const SE3 &, const Mat6 &>(),
+                 "Construtor of SE3Cov object with given pose and covariance",
+                 py::return_value_policy::copy)
+            .def(py::init<const SE3Cov &>(),
+                 "Copy constructor",
+                 py::return_value_policy::copy)
+            .def("cov", &SE3Cov::cov,
+                 "returns current covariance matrix state",
+                 py::return_value_policy::copy)
+            .def("compound_2nd_order",
+                 py::overload_cast<const SE3Cov &>(&SE3Cov::compound_2nd_order, py::const_),
+                 "Pose uncertainty compounding of the second order.")
+            .def("compound_2nd_order",
+                 py::overload_cast<const SE3 &, const Mat6 &>(&SE3Cov::compound_2nd_order, py::const_),
+                 "Pose uncertainty compounding of the second order.")
+            .def("compound_4th_order",
+                 py::overload_cast<const SE3Cov &>(&SE3Cov::compound_4th_order, py::const_),
+                 "SE3pose uncertainy compounding of the fourth order.")
+            .def("compound_4th_order",
+                 py::overload_cast<const SE3 &, const Mat6 &>(&SE3Cov::compound_4th_order, py::const_),
+                 "SE3pose uncertainy compounding of the fourth order.")
+            .def("print",
+                 &SE3Cov::print,
+                 "Prints current state of pose and covariance.")
+            .def("mul",
+                 py::overload_cast<const SE3Cov &>(&SE3Cov::mul, py::const_),
+                 "Multiplication method mul() as an interface for compounding.",
+                 py::return_value_policy::copy)
+            .def("__mul__", &SE3Cov::operator*, py::is_operator());
+        m.def("curley_wedge", &mrob::curly_wedge, "Returns 6-by-6 matrix, the output of curley wedge operator.", py::return_value_policy::copy);
 }
 

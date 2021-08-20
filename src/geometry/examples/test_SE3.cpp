@@ -182,7 +182,7 @@ TEST_CASE("SE3 tests")
         REQUIRE((v - tmp).norm() == Approx(0.0).margin(1e-12));
     }
 
-    SECTION("Acess inner matrix")
+    SECTION("Access inner matrix")
     {
         mrob::SE3 T;
         mrob::Mat4 gt;
@@ -234,6 +234,30 @@ TEST_CASE("SE3 tests")
         std::cout << "testing adjoint" << std::endl;
         std::cout << "Adjoint= " << T.adj() << std::endl;
         REQUIRE((T.adj() - gt).norm() == Approx(0.0).margin(1e-12));
+    }
+
+    SECTION("Testing adjoint property: T*exp(xi) = exp(Adj_t(xi))*Ts")
+    {
+        // checking equality for Adj(): T*exp(xi) = exp(Adj_t(xi))*T
+        //initial pose
+        mrob::Mat61 xi;
+        xi << 0.1, 0.2, 0.3, 4, 5, 6;
+        mrob::SE3 T(xi);
+
+        //small disturbance
+        mrob::Mat61 eta;
+        eta << 0.05, 0.05, 0.05, 0.1, 0.1, 0.1;
+
+        // left part of equality
+        mrob::SE3 T_exp(T);
+        T_exp.update_rhs(eta);
+
+        // right part of the equality
+        mrob::SE3 tmp_pose(mrob::Mat4(T.T()));
+        tmp_pose.update_lhs(T.adj()*eta);
+
+        // checking that both parts of equality are equal
+        REQUIRE((T_exp.T() - tmp_pose.T()).norm() == Approx(0.0).margin(1e-12));
     }
 
     SECTION("Testing subblock metrixes")

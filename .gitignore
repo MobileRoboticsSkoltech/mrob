@@ -20,6 +20,8 @@ bin/
 *.pkl
 .vscode
 doc/*
+__pycache__
+.*
 
 mrob
 dist/
