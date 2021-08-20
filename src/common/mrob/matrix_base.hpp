@@ -84,6 +84,5 @@ using MatRefConst = const Eigen::Ref<const MatX>;
 
 }//end of namespace
 
-}//end of namespace
 
 #endif /* MATRIX_BASE_HPP_ */
