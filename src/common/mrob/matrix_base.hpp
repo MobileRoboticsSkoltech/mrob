@@ -13,7 +13,7 @@
  * limitations under the License.
  *
  *
- * time_profiling.jpp
+ * matrix_base.hpp
  *
  *  Created on: Aug 14, 2019
  *      Author: Gonzalo Ferrer
@@ -31,7 +31,6 @@
 #include <Eigen/StdVector>
 
 #define EIGEN_DEFAULT_TO_ROW_MAJOR
-
 
 
 namespace mrob{
@@ -82,6 +81,8 @@ using Mat = Eigen::Matrix<matData_t, Rw, Col, Eigen::RowMajor>;
 //we might need this for aligment requirements: Eigen::Ref<const MatX1, Eigen::AlignmentType::Aligned16>
 using VectRefConst = const Eigen::Ref<const MatX1>;
 using MatRefConst = const Eigen::Ref<const MatX>;
+
+}//end of namespace
 
 }//end of namespace
 

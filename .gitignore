@@ -20,6 +20,9 @@ cmake-build*
 *.pdf
 *.pkl
 .vscode
+doc/*
+__pycache__
+.*
 
 mrob
 dist/

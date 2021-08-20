@@ -48,35 +48,11 @@ jobs:
 
       - name: Install mrob & numpy
         run: |
-          python3 -m pip install ./artifact/mrob*.whl numpy
+          python3 -m pip install ./artifact/mrob*.whl numpy pytest
 
-      - name: Run FGraph_2d
+      - name: "Python unit tests"
         run: |
-          python3 mrobpy/tests/FGraph_2d.py
-
-      - name: Run FGraph_M3500
-        run: |
-          python3 mrobpy/tests/FGraph_M3500.py
-
-      - name: Run FGraph_sphere
-        run: |
-          python3 mrobpy/tests/FGraph_sphere.py
-
-      - name: Run SE3_examples
-        run: |
-          python3 mrobpy/tests/SE3_examples.py
-
-      - name: Run FGraph_landmark_3d_example
-        run: |
-          python3 mrobpy/tests/FGraph_landmark_3d_example.py
-
-      - name: Run FGraph_landmark_2d_example
-        run: |
-          python3 mrobpy/tests/FGraph_landmark_2d_example.py
-
-      - name: Run PC_align
-        run: |
-          python3 mrobpy/tests/PC_align.py
+          python3 -m pytest mrobpy
 
   publish_pypi:
     name: Publish macOS wheel to PyPI
