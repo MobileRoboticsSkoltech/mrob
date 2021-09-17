@@ -45,6 +45,8 @@ try:
                 arch = plat
                 version = os.getenv('MACOSX_DEPLOYMENT_TARGET').replace('.', '_')
                 plat = name + "_" + version + "_" + arch
+            elif platform.system() == "Windows":
+                plat = "win_amd64" # TODO
             return python, abi, plat
 
 except ImportError:
