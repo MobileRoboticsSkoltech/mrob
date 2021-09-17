@@ -50,7 +50,7 @@ do
 done
 
 chrpath -r '$ORIGIN' ../mrob/mrob.*.so
-${LATEST}python3 -m pip install $([[ -n "$VIRTUAL_ENV" ]] || echo "--user") -q pep517 auditwheel
-${LATEST}python3 -m pep517.build ../
+${LATEST}python3 -m pip install $([[ -n "$VIRTUAL_ENV" ]] || echo "--user") -q build auditwheel
+${LATEST}python3 -m build --wheel --outdir dist/ .
 auditwheel repair ../dist/*.whl
 

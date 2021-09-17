@@ -52,7 +52,7 @@ jobs:
           command: git submodule update --init --recursive
       - run:
           name: "Build Python wheels"
-          command: scripts/build-wheels.sh
+          command: scripts/build-wheels-linux.sh
       - store_artifacts:
           path: /root/project/build/wheelhouse
           destination: ~/artifacts
