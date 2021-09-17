@@ -51,6 +51,6 @@ done
 
 chrpath -r '$ORIGIN' ../mrob/mrob.*.so
 ${LATEST}python3 -m pip install $([[ -n "$VIRTUAL_ENV" ]] || echo "--user") -q build auditwheel
-${LATEST}python3 -m build --wheel --outdir dist/ .
+${LATEST}python3 -m build --wheel --outdir ../dist/ ..
 auditwheel repair ../dist/*.whl
 
