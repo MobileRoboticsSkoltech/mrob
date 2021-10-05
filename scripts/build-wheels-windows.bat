@@ -1,6 +1,10 @@
+set msvc_redist_path='C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.29.30133\x64\Microsoft.VC142.CRT'
 mkdir .\build 
 mkdir .\mrob
 cp __init__.py .\mrob\__init__.py
+cp %msvc_redist_path%\msvcp140.dll .\mrob\msvcp140.dll
+cp %msvc_redist_path%\vcruntime140.dll .\mrob\vcruntime140.dll 
+cp %msvc_redist_path%\vcruntime140_1.dll .\mrob\vcruntime140_1.dll 
 
 for /D %%P in (C:\hostedtoolcache\windows\Python\3*) do CALL :build %%P\x64\python.exe
 
