@@ -1,19 +1,26 @@
-set msvc_redist_path='C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.29.30133\x64\Microsoft.VC142.CRT'
-mkdir .\build 
-mkdir .\mrob
-cp __init__.py .\mrob\__init__.py
-cp %msvc_redist_path%\msvcp140.dll .\mrob\msvcp140.dll
-cp %msvc_redist_path%\vcruntime140.dll .\mrob\vcruntime140.dll 
-cp %msvc_redist_path%\vcruntime140_1.dll .\mrob\vcruntime140_1.dll 
+SETLOCAL EnableDelayedExpansion
 
-for /D %%P in (C:\hostedtoolcache\windows\Python\3*) do CALL :build %%P\x64\python.exe
+#Early check for build tools
+cmake --version || EXIT /B !ERRORLEVEL!
 
-python -m pip install --user -q build
-python -m build --wheel --outdir dist .
+pushd %~dp0 
+cd .. 
 
-EXIT /B %ERRORLEVEL% 
+mkdir .\build || popd && EXIT /B !ERRORLEVEL!
+mkdir .\mrob || popd && EXIT /B !ERRORLEVEL!
+cp __init__.py .\mrob\__init__.py || popd && EXIT /B !ERRORLEVEL!
+
+
+for /D %%P in (C:\hostedtoolcache\windows\Python\3*) do CALL :build %%P\x64\python.exe || popd && EXIT /B !ERRORLEVEL!
+
+
+python -m pip install --user -q build || popd && EXIT /B !ERRORLEVEL!
+python -m build --wheel --outdir dist . || popd && EXIT /B !ERRORLEVEL!
+
+popd
+EXIT /B 0
 
 :build
-cmake -S . -B build -G "Visual Studio 16 2019" -A "x64" -DPYTHON_EXECUTABLE:FILEPATH=%~1 -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=%cd%\mrob -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE=%cd%\mrob 
-cmake --build build --config Release -j %NUMBER_OF_PROCESSORS%
+cmake -S . -B build -G "Visual Studio 16 2019" -A "x64" -DPYTHON_EXECUTABLE:FILEPATH=%~1 -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=%cd%\mrob -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE=%cd%\mrob || EXIT /B !ERRORLEVEL!
+cmake --build build --config Release -j %NUMBER_OF_PROCESSORS% || EXIT /B !ERRORLEVEL!
 EXIT /B 0
