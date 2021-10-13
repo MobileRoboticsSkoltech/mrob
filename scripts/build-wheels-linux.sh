@@ -14,7 +14,7 @@
 #  limitations under the License.
 # 
 # 
-#  build-wheels.sh
+#  build-wheels-linux.sh
 # 
 #  Created on: Nov 28, 2020
 #       Author: Lyubov Miloserdova

@@ -14,7 +14,7 @@
 #  limitations under the License.
 # 
 # 
-#  build-wheels.sh
+#  build-wheels-macOS.sh
 # 
 #  Created on: Mar 22, 2021
 #       Author: Lyubov Miloserdova
