@@ -1,4 +1,4 @@
-name: Build macOS & Windows wheels
+name: Build wheels
 
 on: [push, pull_request, workflow_dispatch]
 
@@ -44,9 +44,14 @@ jobs:
           path: ./__init__.py
 
   build_wheel_linux:
-    runs-on: ubuntu-latest
+    name: Build wheel on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     container: quay.io/pypa/manylinux2010_x86_64
     needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
     steps:
       - name: "Install additional utils"
         run: yum install -y chrpath git openssh-clients
@@ -139,10 +144,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Setup Python 3.10
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.10
 
       - name: Build wheel
         run: .\scripts\build-wheels-windows.bat
@@ -162,7 +163,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-10.15, windows-2019]
-        python: [3.6, 3.7, 3.8, 3.9, 3.10]
+        python: [3.6, 3.7, 3.8, 3.9]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
