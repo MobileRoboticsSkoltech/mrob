@@ -175,6 +175,9 @@ jobs:
 
       - name: Download artifacts
         uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: ./artifact
 
       - name: Install mrob & numpy
         if: matrix.os == 'windows-2019'

@@ -33,7 +33,7 @@ cd ..
 
 mkdir .\build || popd && EXIT /B !ERRORLEVEL!
 mkdir .\mrob || popd && EXIT /B !ERRORLEVEL!
-cp __init__.py .\mrob\__init__.py || popd && EXIT /B !ERRORLEVEL!
+mv __init__.py .\mrob\__init__.py || popd && EXIT /B !ERRORLEVEL!
 
 
 for /D %%P in (C:\hostedtoolcache\windows\Python\3*) do CALL :build %%P\x64\python.exe || popd && EXIT /B !ERRORLEVEL!
