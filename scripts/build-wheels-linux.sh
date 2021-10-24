@@ -48,7 +48,7 @@ do
 done
 
 cd ../
-chrpath -r '$ORIGIN' ../mrob/mrob.*.so
+chrpath -r '$ORIGIN' ./mrob/mrob.*.so
 ${LATEST}python3 -m pip install $([[ -n "$VIRTUAL_ENV" ]] || echo "--user") -q build auditwheel argparse
 ${LATEST}python3 ./scripts/getInit.py -output-path ./mrob/__init__.py
 ${LATEST}python3 -m build --wheel --outdir ./dist/ .
