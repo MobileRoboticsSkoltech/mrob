@@ -28,9 +28,7 @@ export LC_ALL=C
 chrpath --version && cmake --version
 
 cd $(dirname $(readlink -f "${BASH_SOURCE[0]}"))/..
-mkdir -p ./build ./dist ./mrob
-
-cp ./__init__.py ./mrob/__init__.py 
+mkdir -p ./build ./dist ./mrob 
 
 cd ./build
 
@@ -49,8 +47,11 @@ do
     && cmake --build . -j $(nproc)
 done
 
+cd ../
+python3 ./scripts/getInit.py -output-path ./mrob/__init__.py
+
 chrpath -r '$ORIGIN' ../mrob/mrob.*.so
 ${LATEST}python3 -m pip install $([[ -n "$VIRTUAL_ENV" ]] || echo "--user") -q build auditwheel
-${LATEST}python3 -m build --wheel --outdir ../dist/ ..
-auditwheel repair ../dist/*.whl
+${LATEST}python3 -m build --wheel --outdir ./dist/ .
+auditwheel repair ./dist/*.whl
 
