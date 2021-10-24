@@ -126,7 +126,7 @@ jobs:
           python-version: 3.9
 
       - name: Build wheel
-        run: .\scripts\build-wheels-windows.bat
+        run: .\scripts\build-wheels-windows.cmd
         env:
           PYTHONPATH: .\mrob
 
