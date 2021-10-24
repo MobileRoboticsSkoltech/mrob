@@ -1,21 +1,11 @@
-import argparse
 import mrob
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-output-path", 
-    metavar="PATH",
-    type=str,
-    help="Specify path to resulting __init__.py file", 
-    required=True
-)
-args = parser.parse_args()
+print('from mrob import mrob\n')
 
-with open(args.output_path, 'w') as f:
-    f.write("from mrob import mrob\n\n")
-    for x in dir(mrob):
-        if not (len(x) > 2 and x[0] == '_' and x[1] == '_') and x.count('.') == 0:
-            f.write(x + " = mrob." + x + "\n")
+for module in dir(mrob):
+    n = len(module)-1
+    if not (module[:2] == '__' and module[n:n-2:-1] == '__') and module.count('.') == 0:
+        print(module + ' = mrob.' + module)
 
-    f.write("\ndel(mrob)")
+print('\ndel(mrob)')

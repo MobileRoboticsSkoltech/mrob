@@ -37,7 +37,7 @@ mkdir .\mrob || popd && EXIT /B !ERRORLEVEL!
 
 for /D %%P in (C:\hostedtoolcache\windows\Python\3*) do CALL :build %%P\x64\python.exe || popd && EXIT /B !ERRORLEVEL!
 
-python .\scripts\getInit.py -output-path .\mrob\__init__.py || popd && EXIT /B !ERRORLEVEL!
+python .\scripts\getInit.py > .\mrob\__init__.py || popd && EXIT /B !ERRORLEVEL!
 
 python -m pip install --user -q build || popd && EXIT /B !ERRORLEVEL!
 python -m build --wheel --outdir dist . || popd && EXIT /B !ERRORLEVEL!

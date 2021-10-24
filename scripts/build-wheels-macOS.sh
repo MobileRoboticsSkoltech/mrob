@@ -45,7 +45,7 @@ do
 done
 
 cd ../
-python3 ./scripts/getInit.py -output-path ./mrob/__init__.py
+python3 ./scripts/getInit.py > ./mrob/__init__.py
 
 python3 -m pip install --user -q build
 python3 -m build --wheel --outdir dist/ .
