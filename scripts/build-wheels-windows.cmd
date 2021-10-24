@@ -14,7 +14,7 @@
 ::  limitations under the License.
 :: 
 :: 
-::  build-wheels-windows.bat
+::  build-wheels-windows.cmd
 :: 
 ::  Created on: Sep 17, 2021
 ::       Author: Lyubov Miloserdova
