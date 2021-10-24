@@ -48,7 +48,7 @@ do
 done
 
 cd ../
-python3 ./scripts/getInit.py -output-path ./mrob/__init__.py
+python ./scripts/getInit.py -output-path ./mrob/__init__.py
 
 chrpath -r '$ORIGIN' ../mrob/mrob.*.so
 ${LATEST}python3 -m pip install $([[ -n "$VIRTUAL_ENV" ]] || echo "--user") -q build auditwheel
