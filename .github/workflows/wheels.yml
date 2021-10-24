@@ -66,7 +66,7 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: artifact
-          path: ./build/wheelhouse
+          path: ./wheelhouse
 
 
   build_wheel_macOS:
