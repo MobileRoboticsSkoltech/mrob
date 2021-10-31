@@ -27,6 +27,7 @@ export MACOSX_DEPLOYMENT_TARGET=10.9
 
 cd $(dirname $(greadlink -f "${BASH_SOURCE[0]}"))/..
 mkdir -p ./build ./dist ./mrob
+cp ./__init__.py ./mrob/__init__.py 
 
 cd ./build
 
@@ -45,8 +46,6 @@ do
 done
 
 cd ../
-python3 ./scripts/getInit.py > ./mrob/__init__.py
-
 python3 -m pip install --user -q build
 python3 -m build --wheel --outdir dist/ .
 
