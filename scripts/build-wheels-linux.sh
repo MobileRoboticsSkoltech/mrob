@@ -44,13 +44,14 @@ do
     LATEST=${PYBIN}
     cmake -S .. -B . \
              -DPYTHON_EXECUTABLE:FILEPATH=${PYBIN}python3 \
+             -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE \
+             -DCMAKE_INSTALL_RPATH='$ORIGIN' \
              -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/../bin \
              -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$PWD/../mrob \
     && cmake --build . -j $(nproc)
 done
 
 cd ../
-chrpath -r '$ORIGIN' ./mrob/mrob.*.so
 ${LATEST}python3 -m pip install $([[ -n "$VIRTUAL_ENV" ]] || echo "--user") -q build auditwheel
 ${LATEST}python3 -m build --wheel --outdir ./dist/ .
 auditwheel repair ./dist/*.whl

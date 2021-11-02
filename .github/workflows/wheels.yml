@@ -47,7 +47,7 @@ jobs:
         os: [ubuntu-latest]
     steps:
       - name: "Install additional utils"
-        run: yum install -y chrpath git openssh-clients
+        run: yum install -y git openssh-clients
 
       - uses: actions/checkout@v1
         with:

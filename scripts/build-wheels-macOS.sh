@@ -37,7 +37,6 @@ echo "Running $NUMPROC parallel jobs"
 for PYBIN in /Users/runner/hostedtoolcache/Python/3.*/x64/bin/python3.[5-9]
 do
     cmake .. -DPYTHON_EXECUTABLE:FILEPATH=$PYBIN \
-             -DCMAKE_MACOSX_RPATH=ON \
              -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE \
              -DCMAKE_INSTALL_RPATH="@loader_path" \
              -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/../bin \
