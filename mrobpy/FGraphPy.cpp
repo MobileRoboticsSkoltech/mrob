@@ -33,6 +33,7 @@
 #include "mrob/factors/nodePose3d.hpp"
 #include "mrob/factors/factor1Pose3d.hpp"
 #include "mrob/factors/factor2Poses3d.hpp"
+#include "mrob/factors/factor2Poses3d2obs.hpp"
 #include "mrob/factors/nodeLandmark3d.hpp"
 #include "mrob/factors/factor1Pose1Landmark3d.hpp"
 #include "mrob/factors/nodeLandmark2d.hpp"
@@ -126,6 +127,16 @@ public:
         auto nO = this->get_node(nodeOriginId);
         auto nT = this->get_node(nodeTargetId);
         std::shared_ptr<mrob::Factor> f(new mrob::Factor2Poses3d(obs,nO,nT,obsInvCov, updateNodeTarget, robust_type_));
+        this->add_factor(f);
+        return f->get_id();
+    }
+
+    factor_id_t add_factor_2poses_3d_2obs(const SE3 &obs, const SE3 &obs2, uint_t nodeOriginId, uint_t nodeTargetId,
+                                     const py::EigenDRef<const Mat6> obsInvCov)
+    {
+        auto nO = this->get_node(nodeOriginId);
+        auto nT = this->get_node(nodeTargetId);
+        std::shared_ptr<mrob::Factor> f(new mrob::Factor2Poses3d2obs(obs,obs2,nO,nT,obsInvCov, robust_type_));
         this->add_factor(f);
         return f->get_id();
     }
@@ -307,6 +318,13 @@ void init_FGraph(py::module &m)
                             py::arg("nodeTargetId"),
                             py::arg("obsInvCov"),
                             py::arg("updateNodeTarget") = false)
+            .def("add_factor_2poses_3d_2obs", &FGraphPy::add_factor_2poses_3d_2obs,
+                             "Factors connecting 2 poses with 2 observations.",
+                             py::arg("obs"),
+                             py::arg("obs2"),
+                             py::arg("nodeOriginId"),
+                             py::arg("nodeTargetId"),
+                             py::arg("obsInvCov"))
             // -----------------------------------------------------------------------------
             // Landmark or Point 3D
             .def("add_node_landmark_3d", &FGraphPy::add_node_landmark_3d,
