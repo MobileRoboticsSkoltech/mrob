@@ -44,8 +44,9 @@ Factor2Poses3d2obs::Factor2Poses3d2obs(const Mat4 &observation, const Mat4 &obse
         neighbourNodes_.push_back(nodeTarget);
         neighbourNodes_.push_back(nodeOrigin);
 
-        // inverse observations to correctly modify this
-        Tobs_.inv();
+        // If order reversed, then the new chain looks like T * o2^-1 * To * obs1         
+        Tobs_ = SE3(observation2).inv();
+        Tobs2_ = SE3(observation).inv();
     }
 
 }
@@ -66,7 +67,8 @@ Factor2Poses3d2obs::Factor2Poses3d2obs(const SE3 &observation, const SE3 &observ
         neighbourNodes_.push_back(nodeOrigin);
 
         // inverse observations to correctly modify this
-        Tobs_.inv();
+        Tobs_ = SE3(observation2).inv();
+        Tobs2_ = SE3(observation).inv();
     }
 
 }
