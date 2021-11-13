@@ -20,11 +20,14 @@
 #               miloslubov@gmail.com
 #
 
-from mrob import mrob
+try:
+    from mrob import mrob
 
-for module in dir(mrob):
-    n = len(module) - 1
-    if not (module[:2] == '__' and module[n:n-2:-1] == '__') and module.count('.') == 0:
-        globals()[module] = getattr(mrob, module)
+    for module in dir(mrob):
+        n = len(module) - 1
+        if not (module[:2] == '__' and module[n:n-2:-1] == '__') and module.count('.') == 0:
+            globals()[module] = getattr(mrob, module)
 
-del(mrob)
+    del(mrob)
+except ImportError:
+    raise ImportError("You don't have Microsoft Visual C++ installed. Please follow the link and install redistributable package: https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160#visual-studio-2015-2017-2019-and-2022") from None

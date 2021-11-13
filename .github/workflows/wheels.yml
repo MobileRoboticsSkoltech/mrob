@@ -15,24 +15,22 @@ jobs:
         with:
           submodules: recursive
 
-      - name: "Install required packages from distro"
+      - name: Install required packages from distro
         run: |
             sudo apt-get update
             sudo apt-get install -y --no-install-recommends git build-essential g++ cmake python3-distutils python3-dev python3-numpy python3-pip
             python3 -m pip install pytest
-
-      - name: "Configure and build native mrob library with Python bindings"
+      - name: Configure and build native mrob library with Python bindings
         run: |
             mkdir -p build
             cmake -S $PWD -B $PWD/build \
              -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/bin \
              -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$PWD/lib \
             && cmake --build build -j $(nproc)  
-
-      - name: "C++ unit tests"
+      - name: C++ unit tests
         run: make test -C build
 
-      - name: "Python unit tests"
+      - name: Python unit tests
         run: python3 -m pytest mrobpy
 
 
@@ -46,19 +44,18 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     steps:
-      - name: "Install additional utils"
+      - name: Install additional utils
         run: yum install -y git openssh-clients
 
       - uses: actions/checkout@v1
         with:
           submodules: recursive
 
-      - name: "Install fresh CMake into ManyLinux container"
+      - name: Install fresh CMake into ManyLinux container
         run: |
             env pybin=$(LANG=C ls -d1r /opt/python/cp3*/bin | head -n 1) bash -c '$pybin/python -m pip install cmake && mkdir -p /usr/local/bin && ln -svf $pybin/cmake /usr/local/bin/cmake'
             cmake --version
-
-      - name: "Build Python wheels"
+      - name: Build Python wheel
         run: scripts/build-wheels-linux.sh
 
       - uses: actions/upload-artifact@v1
@@ -94,13 +91,14 @@ jobs:
 
 
   build_wheel_windows:
-    name: Build wheel on ${{ matrix.os }}
+    name: Build wheel on ${{ matrix.os }} ${{ matrix.arch }}
     needs: build
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [windows-2019]
+        arch: [x64, x86]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -112,41 +110,42 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.6
+          architecture: ${{ matrix.arch }}
       - name: Setup Python 3.7
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
+          architecture: ${{ matrix.arch }}
       - name: Setup Python 3.8
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+          architecture: ${{ matrix.arch }}
       - name: Setup Python 3.9
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+          architecture: ${{ matrix.arch }}
       - name: Setup Python 3.10
         uses: actions/setup-python@v2
         with:
           python-version: '3.10'
+          architecture: ${{ matrix.arch }}
 
       - name: Build wheel
-        run: .\scripts\build-wheels-windows.cmd
-
+        run: .\scripts\build-wheels-windows.cmd ${{ matrix.arch }}
       - uses: actions/upload-artifact@v2
         with:
           path: .\dist
 
-  test_wheel:
-    name: Test Python ${{ matrix.python }} wheel on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    needs: 
-      - build_wheel_linux
-      - build_wheel_macOS
-      - build_wheel_windows
+
+  test_wheel_linux:
+    name: Test Python ${{ matrix.python }} wheel on Linux
+    runs-on: ubuntu-latest
+    needs: build_wheel_linux
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-10.15, windows-2019]
         python: ['3.6', '3.7', '3.8', '3.9', '3.10']
     steps:
       - name: Checkout
@@ -161,27 +160,108 @@ jobs:
         uses: actions/download-artifact@v2
 
       - name: Install mrob & numpy
-        if: matrix.os == 'windows-2019'
-        run: |
-          python -m pip install .\artifact\$(dir artifact -Name | findstr mrob-.*-win_amd64.whl) numpy pytest
-
-      - name: Install mrob & numpy
-        if: matrix.os == 'macos-10.15'
-        run: |
-          python -m pip install ./artifact/mrob-*-macosx_10_9_x86_64.whl numpy pytest
-
-      - name: Install mrob & numpy
-        if: matrix.os == 'ubuntu-latest'
         run: |
           python -m pip install ./artifact/mrob-*-manylinux*.whl numpy pytest
+      - name: "Python unit tests"
+        run: |
+          python -m pytest mrobpy
+
+  test_wheel_macos:
+    name: Test Python ${{ matrix.python }} wheel on macOS
+    runs-on: macos-latest
+    needs: build_wheel_macos
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.6', '3.7', '3.8', '3.9', '3.10']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Install mrob & numpy
+        run: |
+          python -m pip install ./artifact/mrob-*-macosx_10_9_x86_64.whl numpy pytest
+      - name: "Python unit tests"
+        run: |
+          python -m pytest mrobpy
+          
+  test_wheel_windows64:
+    name: Test Python ${{ matrix.python }} wheel on Windows 64bit
+    runs-on: windows-latest
+    needs: build_wheel_windows
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.6', '3.7', '3.8', '3.9', '3.10']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Install mrob & numpy
+        run: |
+          python -m pip install .\artifact\$(dir artifact -Name | findstr mrob-.*-win_amd64.whl) numpy pytest
 
       - name: "Python unit tests"
         run: |
           python -m pytest mrobpy
 
+
+  test_wheel_windows32:
+    name: Test Python ${{ matrix.python }} wheel on Windows 32bit
+    runs-on: windows-latest
+    needs: build_wheel_windows
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.6', '3.7', '3.8', '3.9', '3.10']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+          architecture: x86
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Install mrob & numpy
+        run: |
+          python -m pip install .\artifact\$(dir artifact -Name | findstr mrob-.*-win32.whl) numpy 
+
+      - name: "Python unit tests"
+        run: |
+          $files = Get-ChildItem -Path python_examples -Include *.py
+          foreach ($f in $files){
+            python $f.FullName || EXIT /B !ERRORLEVEL!
+          }
+
+
   publish_pypi:
     name: Publish wheels to PyPI
-    needs: test_wheel
+    needs: 
+      - test_wheel_linux
+      - test_wheel_macos
+      - test_wheel_windows64
+      - test_wheel_windows32
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:
@@ -197,7 +277,11 @@ jobs:
 
   publish-github-release:
     name: Publish wheels to GitHub Releases
-    needs: test_wheel
+    needs: 
+      - test_wheel_linux
+      - test_wheel_macos
+      - test_wheel_windows64
+      - test_wheel_windows32
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     runs-on: ubuntu-latest
     steps:

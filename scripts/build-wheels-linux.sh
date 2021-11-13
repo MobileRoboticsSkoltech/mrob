@@ -25,7 +25,7 @@ set -euo pipefail
 export LC_ALL=C
 
 #Early check for build tools
-chrpath --version && cmake --version
+cmake --version
 
 cd $(dirname $(readlink -f "${BASH_SOURCE[0]}"))/..
 
@@ -39,11 +39,11 @@ echo "Running $NUMPROC parallel jobs"
 
 LATEST=""
 
-for PYBIN in /opt/python/cp3*/bin/
+for PYBIN in /opt/python/cp3*/bin/python
 do
     LATEST=${PYBIN}
     cmake -S .. -B . \
-             -DPYTHON_EXECUTABLE:FILEPATH=${PYBIN}python3 \
+             -DPYTHON_EXECUTABLE:FILEPATH=${PYBIN} \
              -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE \
              -DCMAKE_INSTALL_RPATH='$ORIGIN' \
              -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/../bin \
@@ -52,7 +52,7 @@ do
 done
 
 cd ../
-${LATEST}python3 -m pip install $([[ -n "$VIRTUAL_ENV" ]] || echo "--user") -q build auditwheel
-${LATEST}python3 -m build --wheel --outdir ./dist/ .
+${LATEST} -m pip install $([[ -n "$VIRTUAL_ENV" ]] || echo "--user") -q build auditwheel
+${LATEST} -m build --wheel --outdir ./dist/ .
 auditwheel repair ./dist/*.whl
 
