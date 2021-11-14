@@ -166,6 +166,7 @@ jobs:
         run: |
           python -m pytest mrobpy
 
+
   test_wheel_macos:
     name: Test Python ${{ matrix.python }} wheel on macOS
     runs-on: macos-latest
@@ -192,7 +193,8 @@ jobs:
       - name: "Python unit tests"
         run: |
           python -m pytest mrobpy
-          
+
+
   test_wheel_windows64:
     name: Test Python ${{ matrix.python }} wheel on Windows 64bit
     runs-on: windows-latest
