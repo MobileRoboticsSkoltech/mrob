@@ -20,17 +20,11 @@
 #               miloslubov@gmail.com
 #
 
-from mrob import mrob
+from . import mrob
 
-FGraph = mrob.FGraph
-GN = mrob.GN
-LEVENBERG_MARQUARDT_ELLIP = mrob.LEVENBERG_MARQUARDT_ELLIP
-LEVENBERG_MARQUARDT_SPHER = mrob.LEVENBERG_MARQUARDT_SPHER 
-LM = mrob.LM
-NEWTON_RAPHSON = mrob.NEWTON_RAPHSON
-geometry = mrob.geometry
-optimMethod = mrob.optimMethod 
-ostream_redirect = mrob.ostream_redirect
-registration = mrob.registration
+for module in dir(mrob):
+    n = len(module) - 1
+    if not (module[:2] == '__' and module[n:n-2:-1] == '__') and module.count('.') == 0:
+        globals()[module] = getattr(mrob, module)
 
-del(mrob)
+del mrob

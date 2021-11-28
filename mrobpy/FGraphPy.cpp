@@ -209,7 +209,7 @@ void init_FGraph(py::module &m)
         .value("LM", FGraphSolve::optimMethod::LM)
         .export_values()
         ;
-    py::enum_<Factor::robustFactorType>(m, "FGraph.robutsFactorType")
+    py::enum_<Factor::robustFactorType>(m, "FGraph.robustFactorType")
         .value("QUADRATIC", Factor::robustFactorType::QUADRATIC)
         .value("CAUCHY", Factor::robustFactorType::CAUCHY)
         .value("HUBER", Factor::robustFactorType::HUBER)

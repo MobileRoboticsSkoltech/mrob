@@ -14,7 +14,7 @@
 #  limitations under the License.
 # 
 # 
-#  build-wheels.sh
+#  build-wheel-macOS.sh
 # 
 #  Created on: Mar 22, 2021
 #       Author: Lyubov Miloserdova
@@ -35,10 +35,9 @@ cd ./build
 NUMPROC=$(sysctl -n hw.ncpu)
 echo "Running $NUMPROC parallel jobs"
 
-for PYBIN in /Users/runner/hostedtoolcache/Python/3.*/x64/bin/python3.[5-9]
+for PYBIN in /Users/runner/hostedtoolcache/Python/3.*/x64/bin/python3.*
 do
     cmake .. -DPYTHON_EXECUTABLE:FILEPATH=$PYBIN \
-             -DCMAKE_MACOSX_RPATH=ON \
              -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE \
              -DCMAKE_INSTALL_RPATH="@loader_path" \
              -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/../bin \
@@ -49,4 +48,3 @@ done
 cd ../
 python3 -m pip install --user -q build
 python3 -m build --wheel --outdir dist/ .
-
