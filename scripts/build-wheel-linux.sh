@@ -14,7 +14,7 @@
 #  limitations under the License.
 # 
 # 
-#  build-wheels.sh
+#  build-wheel-linux.sh
 # 
 #  Created on: Nov 28, 2020
 #       Author: Lyubov Miloserdova
@@ -25,32 +25,32 @@ set -euo pipefail
 export LC_ALL=C
 
 #Early check for build tools
-chrpath --version && cmake --version
+cmake --version
 
 cd $(dirname $(readlink -f "${BASH_SOURCE[0]}"))/..
+
 mkdir -p ./build ./dist ./mrob
-
 cp ./__init__.py ./mrob/__init__.py 
-
-cd ./build
 
 NUMPROC=$(nproc)
 echo "Running $NUMPROC parallel jobs"
 
 LATEST=""
-
-for PYBIN in /opt/python/cp3*/bin/
+cd ./build
+for PYBIN in /opt/python/cp3*/bin/python
 do
     LATEST=${PYBIN}
     cmake -S .. -B . \
-             -DPYTHON_EXECUTABLE:FILEPATH=${PYBIN}python3 \
+             -DPYTHON_EXECUTABLE:FILEPATH=${PYBIN} \
+             -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE \
+             -DCMAKE_INSTALL_RPATH='$ORIGIN' \
              -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$PWD/../bin \
              -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$PWD/../mrob \
     && cmake --build . -j $(nproc)
 done
+cd ../
 
-chrpath -r '$ORIGIN' ../mrob/mrob.*.so
-${LATEST}python3 -m pip install $([[ -n "$VIRTUAL_ENV" ]] || echo "--user") -q pep517 auditwheel
-${LATEST}python3 -m pep517.build ../
-auditwheel repair ../dist/*.whl
+${LATEST} -m pip install $([[ -n "$VIRTUAL_ENV" ]] || echo "--user") -q build auditwheel
+${LATEST} -m build --wheel --outdir ./dist/ .
+auditwheel repair ./dist/*.whl
 

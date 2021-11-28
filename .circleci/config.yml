@@ -40,7 +40,7 @@ jobs:
     steps:
       - run:
           name: "Install additional utils"
-          command: yum install -y chrpath git openssh-clients
+          command: yum install -y git openssh-clients
       - checkout
       - run:
           name: "Install fresh CMake into ManyLinux container"
@@ -52,14 +52,14 @@ jobs:
           command: git submodule update --init --recursive
       - run:
           name: "Build Python wheels"
-          command: scripts/build-wheels.sh
+          command: scripts/build-wheel-linux.sh
       - store_artifacts:
-          path: /root/project/build/wheelhouse
+          path: /root/project/wheelhouse
           destination: ~/artifacts
       - persist_to_workspace:
           root: ~/
           paths:
-            - project/build/wheelhouse
+            - project/wheelhouse
   test-wheel:
     docker:
       - image: cimg/base:stable
@@ -74,7 +74,7 @@ jobs:
           command: |
             sudo apt-get update
             sudo apt-get install -y --no-install-recommends python3-pip
-            python3 -m pip install ~/project/build/wheelhouse/mrob*.whl numpy
+            python3 -m pip install ~/project/wheelhouse/mrob*.whl numpy
             python3 -m pip install pytest scipy matplotlib
       - run:
           name: "Python unit tests"
@@ -89,12 +89,12 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-              VERSION=v$(ls ~/project/build/wheelhouse/*.whl | cut -f2 -d-)
+              VERSION=v$(ls ~/project/wheelhouse/*.whl | cut -f2 -d-)
               ghr -t "${GITHUB_TOKEN}" \
                   -u "${CIRCLE_PROJECT_USERNAME}" \
                   -r "${CIRCLE_PROJECT_REPONAME}" \
                   -c "${CIRCLE_SHA1}" \
-                  ${VERSION} ~/project/build/wheelhouse/*.whl
+                  ${VERSION} ~/project/wheelhouse/*.whl
   publish-pypi:
     docker:
       - image: cimg/python:3.9
@@ -110,7 +110,7 @@ jobs:
               password = $PYPI_PASSWORD
               EOD
               python3 -m pip install --user --upgrade twine
-              twine upload ~/project/build/wheelhouse/*.whl
+              twine upload ~/project/wheelhouse/*.whl
 
 # Jobs for branches are run by default, but jobs for tags MUST be turned on explicitly
 # for ALL dependencies too, not only for the single job.
