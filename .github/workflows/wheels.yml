@@ -96,7 +96,7 @@ jobs:
     runs-on: windows-2019
     strategy:
       fail-fast: false
-     matrix:
+      matrix:
         arch: [x64, x86]
     steps:
       - uses: actions/checkout@v2
