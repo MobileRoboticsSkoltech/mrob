@@ -37,8 +37,9 @@ using namespace mrob;
 
 
 void init_geometry(py::module &m) {
-    py::class_<SE3>(m, "SE3")
-		.def(py::init<>(),
+    py::class_<SE3> se3(m, "SE3");
+
+    se3.def(py::init<>(),
 				"The Default constructor creates the identity transformation",
 				py::return_value_policy::copy)
         .def(py::init<const Mat4 &>(),
