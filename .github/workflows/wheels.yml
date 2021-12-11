@@ -138,7 +138,7 @@ jobs:
   test_wheel:
     name: Test Python ${{ matrix.python }} wheel on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    needs: [build_wheel_linux, build_wheel_macOS]
+    needs: [build_wheel_linux, build_wheel_macOS, build_wheel_windows]
     if: ${{ always() && contains(needs.*.result, 'success') }}
     strategy:
       fail-fast: false

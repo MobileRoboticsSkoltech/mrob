@@ -53,6 +53,15 @@ cmake ..
 make -j
 ```
 
+If you need to use this library in Python code, you can install it using pip:
+`pip install mrob`
+
+**Note:** If your OS is Windows and you don't have Microsoft Visual C++ Redistributable package installed, 
+then you need to [install it](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-160#visual-studio-2015-2017-2019-and-2022) additionally.
+If you are using a 32-bit Python, then install the package for the X86 architecture. 
+If you are using 64-bit Python, then install the package for the X64 architecture. 
+Don't be afraid to install both packages.
+
 
 ## License
 Apache-2.0 License
