@@ -191,7 +191,7 @@ jobs:
       - name: Install mrob & numpy on Windows 32bit
         if: ${{ matrix.os == 'windows-2019' }}
         run: |
-          python -m pip install .\artifact\$(dir artifact -Name | findstr mrob-.*-win32.whl) numpy 
+          python -m pip install .\artifact\$(dir artifact -Name | findstr mrob-.*-win32.whl) numpy
 
       - name: Python unit tests
         if: ${{ matrix.os != 'windows-2019' }}
