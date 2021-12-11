@@ -26,7 +26,7 @@ import setuptools
 
 try:
     from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
-    import platform, os
+    import platform, os, ctypes
 
     class bdist_wheel(_bdist_wheel):
 
@@ -46,7 +46,10 @@ try:
                 version = os.getenv('MACOSX_DEPLOYMENT_TARGET').replace('.', '_')
                 plat = name + "_" + version + "_" + arch
             elif platform.system() == "Windows":
-                plat = "win_" + platform.machine().lower()
+                if ctypes.sizeof(ctypes.c_voidp) * 8 > 32:
+                    plat = "win_" + platform.machine().lower()
+                else:
+                    plat = "win32"
             return python, abi, plat
 
 except ImportError:
