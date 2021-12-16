@@ -355,7 +355,6 @@ void FGraphSolve::build_info_adjacency()
     // If any EF, we should combine both solutions
     if (eigen_factors_.size() > 0 )
     {
-        std::cout << "Adding EF's\n";
         L_ += hessianEF_.selfadjointView<Eigen::Upper>();
         b_ += gradientEF_;
     }

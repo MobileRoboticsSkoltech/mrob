@@ -48,39 +48,32 @@ void EigenFactorPlane::evaluate_jacobians()
     // Assumes residuals evaluated beforehand
     J_.clear();
     H_.clear();
-    // for all nodes, calculate jacobian
-    uint_t nodeIdLocal = 0;
     for (auto &Qt: Q_)
     {
         Mat61 jacobian = Mat61::Zero();
+        Mat6 hessian = Mat6::Zero();
         Mat4 dQ = Mat4::Zero();
         for (uint_t i = 0 ; i < 6; i++)
         {
-            dQ = SE3GenerativeMatrix(i)*Qt + Qt*SE3GenerativeMatrix(i);
+            dQ = SE3GenerativeMatrix(i)*Qt + Qt*SE3GenerativeMatrix(i).transpose();
             jacobian(i) = planeEstimation_.dot(dQ*planeEstimation_);
 
-        }
-        J_.push_back(jacobian);
-
-        //now calculate Hessian here. Upper triangular view
-        Mat6 hessian = Mat6::Zero();
-        Mat4 ddQ;
-        for (uint_t i =0 ; i< 6 ; ++i)
-        {
+            //now calculate Hessian here. Upper triangular view
+            Mat4 ddQ; // second derivative of the Q matrix
             for (uint_t j = i ; j< 6 ; ++j)
             {
                 ddQ.setZero();
                 ddQ = SE3GenerativeMatrix(i)*SE3GenerativeMatrix(j) + SE3GenerativeMatrix(j)*SE3GenerativeMatrix(i);
                 //compound operator *= as in a*=b (this multiplies on the right: a*=b is equivalent to a = a*b)
                 ddQ *= 0.5 * Qt;
-                ddQ += SE3GenerativeMatrix(i) * dQ;
+                ddQ += SE3GenerativeMatrix(i) * dQ;// esto sigue estando mal, swap indexes para cumplir la formula
                 ddQ += ddQ.transpose().eval();
                 hessian(i,j) = planeEstimation_.dot(ddQ*planeEstimation_);
             }
         }
+        J_.push_back(jacobian);
         H_.push_back(hessian);
 
-        nodeIdLocal++;
     }
 }
 
@@ -146,7 +139,6 @@ void EigenFactorPlane::calculate_all_matrices_S(bool reset)
     {
         for (auto &vectorPoints: allPlanePoints_)
         {
-            std::cout << "So we are here in S's\n";
             Mat4 S = Mat4::Zero();
             for (Mat31 &p : vectorPoints)
             {

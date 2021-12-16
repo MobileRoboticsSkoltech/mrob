@@ -151,6 +151,11 @@ protected:
      * elements. The same applies for other structures containing matrices
      */
     std::deque<factor_id_t> nodeIds_;
+    /**
+     * Mapping from the FG nodes IDs to the local indexes in the current EF.
+     * This conversion is necessary to maintain consistency in case of
+     * non-subsequent observations
+     */
     std::unordered_map<factor_id_t, uint_t> reverseNodeIds_;
     /**
      * The Jacobian of the plane error, the poses involved.

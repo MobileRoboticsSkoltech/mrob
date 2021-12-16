@@ -20,7 +20,7 @@ def draw_planes(synthetic,traj=[]):
     open3d.visualization.draw_geometries(pcds)
 
 N_points = 500
-N_planes = 3
+N_planes = 4
 N_poses = 2
 
 synthetic = mrob.registration.CreatePoints(N_points,N_planes,N_poses, 0.05, 0.1) #point noise, bias noise
@@ -40,7 +40,7 @@ for t in range(N_poses):
     # It is an ordered progression 0:N-1, no need for dict
     print('Pose node id = ', n1)
 
-graph.add_factor_1pose_3d(mrob.geometry.SE3(),0,1e9*np.identity(6))
+graph.add_factor_1pose_3d(mrob.geometry.SE3(),0,1e3*np.identity(6))
 
 for t in range(N_poses):
     print('Processing pose ', t)
@@ -53,13 +53,15 @@ for t in range(N_poses):
                                    point = p,
                                    W = 1.0)
 
+print('Initial error = ', graph.chi2(True))
 # Does it require a better initialization?? with median?
-graph.solve(mrob.LM_ELLIPS,3)
+graph.solve(mrob.LM_ELLIPS,1)
 if 0:
     import matplotlib.pyplot as plt
     L = graph.get_information_matrix()
     plt.spy(L, marker='o', markersize=5)
     plt.title('Information matrix $\Lambda$')
+    print(L)
     plt.show()
 draw_planes(synthetic, graph.get_estimated_state())
-graph.print(True)
+#graph.print(True)
