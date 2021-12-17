@@ -66,7 +66,7 @@ void EigenFactorPlane::evaluate_jacobians()
                 ddQ = SE3GenerativeMatrix(i)*SE3GenerativeMatrix(j) + SE3GenerativeMatrix(j)*SE3GenerativeMatrix(i);
                 //compound operator *= as in a*=b (this multiplies on the right: a*=b is equivalent to a = a*b)
                 ddQ *= 0.5 * Qt;
-                ddQ += SE3GenerativeMatrix(i) * dQ;// esto sigue estando mal, swap indexes para cumplir la formula
+                ddQ += SE3GenerativeMatrix(j) * dQ;
                 ddQ += ddQ.transpose().eval();
                 hessian(i,j) = planeEstimation_.dot(ddQ*planeEstimation_);
             }
@@ -159,6 +159,7 @@ void EigenFactorPlane::calculate_all_matrices_Q()
     {
         Mat4 T = this->neighbourNodes_[nodeIdLocal]->get_state();
         // Use the corresponding matrix S
+        std::cout << "curent transform = " << T << std::endl;
         Mat4 Q;
         Q.noalias() =  T * S * T.transpose();
         Q_.push_back(Q);
