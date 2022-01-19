@@ -25,6 +25,17 @@
 
 SETLOCAL EnableDelayedExpansion
 
+If "%~1"=="x64" (
+    SET plat="x64" || EXIT /B !ERRORLEVEL!
+) else (
+    If "%~1"=="x86" (
+        SET plat="Win32" || EXIT /B !ERRORLEVEL!
+    ) else (
+        echo Illegal argument: the argument must be set to x64 or x86
+        EXIT /B 1
+    )
+) 
+
 :: Early check for build tools
 cmake --version || EXIT /B !ERRORLEVEL!
 
@@ -36,7 +47,7 @@ mkdir .\mrob || popd && EXIT /B !ERRORLEVEL!
 copy .\__init__.py .\mrob\__init__.py || popd && EXIT /B !ERRORLEVEL!
 
 
-for /D %%P in (C:\hostedtoolcache\windows\Python\3*) do CALL :build %%P\x64\python.exe || popd && EXIT /B !ERRORLEVEL!
+for /D %%P in (C:\hostedtoolcache\windows\Python\3*) do CALL :build %plat% %%P\%~1\python.exe || popd && EXIT /B !ERRORLEVEL!
 
 python -m pip install --user -q build || popd && EXIT /B !ERRORLEVEL!
 python -m build --wheel --outdir dist . || popd && EXIT /B !ERRORLEVEL!
@@ -45,6 +56,6 @@ popd
 EXIT /B 0
 
 :build
-cmake -S . -B build -G "Visual Studio 16 2019" -A "x64" -DPYTHON_EXECUTABLE:FILEPATH=%~1 -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=%cd%\mrob -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE=%cd%\mrob || EXIT /B !ERRORLEVEL!
+cmake -S . -B build -G "Visual Studio 16 2019" -A "%~1" -DPYTHON_EXECUTABLE:FILEPATH=%~2 -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=%cd%\mrob -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE=%cd%\mrob || EXIT /B !ERRORLEVEL!
 cmake --build build --config Release -j %NUMBER_OF_PROCESSORS% || EXIT /B !ERRORLEVEL!
 EXIT /B 0
