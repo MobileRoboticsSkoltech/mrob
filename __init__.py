@@ -23,6 +23,10 @@
 try:
     from . import mrob
 
+    from pkg_resources import get_distribution
+
+    __version__ = get_distribution('mrob').version
+
     for module in dir(mrob):
         n = len(module) - 1
         if not (module[:2] == '__' and module[n:n-2:-1] == '__') and module.count('.') == 0:
