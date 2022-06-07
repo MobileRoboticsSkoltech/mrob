@@ -55,7 +55,7 @@ for t in range(N_poses):
 
 print('Initial error = ', graph.chi2(True))
 # Does it require a better initialization?? with median?
-graph.solve(mrob.LM_ELLIPS,1)
+graph.solve(mrob.LM_ELLIPS,10)
 if 0:
     import matplotlib.pyplot as plt
     L = graph.get_information_matrix()

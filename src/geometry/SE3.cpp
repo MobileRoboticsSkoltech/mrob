@@ -298,10 +298,15 @@ bool mrob::isSE3(const Mat4 &T)
     return true;
 }
 
+// Here we deine a global variable inside the file of this class, to be copied
+const std::vector<Mat4> LieGenerative{
 
+};
+
+
+// DEPRECATED?
 Mat4 mrob::SE3GenerativeMatrix(uint_t coordinate)
 {
-    // TODO this should be better be a global variable...
     Mat4 G = Mat4::Zero();
     switch(coordinate)
     {

@@ -66,7 +66,7 @@ void EigenFactorPlane::evaluate_jacobians()
                 ddQ = SE3GenerativeMatrix(i)*SE3GenerativeMatrix(j) + SE3GenerativeMatrix(j)*SE3GenerativeMatrix(i);
                 //compound operator *= as in a*=b (this multiplies on the right: a*=b is equivalent to a = a*b)
                 ddQ *= 0.5 * Qt;
-                ddQ += SE3GenerativeMatrix(j) * dQ;
+                ddQ += SE3GenerativeMatrix(j) * dQ;//here indices should be different, later Hessian is symmetric.
                 ddQ += ddQ.transpose().eval();
                 hessian(i,j) = planeEstimation_.dot(ddQ*planeEstimation_);
             }
