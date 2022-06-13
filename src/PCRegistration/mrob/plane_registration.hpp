@@ -40,6 +40,8 @@ namespace mrob{
 /**
  * class PlaneRegistration introduced a class for the alignment of
  * planes.
+ *
+ * TO BE DEPRECATED
  */
 class PlaneRegistration: public OptimizerDense{
 
@@ -110,9 +112,13 @@ class PlaneRegistration: public OptimizerDense{
     void reset_solution();
     double get_current_error() const;
     /**
-     * Get trajectory returns a SE3 transformations,
+     * Get pose from trajectory, a SE3 transformations,
      */
-    SE3 get_trajectory(uint_t time);
+    SE3 get_pose(uint_t time);
+    /**
+      * Get trajectory returns a SE3 transformations,
+      */
+    std::vector<SE3>& get_trajectory();
 
     SE3 get_last_pose() {return trajectory_->back();}
 
@@ -183,6 +189,7 @@ class PlaneRegistration: public OptimizerDense{
     uint_t time_{};
     std::unordered_map<uint_t, std::shared_ptr<Plane>> planes_;
     std::shared_ptr<std::vector<SE3>> trajectory_;
+    std::vector<SE3> temporary_trajectory_;
     SE3 bookept_trajectory_;//last pose is stored/bookept
     double tau_ {};//variable for weighting the number of poses in traj
     uint_t solveIters_ {};

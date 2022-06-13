@@ -379,12 +379,21 @@ std::vector<Mat31> PlaneRegistration::get_point_cloud(uint_t time)
 	return aggregated_pc;
 }
 
-SE3 PlaneRegistration::get_trajectory(uint_t time)
+SE3 PlaneRegistration::get_pose(uint_t time)
 {
     assert(time < numberPoses_ && "CreatePoints::getPointCloud: temporal index larger than number of calculated poses\n");
     if (time < numberPoses_ )
         return trajectory_->at(time);
     return SE3();
+}
+
+std::vector<SE3>& PlaneRegistration::get_trajectory()
+{
+    // this implementation is not to break much the current class structure, but having in mind it should disapear
+    temporary_trajectory_.clear();
+    for (SE3 pose : *trajectory_)
+        temporary_trajectory_.push_back(pose);
+    return temporary_trajectory_;
 }
 
 void PlaneRegistration::print(bool plotPlanes) const
