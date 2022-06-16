@@ -79,7 +79,7 @@ void EigenFactorPlane::evaluate_jacobians()
 
 void EigenFactorPlane::evaluate_chi2()
 {
-    chi2_ = planeError_;//not really an evaluation...should we do again?
+    chi2_ = planeError_;
 }
 
 void EigenFactorPlane::add_point(const Mat31& p, std::shared_ptr<Node> &node, matData_t &W)
@@ -144,7 +144,7 @@ void EigenFactorPlane::calculate_all_matrices_S(bool reset)
             {
                 Mat41 pHomog;
                 pHomog << p , 1.0;
-                S += pHomog * pHomog.transpose();//TODO add coeficient W here...
+                S += pHomog * pHomog.transpose();//TODO robust: add coeficient W here...
             }
             S_.push_back(S);
         }
@@ -159,7 +159,6 @@ void EigenFactorPlane::calculate_all_matrices_Q()
     {
         Mat4 T = this->neighbourNodes_[nodeIdLocal]->get_state();
         // Use the corresponding matrix S
-        std::cout << "curent transform = " << T << std::endl;
         Mat4 Q;
         Q.noalias() =  T * S * T.transpose();
         Q_.push_back(Q);

@@ -382,11 +382,11 @@ void FGraphSolve::build_info_EF()
             // Updating Jacobian, b should has been previously calculated
             Mat61 J = f->get_jacobian(indNode);
             gradientEF_.block<6,1>(indNodesMatrix_[indNode],0) += J;//TODO robust weight would go here
-            std::cout << "Jacobian = " << J.transpose() << std::endl;
+            //std::cout << "Jacobian = " << J.transpose() << std::endl;
 
             // Updating the Hessian
             Mat6 H = f->get_hessian(indNode);
-            std::cout << "Hessian = " << H << std::endl;
+            //std::cout << "Hessian = " << H << std::endl;
             uint_t startingIndex = indNodesMatrix_[indNode];//XXX this should be change (someday) to a proper table for any ordering
             // XXX if EF ever connected a node that is not 6D, then this will not hold.
             for (uint_t i = 0; i < 6; i++)
