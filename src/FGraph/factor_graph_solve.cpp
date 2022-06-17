@@ -30,6 +30,7 @@
 #include <Eigen/SparseLU>
 #include <Eigen/SparseCholesky>
 #include <Eigen/SparseQR>
+#include <unordered_map>
 
 using namespace mrob;
 using namespace std;
@@ -206,30 +207,26 @@ uint_t FGraphSolve::optimize_levenberg_marquardt(uint_t maxIters)
 
 void FGraphSolve::build_adjacency()
 {
-    // 0) resize properly matrices (if needed)
+    // 1) resize properly matrices (if needed)
     r_.resize(obsDim_,1);//dense vector TODO is it better to reserve and push_back??
     A_.resize(obsDim_, stateDim_);//Sparse matrix clear data
     W_.resize(obsDim_, obsDim_);//TODO should we reinitialize this all the time? an incremental should be fairly easy
 
-    // 1) create the vector's structures
-    std::deque<std::shared_ptr<Factor> >* factors;
-    std::deque<std::shared_ptr<Node> >* nodes;
-    // TODO: optimizing subgraph is not an option now, but we maintain generality
-    factors = &factors_;
-    nodes = &nodes_;
 
     // 2) vector structure to bookkeep the starting Nodes indices inside A
 
-    // 2.2) Node indexes bookeept
-    std::vector<uint_t> indNodesMatrix;
-    indNodesMatrix.reserve(nodes->size());
+    // 2.2) Node indexes bookeept. We use a map to ensure the index from nodes to the current active_node
+    //std::vector<uint_t> indNodesMatrix;
+    std::unordered_map<factor_id_t, factor_id_t > indNodesMatrix;
+    //indNodesMatrix.reserve(nodes->size());
 
     N_ = 0;
-    for (size_t i = 0; i < nodes->size(); ++i)
+    for (size_t i = 0; i < active_nodes_.size(); ++i)
     {
         // calculate the indices to access
-        uint_t dim = (*nodes)[i]->get_dim();
-        indNodesMatrix.push_back(N_);
+        uint_t dim = active_nodes_[i]->get_dim();
+        factor_id_t id = active_nodes_[i]->get_id();
+        indNodesMatrix.emplace(id,N_);
         N_ += dim;
 
     }
@@ -240,12 +237,12 @@ void FGraphSolve::build_adjacency()
     reservationA.reserve( obsDim_ );
     std::vector<uint_t> reservationW;
     reservationW.reserve( obsDim_ );
-    std::vector<uint_t> indFactorsMatrix;
-    indFactorsMatrix.reserve(factors->size());
+    std::vector<factor_id_t> indFactorsMatrix;
+    indFactorsMatrix.reserve(factors_.size());
     M_ = 0;
-    for (uint_t i = 0; i < factors->size(); ++i)
+    for (uint_t i = 0; i < factors_.size(); ++i)
     {
-        auto f = (*factors)[i];
+        auto f = factors_[i];
         f->evaluate_residuals();
         f->evaluate_jacobians();
         f->evaluate_chi2();
@@ -267,9 +264,9 @@ void FGraphSolve::build_adjacency()
 
 
     // XXX This could be subject to parallelization, maybe on two steps: eval + build
-    for (uint_t i = 0; i < factors->size(); ++i)
+    for (factor_id_t i = 0; i < factors_.size(); ++i)
     {
-        auto f = (*factors)[i];
+        auto f = factors_[i];
 
         // 4) Get the calculated residual
         r_.block(indFactorsMatrix[i], 0, f->get_dim(), 1) <<  f->get_residual();
@@ -284,13 +281,13 @@ void FGraphSolve::build_adjacency()
             // Iterates over the number of neighbour Nodes (ordered by construction)
             for (uint_t j=0; j < neighNodes->size(); ++j)
             {
-                uint_t indNode = (*neighNodes)[j]->get_id();
+                factor_id_t id = (*neighNodes)[j]->get_id();
                 uint_t dimNode = (*neighNodes)[j]->get_dim();
                 for(uint_t k = 0; k < dimNode; ++k)
                 {
                     // order according to the permutation vector
                     uint_t iRow = indFactorsMatrix[i] + l;
-                    uint_t iCol = indNodesMatrix[indNode] + k;
+                    uint_t iCol = indNodesMatrix[id] + k;
                     // This is an ordered insertion
                     A_.insert(iRow,iCol) = f->get_jacobian()(l, k + totalK);
                 }
@@ -351,28 +348,28 @@ matData_t FGraphSolve::chi2(bool evaluateResidualsFlag)
 void FGraphSolve::update_nodes()
 {
     int acc_start = 0;
-    for (uint_t i = 0; i < nodes_.size(); i++)
+    for (uint_t i = 0; i < active_nodes_.size(); i++)
     {
         // node update is the negative of dx just calculated.
         // x = x - alpha * H^(-1) * Grad = x - dx
         // Depending on the optimization, it is already taking care of the step alpha, so we assume alpha = 1
-        auto node_update = -dx_.block(acc_start, 0, nodes_[i]->get_dim(), 1);
-        nodes_[i]->update(node_update);
+        auto node_update = -dx_.block(acc_start, 0, active_nodes_[i]->get_dim(), 1);
+        active_nodes_[i]->update(node_update);
 
-        acc_start += nodes_[i]->get_dim();
+        acc_start += active_nodes_[i]->get_dim();
     }
 }
 
 void FGraphSolve::synchronize_nodes_auxiliary_state()
 {
-    for (auto &&n : nodes_)
+    for (auto &&n : active_nodes_)
         n->set_auxiliary_state(n->get_state());
 }
 
 
 void FGraphSolve::synchronize_nodes_state()
 {
-    for (auto &&n : nodes_)
+    for (auto &&n : active_nodes_)
         n->set_state(n->get_auxiliary_state());
 }
 

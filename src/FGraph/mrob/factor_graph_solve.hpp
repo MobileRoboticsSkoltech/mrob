@@ -218,8 +218,8 @@ protected:
     // Variables for solving the FGraph
     matrixMethod matrixMethod_;
 
-    uint_t N_; // total number of state variables
-    uint_t M_; // total number of observation variables
+    factor_id_t N_; // total number of state variables
+    factor_id_t M_; // total number of observation variables
 
     SMatRow A_; //Adjacency matrix, as a Row sparse matrix
     SMatRow W_; //A block diagonal information matrix. For types Adjacency it calculates its block transposed squared root

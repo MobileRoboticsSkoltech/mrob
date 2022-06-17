@@ -119,13 +119,15 @@ protected:
 	 since it has fast access and does no require memory allocation
      *
      */
-    //std::unordered_set<std::shared_ptr<Node> >   nodes_;
-    std::deque<std::shared_ptr<Node> >   nodes_; // added as they appear. Removing them is not an efficient option for now
+    //All nodes in the system. The index Id corresponds to the position in this vector
+    std::deque<std::shared_ptr<Node> >   nodes_;
+    // Only active nodes, here the index does not guarantee anything.
+    std::deque<std::shared_ptr<Node> >   active_nodes_;
 
     //std::unordered_set<std::shared_ptr<Factor> > factors_;
     std::deque<std::shared_ptr<Factor> > factors_; // no specific order needed
 
-    // This requires a special list for the factors
+    // This requires a special list for the factors. Ids will duplicate for standard factors
     std::deque<std::shared_ptr<Factor> > eigen_factors_;
 
     /**

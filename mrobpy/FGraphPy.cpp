@@ -71,9 +71,9 @@ public:
      */
     FGraphPy(mrob::Factor::robustFactorType robust_type = mrob::Factor::robustFactorType::QUADRATIC) :
         FGraphSolve(FGraphSolve::matrixMethod::ADJ), robust_type_(robust_type) {}
-    factor_id_t add_node_pose_2d(const py::EigenDRef<const Mat31> x)
+    factor_id_t add_node_pose_2d(const py::EigenDRef<const Mat31> x, mrob::Node::nodeMode mode)
     {
-        std::shared_ptr<mrob::Node> n(new mrob::NodePose2d(x));
+        std::shared_ptr<mrob::Node> n(new mrob::NodePose2d(x,mode));
         this->add_node(n);
         return n->get_id();
     }
@@ -107,9 +107,9 @@ public:
         this->add_node(n);
         return n->get_id();
     }*/
-    factor_id_t add_node_pose_3d(const SE3 &x)
+    factor_id_t add_node_pose_3d(const SE3 &x, mrob::Node::nodeMode mode)
     {
-        std::shared_ptr<mrob::Node> n(new mrob::NodePose3d(x));
+        std::shared_ptr<mrob::Node> n(new mrob::NodePose3d(x,mode));
         this->add_node(n);
         return n->get_id();
     }
@@ -132,9 +132,9 @@ public:
     
     // 3D Landmarks
     // ------------------------------------------------------------------------------------
-    factor_id_t add_node_landmark_3d(const py::EigenDRef<const Mat31> x)
+    factor_id_t add_node_landmark_3d(const py::EigenDRef<const Mat31> x, mrob::Node::nodeMode mode)
     {
-        std::shared_ptr<mrob::Node> n(new mrob::NodeLandmark3d(x));
+        std::shared_ptr<mrob::Node> n(new mrob::NodeLandmark3d(x,mode));
         this->add_node(n);
         return n->get_id();
     }
@@ -151,9 +151,9 @@ public:
 
     // 2D Landmarks
     // ------------------------------------------------------------------------------------
-    factor_id_t add_node_landmark_2d(const py::EigenDRef<const Mat21> x)
+    factor_id_t add_node_landmark_2d(const py::EigenDRef<const Mat21> x, mrob::Node::nodeMode mode)
     {
-        std::shared_ptr<mrob::Node> n(new mrob::NodeLandmark2d(x));
+        std::shared_ptr<mrob::Node> n(new mrob::NodeLandmark2d(x,mode));
         this->add_node(n);
         return n->get_id();
     }
@@ -171,9 +171,9 @@ public:
     // There is a problem with scaling of long distances (d->inf n->0), but well, this
     // is not a minimal representation. For finite distances should be fine.
     // ------------------------------------------------------------------------------------
-    factor_id_t add_node_plane_4d(const py::EigenDRef<const Mat41> x)
+    factor_id_t add_node_plane_4d(const py::EigenDRef<const Mat41> x, mrob::Node::nodeMode mode)
     {
-        std::shared_ptr<mrob::Node> n(new mrob::NodePlane4d(x));
+        std::shared_ptr<mrob::Node> n(new mrob::NodePlane4d(x, mode));
         this->add_node(n);
         return n->get_id();
     }
@@ -217,6 +217,12 @@ void init_FGraph(py::module &m)
         .value("RANSAC", Factor::robustFactorType::RANSAC)
         .export_values()
         ;
+    py::enum_<Node::nodeMode>(m, "FGraph.nodeMode")
+    .value("NODE_STANDARD", Node::nodeMode::STANDARD)
+    .value("NODE_ANCHOR", Node::nodeMode::ANCHOR)
+    .value("NODE_SCHUR_MARGI", Node::nodeMode::SCHUR_MARGI)
+    .export_values()
+    ;
     // Fgraph class adding factors and providing method to solve the inference problem.
     py::class_<FGraphPy> (m,"FGraph")
             .def(py::init<Factor::robustFactorType>(),
@@ -266,7 +272,9 @@ void init_FGraph(py::module &m)
             // Specific call to 2D
             .def("add_node_pose_2d", &FGraphPy::add_node_pose_2d,
                     " - arguments, initial estimate (np.zeros(3)\n"
-                    "output, node id, for later usage")
+                    "output, node id, for later usage",
+                    py::arg("x"),
+                    py::arg("mode") = Node::nodeMode::STANDARD)
             .def("add_factor_1pose_2d", &FGraphPy::add_factor_1pose_2d)
             .def("add_factor_2poses_2d", &FGraphPy::add_factor_2poses_2d,
                     "Factors connecting 2 poses. If last input set to true (by default false), also updates "
@@ -287,7 +295,9 @@ void init_FGraph(py::module &m)
             // 2d Landmkarks
             .def("add_node_landmark_2d", &FGraphPy::add_node_landmark_2d,
                     "Landmarks are 2D points, in [x,y]. It requries initialization, "
-                    "although factor 1pose 1land 2d can initialize with the inverse observation function")
+                    "although factor 1pose 1land 2d can initialize with the inverse observation function",
+                    py::arg("x"),
+                    py::arg("mode") = Node::nodeMode::STANDARD)
             .def("add_factor_1pose_1landmark_2d", &FGraphPy::add_factor_1pose_1landmark_2d,
                     "Factor connecting 1 pose and 1 point (landmark).",
                     py::arg("obs"),
@@ -298,7 +308,9 @@ void init_FGraph(py::module &m)
             // -----------------------------------------------------------------------------
             // Specific call to 3D
             .def("add_node_pose_3d", &FGraphPy::add_node_pose_3d,
-                    "Input are 3D poses, as Lie Algebra of RBT around the Identity")
+                    "Input are poses in 3D, as Lie Algebra of RBT around the Identity",
+                    py::arg("x"),
+                    py::arg("mode") = Node::nodeMode::STANDARD)
             .def("add_factor_1pose_3d", &FGraphPy::add_factor_1pose_3d)
             .def("add_factor_2poses_3d", &FGraphPy::add_factor_2poses_3d,
                             "Factors connecting 2 poses. If last input set to true (by default false), also updates the value of the target Node according to the new obs + origin node",
@@ -310,7 +322,9 @@ void init_FGraph(py::module &m)
             // -----------------------------------------------------------------------------
             // Landmark or Point 3D
             .def("add_node_landmark_3d", &FGraphPy::add_node_landmark_3d,
-                    "Ladmarks are 3D points, in [x,y,z]")
+                    "Ladmarks are 3D points, in [x,y,z]",
+                    py::arg("x"),
+                    py::arg("mode") = Node::nodeMode::STANDARD)
             .def("add_factor_1pose_1landmark_3d", &FGraphPy::add_factor_1pose_1landmark_3d,
                             "Factor connecting 1 pose and 1 point (landmark).",
                             py::arg("obs"),
@@ -321,7 +335,9 @@ void init_FGraph(py::module &m)
             // -----------------------------------------------------------------------------
             // Plane 4d Landmark to Pose 3D
             .def("add_node_plane_4d", &FGraphPy::add_node_plane_4d,
-                    "Panes are points in P^3, in [nx,ny,nz, d]")
+                    "Panes are points in P^3, in [nx,ny,nz, d]",
+                    py::arg("x"),
+                    py::arg("mode") = Node::nodeMode::STANDARD)
             .def("add_factor_1pose_1plane_4d", &FGraphPy::add_factor_1pose_1plane_4d,
                             "Factor observing a plane(landmark) from the current pose.",
                             py::arg("obs"),

@@ -39,11 +39,11 @@ class NodePose3d : public Node
      * 
      * Note that the dimensionality of this node is 6, that is the DOF
      */
-    NodePose3d(const Mat4 &initial_x);
+    NodePose3d(const Mat4 &initial_x, Node::nodeMode mode = STANDARD);
     /**
      * Initialization directly on SE3 a matrix
      */
-    NodePose3d(const SE3 &initial_x);
+    NodePose3d(const SE3 &initial_x, Node::nodeMode mode = STANDARD);
     ~NodePose3d()  override = default;
     /**
      * Left update operation corresponds to
