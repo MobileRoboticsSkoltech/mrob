@@ -7,7 +7,11 @@ import numpy as np
 graph = mrob.FGraph()
 
 #initial point at [0,0,0] with some noise
-n1 = graph.add_node_pose_2d(np.zeros(3), mrob.NODE_ANCHOR)
+n1 = graph.add_node_pose_2d(np.random.randn(3)*0.0005)
+#n1 = graph.add_node_pose_2d(np.zeros(3)*0.0005)# hay un problem aqui cuando se inicia con el def constructor
+W_0 = np.identity(3)
+graph.add_factor_1pose_2d(np.zeros(3),n1,1e6*W_0)
+#n1 = graph.add_node_pose_2d(np.zeros(3), mrob.NODE_ANCHOR)
 # non-initialized landmarks, but they could be initialiazed when adding factors
 # In case of 2d landmarks, they might be sensitive to IC, around 0 of initiakl pose and landmark On those cases might (rearely) GN fail to converge.
 l1 = graph.add_node_landmark_2d(np.array([0,0]))

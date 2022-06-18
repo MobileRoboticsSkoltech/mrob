@@ -62,6 +62,8 @@ void FGraphSolve::solve(optimMethod method, uint_t maxIters, matData_t lambda, m
     solutionTolerance_ = solutionTolerance;
     time_profiles_.reset();
 
+    assert(stateDim_ > 0 && "FGraphSolve::solve: empty node state");
+
     // Optimization
     switch(method)
     {
@@ -207,6 +209,7 @@ uint_t FGraphSolve::optimize_levenberg_marquardt(uint_t maxIters)
 
 void FGraphSolve::build_adjacency()
 {
+    assert(obsDim_ > 0 && "FGraphSolve::build_adjacency: empty observations vector");
     // 1) resize properly matrices (if needed)
     r_.resize(obsDim_,1);//dense vector TODO is it better to reserve and push_back??
     A_.resize(obsDim_, stateDim_);//Sparse matrix clear data
@@ -281,12 +284,16 @@ void FGraphSolve::build_adjacency()
             // Iterates over the number of neighbour Nodes (ordered by construction)
             for (uint_t j=0; j < neighNodes->size(); ++j)
             {
+                // check for node if it is an anchor node, then skip emplacement of Jacobian in the Adjacency
+                if ((*neighNodes)[j]->get_node_mode() == Node::nodeMode::ANCHOR)
+                    continue;//skip this loop
                 factor_id_t id = (*neighNodes)[j]->get_id();
                 uint_t dimNode = (*neighNodes)[j]->get_dim();
                 for(uint_t k = 0; k < dimNode; ++k)
                 {
                     // order according to the permutation vector
                     uint_t iRow = indFactorsMatrix[i] + l;
+                    // In release mode, indexes outside will not trigger an exception
                     uint_t iCol = indNodesMatrix[id] + k;
                     // This is an ordered insertion
                     A_.insert(iRow,iCol) = f->get_jacobian()(l, k + totalK);
