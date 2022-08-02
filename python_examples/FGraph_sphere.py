@@ -113,9 +113,7 @@ with open(file_path, 'r') as file:
 graph = mrob.FGraph()
 x = vertex_ini[0]
 print(x.T())
-n = graph.add_node_pose_3d(x)
-W = np.eye(6)
-graph.add_factor_1pose_3d(x,n,1e5*W)
+n = graph.add_node_pose_3d(x,mrob.NODE_ANCHOR)
 processing_time = []
 
 # start events, we solve for each node, adding it and it corresponding factors
