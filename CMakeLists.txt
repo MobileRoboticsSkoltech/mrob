@@ -60,6 +60,9 @@ ADD_SUBDIRECTORY(./src/PCRegistration)
 #INCLUDE_DIRECTORIES(./src/EigenFactors)
 #ADD_SUBDIRECTORY(./src/EigenFactors)
 
+INCLUDE_DIRECTORIES(./src/VI)
+ADD_SUBDIRECTORY(./src/VI)
+
 
 # ===================================================================
 # New modules should be included here
