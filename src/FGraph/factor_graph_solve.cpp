@@ -180,7 +180,7 @@ uint_t FGraphSolve::optimize_levenberg_marquardt(uint_t maxIters)
         // 1.3) check for convergence
         if (deltaChi2 < solutionTolerance_)
         {
-        	std::cout << "\nFGraphSolve::optimize_levenberg_marquardt: Converged Successfully" << std::endl;
+            std::cout << "\nFGraphSolve::optimize_levenberg_marquardt: Converged Successfully" << std::endl;
             return iter;
         }
 
@@ -291,7 +291,7 @@ void FGraphSolve::build_adjacency()
                 // check for node if it is an anchor node, then skip emplacement of Jacobian in the Adjacency
                 if ((*neighNodes)[j]->get_node_mode() == Node::nodeMode::ANCHOR)
                 {
-                	totalK += dimNode;// we need to account for the dim in the Jacobian, to read the next block
+                    totalK += dimNode;// we need to account for the dim in the Jacobian, to read the next block
                     continue;//skip this loop
                 }
                 factor_id_t id = (*neighNodes)[j]->get_id();
