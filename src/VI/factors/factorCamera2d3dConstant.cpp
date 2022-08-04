@@ -47,9 +47,10 @@ FactorCamera2d3dConstant::FactorCamera2d3dConstant(const Mat21 &observation,
 void FactorCamera2d3dConstant::evaluate_residuals()
 {
     Mat4 Tx = get_neighbour_nodes()->at(0)->get_state();
-    Mat31 point = get_neighbour_nodes()->at(1)->get_state();
-    Mat<3,4> K = get_neighbour_nodes()->at(2)->get_state();
-    Mat31 p_camera = SE3(Tx).transform(point);
+    Mat31 P = get_neighbour_nodes()->at(1)->get_state();
+    Mat41 K = get_neighbour_nodes()->at(2)->get_state();
+    P_camera_coord_ = SE3(Tx).transform(P);
+    r_ = CameraPinhole::project(K,P);
 }
 void FactorCamera2d3dConstant::evaluate_jacobians()
 {

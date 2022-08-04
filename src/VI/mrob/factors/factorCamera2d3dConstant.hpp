@@ -28,6 +28,7 @@
 #include "mrob/matrix_base.hpp"
 #include "mrob/SE3.hpp" //requires including and linking SE3 library
 #include "mrob/factor.hpp"
+#include "mrob/factors/nodeCameraPinhole.hpp"
 
 namespace mrob{
 
@@ -75,6 +76,7 @@ protected:
     Mat21 obs_, r_;
     Mat2 W_;
     Mat<2,6> J_;
+    Mat31 P_camera_coord_;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW // as proposed by Eigen

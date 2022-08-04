@@ -4,11 +4,13 @@
 # extra source files
 SET(sources
     factors/factorCamera2d3dConstant.cpp
+    factors/nodeCameraPinhole.cpp
 )
 
 # extra header files
 SET(headers
     mrob/factors/factorCamera2d3dConstant.hpp
+    mrob/factors/nodeCameraPinhole.hpp
 )
 
 # create the shared library
