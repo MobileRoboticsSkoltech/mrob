@@ -59,7 +59,6 @@ class Factor;
  */
 
 class Node{
-
   public:
     enum nodeMode{STANDARD = 0, ANCHOR, SCHUR_MARGI};
 

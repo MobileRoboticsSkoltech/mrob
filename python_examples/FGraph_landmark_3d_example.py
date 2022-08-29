@@ -11,7 +11,7 @@ import numpy as np
 #graph = mrob.FGraph(mrob.MCCLURE)
 graph = mrob.FGraph(mrob.CAUCHY)
 
-xi = np.array([-0.0282668,  -0.05882867,  0.0945925,  -0.02430618,  0.01794402, -0.06549129])
+xi = np.array([-0.0282668, -0.05882867, 0.0945925, -0.02430618, 0.01794402, -0.06549129])
 n1 = graph.add_node_pose_3d(mrob.geometry.SE3(xi))# hay un problem aqui cuando se inicia con el def constructor
 # anchor factor
 W_0 = np.identity(6)
