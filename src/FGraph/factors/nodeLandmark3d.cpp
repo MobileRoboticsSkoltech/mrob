@@ -28,8 +28,8 @@
 
 using namespace mrob;
 
-NodeLandmark3d::NodeLandmark3d(const Mat31 &initial_x) :
-        Node(3), state_(initial_x), auxiliaryState_(initial_x)
+NodeLandmark3d::NodeLandmark3d(const Mat31 &initial_x, Node::nodeMode mode) :
+    Node(3, mode), state_(initial_x), auxiliaryState_(initial_x)
 {
     assert(initial_x.rows() == 3 && "NodeLandmark3d:: Incorrect dimension on initial state rows" );
     assert(initial_x.cols() == 1 && "NodeLandmark3d:: Incorrect dimension on initial state cols" );

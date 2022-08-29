@@ -72,7 +72,18 @@ factor_id_t FGraph::add_node(std::shared_ptr<Node> &node)
 {
 	node->set_id(nodes_.size());
 	nodes_.push_back(node);
-	stateDim_ += node->get_dim();
+	switch(node->get_node_mode())
+	{
+	    case Node::nodeMode::STANDARD:
+	        active_nodes_.push_back(node);
+	        stateDim_ += node->get_dim();
+	        break;
+	    case Node::nodeMode::ANCHOR:
+	        break;
+	    case Node::nodeMode::SCHUR_MARGI:
+	        assert(0 && "add_node::SCHUR_MARGI: Functionality not programmed yey");
+	        break;
+	}
 	return node->get_id();
 }
 

@@ -51,11 +51,18 @@ class Factor;
  *	Two states are kept at the same time:
  *	- (principal) state: used for factors evaluations, errors and Jacobians
  *	- auxiliary state: a book-keep state useful for partial updates
+ *
+ *	Node mode refer on how they will be processed further in the FGraph:
+ *	- Standard: process as usual
+ *	- Anchor: This node will be constant and insensitive to gradients (not processed). It must be correctly initialized
+ *	- Schur_margi: Node to be marginalized when using Schur
  */
 
 class Node{
   public:
-    Node(uint_t dim, uint_t potNumberFactors = 5);
+    enum nodeMode{STANDARD = 0, ANCHOR, SCHUR_MARGI};
+
+    Node(uint_t dim, nodeMode mode = STANDARD);
     virtual ~Node();
     /**
      * The update function, given any block vector it updates
@@ -115,11 +122,17 @@ class Node{
     const std::vector<std::shared_ptr<Factor> >*
             get_neighbour_factors(void) const {return &neighbourFactors_;}
 
+
+    void set_node_mode(nodeMode mode){node_mode_ = mode;}
+    nodeMode get_node_mode(){return node_mode_;}
+
+
   protected:
     // no oder needed here
     std::vector<std::shared_ptr<Factor> > neighbourFactors_;
     factor_id_t id_;
     uint_t dim_;
+    nodeMode node_mode_;
     /**
      * On this pure abstract class we can't define a vector state,
      * but we will return and process Ref<> to dynamic matrices.

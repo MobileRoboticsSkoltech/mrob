@@ -78,6 +78,12 @@ void Factor1Pose1Landmark2d::evaluate_residuals()
     dx_ = landmark_(0) - state_(0);
     dy_ = landmark_(1) - state_(1);
     q_ = dx_*dx_ + dy_*dy_;
+
+    if (q_ < 1e-6)
+    {
+        r_.setZero();
+        return;
+    }
     // r = [range, bearing]
     r_ << std::sqrt(q_),
          std::atan2(dy_,dx_) - state_(2);
@@ -94,6 +100,12 @@ void Factor1Pose1Landmark2d::evaluate_jacobians()
     Mat<2,2> Jl = Mat<2,2>::Zero();
     Jl << dx_/sqrt_q, dy_/sqrt_q,
           -dy_/q_,    dx_/q_;
+    // If that happens, the configuration is singular and no valid angle can be calcualted
+    if (q_ < 1e-6)
+    {
+        Jx.setIdentity();
+        Jl.setIdentity();
+    }
     if (!reversedNodeOrder_)
     {
         J_.topLeftCorner<2,3>() = Jx;

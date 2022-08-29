@@ -42,7 +42,7 @@ class NodeLandmark2d : public Node
     /**
      * For initialization, requires an initial estimation of the state.
      */
-    NodeLandmark2d(const Mat21 &initial_x);
+    NodeLandmark2d(const Mat21 &initial_x, Node::nodeMode mode = STANDARD);
     virtual ~NodeLandmark2d()  override = default;
 
     virtual void update(const Eigen::Ref<const MatX1> &dx);

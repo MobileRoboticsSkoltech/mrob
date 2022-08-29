@@ -14,6 +14,8 @@ def print_2d_graph(graph):
     x = graph.get_estimated_state()
     prev_p = np.zeros(3)
     plt.figure()
+    p = x[0]
+    plt.plot(p[0],p[0],'ob') 
     for p in x:
         #plt.plot(p[0],p[1],'ob')
         plt.plot((prev_p[0],p[0]),(prev_p[1],p[1]) , '-b')
@@ -50,9 +52,8 @@ with open('../benchmarks/M3500.txt', 'r') as file:
 # Initialize FG
 graph = mrob.FGraph()
 x = np.zeros(3)
-n = graph.add_node_pose_2d(x)
+n = graph.add_node_pose_2d(x,mrob.NODE_ANCHOR)
 print('node 0 id = ', n) # id starts at 1
-graph.add_factor_1pose_2d(x,n,1e9*np.identity(3))
 processing_time = []
 
 # start events, we solve for each node, adding it and it corresponding factors

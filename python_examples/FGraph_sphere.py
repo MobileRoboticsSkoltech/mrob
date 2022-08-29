@@ -15,7 +15,7 @@ def print_3d_graph(graph):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     x = graph.get_estimated_state()
-    To =  mrob.geometry.SE3(vertex_ini[0]) #XXX for some reason (ownership?) can't do this is 1 line
+    To = mrob.geometry.SE3(vertex_ini[0]) #XXX for some reason (ownership?) can't do this is 1 line
     prev_p =To.T()[:3,3]
     for xi in x:
         Ti = mrob.geometry.SE3(xi)
@@ -65,7 +65,7 @@ with open(file_path, 'r') as file:
             # transforming quaterntion to SE3
             quat = np.array([d[6],d[7],d[8],d[9]],dtype='float64')
             T = np.eye(4,dtype='float64')
-            T[:3,:3] =  mrob.geometry.quat_to_so3(quat)
+            T[:3,:3] = mrob.geometry.quat_to_so3(quat)
             T[0, 3] = d[3]
             T[1, 3] = d[4]
             T[2, 3] = d[5]
@@ -94,7 +94,7 @@ with open(file_path, 'r') as file:
             # transforming quaterntion to SE3
             quat = np.array([d[5],d[6],d[7],d[8]],dtype='float64')
             T = np.eye(4,dtype='float64')
-            T[:3,:3] =  mrob.geometry.quat_to_so3(quat)
+            T[:3,:3] = mrob.geometry.quat_to_so3(quat)
             T[0, 3] = d[2]
             T[1, 3] = d[3]
             T[2, 3] = d[4]
@@ -113,9 +113,7 @@ with open(file_path, 'r') as file:
 graph = mrob.FGraph()
 x = vertex_ini[0]
 print(x.T())
-n = graph.add_node_pose_3d(x)
-W = np.eye(6)
-graph.add_factor_1pose_3d(x,n,1e5*W)
+n = graph.add_node_pose_3d(x,mrob.NODE_ANCHOR)
 processing_time = []
 
 # start events, we solve for each node, adding it and it corresponding factors

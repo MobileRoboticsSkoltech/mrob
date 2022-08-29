@@ -36,7 +36,7 @@ class NodeLandmark3d : public Node
     /**
      * For initialization, requires an initial estimation of the state.
      */
-    NodeLandmark3d(const Mat31 &initial_x);
+    NodeLandmark3d(const Mat31 &initial_x, Node::nodeMode mode = STANDARD);
     //NodePose3d(const SE3 &initial_T);
     virtual ~NodeLandmark3d()  override = default;
 

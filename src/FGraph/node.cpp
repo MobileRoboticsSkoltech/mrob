@@ -25,10 +25,9 @@
 
 using namespace mrob;
 
-Node::Node(uint_t dim, uint_t potNumberFactors):
-		 id_(0), dim_(dim)
+Node::Node(uint_t dim, nodeMode mode):
+		 id_(0), dim_(dim), node_mode_(mode)
 {
-    neighbourFactors_.reserve( potNumberFactors );
 }
 
 Node::~Node()
