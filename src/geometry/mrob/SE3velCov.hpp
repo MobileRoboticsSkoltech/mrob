@@ -2,6 +2,7 @@
 #define SE3VELCOV_HPP_
 
 #include "mrob/SE3vel.hpp"
+#include "mrob/SE3cov.hpp"
 
 namespace mrob
 {
@@ -24,9 +25,6 @@ namespace mrob
         // transform(transform(cov)) = cov - self-inverse
         Mat9 transform(const Mat9 &covariance) const;
     };
-
-    Mat3 brackets(const Mat3 &A);
-    Mat3 brackets(const Mat3 &A, const Mat3 &B);
 
 } // end namespace
 

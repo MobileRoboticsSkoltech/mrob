@@ -31,7 +31,8 @@ class SE3vel{
         void Exp(const Mat91 &xi);
         Mat91 Ln(void) const;
 
-        void regenerate();        
+        void regenerate();
+     
     protected:
         Mat5 T_;
 };

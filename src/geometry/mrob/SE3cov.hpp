@@ -135,6 +135,8 @@ namespace mrob
      * @return Mat6
      */
     Mat6 curly_wedge(const Mat61& xi);
+    Mat3 brackets(const Mat3 &A);
+    Mat3 brackets(const Mat3 &A, const Mat3 &B);
 
 } // end namespace
 
