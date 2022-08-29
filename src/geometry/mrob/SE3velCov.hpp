@@ -25,8 +25,8 @@ namespace mrob
         Mat9 transform(const Mat9 &covariance) const;
     };
 
-    // Mat3 brackets(const Mat3 &A);
-    // Mat3 brackets(const Mat3 &A, const Mat3 &B);
+    Mat3 brackets(const Mat3 &A);
+    Mat3 brackets(const Mat3 &A, const Mat3 &B);
 
 } // end namespace
 

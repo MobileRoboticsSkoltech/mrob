@@ -3,12 +3,12 @@
 
 using namespace mrob;
 
-Mat3 brackets(const Mat3 &A)
+Mat3 mrob::brackets(const Mat3 &A)
 {
     return -A.trace() * Mat3::Identity() + A;
 }
 
-Mat3 brackets(const Mat3 &A, const Mat3 &B)
+Mat3 mrob::brackets(const Mat3 &A, const Mat3 &B)
 {
     return brackets(A) * brackets(B) + brackets(B * A);
 }
