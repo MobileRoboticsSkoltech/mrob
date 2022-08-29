@@ -9,12 +9,12 @@ SE3Cov::SE3Cov(const SE3& T, const Mat6 &cov): SE3(T), covariance_(cov){}
 
 SE3Cov::SE3Cov(const SE3Cov& pose):SE3(Mat4(pose.T())), covariance_(pose.cov()){}
 
-Mat3 brackets(const Mat3& A)
+Mat3 mrob::brackets(const Mat3& A)
 {
     return -A.trace()*Mat3::Identity() + A;
 }
 
-Mat3 brackets(const Mat3& A, const Mat3& B)
+Mat3 mrob::brackets(const Mat3& A, const Mat3& B)
 {
     return brackets(A)*brackets(B) + brackets(B*A);
 }
